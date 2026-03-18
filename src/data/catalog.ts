@@ -1,4 +1,6 @@
 import dynamicSystemPrompt from '../../docs/prompts/system/prompt.dynamic.md?raw'
+import result2DynamicSystemPrompt from '../../docs/prompts/system/math-visualization-system-prompt-v4.md?raw'
+import result2StaticSystemPrompt from '../../docs/prompts/system/math-visualization-system-prompt-v3.md?raw'
 import staticSystemPrompt from '../../docs/prompts/system/prompt.static.md?raw'
 import userPromptsRaw from './user-prompts.json?raw'
 
@@ -15,9 +17,15 @@ export interface PairItem {
   userPrompt: string
 }
 
-export const systemPromptByVariant: Record<Variant, string> = {
-  static: staticSystemPrompt,
-  dynamic: dynamicSystemPrompt,
+export const systemPromptByTabVariant: Record<RenderableResultTab, Record<Variant, string>> = {
+  result1: {
+    static: staticSystemPrompt,
+    dynamic: dynamicSystemPrompt,
+  },
+  result2: {
+    static: result2StaticSystemPrompt,
+    dynamic: result2DynamicSystemPrompt,
+  },
 }
 
 const userPromptMap = JSON.parse(userPromptsRaw) as PromptMap

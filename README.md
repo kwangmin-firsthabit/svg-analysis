@@ -71,3 +71,20 @@ export default defineConfig([
   },
 ])
 ```
+
+## Static Deployment (GitHub Pages)
+
+This repository includes `.github/workflows/deploy-pages.yml` for automatic deployment to GitHub Pages on every push to `main`.
+
+### One-time setup
+
+1. Go to `Settings > Pages` in your GitHub repository.
+2. Set Source to `GitHub Actions`.
+
+### Local pre-check
+
+```bash
+npm ci
+npm run generate
+npm run build -- --base="/<repo-name>/"
+```

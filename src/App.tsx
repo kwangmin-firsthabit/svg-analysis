@@ -2,7 +2,7 @@ import { useState } from 'react'
 import SvgRenderPanel from './components/SvgRenderPanel'
 import {
   resultPairsByTab,
-  systemPromptByVariant,
+  systemPromptByTabVariant,
   type RenderableResultTab,
   type ResultTab,
 } from './data/catalog'
@@ -73,7 +73,7 @@ export default function App() {
                       variant="static"
                       htmlSource={pair.staticHtml}
                       userPrompt={pair.userPrompt}
-                      systemPrompt={systemPromptByVariant.static}
+                      systemPrompt={systemPromptByTabVariant[activeTab].static}
                     />
                     {pair.dynamicHtml ? (
                       <SvgRenderPanel
@@ -81,7 +81,7 @@ export default function App() {
                         variant="dynamic"
                         htmlSource={pair.dynamicHtml}
                         userPrompt={pair.userPrompt}
-                        systemPrompt={systemPromptByVariant.dynamic}
+                        systemPrompt={systemPromptByTabVariant[activeTab].dynamic}
                       />
                     ) : (
                       <article className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6">

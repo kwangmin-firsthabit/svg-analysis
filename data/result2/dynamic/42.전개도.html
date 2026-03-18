@@ -1,0 +1,74 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 1 unit = 24px: a=72(3), b=96(4), c=120(5), h=240(10)
+const a = 72, b = 96, c = 120, h = 240;
+const rx = 196, ry = 110;
+
+// 세 직사각형
+svg.appendChild(el('rect', { x: rx, y: ry, width: a, height: h, fill: '#3B82F6', 'fill-opacity': '0.08', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+svg.appendChild(el('rect', { x: rx + a, y: ry, width: b, height: h, fill: '#3B82F6', 'fill-opacity': '0.08', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+svg.appendChild(el('rect', { x: rx + a + b, y: ry, width: c, height: h, fill: '#3B82F6', 'fill-opacity': '0.08', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+
+// 직각삼각형 3-4-5: 직각은 변 a(3)와 변 b(4) 사이
+// 위쪽 삼각형: rect1 상단(rx, ry)-(rx+a, ry) 를 밑변으로
+// 직각삼각형에서 a=3(가로), b=4(세로) 이므로
+// A=(rx, ry), B=(rx+a, ry), C=(rx, ry-b)
+const Ax = rx, Ay = ry;
+const Bx = rx + a, By = ry;
+const Cx = rx, Cy = ry - b;
+svg.appendChild(el('polygon', {
+  points: `${Ax},${Ay} ${Bx},${By} ${Cx},${Cy}`,
+  fill: '#3B82F6', 'fill-opacity': '0.08', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 아래쪽 삼각형: rect3 하단 우측
+// D=(rx+a+b, ry+h), E=(rx+a+b+c, ry+h), F=(rx+a+b+c, ry+h+b)
+const Dx = rx + a + b, Dy = ry + h;
+const Ex = rx + a + b + c, Ey = ry + h;
+const Fx = rx + a + b + c, Fy = ry + h + b;
+svg.appendChild(el('polygon', {
+  points: `${Dx},${Dy} ${Ex},${Ey} ${Fx},${Fy}`,
+  fill: '#3B82F6', 'fill-opacity': '0.08', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 치수 레이블: 직사각형 상단에 변 길이
+addText(Math.round(rx + a / 2), ry - 14, '3', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+addText(Math.round(rx + a + b / 2), ry - 14, '4', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+addText(Math.round(rx + a + b + c / 2), ry - 14, '5', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+
+// 높이 레이블: 오른쪽 직사각형 우측
+addText(Math.round(rx + a + b + c + 20), Math.round(ry + h / 2), '10', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+
+// 직각 표시 (위 삼각형)
+const sqS = 8;
+svg.appendChild(el('path', {
+  d: `M ${Ax + sqS},${Ay} L ${Ax + sqS},${Ay - sqS} L ${Ax},${Ay - sqS}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1'
+}));
+
+// 직각 표시 (아래 삼각형)
+svg.appendChild(el('path', {
+  d: `M ${Ex - sqS},${Ey} L ${Ex - sqS},${Ey + sqS} L ${Ex},${Ey + sqS}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1'
+}));
+
+// 제목
+addText(340, 468, '삼각기둥 전개도 (밑변 3, 4, 5 / 높이 10)', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+</script>
