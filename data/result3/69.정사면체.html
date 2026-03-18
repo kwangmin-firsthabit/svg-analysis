@@ -1,0 +1,240 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L8,3 z" fill="#475569"/>
+  </marker>
+</defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function project(x, y, z) {
+  return {
+    px: Math.round(x + z * Math.cos(Math.PI / 4) * 0.5),
+    py: Math.round(y - z * Math.sin(Math.PI / 4) * 0.5)
+  };
+}
+
+// a=6 정사면체
+const a = 6;
+const sqrt3 = Math.sqrt(3);
+const sqrt6 = Math.sqrt(6);
+
+// 3D 좌표 (수학적 좌표계, y가 위)
+// A=(0,0,0), B=(6,0,0), C=(3, 3√3, 0), D=(3, √3, 2√6)
+const pts3d = {
+  A: [0, 0, 0],
+  B: [a, 0, 0],
+  C: [a / 2, a * sqrt3 / 2, 0],
+  D: [a / 2, a * sqrt3 / 6, a * Math.sqrt(2 / 3)]
+};
+
+// 스케일 및 오프셋 설정
+// 중심 계산
+const centerX = (pts3d.A[0] + pts3d.B[0] + pts3d.C[0] + pts3d.D[0]) / 4;
+const centerY = (pts3d.A[1] + pts3d.B[1] + pts3d.C[1] + pts3d.D[1]) / 4;
+const centerZ = (pts3d.A[2] + pts3d.B[2] + pts3d.C[2] + pts3d.D[2]) / 4;
+
+const scale = 38;
+const offX = 230;
+const offY = 310;
+
+function toScreen(p3d) {
+  const sx = (p3d[0] - centerX) * scale;
+  const sy = -(p3d[1] - centerY) * scale; // y축 반전
+  const sz = (p3d[2] - centerZ) * scale;
+  const proj = project(sx, sy, sz);
+  return { px: offX + proj.px, py: offY + proj.py };
+}
+
+const sA = toScreen(pts3d.A);
+const sB = toScreen(pts3d.B);
+const sC = toScreen(pts3d.C);
+const sD = toScreen(pts3d.D);
+
+// 면 그리기 (뒤쪽 면 먼저)
+// 면 ABC: z=0 평면 (밑면), D가 앞위로 나옴
+// 보이는 면: ABD, ACD, BCD
+// 가려진 면: ABC (밑면, BC 모서리가 가려짐)
+
+// 면 ABD (왼쪽 앞면)
+svg.appendChild(el('polygon', {
+  points: `${sA.px},${sA.py} ${sB.px},${sB.py} ${sD.px},${sD.py}`,
+  fill: '#3B82F6',
+  'fill-opacity': '0.10',
+  stroke: 'none'
+}));
+
+// 면 ACD (오른쪽 앞면)
+svg.appendChild(el('polygon', {
+  points: `${sA.px},${sA.py} ${sC.px},${sC.py} ${sD.px},${sD.py}`,
+  fill: '#3B82F6',
+  'fill-opacity': '0.12',
+  stroke: 'none'
+}));
+
+// 면 BCD (뒤쪽 앞면)
+svg.appendChild(el('polygon', {
+  points: `${sB.px},${sB.py} ${sC.px},${sC.py} ${sD.px},${sD.py}`,
+  fill: '#3B82F6',
+  'fill-opacity': '0.08',
+  stroke: 'none'
+}));
+
+// 가려진 모서리: BC (밑면 뒤쪽)
+svg.appendChild(el('line', {
+  x1: sB.px, y1: sB.py,
+  x2: sC.px, y2: sC.py,
+  stroke: '#94A3B8',
+  'stroke-width': '1',
+  'stroke-dasharray': '5 4',
+  opacity: '0.5'
+}));
+
+// 보이는 모서리
+const edges = [
+  [sA, sB], [sA, sC], [sA, sD], [sB, sD], [sC, sD]
+];
+for (const [p1, p2] of edges) {
+  svg.appendChild(el('line', {
+    x1: p1.px, y1: p1.py,
+    x2: p2.px, y2: p2.py,
+    stroke: '#1D4ED8',
+    'stroke-width': '1.5',
+    opacity: '1'
+  }));
+}
+
+// 높이 표시: D에서 BCD 면의 무게중심(= A에서 대면의 수선 발)
+// 정사면체에서 A의 대면 = BCD
+// BCD 무게중심 G
+const Gx = (pts3d.B[0] + pts3d.C[0] + pts3d.D[0]) / 3;
+const Gy = (pts3d.B[1] + pts3d.C[1] + pts3d.D[1]) / 3;
+const Gz = (pts3d.B[2] + pts3d.C[2] + pts3d.D[2]) / 3;
+const sG = toScreen([Gx, Gy, Gz]);
+
+// A에서 G까지 높이선
+svg.appendChild(el('line', {
+  x1: sA.px, y1: sA.py,
+  x2: sG.px, y2: sG.py,
+  stroke: '#F59E0B',
+  'stroke-width': '1.5',
+  'stroke-dasharray': '6 3',
+  opacity: '0.9'
+}));
+
+// G 점
+svg.appendChild(el('circle', {
+  cx: sG.px, cy: sG.py, r: '3',
+  fill: '#F59E0B'
+}));
+
+// 직각 표시 (A에서 G 방향)
+const hLen = 8;
+const dxAG = sG.px - sA.px;
+const dyAG = sG.py - sA.py;
+const lenAG = Math.sqrt(dxAG * dxAG + dyAG * dyAG);
+const nx = dyAG / lenAG;
+const ny = -dxAG / lenAG;
+const sqPts = [
+  { px: sA.px + Math.round(dxAG / lenAG * hLen), py: sA.py + Math.round(dyAG / lenAG * hLen) },
+  { px: sA.px + Math.round(dxAG / lenAG * hLen + nx * hLen), py: sA.py + Math.round(dyAG / lenAG * hLen + ny * hLen) },
+  { px: sA.px + Math.round(nx * hLen), py: sA.py + Math.round(ny * hLen) }
+];
+
+// 꼭짓점 점 및 라벨
+const verts = { A: sA, B: sB, C: sC, D: sD };
+const labels = { A: [-14, 0], B: [8, 4], C: [8, 4], D: [0, -14] };
+for (const [name, pt] of Object.entries(verts)) {
+  svg.appendChild(el('circle', {
+    cx: pt.px, cy: pt.py, r: '3.5',
+    fill: '#1D4ED8'
+  }));
+  const off = labels[name];
+  const t = el('text', {
+    x: pt.px + off[0], y: pt.py + off[1],
+    'font-size': '14', fill: '#1E293B',
+    'font-family': 'serif',
+    'dominant-baseline': 'central'
+  });
+  t.textContent = name;
+  svg.appendChild(t);
+}
+
+// G 라벨
+const tG = el('text', {
+  x: sG.px + 8, y: sG.py,
+  'font-size': '12', fill: '#F59E0B',
+  'font-family': 'serif',
+  'dominant-baseline': 'central'
+});
+tG.textContent = 'G';
+svg.appendChild(tG);
+
+// 높이 라벨 (선 중간)
+const midHx = Math.round((sA.px + sG.px) / 2);
+const midHy = Math.round((sA.py + sG.py) / 2);
+const tH = el('text', {
+  x: midHx - 30, y: midHy,
+  'font-size': '12', fill: '#B45309',
+  'font-family': 'serif',
+  'dominant-baseline': 'central'
+});
+tH.textContent = 'h';
+svg.appendChild(tH);
+
+// 변 라벨 AB
+const midABx = Math.round((sA.px + sB.px) / 2);
+const midABy = Math.round((sA.py + sB.py) / 2);
+const tAB = el('text', {
+  x: midABx, y: midABy + 16,
+  'font-size': '12', fill: '#475569',
+  'font-family': 'serif',
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central'
+});
+tAB.textContent = 'a = 6';
+svg.appendChild(tAB);
+
+// 오른쪽 구분선
+svg.appendChild(el('line', {
+  x1: '440', y1: '60',
+  x2: '440', y2: '400',
+  stroke: '#E2E8F0',
+  'stroke-width': '1'
+}));
+
+// 오른쪽 텍스트
+const textData = [
+  { y: 90, text: '정사면체', size: '18', weight: 'bold', fill: '#1E293B' },
+  { y: 125, text: '변의 길이 a = 6', size: '14', fill: '#475569' },
+  { y: 165, text: '높이 h = a√(2/3)', size: '13', fill: '#1E293B' },
+  { y: 190, text: '= 6 × √(2/3)', size: '13', fill: '#1E293B' },
+  { y: 215, text: '= 2√6', size: '14', weight: 'bold', fill: '#1D4ED8' },
+  { y: 240, text: '≈ 4.90', size: '13', fill: '#475569' },
+  { y: 285, text: '꼭짓점 A에서', size: '13', fill: '#1E293B' },
+  { y: 308, text: '대면 BCD까지의', size: '13', fill: '#1E293B' },
+  { y: 331, text: '수선의 발 : G', size: '13', fill: '#1E293B' },
+  { y: 365, text: '|AG| = 2√6 ≈ 4.90', size: '13', weight: 'bold', fill: '#B45309' },
+];
+
+for (const d of textData) {
+  const t = el('text', {
+    x: '458',
+    y: d.y,
+    'font-size': d.size || '13',
+    fill: d.fill || '#1E293B',
+    'font-family': 'serif',
+    'dominant-baseline': 'central',
+    ...(d.weight ? { 'font-weight': d.weight } : {})
+  });
+  t.textContent = d.text;
+  svg.appendChild(t);
+}
+</script>

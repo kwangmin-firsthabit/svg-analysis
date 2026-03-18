@@ -1,0 +1,25 @@
+<div style="position:relative;width:100%;height:360px;">
+  <canvas id="chart2"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+new Chart(document.getElementById('chart2'), {
+  type: 'pie',
+  data: {
+    labels: ['식비 40%','주거 20%','교육 18%','교통 12%','기타 10%'],
+    datasets: [{
+      data: [40,20,18,12,10],
+      backgroundColor: ['#2563EB','#16A34A','#D97706','#DC2626','#7C3AED'],
+      borderColor: '#ffffff',
+      borderWidth: 2
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'right', labels: { font: { size: 12 } } }
+    }
+  }
+});
+</script>

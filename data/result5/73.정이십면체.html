@@ -1,0 +1,109 @@
+<svg id="vis" width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const phi = (1 + Math.sqrt(5)) / 2;
+const rawVerts = [
+  [0, 1, phi], [0, -1, phi], [0, 1, -phi], [0, -1, -phi],
+  [1, phi, 0], [-1, phi, 0], [1, -phi, 0], [-1, -phi, 0],
+  [phi, 0, 1], [phi, 0, -1], [-phi, 0, 1], [-phi, 0, -1]
+];
+
+const scale = 110;
+const cx = 340, cy = 240;
+
+function iso(v) {
+  const [x, y, z] = v;
+  return {
+    px: Math.round(cx + (x - z) * Math.cos(Math.PI / 6) * scale),
+    py: Math.round(cy - y * scale + (x + z) * Math.sin(Math.PI / 6) * scale)
+  };
+}
+
+const projected = rawVerts.map(iso);
+
+// 모서리 탐색: 원래 좌표 거리 = 2
+const edges = [];
+for (let i = 0; i < rawVerts.length; i++) {
+  for (let j = i + 1; j < rawVerts.length; j++) {
+    const [x1, y1, z1] = rawVerts[i];
+    const [x2, y2, z2] = rawVerts[j];
+    const dist = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2);
+    if (Math.abs(dist - 2) < 0.01) {
+      edges.push([i, j]);
+    }
+  }
+}
+
+// 앞/뒤 판단: 투영 후 py가 낮을수록 (화면 위) 뒤쪽
+// 두 꼭짓점 모두 py가 평균보다 작으면 뒤쪽 → 점선
+const avgPy = projected.reduce((s, p) => s + p.py, 0) / projected.length;
+
+const backEdges = [];
+const frontEdges = [];
+
+edges.forEach(([i, j]) => {
+  const pi = projected[i], pj = projected[j];
+  // 3D y좌표 기준으로 앞뒤 판단 (y가 작을수록 뒤)
+  const yi = rawVerts[i][1], yj = rawVerts[j][1];
+  if (yi < 0 && yj < 0) {
+    backEdges.push([i, j]);
+  } else {
+    frontEdges.push([i, j]);
+  }
+});
+
+// 뒤쪽 모서리 먼저 (점선)
+backEdges.forEach(([i, j]) => {
+  const pi = projected[i], pj = projected[j];
+  svg.appendChild(el('line', {
+    x1: pi.px, y1: pi.py, x2: pj.px, y2: pj.py,
+    stroke: '#94A3B8', 'stroke-width': '1',
+    'stroke-dasharray': '4,3'
+  }));
+});
+
+// 앞쪽 모서리 (실선)
+frontEdges.forEach(([i, j]) => {
+  const pi = projected[i], pj = projected[j];
+  svg.appendChild(el('line', {
+    x1: pi.px, y1: pi.py, x2: pj.px, y2: pj.py,
+    stroke: '#1D4ED8', 'stroke-width': '1.5'
+  }));
+});
+
+// 꼭짓점 점
+projected.forEach((p, i) => {
+  const yi = rawVerts[i][1];
+  svg.appendChild(el('circle', {
+    cx: p.px, cy: p.py, r: '2.5',
+    fill: yi >= 0 ? '#1D4ED8' : '#94A3B8'
+  }));
+});
+
+// "5" 레이블 (오각형 1개의 꼭짓점 수)
+addText(340, 30, '정이십면체', { 'font-size': '14', 'font-weight': '600', fill: '#1E293B' });
+addText(340, 50, '꼭짓점: 12  모서리: 30  면: 20', { 'font-size': '11', fill: '#475569' });
+
+// 한 모서리에 "5" 레이블 (각 꼭짓점에서 5개의 모서리가 만남)
+const edgeLabelEdge = frontEdges[0];
+if (edgeLabelEdge) {
+  const pi = projected[edgeLabelEdge[0]], pj = projected[edgeLabelEdge[1]];
+  const mx = Math.round((pi.px + pj.px) / 2);
+  const my = Math.round((pi.py + pj.py) / 2);
+  addText(mx + 8, my - 8, '5', { 'font-size': '11', fill: '#475569' });
+}
+</script>

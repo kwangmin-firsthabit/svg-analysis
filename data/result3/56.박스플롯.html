@@ -1,0 +1,311 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+    <path d="M0,0 L6,3 L0,6 Z" fill="#94A3B8"/>
+  </marker>
+</defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+const W = 680;
+const H = 440;
+const padTop = 30;
+const padBottom = 60;
+const padLeft = 65;
+const padRight = 30;
+const chartH = H - padTop - padBottom;
+const chartW = W - padLeft - padRight;
+
+const scoreMin = 0;
+const scoreMax = 110;
+
+function scoreToY(score) {
+  return Math.round(padTop + chartH * (1 - (score - scoreMin) / (scoreMax - scoreMin)));
+}
+
+const classes = [
+  {
+    name: 'A반',
+    color: '#3B82F6',
+    fillLight: '#DBEAFE',
+    min: 42, q1: 58, median: 71, q3: 84, max: 98,
+    outliers: [28]
+  },
+  {
+    name: 'B반',
+    color: '#10B981',
+    fillLight: '#D1FAE5',
+    min: 50, q1: 65, median: 75, q3: 88, max: 100,
+    outliers: []
+  },
+  {
+    name: 'C반',
+    color: '#F59E0B',
+    fillLight: '#FEF3C7',
+    min: 38, q1: 55, median: 68, q3: 80, max: 95,
+    outliers: []
+  }
+];
+
+const boxCenters = [200, 340, 480];
+const boxW = 48;
+
+// background
+svg.appendChild(el('rect', { x: 0, y: 0, width: W, height: H, fill: '#F8FAFC' }));
+
+// chart area background
+svg.appendChild(el('rect', { x: padLeft, y: padTop, width: chartW, height: chartH, fill: '#FFFFFF', stroke: '#E2E8F0', 'stroke-width': '1' }));
+
+// title
+const title = el('text', {
+  x: Math.round(W / 2), y: 16,
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central',
+  fill: '#1E293B',
+  'font-size': '15',
+  'font-weight': '600',
+  'font-family': 'sans-serif'
+});
+title.textContent = 'A반·B반·C반 점수 박스플롯 비교';
+svg.appendChild(title);
+
+// y-axis grid lines and labels
+const yTicks = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110];
+yTicks.forEach(score => {
+  const y = scoreToY(score);
+  // grid line
+  svg.appendChild(el('line', {
+    x1: padLeft, y1: y, x2: W - padRight, y2: y,
+    stroke: score % 20 === 0 ? '#CBD5E1' : '#E2E8F0',
+    'stroke-width': score % 20 === 0 ? '1' : '0.5',
+    'stroke-dasharray': score % 20 === 0 ? 'none' : '3,3'
+  }));
+  // y label
+  const lbl = el('text', {
+    x: padLeft - 8, y: y,
+    'text-anchor': 'end',
+    'dominant-baseline': 'central',
+    fill: '#475569',
+    'font-size': '11',
+    'font-family': 'sans-serif'
+  });
+  lbl.textContent = String(score);
+  svg.appendChild(lbl);
+});
+
+// y axis label
+const yAxisLabel = el('text', {
+  x: 14, y: Math.round(padTop + chartH / 2),
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central',
+  fill: '#475569',
+  'font-size': '12',
+  'font-weight': '500',
+  'font-family': 'sans-serif',
+  transform: `rotate(-90, 14, ${Math.round(padTop + chartH / 2)})`
+});
+yAxisLabel.textContent = '점수';
+svg.appendChild(yAxisLabel);
+
+// draw each boxplot
+classes.forEach((cls, idx) => {
+  const cx = boxCenters[idx];
+  const bx1 = Math.round(cx - boxW / 2);
+  const bx2 = Math.round(cx + boxW / 2);
+
+  const yMin = scoreToY(cls.min);
+  const yQ1 = scoreToY(cls.q1);
+  const yMed = scoreToY(cls.median);
+  const yQ3 = scoreToY(cls.q3);
+  const yMax = scoreToY(cls.max);
+
+  // whisker lower (Q1 to min)
+  svg.appendChild(el('line', {
+    x1: cx, y1: yQ1, x2: cx, y2: yMin,
+    stroke: cls.color, 'stroke-width': '1.5', 'stroke-dasharray': '4,2'
+  }));
+  // whisker cap min
+  svg.appendChild(el('line', {
+    x1: Math.round(cx - 14), y1: yMin, x2: Math.round(cx + 14), y2: yMin,
+    stroke: cls.color, 'stroke-width': '2'
+  }));
+
+  // whisker upper (Q3 to max)
+  svg.appendChild(el('line', {
+    x1: cx, y1: yQ3, x2: cx, y2: yMax,
+    stroke: cls.color, 'stroke-width': '1.5', 'stroke-dasharray': '4,2'
+  }));
+  // whisker cap max
+  svg.appendChild(el('line', {
+    x1: Math.round(cx - 14), y1: yMax, x2: Math.round(cx + 14), y2: yMax,
+    stroke: cls.color, 'stroke-width': '2'
+  }));
+
+  // box fill
+  svg.appendChild(el('rect', {
+    x: bx1, y: yQ3,
+    width: boxW, height: Math.round(yQ1 - yQ3),
+    fill: cls.fillLight, stroke: cls.color, 'stroke-width': '2', rx: '3'
+  }));
+
+  // median line
+  svg.appendChild(el('line', {
+    x1: bx1, y1: yMed, x2: bx2, y2: yMed,
+    stroke: cls.color, 'stroke-width': '2.5'
+  }));
+
+  // outliers
+  cls.outliers.forEach(val => {
+    const oy = scoreToY(val);
+    svg.appendChild(el('circle', {
+      cx: cx, cy: oy, r: '5',
+      fill: '#FEF2F2', stroke: cls.color, 'stroke-width': '1.5'
+    }));
+    const olbl = el('text', {
+      x: Math.round(cx + 10), y: oy,
+      'text-anchor': 'start',
+      'dominant-baseline': 'central',
+      fill: cls.color,
+      'font-size': '11',
+      'font-family': 'sans-serif'
+    });
+    olbl.textContent = String(val);
+    svg.appendChild(olbl);
+  });
+
+  // data labels on whisker caps
+  const maxLbl = el('text', {
+    x: Math.round(bx2 + 5), y: yMax,
+    'text-anchor': 'start',
+    'dominant-baseline': 'central',
+    fill: '#475569',
+    'font-size': '10',
+    'font-family': 'sans-serif'
+  });
+  maxLbl.textContent = String(cls.max);
+  svg.appendChild(maxLbl);
+
+  const minLbl = el('text', {
+    x: Math.round(bx2 + 5), y: yMin,
+    'text-anchor': 'start',
+    'dominant-baseline': 'central',
+    fill: '#475569',
+    'font-size': '10',
+    'font-family': 'sans-serif'
+  });
+  minLbl.textContent = String(cls.min);
+  svg.appendChild(minLbl);
+
+  // median label
+  const medLbl = el('text', {
+    x: Math.round(bx2 + 5), y: yMed,
+    'text-anchor': 'start',
+    'dominant-baseline': 'central',
+    fill: cls.color,
+    'font-size': '11',
+    'font-weight': '600',
+    'font-family': 'sans-serif'
+  });
+  medLbl.textContent = String(cls.median);
+  svg.appendChild(medLbl);
+
+  // Q1 Q3 labels inside box
+  const q1Lbl = el('text', {
+    x: cx, y: Math.round(yQ1 - 8),
+    'text-anchor': 'middle',
+    'dominant-baseline': 'central',
+    fill: cls.color,
+    'font-size': '10',
+    'font-family': 'sans-serif'
+  });
+  q1Lbl.textContent = String(cls.q1);
+  svg.appendChild(q1Lbl);
+
+  const q3Lbl = el('text', {
+    x: cx, y: Math.round(yQ3 + 8),
+    'text-anchor': 'middle',
+    'dominant-baseline': 'central',
+    fill: cls.color,
+    'font-size': '10',
+    'font-family': 'sans-serif'
+  });
+  q3Lbl.textContent = String(cls.q3);
+  svg.appendChild(q3Lbl);
+
+  // x axis class name
+  const xLbl = el('text', {
+    x: cx, y: H - padBottom + 20,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'central',
+    fill: '#1E293B',
+    'font-size': '13',
+    'font-weight': '600',
+    'font-family': 'sans-serif'
+  });
+  xLbl.textContent = cls.name;
+  svg.appendChild(xLbl);
+
+  // color swatch under name
+  svg.appendChild(el('rect', {
+    x: Math.round(cx - 12), y: H - padBottom + 30,
+    width: 24, height: 5, rx: 2,
+    fill: cls.color
+  }));
+});
+
+// x axis line
+svg.appendChild(el('line', {
+  x1: padLeft, y1: H - padBottom,
+  x2: W - padRight, y2: H - padBottom,
+  stroke: '#94A3B8', 'stroke-width': '1.5'
+}));
+
+// y axis line
+svg.appendChild(el('line', {
+  x1: padLeft, y1: padTop,
+  x2: padLeft, y2: H - padBottom,
+  stroke: '#94A3B8', 'stroke-width': '1.5'
+}));
+
+// legend
+const legendX = W - padRight - 180;
+const legendY = padTop + 10;
+svg.appendChild(el('rect', { x: legendX, y: legendY, width: 175, height: 60, rx: 6, fill: '#F8FAFC', stroke: '#E2E8F0', 'stroke-width': '1' }));
+
+const legendTitle = el('text', {
+  x: legendX + 88, y: legendY + 14,
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central',
+  fill: '#475569',
+  'font-size': '11',
+  'font-weight': '500',
+  'font-family': 'sans-serif'
+});
+legendTitle.textContent = '중앙값';
+svg.appendChild(legendTitle);
+
+classes.forEach((cls, i) => {
+  const lx = legendX + 12 + i * 58;
+  const ly = legendY + 38;
+  svg.appendChild(el('rect', { x: lx, y: Math.round(ly - 6), width: 24, height: 12, rx: 3, fill: cls.fillLight, stroke: cls.color, 'stroke-width': '1.5' }));
+  svg.appendChild(el('line', { x1: lx, y1: ly, x2: lx + 24, y2: ly, stroke: cls.color, 'stroke-width': '2' }));
+  const llt = el('text', {
+    x: lx + 12, y: ly + 14,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'central',
+    fill: cls.color,
+    'font-size': '11',
+    'font-weight': '600',
+    'font-family': 'sans-serif'
+  });
+  llt.textContent = String(cls.median);
+  svg.appendChild(llt);
+});
+</script>

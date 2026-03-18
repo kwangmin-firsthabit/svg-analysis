@@ -1,0 +1,233 @@
+<svg id="vis" width="100%" viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <line id="divider" x1="0" y1="0" x2="0" y2="0"/>
+</defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+const W = 680;
+const stemX = 340;
+const stemColW = 50;
+const rowH = 40;
+const headerY = 50;
+const firstRowY = 100;
+
+const stems = [14, 15, 16, 17];
+
+const boysLeaves = {
+  14: [8],
+  15: [2, 5, 7, 9],
+  16: [1, 3, 5, 7, 8],
+  17: [0, 2, 4, 5, 8]
+};
+
+const girlsLeaves = {
+  14: [4, 7, 9],
+  15: [1, 3, 4, 6, 8],
+  16: [0, 2, 4, 5, 7, 9],
+  17: [2]
+};
+
+const boysMedian = 165;
+const girlsMedian = 160;
+
+// background
+svg.appendChild(el('rect', { x: 0, y: 0, width: W, height: 320, fill: '#F8FAFC' }));
+
+// title
+const title = el('text', {
+  x: Math.round(W / 2), y: 25,
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central',
+  fill: '#1E293B',
+  'font-size': '15',
+  'font-weight': '600',
+  'font-family': 'sans-serif'
+});
+title.textContent = '키(cm) 줄기-잎 그림 비교';
+svg.appendChild(title);
+
+// header background
+svg.appendChild(el('rect', { x: 20, y: 35, width: Math.round(W / 2 - stemColW / 2 - 20), height: 30, rx: 4, fill: '#DBEAFE' }));
+svg.appendChild(el('rect', { x: Math.round(W / 2 - stemColW / 2), y: 35, width: stemColW, height: 30, rx: 4, fill: '#E2E8F0' }));
+svg.appendChild(el('rect', { x: Math.round(W / 2 + stemColW / 2), y: 35, width: Math.round(W / 2 - stemColW / 2 - 20), height: 30, rx: 4, fill: '#FEE2E2' }));
+
+// header labels
+const hdrBoys = el('text', {
+  x: Math.round((20 + (W / 2 - stemColW / 2)) / 2), y: headerY,
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central',
+  fill: '#1D4ED8',
+  'font-size': '14',
+  'font-weight': '600',
+  'font-family': 'sans-serif'
+});
+hdrBoys.textContent = '남학생';
+svg.appendChild(hdrBoys);
+
+const hdrStem = el('text', {
+  x: stemX, y: headerY,
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central',
+  fill: '#1E293B',
+  'font-size': '14',
+  'font-weight': '600',
+  'font-family': 'sans-serif'
+});
+hdrStem.textContent = '줄기';
+svg.appendChild(hdrStem);
+
+const hdrGirls = el('text', {
+  x: Math.round((W / 2 + stemColW / 2 + W - 20) / 2), y: headerY,
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central',
+  fill: '#DC2626',
+  'font-size': '14',
+  'font-weight': '600',
+  'font-family': 'sans-serif'
+});
+hdrGirls.textContent = '여학생';
+svg.appendChild(hdrGirls);
+
+const leafSpacing = 18;
+
+stems.forEach((stem, i) => {
+  const rowY = firstRowY + i * rowH;
+  const rowBg = i % 2 === 0 ? '#FFFFFF' : '#F1F5F9';
+
+  // row background
+  svg.appendChild(el('rect', { x: 20, y: Math.round(rowY - rowH / 2), width: W - 40, height: rowH, fill: rowBg }));
+
+  // stem box
+  svg.appendChild(el('rect', {
+    x: Math.round(stemX - stemColW / 2), y: Math.round(rowY - rowH / 2),
+    width: stemColW, height: rowH,
+    fill: '#E2E8F0', stroke: '#CBD5E1', 'stroke-width': '1'
+  }));
+
+  // stem number
+  const stemText = el('text', {
+    x: stemX, y: rowY,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'central',
+    fill: '#1E293B',
+    'font-size': '14',
+    'font-weight': '600',
+    'font-family': 'sans-serif'
+  });
+  stemText.textContent = String(stem);
+  svg.appendChild(stemText);
+
+  // boys leaves (right to left from stem)
+  const boys = boysLeaves[stem] || [];
+  // boys are displayed right-to-left (largest index nearest stem)
+  for (let j = 0; j < boys.length; j++) {
+    const lx = Math.round(stemX - stemColW / 2 - 10 - j * leafSpacing);
+    const lt = el('text', {
+      x: lx, y: rowY,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: '#1D4ED8',
+      'font-size': '14',
+      'font-family': 'sans-serif'
+    });
+    lt.textContent = String(boys[boys.length - 1 - j]);
+    svg.appendChild(lt);
+  }
+
+  // girls leaves (left to right from stem)
+  const girls = girlsLeaves[stem] || [];
+  for (let j = 0; j < girls.length; j++) {
+    const lx = Math.round(stemX + stemColW / 2 + 10 + j * leafSpacing);
+    const lt = el('text', {
+      x: lx, y: rowY,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: '#DC2626',
+      'font-size': '14',
+      'font-family': 'sans-serif'
+    });
+    lt.textContent = String(girls[j]);
+    svg.appendChild(lt);
+  }
+});
+
+// dividing lines
+const tableTop = Math.round(firstRowY - rowH / 2);
+const tableBottom = Math.round(firstRowY + stems.length * rowH - rowH / 2);
+
+svg.appendChild(el('line', {
+  x1: Math.round(stemX - stemColW / 2), y1: tableTop,
+  x2: Math.round(stemX - stemColW / 2), y2: tableBottom,
+  stroke: '#94A3B8', 'stroke-width': '1'
+}));
+svg.appendChild(el('line', {
+  x1: Math.round(stemX + stemColW / 2), y1: tableTop,
+  x2: Math.round(stemX + stemColW / 2), y2: tableBottom,
+  stroke: '#94A3B8', 'stroke-width': '1'
+}));
+
+// outer border
+svg.appendChild(el('rect', {
+  x: 20, y: tableTop, width: W - 40, height: tableBottom - tableTop,
+  fill: 'none', stroke: '#CBD5E1', 'stroke-width': '1.5', rx: '2'
+}));
+
+// header bottom line
+svg.appendChild(el('line', {
+  x1: 20, y1: 65, x2: W - 20, y2: 65,
+  stroke: '#CBD5E1', 'stroke-width': '1'
+}));
+
+// median section
+const medY = tableBottom + 35;
+
+svg.appendChild(el('rect', { x: 20, y: tableBottom + 15, width: W - 40, height: 40, rx: 6, fill: '#F1F5F9', stroke: '#E2E8F0', 'stroke-width': '1' }));
+
+const medTitle = el('text', {
+  x: stemX, y: medY,
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central',
+  fill: '#475569',
+  'font-size': '13',
+  'font-weight': '500',
+  'font-family': 'sans-serif'
+});
+medTitle.textContent = '중앙값';
+svg.appendChild(medTitle);
+
+const medBoys = el('text', {
+  x: Math.round(stemX - 120), y: medY,
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central',
+  fill: '#1D4ED8',
+  'font-size': '13',
+  'font-weight': '600',
+  'font-family': 'sans-serif'
+});
+medBoys.textContent = `남학생: ${boysMedian} cm`;
+svg.appendChild(medBoys);
+
+const medGirls = el('text', {
+  x: Math.round(stemX + 120), y: medY,
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central',
+  fill: '#DC2626',
+  'font-size': '13',
+  'font-weight': '600',
+  'font-family': 'sans-serif'
+});
+medGirls.textContent = `여학생: ${girlsMedian} cm`;
+svg.appendChild(medGirls);
+
+// highlight median rows
+// boys median 165 → stem 16, leaf 5 (index in boysLeaves[16]: [1,3,5,7,8] → index 2, displayed reversed)
+// girls median 160 → stem 16, leaf 0 (index 0)
+</script>

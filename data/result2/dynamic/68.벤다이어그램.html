@@ -1,0 +1,20 @@
+<svg id="vis" width="100%" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg=document.getElementById('vis');
+const ns='http://www.w3.org/2000/svg';
+function el(tag,attrs){const e=document.createElementNS(ns,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);return e;}
+function txt(x,y,s,attrs={}){const t=el('text',{x,y,'font-size':'14','font-weight':'400','text-anchor':'middle','dominant-baseline':'central',fill:'#1E293B',...attrs});t.textContent=s;svg.appendChild(t);}
+
+svg.appendChild(el('rect',{x:80,y:60,width:520,height:280,rx:'8',fill:'none',stroke:'#94A3B8','stroke-width':'1'}));
+
+svg.appendChild(el('circle',{cx:270,cy:200,r:110,fill:'#3B82F6','fill-opacity':'0.15',stroke:'#1D4ED8','stroke-width':'1.5'}));
+
+svg.appendChild(el('circle',{cx:410,cy:200,r:110,fill:'#16A34A','fill-opacity':'0.15',stroke:'#16A34A','stroke-width':'1.5'}));
+
+txt(210,200,'15',{'font-size':'20','font-weight':'500'});
+txt(340,200,'7',{'font-size':'20','font-weight':'500'});
+txt(470,200,'11',{'font-size':'20','font-weight':'500'});
+txt(270,110,'수영',{'font-size':'14','font-weight':'500'});
+txt(410,110,'농구',{'font-size':'14','font-weight':'500'});
+txt(570,80,'40',{'font-size':'12',fill:'#475569'});
+</script>

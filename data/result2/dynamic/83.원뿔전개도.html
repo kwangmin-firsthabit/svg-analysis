@@ -1,16 +1,14 @@
-<svg id="vis" width="100%" viewBox="0 0 680 530" xmlns="http://www.w3.org/2000/svg">
-<defs></defs>
+<svg id="vis" width="100%" viewBox="0 0 680 540" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
 </svg>
 <script>
 const svg = document.getElementById('vis');
 const ns = 'http://www.w3.org/2000/svg';
-
 function el(tag, attrs) {
   const e = document.createElementNS(ns, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
   return e;
 }
-
 function addText(x, y, content, attrs = {}) {
   const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
   t.textContent = content;
@@ -20,59 +18,50 @@ function addText(x, y, content, attrs = {}) {
 function arcPath(cx, cy, r, startDeg, endDeg) {
   const s = startDeg * Math.PI / 180;
   const e = endDeg * Math.PI / 180;
-  const x1 = cx + r * Math.cos(s), y1 = cy + r * Math.sin(s);
-  const x2 = cx + r * Math.cos(e), y2 = cy + r * Math.sin(e);
+  const x1 = cx + r * Math.cos(s);
+  const y1 = cy + r * Math.sin(s);
+  const x2 = cx + r * Math.cos(e);
+  const y2 = cy + r * Math.sin(e);
   const large = (endDeg - startDeg > 180) ? 1 : 0;
-  return `M ${cx},${cy} L ${x1},${y1} A ${r},${r} 0 ${large} 1 ${x2},${y2} Z`;
+  return `M ${cx},${cy} L ${Math.round(x1)},${Math.round(y1)} A ${r},${r} 0 ${large} 1 ${Math.round(x2)},${Math.round(y2)} Z`;
 }
 
-// l=10, r_base=4, 1 unit=22px → l_px=220, r_px=88
-const l_px = 220, r_px = 88;
-const cx = 340, cy = 110;
-
-// 부채꼴 중심각 θ = 360 * r/l = 360 * 4/10 = 144°
-const theta = 144;
-const startDeg = 270 - theta / 2; // 198
-const endDeg = 270 + theta / 2;   // 342
+const l = 220, r_base = 88;
+const cx = 340, cy = 100;
+const startDeg = 198, endDeg = 342;
 
 // 부채꼴
-svg.appendChild(el('path', {
-  d: arcPath(cx, cy, l_px, startDeg, endDeg),
-  fill: '#3B82F6', 'fill-opacity': '0.08', stroke: '#1D4ED8', 'stroke-width': '1.5'
-}));
+const sector = el('path', {
+  d: arcPath(cx, cy, l, startDeg, endDeg),
+  fill: '#EFF6FF',
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5',
+});
+svg.appendChild(sector);
 
 // 밑면 원
-const botCy = 430;
-svg.appendChild(el('circle', { cx, cy: botCy, r: r_px, fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+svg.appendChild(el('circle', {
+  cx: 340, cy: 430, r: r_base,
+  fill: '#EFF6FF',
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5',
+}));
 
-// 점선 연결: 부채꼴 호 끝점 → 밑면 원 상단
-const s_rad = startDeg * Math.PI / 180;
-const e_rad = endDeg * Math.PI / 180;
-const sx = Math.round(cx + l_px * Math.cos(s_rad));
-const sy = Math.round(cy + l_px * Math.sin(s_rad));
-const ex = Math.round(cx + l_px * Math.cos(e_rad));
-const ey = Math.round(cy + l_px * Math.sin(e_rad));
+// 모선 레이블 "10" — 부채꼴 왼쪽 반지름 중점
+const midDeg = (startDeg + 180) * Math.PI / 180;
+const lx = Math.round(cx + (l / 2) * Math.cos(startDeg * Math.PI / 180));
+const ly = Math.round(cy + (l / 2) * Math.sin(startDeg * Math.PI / 180));
+addText(lx - 14, ly + 6, '10', { 'font-size': '13', fill: '#374151' });
 
-svg.appendChild(el('line', { x1: sx, y1: sy, x2: cx - r_px, y2: botCy, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
-svg.appendChild(el('line', { x1: ex, y1: ey, x2: cx + r_px, y2: botCy, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+// 중심각 레이블 "144°"
+const midAngle = (startDeg + endDeg) / 2;
+const labelR = 50;
+const lax = Math.round(cx + labelR * Math.cos(midAngle * Math.PI / 180));
+const lay = Math.round(cy + labelR * Math.sin(midAngle * Math.PI / 180));
+addText(lax, lay, '144°', { 'font-size': '12', fill: '#374151' });
 
-// 모선 레이블 l=10 (부채꼴 왼쪽 모선 중간)
-const midS_rad = (startDeg + 270) / 2 * Math.PI / 180;
-const lx = Math.round(cx + (l_px / 2) * Math.cos(s_rad)) - 14;
-const ly = Math.round(cy + (l_px / 2) * Math.sin(s_rad));
-addText(lx, ly, '10', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
-
-// 오른쪽 모선 레이블
-const lx2 = Math.round(cx + (l_px / 2) * Math.cos(e_rad)) + 14;
-const ly2 = Math.round(cy + (l_px / 2) * Math.sin(e_rad));
-addText(lx2, ly2, '10', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
-
-// 중심각 레이블
-addText(cx, cy + 30, '144°', { 'font-size': '12', 'font-weight': '500', fill: '#1E293B' });
-
-// 밑면 반지름 레이블
-addText(Math.round(cx + r_px / 2), botCy - 12, 'r = 4', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
-
-// 제목
-addText(340, 500, '원뿔 전개도 (밑면 r = 4, 모선 l = 10)', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+// 반지름 레이블 "4" — 밑면 원 오른쪽
+addText(340 + r_base / 2 + 8, 430, '4', { 'font-size': '13', fill: '#374151' });
+// 밑면 반지름 선
+svg.appendChild(el('line', { x1: 340, y1: 430, x2: 340 + r_base, y2: 430, stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '4 3' }));
 </script>

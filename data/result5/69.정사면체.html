@@ -1,0 +1,97 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const scale = 210;
+const cx = 340, cy = 250;
+
+function iso(x, y, z) {
+  return {
+    px: Math.round(cx + (x - z) * Math.cos(Math.PI / 6) * scale),
+    py: Math.round(cy - y * scale + (x + z) * Math.sin(Math.PI / 6) * scale)
+  };
+}
+
+const B3 = [0, 0, 0];
+const C3 = [1, 0, 0];
+const D3 = [0.5, 0, Math.sqrt(3) / 2];
+const A3 = [0.5, Math.sqrt(6) / 3, Math.sqrt(3) / 6];
+
+const A = iso(...A3);
+const B = iso(...B3);
+const C = iso(...C3);
+const D = iso(...D3);
+
+const verts = { A, B, C, D };
+const vert3 = { A: A3, B: B3, C: C3, D: D3 };
+
+const edges = [
+  ['A', 'B'], ['A', 'C'], ['A', 'D'],
+  ['B', 'C'], ['B', 'D'], ['C', 'D']
+];
+
+// 면 채우기 (뒤 면 먼저)
+const faces = [
+  ['B', 'C', 'D'],
+  ['A', 'B', 'C'],
+  ['A', 'B', 'D'],
+  ['A', 'C', 'D']
+];
+
+faces.forEach(face => {
+  const pts = face.map(n => verts[n]);
+  const d = pts.map(p => `${p.px},${p.py}`).join(' ');
+  svg.appendChild(el('polygon', {
+    points: d,
+    fill: '#3B82F6',
+    'fill-opacity': '0.12',
+    stroke: 'none'
+  }));
+});
+
+// 숨겨진 모서리 (점선): B-D (뒷면 아래)
+const hiddenEdges = [['B', 'D']];
+hiddenEdges.forEach(([n1, n2]) => {
+  const p1 = verts[n1], p2 = verts[n2];
+  svg.appendChild(el('line', {
+    x1: p1.px, y1: p1.py, x2: p2.px, y2: p2.py,
+    stroke: '#94A3B8', 'stroke-width': '1.2',
+    'stroke-dasharray': '5,4'
+  }));
+});
+
+// 보이는 모서리 (실선)
+const visibleEdges = [['A', 'B'], ['A', 'C'], ['A', 'D'], ['B', 'C'], ['C', 'D']];
+visibleEdges.forEach(([n1, n2]) => {
+  const p1 = verts[n1], p2 = verts[n2];
+  svg.appendChild(el('line', {
+    x1: p1.px, y1: p1.py, x2: p2.px, y2: p2.py,
+    stroke: '#1D4ED8', 'stroke-width': '1.5'
+  }));
+});
+
+// 꼭짓점 레이블
+const offsets = { A: [0, -16], B: [-14, 8], C: [14, 8], D: [0, 14] };
+Object.entries(verts).forEach(([name, p]) => {
+  const [ox, oy] = offsets[name];
+  addText(p.px + ox, p.py + oy, name, { 'font-size': '14', 'font-weight': '600', fill: '#1E293B' });
+});
+
+// 모서리 길이 레이블 "1" (BC 중점)
+const bcMx = Math.round((B.px + C.px) / 2);
+const bcMy = Math.round((B.py + C.py) / 2);
+addText(bcMx, bcMy + 14, '1', { 'font-size': '13', fill: '#475569' });
+</script>

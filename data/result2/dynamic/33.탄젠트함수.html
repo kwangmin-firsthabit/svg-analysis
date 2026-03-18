@@ -4,79 +4,91 @@
 <script>
 const svg = document.getElementById('vis');
 const ns = 'http://www.w3.org/2000/svg';
-
 function el(tag, attrs) {
   const e = document.createElementNS(ns, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
   return e;
 }
-
 function addText(x, y, content, attrs = {}) {
   const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
   t.textContent = content;
   svg.appendChild(t);
 }
 
-const ox = 340, oy = 280, scaleX = 80, scaleY = 60, H = 560;
-const PI = Math.PI;
-const eps = 0.08;
+const ox = 340, oy = 280, scaleX = 80, scaleY = 60;
+
+// x축
+const xAxis = el('line', { x1: 30, y1: oy, x2: 650, y2: oy, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' });
+svg.appendChild(xAxis);
+// y축
+const yAxis = el('line', { x1: ox, y1: 530, x2: ox, y2: 20, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' });
+svg.appendChild(yAxis);
+
+addText(660, oy, 'x', { 'font-size': '13', fill: '#374151' });
+addText(ox, 10, 'y', { 'font-size': '13', fill: '#374151' });
 
 // 점근선 x = ±π/2, ±3π/2
-const asymptotes = [-3 * PI / 2, -PI / 2, PI / 2, 3 * PI / 2];
+const asymptotes = [-3, -1, 1, 3].map(k => k * Math.PI / 2);
 for (const mx of asymptotes) {
   const px = Math.round(ox + mx * scaleX);
-  svg.appendChild(el('line', { x1: px, y1: 30, x2: px, y2: H - 30, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+  const d = el('line', { x1: px, y1: 30, x2: px, y2: 530, stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '4 3' });
+  svg.appendChild(d);
 }
 
-// 축
-svg.appendChild(el('line', { x1: 30, y1: oy, x2: 650, y2: oy, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' }));
-svg.appendChild(el('line', { x1: ox, y1: H - 20, x2: ox, y2: 20, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' }));
-addText(658, oy, 'x', { fill: '#374151', 'font-weight': '600' });
-addText(ox, 12, 'y', { fill: '#374151', 'font-weight': '600' });
+// 탄젠트 곡선 3개 구간
+const segments = [
+  { xStart: -3 * Math.PI / 2, xEnd: -Math.PI / 2 },
+  { xStart: -Math.PI / 2, xEnd: Math.PI / 2 },
+  { xStart: Math.PI / 2, xEnd: 3 * Math.PI / 2 },
+];
 
-// tan 곡선 — 3개 구간
-function drawTan(xMin, xMax) {
-  const pts = [];
-  for (let px = 0; px <= 680; px += 1) {
+for (const seg of segments) {
+  const pxStart = Math.round(ox + seg.xStart * scaleX) + 2;
+  const pxEnd = Math.round(ox + seg.xEnd * scaleX) - 2;
+  const points = [];
+  for (let px = pxStart; px <= pxEnd; px++) {
     const mx = (px - ox) / scaleX;
-    if (mx < xMin || mx > xMax) continue;
     const my = Math.tan(mx);
     const py = Math.round(oy - my * scaleY);
-    if (py > 30 && py < H - 30) pts.push(`${px},${py}`);
+    if (py > 30 && py < 530) {
+      points.push(`${px},${py}`);
+    }
   }
-  if (pts.length > 1) {
-    svg.appendChild(el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#2563EB', 'stroke-width': '2' }));
+  if (points.length > 1) {
+    const poly = el('polyline', {
+      points: points.join(' '),
+      fill: 'none',
+      stroke: '#2563EB',
+      'stroke-width': '2',
+      'stroke-linejoin': 'round',
+    });
+    svg.appendChild(poly);
   }
 }
 
-drawTan(-3 * PI / 2 + eps, -PI / 2 - eps);
-drawTan(-PI / 2 + eps, PI / 2 - eps);
-drawTan(PI / 2 + eps, 3 * PI / 2 - eps);
-
-// 눈금 x축
-const ticksX = [
-  { v: -1, label: '−π' },
-  { v: -0.5, label: '−π/2' },
-  { v: 0.5, label: 'π/2' },
-  { v: 1, label: 'π' }
+// x눈금: -π, -π/2, π/2, π
+const xTicks = [
+  { mx: -Math.PI, label: '−π' },
+  { mx: -Math.PI / 2, label: '−π/2' },
+  { mx: Math.PI / 2, label: 'π/2' },
+  { mx: Math.PI, label: 'π' },
 ];
-for (const { v, label } of ticksX) {
-  const px = Math.round(ox + v * PI * scaleX);
+for (const t of xTicks) {
+  const px = Math.round(ox + t.mx * scaleX);
   svg.appendChild(el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: '#374151', 'stroke-width': '1' }));
-  addText(px, oy + 16, label);
+  addText(px, oy + 16, t.label);
 }
 
-// 눈금 y축
-for (let v = -3; v <= 3; v++) {
-  if (v === 0) continue;
-  const py = Math.round(oy - v * scaleY);
+// y눈금: -3 ~ 3
+for (let my = -3; my <= 3; my++) {
+  if (my === 0) continue;
+  const py = Math.round(oy - my * scaleY);
   svg.appendChild(el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: '#374151', 'stroke-width': '1' }));
-  addText(ox - 16, py, v === -1 ? '−1' : String(v));
+  addText(ox - 16, py, String(my));
 }
 
-// 레이블
-addText(580, 50, 'y = tan x', { fill: '#1E293B', 'font-size': '14', 'font-weight': '600', 'text-anchor': 'end' });
+addText(ox - 10, oy + 16, 'O');
 
-// 원점 레이블
-addText(ox + 10, oy + 16, 'O', { 'text-anchor': 'start' });
+// 함수식 레이블
+addText(580, 140, 'y = tan x', { 'font-size': '13', fill: '#2563EB', 'font-style': 'italic', 'text-anchor': 'start' });
 </script>

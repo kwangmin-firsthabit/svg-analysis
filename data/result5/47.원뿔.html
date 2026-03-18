@@ -1,0 +1,85 @@
+<svg id="vis" width="100%" viewBox="0 0 680 370" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const cx = 340, cy = 320, rx = 160, ry = 55;
+const ax = 340, ay = 140;
+
+// 앞쪽 반타원 (실선)
+const frontArc = el('path', {
+  d: `M ${cx - rx},${cy} A ${rx},${ry} 0 0 1 ${cx + rx},${cy}`,
+  fill: 'none',
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5'
+});
+svg.appendChild(frontArc);
+
+// 뒤쪽 반타원 (점선)
+const backArc = el('path', {
+  d: `M ${cx - rx},${cy} A ${rx},${ry} 0 0 0 ${cx + rx},${cy}`,
+  fill: 'none',
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5',
+  'stroke-dasharray': '5,4'
+});
+svg.appendChild(backArc);
+
+// 밑면 채우기 (반투명)
+const baseFill = el('ellipse', {
+  cx: cx, cy: cy, rx: rx, ry: ry,
+  fill: '#3B82F6',
+  'fill-opacity': '0.12',
+  stroke: 'none'
+});
+svg.appendChild(baseFill);
+
+// 모선 왼쪽
+svg.appendChild(el('line', {
+  x1: ax, y1: ay, x2: cx - rx, y2: cy,
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// 모선 오른쪽
+svg.appendChild(el('line', {
+  x1: ax, y1: ay, x2: cx + rx, y2: cy,
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// 측면 채우기
+const sideFill = el('path', {
+  d: `M ${ax},${ay} L ${cx - rx},${cy} A ${rx},${ry} 0 0 1 ${cx + rx},${cy} Z`,
+  fill: '#3B82F6',
+  'fill-opacity': '0.12',
+  stroke: 'none'
+});
+svg.appendChild(sideFill);
+
+// 높이 보조선 (점선)
+svg.appendChild(el('line', {
+  x1: cx, y1: ay, x2: cx, y2: cy,
+  stroke: '#94A3B8', 'stroke-width': '1.2',
+  'stroke-dasharray': '5,4'
+}));
+
+// 꼭짓점 레이블 A
+addText(ax, ay - 14, 'A', { 'font-size': '13', 'font-weight': '600', fill: '#1E293B' });
+
+// 높이 레이블
+addText(cx + 18, Math.round((ay + cy) / 2), 'h = 6', { 'text-anchor': 'start', fill: '#475569' });
+
+// r 레이블
+addText(cx, cy + ry + 14, 'r = 4', { fill: '#475569' });
+</script>

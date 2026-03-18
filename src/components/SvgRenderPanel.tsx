@@ -11,6 +11,12 @@ interface SvgRenderPanelProps {
 const variantLabel: Record<Variant, string> = {
   static: 'static',
   dynamic: 'dynamic',
+  original: '기존 프롬프트',
+  modified: '수정 프롬프트',
+  v1: 'prompt.dynamic (v1)',
+  v4: 'math-visualization-v4',
+  before: '원본 코드',
+  after: '수정 코드',
 }
 
 export default function SvgRenderPanel({

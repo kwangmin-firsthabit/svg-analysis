@@ -1,0 +1,179 @@
+<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arrBlue" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L6,3 Z" fill="#1D4ED8"/>
+  </marker>
+  <marker id="arrGray" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L6,3 Z" fill="#94A3B8"/>
+  </marker>
+</defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+// scale: 20px per unit
+// sector: radius R=10 -> 200px, center angle 144 deg
+// circle: radius r=4 -> 80px
+// Layout: sector on left, circle on right
+
+const scale = 20;
+const sectorR = 200; // 10 * scale
+const circleR = 80;  // 4 * scale
+
+// Sector center at (220, 280)
+const scx = 220, scy = 300;
+// 144 deg sector, symmetric about downward direction (270 deg from positive x-axis)
+// Actually let's orient it nicely: open upward, so center angle bisector pointing up
+// bisector at -90deg (pointing up), half-angle = 72deg
+// left ray at -90-72 = -162 deg, right ray at -90+72 = -18 deg
+const halfAngle = 72 * Math.PI / 180;
+const bisector = -Math.PI / 2; // pointing up
+const a1 = bisector - halfAngle; // left ray angle
+const a2 = bisector + halfAngle; // right ray angle
+
+const sx1 = Math.round(scx + sectorR * Math.cos(a1));
+const sy1 = Math.round(scy + sectorR * Math.sin(a1));
+const sx2 = Math.round(scx + sectorR * Math.cos(a2));
+const sy2 = Math.round(scy + sectorR * Math.sin(a2));
+
+// Arc path (large-arc-flag=1 since 144>180? No, 144<180 so flag=0)
+const sectorPath = `M ${scx},${scy} L ${sx1},${sy1} A ${sectorR},${sectorR} 0 0,1 ${sx2},${sy2} Z`;
+svg.appendChild(el('path', {
+  d: sectorPath,
+  fill: '#3B82F6', 'fill-opacity': '0.12',
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// Arc only (for label positioning)
+// Sector label: "옆면 넓이 = 40π"
+const labelAngle = bisector; // straight up from center
+const labelR = sectorR * 0.55;
+const lx = Math.round(scx + labelR * Math.cos(labelAngle));
+const ly = Math.round(scy + labelR * Math.sin(labelAngle));
+svg.appendChild(el('text', {
+  x: lx, y: ly - 12,
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  fill: '#1E293B', 'font-size': '14', 'font-weight': '500'
+})).textContent = '옆면 넓이';
+svg.appendChild(el('text', {
+  x: lx, y: ly + 12,
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  fill: '#1E293B', 'font-size': '14', 'font-weight': '500'
+})).textContent = '= 40π';
+
+// Radius lines are already part of the path; add radius label along right ray
+const midR = sectorR * 0.5;
+const rmx = Math.round(scx + midR * Math.cos(a2));
+const rmy = Math.round(scy + midR * Math.sin(a2));
+svg.appendChild(el('text', {
+  x: rmx + 14, y: rmy,
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  fill: '#475569', 'font-size': '12', 'font-weight': '400'
+})).textContent = '10';
+
+// Center angle arc indicator
+const arcIndicatorR = 36;
+const angleArcPath = `M ${Math.round(scx + arcIndicatorR * Math.cos(a1))},${Math.round(scy + arcIndicatorR * Math.sin(a1))} A ${arcIndicatorR},${arcIndicatorR} 0 0,1 ${Math.round(scx + arcIndicatorR * Math.cos(a2))},${Math.round(scy + arcIndicatorR * Math.sin(a2))}`;
+svg.appendChild(el('path', {
+  d: angleArcPath,
+  fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.2'
+}));
+// Angle label
+svg.appendChild(el('text', {
+  x: scx, y: Math.round(scy - arcIndicatorR - 10),
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  fill: '#1D4ED8', 'font-size': '13', 'font-weight': '500'
+})).textContent = '144°';
+
+// Circle on the right side
+const ccx = 530, ccy = 300;
+svg.appendChild(el('circle', {
+  cx: ccx, cy: ccy, r: circleR,
+  fill: '#3B82F6', 'fill-opacity': '0.12',
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// Circle radius line
+svg.appendChild(el('line', {
+  x1: ccx, y1: ccy, x2: ccx + circleR, y2: ccy,
+  stroke: '#94A3B8', 'stroke-width': '1.2'
+}));
+svg.appendChild(el('text', {
+  x: Math.round(ccx + circleR / 2), y: ccy - 10,
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  fill: '#475569', 'font-size': '12', 'font-weight': '400'
+})).textContent = '4';
+
+// Circle label
+svg.appendChild(el('text', {
+  x: ccx, y: ccy - 14,
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  fill: '#1E293B', 'font-size': '14', 'font-weight': '500'
+})).textContent = '밑면';
+svg.appendChild(el('text', {
+  x: ccx, y: ccy + 14,
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  fill: '#1E293B', 'font-size': '14', 'font-weight': '500'
+})).textContent = '넓이 = 16π';
+
+// Title
+svg.appendChild(el('text', {
+  x: 340, y: 30,
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  fill: '#1E293B', 'font-size': '16', 'font-weight': '500'
+})).textContent = '원뿔의 전개도';
+
+// Section labels
+svg.appendChild(el('text', {
+  x: scx, y: 80,
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  fill: '#475569', 'font-size': '13', 'font-weight': '400'
+})).textContent = '옆면 (부채꼴)';
+
+svg.appendChild(el('text', {
+  x: ccx, y: 80,
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  fill: '#475569', 'font-size': '13', 'font-weight': '400'
+})).textContent = '밑면 (원)';
+
+// Summary lines
+const summaries = [
+  '모선 l = 10,  밑면 반지름 r = 4',
+  '부채꼴 중심각 = 360° × (r / l) = 360° × (4/10) = 144°',
+  '옆면 넓이 = π × l × r = π × 10 × 4 = 40π',
+];
+summaries.forEach((line, i) => {
+  svg.appendChild(el('text', {
+    x: 340, y: 440 + i * 24,
+    'text-anchor': 'middle', 'dominant-baseline': 'central',
+    fill: '#475569', 'font-size': '12', 'font-weight': '400'
+  })).textContent = line;
+});
+
+// Auxiliary: mark center dot of sector
+svg.appendChild(el('circle', {
+  cx: scx, cy: scy, r: '3',
+  fill: '#1D4ED8'
+}));
+
+// Auxiliary: mark center dot of circle
+svg.appendChild(el('circle', {
+  cx: ccx, cy: ccy, r: '3',
+  fill: '#1D4ED8'
+}));
+
+// Left radius label
+const lrmx = Math.round(scx + midR * Math.cos(a1));
+const lrmy = Math.round(scy + midR * Math.sin(a1));
+svg.appendChild(el('text', {
+  x: lrmx - 16, y: lrmy,
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  fill: '#475569', 'font-size': '12', 'font-weight': '400'
+})).textContent = '10';
+</script>

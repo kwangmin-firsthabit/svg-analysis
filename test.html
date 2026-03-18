@@ -32,148 +32,188 @@
   x축 눈금: 20,30,40,50,60,70,80,90,100
     px=60+점수*4
 -->
-    <svg id="vis" width="100%" viewBox="0 0 680 560" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <marker
-          id="arrow"
-          viewBox="0 0 10 10"
-          refX="8"
-          refY="5"
-          markerWidth="6"
-          markerHeight="6"
-          orient="auto-start-reverse"
-        >
-          <path
-            d="M2 1L8 5L2 9"
-            fill="none"
-            stroke="context-stroke"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-        </marker>
-      </defs>
+    <svg id="vis" width="100%" viewBox="0 0 680 332" xmlns="http://www.w3.org/2000/svg">
+      <defs></defs>
     </svg>
     <script>
       const svg = document.getElementById('vis');
       const ns = 'http://www.w3.org/2000/svg';
-
       function el(tag, attrs) {
         const e = document.createElementNS(ns, tag);
         for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
         return e;
       }
 
-      function addText(x, y, content, attrs = {}) {
-        const t = el('text', {
-          x,
-          y,
-          'font-size': '12',
-          'font-weight': '400',
-          'text-anchor': 'middle',
+      // 등변사다리꼴: 윗변 AD=4, 아랫변 BC=10, 높이=6
+      // 각 옆 돌출 = (10-4)/2 = 3
+      // 수학 좌표 (중심 원점): B=(-5,0), C=(5,0), D=(2,6), A=(-2,6)
+      // SVG 좌표: 중앙 cx=340, 아랫변 y=312, 윗변 y=60
+      // scale = 42px/unit
+
+      const scale = 42;
+      const cx = 340;
+      const top = 60;
+
+      const Ax = Math.round(cx - 2 * scale),
+        Ay = top;
+      const Dx = Math.round(cx + 2 * scale),
+        Dy = top;
+      const Bx = Math.round(cx - 5 * scale),
+        By = Math.round(top + 6 * scale);
+      const Cx = Math.round(cx + 5 * scale),
+        Cy = By;
+
+      // 사다리꼴 채우기
+      svg.appendChild(
+        el('polygon', {
+          points: `${Ax},${Ay} ${Dx},${Dy} ${Cx},${Cy} ${Bx},${By}`,
+          fill: '#3B82F6',
+          'fill-opacity': '0.12',
+          stroke: '#1D4ED8',
+          'stroke-width': '1.5',
+        })
+      );
+
+      // 대각선 AC, BD
+      svg.appendChild(
+        el('line', {
+          x1: Ax,
+          y1: Ay,
+          x2: Cx,
+          y2: Cy,
+          stroke: '#1D4ED8',
+          'stroke-width': '1.2',
+          'stroke-dasharray': '5 3',
+        })
+      );
+      svg.appendChild(
+        el('line', {
+          x1: Bx,
+          y1: By,
+          x2: Dx,
+          y2: Dy,
+          stroke: '#1D4ED8',
+          'stroke-width': '1.2',
+          'stroke-dasharray': '5 3',
+        })
+      );
+
+      // 교점 O 계산
+      // A + t*(C-A) = B + s*(D-B)
+      // 수학 좌표: A=(-2,6), C=(5,0), B=(-5,0), D=(2,6)
+      // t = 2/7
+      const t = 2 / 7;
+      const Ox = Math.round(Ax + t * (Cx - Ax));
+      const Oy = Math.round(Ay + t * (Cy - Ay));
+
+      // 교점 O 점
+      svg.appendChild(
+        el('circle', {
+          cx: Ox,
+          cy: Oy,
+          r: '3.5',
+          fill: '#1D4ED8',
+        })
+      );
+
+      // 등변 표시 (다리 AB, CD 중점에 틱)
+      function tickMark(x1, y1, x2, y2) {
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+        const len = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
+        const dx = (x2 - x1) / len;
+        const dy = (y2 - y1) / len;
+        const nx = -dy,
+          ny = dx;
+        const tk = 6;
+        svg.appendChild(
+          el('line', {
+            x1: Math.round(mx - nx * tk),
+            y1: Math.round(my - ny * tk),
+            x2: Math.round(mx + nx * tk),
+            y2: Math.round(my + ny * tk),
+            stroke: '#1D4ED8',
+            'stroke-width': '1.5',
+          })
+        );
+      }
+      tickMark(Ax, Ay, Bx, By);
+      tickMark(Dx, Dy, Cx, Cy);
+
+      // 꼭짓점 라벨
+      const off = 16;
+      const vLabels = [
+        { text: 'A', x: Ax - off, y: Ay, anchor: 'middle' },
+        { text: 'D', x: Dx + off, y: Dy, anchor: 'middle' },
+        { text: 'B', x: Bx - off, y: By, anchor: 'middle' },
+        { text: 'C', x: Cx + off, y: Cy, anchor: 'middle' },
+        { text: 'O', x: Ox + 16, y: Oy, anchor: 'middle' },
+      ];
+      for (const lb of vLabels) {
+        svg.appendChild(
+          el('text', {
+            x: lb.x,
+            y: lb.y,
+            'dominant-baseline': 'central',
+            'text-anchor': lb.anchor,
+            'font-size': '14px',
+            'font-weight': '500',
+            fill: '#1E293B',
+          })
+        ).textContent = lb.text;
+      }
+
+      // 변 길이 라벨
+      // 윗변 AD=4
+      svg.appendChild(
+        el('text', {
+          x: Math.round((Ax + Dx) / 2),
+          y: Ay - 14,
           'dominant-baseline': 'central',
+          'text-anchor': 'middle',
+          'font-size': '12px',
+          'font-weight': '400',
           fill: '#475569',
-          ...attrs,
-        });
-        t.textContent = content;
-        svg.appendChild(t);
-      }
+        })
+      ).textContent = '4';
 
-      const ox = 200,
-        oy = 300,
-        scale = 40,
-        H = 560;
+      // 아랫변 BC=10
+      svg.appendChild(
+        el('text', {
+          x: Math.round((Bx + Cx) / 2),
+          y: By + 16,
+          'dominant-baseline': 'central',
+          'text-anchor': 'middle',
+          'font-size': '12px',
+          'font-weight': '400',
+          fill: '#475569',
+        })
+      ).textContent = '10';
 
-      // x축
+      // 높이 보조선 + 라벨
+      const hx = Math.round(cx + 5 * scale + 30);
       svg.appendChild(
         el('line', {
-          x1: 60,
-          y1: oy,
-          x2: 630,
-          y2: oy,
-          stroke: '#374151',
-          'stroke-width': '1.2',
-          'marker-end': 'url(#arrow)',
+          x1: hx,
+          y1: Ay,
+          x2: hx,
+          y2: By,
+          stroke: '#94A3B8',
+          'stroke-width': '0.8',
+          'stroke-dasharray': '4 3',
         })
       );
-      // y축
       svg.appendChild(
-        el('line', {
-          x1: ox,
-          y1: H - 20,
-          x2: ox,
-          y2: 40,
-          stroke: '#374151',
-          'stroke-width': '1.2',
-          'marker-end': 'url(#arrow)',
+        el('text', {
+          x: hx + 14,
+          y: Math.round((Ay + By) / 2),
+          'dominant-baseline': 'central',
+          'text-anchor': 'middle',
+          'font-size': '12px',
+          'font-weight': '400',
+          fill: '#475569',
         })
-      );
-      addText(625, oy - 14, 'x', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
-      addText(ox + 14, 52, 'y', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
-      addText(ox - 14, oy + 14, 'O');
-
-      // x축 눈금: -3~7
-      for (let i = -3; i <= 7; i++) {
-        if (i === 0) continue;
-        const px = ox + i * scale;
-        svg.appendChild(
-          el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: '#374151', 'stroke-width': '0.8' })
-        );
-        addText(px, oy + 16, String(i));
-      }
-
-      // y축 눈금: -3~9
-      for (let i = -3; i <= 9; i++) {
-        if (i === 0) continue;
-        const py = oy - i * scale;
-        svg.appendChild(
-          el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: '#374151', 'stroke-width': '0.8' })
-        );
-        addText(ox - 16, py, String(i));
-      }
-
-      // 직선 y = 2x - 3, math_x -0.5 ~ 6.5
-      const pts = [];
-      for (let mx = -0.5; mx <= 6.5; mx += 0.05) {
-        const my = 2 * mx - 3;
-        const px = Math.round((ox + mx * scale) * 10) / 10;
-        const py = Math.round((oy - my * scale) * 10) / 10;
-        if (py > 20 && py < H - 20) pts.push(px + ',' + py);
-      }
-      svg.appendChild(
-        el('polyline', {
-          points: pts.join(' '),
-          fill: 'none',
-          stroke: '#2563EB',
-          'stroke-width': '2',
-          'stroke-linecap': 'round',
-          'stroke-linejoin': 'round',
-        })
-      );
-
-      // 특수점: y절편 (0, -3)
-      const yIntPx = ox + 0 * scale;
-      const yIntPy = oy - -3 * scale;
-      svg.appendChild(
-        el('circle', { cx: yIntPx, cy: yIntPy, r: '4', fill: '#2563EB', stroke: '#fff', 'stroke-width': '1.5' })
-      );
-      addText(yIntPx - 20, yIntPy - 12, '(0, −3)', { 'font-size': '11', fill: '#1E293B', 'text-anchor': 'middle' });
-
-      // 특수점: x절편 (1.5, 0)
-      const xIntPx = ox + 1.5 * scale;
-      const xIntPy = oy - 0 * scale;
-      svg.appendChild(
-        el('circle', { cx: xIntPx, cy: xIntPy, r: '4', fill: '#2563EB', stroke: '#fff', 'stroke-width': '1.5' })
-      );
-      addText(xIntPx + 18, xIntPy - 12, '(3/2, 0)', { 'font-size': '11', fill: '#1E293B', 'text-anchor': 'middle' });
-
-      // 레이블
-      addText(ox + 5.5 * scale, oy - (2 * 5.5 - 3) * scale - 16, 'y = 2x − 3', {
-        'font-size': '14',
-        'font-weight': '500',
-        fill: '#1E293B',
-        'text-anchor': 'middle',
-      });
+      ).textContent = '6';
     </script>
   </body>
 </html>

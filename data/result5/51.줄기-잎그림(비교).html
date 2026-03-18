@@ -1,0 +1,42 @@
+<svg id="vis" width="100%" viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg=document.getElementById('vis');
+const ns='http://www.w3.org/2000/svg';
+function el(tag,attrs){const e=document.createElementNS(ns,tag);for(const[k,v]of Object.entries(attrs))e.setAttribute(k,v);return e;}
+function txt(x,y,s,attrs={}){const t=el('text',{x,y,'font-size':'13','font-weight':'400','text-anchor':'middle','dominant-baseline':'central',fill:'#1E293B',...attrs});t.textContent=s;svg.appendChild(t);}
+
+svg.appendChild(el('rect',{x:40,y:55,width:600,height:200,rx:'6',fill:'#F8FAFC',stroke:'#CBD5E1','stroke-width':'1'}));
+
+svg.appendChild(el('line',{x1:300,y1:55,x2:300,y2:255,stroke:'#64748B','stroke-width':'1.5'}));
+svg.appendChild(el('line',{x1:380,y1:55,x2:380,y2:255,stroke:'#64748B','stroke-width':'1.5'}));
+svg.appendChild(el('line',{x1:40,y1:100,x2:640,y2:100,stroke:'#CBD5E1','stroke-width':'1'}));
+
+txt(210,77,'남학생',{'font-size':'14','font-weight':'600',fill:'#1D4ED8'});
+txt(340,77,'줄기',{'font-size':'14','font-weight':'600',fill:'#374151'});
+txt(470,77,'여학생',{'font-size':'14','font-weight':'600',fill:'#16A34A'});
+
+const rows=[
+  {stem:'14',mLeaves:[],fLeaves:['8']},
+  {stem:'15',mLeaves:['2','8'],fLeaves:['1','3','5','7','9']},
+  {stem:'16',mLeaves:['1','3','5','7','8'],fLeaves:['2','4','5','8']},
+  {stem:'17',mLeaves:['0','2','5'],fLeaves:[]},
+];
+
+const rowY=[110,155,200,245];
+
+rows.forEach((row,i)=>{
+  const y=rowY[i];
+
+  txt(340,y,row.stem,{'font-size':'14','font-weight':'600',fill:'#374151'});
+
+  if(row.mLeaves.length>0){
+    const mStr=row.mLeaves.slice().reverse().join(' ');
+    txt(295,y,mStr,{'text-anchor':'end','font-size':'13',fill:'#1D4ED8'});
+  }
+
+  if(row.fLeaves.length>0){
+    const fStr=row.fLeaves.join(' ');
+    txt(385,y,fStr,{'text-anchor':'start','font-size':'13',fill:'#16A34A'});
+  }
+});
+</script>

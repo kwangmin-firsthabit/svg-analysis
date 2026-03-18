@@ -1,0 +1,195 @@
+<svg id="vis" width="100%" viewBox="0 0 680 386" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+    <path d="M0,0 L6,3 L0,6 Z" fill="#64748B"/>
+  </marker>
+</defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+const deg2rad = d => d * Math.PI / 180;
+
+// 꼭지각 ∠B = 40°, AB = BC = 7, scale = 45px/unit
+const AB = 7;
+const scale = 45;
+const AC_half = AB * Math.sin(deg2rad(20)) * scale; // AC/2 in px
+const BH_px = AB * Math.cos(deg2rad(20)) * scale;   // 높이 in px
+
+const Bx = 340, By = 50;
+const Ax = Math.round(340 - AC_half);
+const Ay = Math.round(50 + BH_px);
+const Cx = Math.round(340 + AC_half);
+const Cy = Ay;
+const Hx = 340, Hy = Ay;
+
+// 삼각형 채우기
+svg.appendChild(el('polygon', {
+  points: `${Bx},${By} ${Ax},${Ay} ${Cx},${Cy}`,
+  fill: '#3B82F6',
+  'fill-opacity': '0.12',
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5'
+}));
+
+// 수선 BH (보조선)
+svg.appendChild(el('line', {
+  x1: Hx, y1: By, x2: Hx, y2: Hy,
+  stroke: '#94A3B8',
+  'stroke-width': '0.8',
+  'stroke-dasharray': '4 3'
+}));
+
+// 직각 마커 at H
+const sq = 8;
+svg.appendChild(el('polyline', {
+  points: `${Hx - sq},${Hy} ${Hx - sq},${Hy - sq} ${Hx},${Hy - sq}`,
+  fill: 'none',
+  stroke: '#64748B',
+  'stroke-width': '1.2'
+}));
+
+// 각도 호 ∠A = 70° at A
+// A에서 AC방향(오른쪽 0°)부터 AB방향(-70°)까지 (SVG y축 반전이므로 -70°)
+const r_arc = 28;
+// A에서 AC방향(0°) → AB방향(-70° = 290°): arc from 0 to -70 (counterclockwise in math = clockwise in SVG)
+// SVG에서: A=(Ax,Ay), AC방향=0°, AB방향=atan2(By-Ay, Bx-Ax)
+const angA_AB = Math.atan2(By - Ay, Bx - Ax); // AB방향 (SVG 좌표)
+const angA_AC = Math.atan2(0, Cx - Ax); // AC방향 = 0
+
+const arcA_sx = Math.round(Ax + r_arc * Math.cos(angA_AC));
+const arcA_sy = Math.round(Ay + r_arc * Math.sin(angA_AC));
+const arcA_ex = Math.round(Ax + r_arc * Math.cos(angA_AB));
+const arcA_ey = Math.round(Ay + r_arc * Math.sin(angA_AB));
+
+svg.appendChild(el('path', {
+  d: `M ${arcA_sx},${arcA_sy} A ${r_arc},${r_arc} 0 0,0 ${arcA_ex},${arcA_ey}`,
+  fill: 'none',
+  stroke: '#F59E0B',
+  'stroke-width': '1.5'
+}));
+
+// 각도 호 ∠B = 40° at B
+const angB_BA = Math.atan2(Ay - By, Ax - Bx); // BA방향
+const angB_BC = Math.atan2(Cy - By, Cx - Bx); // BC방향
+const arcB_sx = Math.round(Bx + r_arc * Math.cos(angB_BA));
+const arcB_sy = Math.round(By + r_arc * Math.sin(angB_BA));
+const arcB_ex = Math.round(Bx + r_arc * Math.cos(angB_BC));
+const arcB_ey = Math.round(By + r_arc * Math.sin(angB_BC));
+
+svg.appendChild(el('path', {
+  d: `M ${arcB_sx},${arcB_sy} A ${r_arc},${r_arc} 0 0,1 ${arcB_ex},${arcB_ey}`,
+  fill: 'none',
+  stroke: '#F59E0B',
+  'stroke-width': '1.5'
+}));
+
+// 각도 호 ∠C = 70° at C
+const angC_CB = Math.atan2(By - Cy, Bx - Cx); // CB방향
+const angC_CA = Math.atan2(0, Ax - Cx); // CA방향 = 180°
+const arcC_sx = Math.round(Cx + r_arc * Math.cos(angC_CB));
+const arcC_sy = Math.round(Cy + r_arc * Math.sin(angC_CB));
+const arcC_ex = Math.round(Cx + r_arc * Math.cos(angC_CA));
+const arcC_ey = Math.round(Cy + r_arc * Math.sin(angC_CA));
+
+svg.appendChild(el('path', {
+  d: `M ${arcC_sx},${arcC_sy} A ${r_arc},${r_arc} 0 0,1 ${arcC_ex},${arcC_ey}`,
+  fill: 'none',
+  stroke: '#F59E0B',
+  'stroke-width': '1.5'
+}));
+
+// 등변 표시 (AB, BC 중점에 틱)
+function tickMark(x1, y1, x2, y2) {
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+  const len = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+  const dx = (x2 - x1) / len;
+  const dy = (y2 - y1) / len;
+  const nx = -dy, ny = dx;
+  const t = 6;
+  svg.appendChild(el('line', {
+    x1: Math.round(mx - nx*t), y1: Math.round(my - ny*t),
+    x2: Math.round(mx + nx*t), y2: Math.round(my + ny*t),
+    stroke: '#1D4ED8', 'stroke-width': '1.5'
+  }));
+}
+tickMark(Bx, By, Ax, Ay);
+tickMark(Bx, By, Cx, Cy);
+
+// 꼭짓점 라벨
+const labelOffset = 16;
+const labels = [
+  { text: 'B', x: Bx, y: By - labelOffset },
+  { text: 'A', x: Ax - labelOffset, y: Ay },
+  { text: 'C', x: Cx + labelOffset, y: Cy },
+  { text: 'H', x: Hx + labelOffset, y: Hy }
+];
+for (const lb of labels) {
+  svg.appendChild(el('text', {
+    x: lb.x, y: lb.y,
+    'dominant-baseline': 'central',
+    'text-anchor': 'middle',
+    'font-size': '14px',
+    'font-weight': '500',
+    fill: '#1E293B'
+  })).textContent = lb.text;
+}
+
+// 각도 라벨
+svg.appendChild(el('text', {
+  x: Ax + 42, y: Ay - 18,
+  'dominant-baseline': 'central',
+  'text-anchor': 'middle',
+  'font-size': '12px',
+  'font-weight': '400',
+  fill: '#475569'
+})).textContent = '70°';
+
+svg.appendChild(el('text', {
+  x: Bx, y: By + 30,
+  'dominant-baseline': 'central',
+  'text-anchor': 'middle',
+  'font-size': '12px',
+  'font-weight': '400',
+  fill: '#475569'
+})).textContent = '40°';
+
+svg.appendChild(el('text', {
+  x: Cx - 42, y: Cy - 18,
+  'dominant-baseline': 'central',
+  'text-anchor': 'middle',
+  'font-size': '12px',
+  'font-weight': '400',
+  fill: '#475569'
+})).textContent = '70°';
+
+// 변 길이 라벨 AB=7, BC=7
+const AB_mx = Math.round((Bx + Ax) / 2) - 14;
+const AB_my = Math.round((By + Ay) / 2);
+svg.appendChild(el('text', {
+  x: AB_mx, y: AB_my,
+  'dominant-baseline': 'central',
+  'text-anchor': 'middle',
+  'font-size': '12px',
+  'font-weight': '400',
+  fill: '#475569'
+})).textContent = '7';
+
+const BC_mx = Math.round((Bx + Cx) / 2) + 14;
+const BC_my = Math.round((By + Cy) / 2);
+svg.appendChild(el('text', {
+  x: BC_mx, y: BC_my,
+  'dominant-baseline': 'central',
+  'text-anchor': 'middle',
+  'font-size': '12px',
+  'font-weight': '400',
+  fill: '#475569'
+})).textContent = '7';
+</script>

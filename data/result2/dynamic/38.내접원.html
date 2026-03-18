@@ -1,0 +1,78 @@
+<svg id="vis" width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const ccx = 200, ccy = 340;
+const acx = 200, acy = 160;
+const bcx = 440, bcy = 340;
+
+svg.appendChild(el('polygon', {
+  points: `${ccx},${ccy} ${acx},${acy} ${bcx},${bcy}`,
+  fill: '#3B82F6', 'fill-opacity': '0.12',
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+const s = 10;
+svg.appendChild(el('path', {
+  d: `M ${ccx},${ccy - s} L ${ccx + s},${ccy - s} L ${ccx + s},${ccy}`,
+  fill: 'none',
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+const ir = 60;
+const ix = 260, iy = 280;
+svg.appendChild(el('circle', {
+  cx: ix, cy: iy, r: ir,
+  fill: '#3B82F6', 'fill-opacity': '0.08',
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+[[ccx, ccy], [acx, acy], [bcx, bcy]].forEach(([x, y]) => {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3', fill: '#1D4ED8' }));
+});
+svg.appendChild(el('circle', { cx: ix, cy: iy, r: '3', fill: '#1D4ED8' }));
+
+addText(ccx - 16, ccy, 'C', { fill: '#1E293B', 'font-size': '14', 'font-weight': '600' });
+addText(acx - 16, acy, 'A', { fill: '#1E293B', 'font-size': '14', 'font-weight': '600' });
+addText(bcx + 16, bcy, 'B', { fill: '#1E293B', 'font-size': '14', 'font-weight': '600' });
+addText(ix + 14, iy - 14, 'I', { fill: '#1E293B', 'font-size': '14', 'font-weight': '600' });
+
+const caMx = Math.round((ccx + acx) / 2);
+const caMy = Math.round((ccy + acy) / 2);
+addText(caMx - 14, caMy, '6', { fill: '#1E293B', 'font-size': '13' });
+
+const cbMx = Math.round((ccx + bcx) / 2);
+const cbMy = Math.round((ccy + bcy) / 2);
+addText(cbMx, cbMy + 16, '8', { fill: '#1E293B', 'font-size': '13' });
+
+const abMx = Math.round((acx + bcx) / 2);
+const abMy = Math.round((acy + bcy) / 2);
+const abdx = bcx - acx;
+const abdy = bcy - acy;
+const abLen = Math.sqrt(abdx * abdx + abdy * abdy);
+const abnx = -abdy / abLen;
+const abny = abdx / abLen;
+const abLx = Math.round(abMx + abnx * 14);
+const abLy = Math.round(abMy + abny * 14);
+addText(abLx, abLy, '10', { fill: '#1E293B', 'font-size': '13' });
+
+svg.appendChild(el('line', {
+  x1: ix, y1: iy,
+  x2: ccx, y2: iy,
+  stroke: '#94A3B8', 'stroke-dasharray': '4 3', 'stroke-width': '0.8'
+}));
+addText(Math.round((ix + ccx) / 2), iy - 10, '2', { fill: '#475569', 'font-size': '12' });
+</script>
