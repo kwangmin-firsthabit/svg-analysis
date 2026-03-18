@@ -1,0 +1,114 @@
+<!--
+  로그함수 y = log₂x 좌표 계산 및 검증
+  축 범위: x: -1~8, y: -3~3
+  단위: 50px
+
+  좌표계 설정:
+    원점(O) = (70, 230) [SVG 좌표]  (x=-1이므로 좌측 여유 50px)
+    1단위 = 50px
+    SVG 너비: 70 + 8*50 + 30 = 500
+    SVG 높이: 230 + 3*50 + 20 = 400
+
+  SVG 변환: svgX = 70 + x*50, svgY = 230 - y*50
+
+  주요 점:
+    (1, 0):  svgX=70+50=120, svgY=230
+    (2, 1):  svgX=70+100=170, svgY=230-50=180
+    (4, 2):  svgX=70+200=270, svgY=230-100=130
+    (8, 3):  svgX=70+400=470, svgY=230-150=80
+    (0.5, -1): svgX=70+25=95, svgY=230+50=280
+    (0.25, -2): svgX=70+12.5=82.5≈83, svgY=230+100=330
+
+  샘플 (x>0, step 0.1):
+    x=0.1: y=log₂(0.1)=-3.322 → 범위 밖
+    y=-3: x=2^(-3)=0.125, svgX=70+6.25=76.25≈76, svgY=230+150=380
+    x=0.13: y≈-2.94, svgX≈76.5, svgY≈377
+    x=0.25: y=-2,    svgX=82.5, svgY=330
+    x=0.5:  y=-1,    svgX=95,   svgY=280
+    x=1.0:  y=0,     svgX=120,  svgY=230
+    x=2.0:  y=1,     svgX=170,  svgY=180
+    x=4.0:  y=2,     svgX=270,  svgY=130
+    x=8.0:  y=3,     svgX=470,  svgY=80
+
+  점근선: x=0 (y축이 점근선, 실제로는 축 자체)
+-->
+<svg width="500" height="400" viewBox="0 0 500 400" xmlns="http://www.w3.org/2000/svg"
+     font-family="serif" font-size="14">
+
+  <!-- x축 -->
+  <line x1="20" y1="230" x2="480" y2="230" stroke="black" stroke-width="1.5"/>
+  <polygon points="480,230 472,226 472,234" fill="black"/>
+  <!-- y축 -->
+  <line x1="70" y1="380" x2="70" y2="20" stroke="black" stroke-width="1.5"/>
+  <polygon points="70,20 66,28 74,28" fill="black"/>
+
+  <!-- x축 눈금 -->
+  <line x1="120" y1="225" x2="120" y2="235" stroke="black" stroke-width="1"/>
+  <text x="120" y="248" text-anchor="middle" font-size="12">1</text>
+  <line x1="170" y1="225" x2="170" y2="235" stroke="black" stroke-width="1"/>
+  <text x="170" y="248" text-anchor="middle" font-size="12">2</text>
+  <line x1="220" y1="225" x2="220" y2="235" stroke="black" stroke-width="1"/>
+  <text x="220" y="248" text-anchor="middle" font-size="12">3</text>
+  <line x1="270" y1="225" x2="270" y2="235" stroke="black" stroke-width="1"/>
+  <text x="270" y="248" text-anchor="middle" font-size="12">4</text>
+  <line x1="320" y1="225" x2="320" y2="235" stroke="black" stroke-width="1"/>
+  <text x="320" y="248" text-anchor="middle" font-size="12">5</text>
+  <line x1="370" y1="225" x2="370" y2="235" stroke="black" stroke-width="1"/>
+  <text x="370" y="248" text-anchor="middle" font-size="12">6</text>
+  <line x1="420" y1="225" x2="420" y2="235" stroke="black" stroke-width="1"/>
+  <text x="420" y="248" text-anchor="middle" font-size="12">7</text>
+  <line x1="470" y1="225" x2="470" y2="235" stroke="black" stroke-width="1"/>
+  <text x="470" y="248" text-anchor="middle" font-size="12">8</text>
+
+  <!-- y축 눈금 -->
+  <line x1="65" y1="80" x2="75" y2="80" stroke="black" stroke-width="1"/>
+  <text x="60" y="84" text-anchor="end" font-size="12">3</text>
+  <line x1="65" y1="130" x2="75" y2="130" stroke="black" stroke-width="1"/>
+  <text x="60" y="134" text-anchor="end" font-size="12">2</text>
+  <line x1="65" y1="180" x2="75" y2="180" stroke="black" stroke-width="1"/>
+  <text x="60" y="184" text-anchor="end" font-size="12">1</text>
+  <line x1="65" y1="280" x2="75" y2="280" stroke="black" stroke-width="1"/>
+  <text x="60" y="284" text-anchor="end" font-size="12">-1</text>
+  <line x1="65" y1="330" x2="75" y2="330" stroke="black" stroke-width="1"/>
+  <text x="60" y="334" text-anchor="end" font-size="12">-2</text>
+  <line x1="65" y1="380" x2="75" y2="380" stroke="black" stroke-width="1"/>
+  <text x="60" y="384" text-anchor="end" font-size="12">-3</text>
+
+  <!-- 축 레이블 -->
+  <text x="484" y="234" text-anchor="start" font-size="14">x</text>
+  <text x="74" y="16" text-anchor="start" font-size="14">y</text>
+  <text x="60" y="248" text-anchor="end" font-size="12">O</text>
+
+  <!-- y = log₂x 곡선 -->
+  <!-- x=0.125~8, step 정밀 샘플 -->
+  <path fill="none" stroke="#2563eb" stroke-width="2.5"
+    d="M 76,380
+       L 83,330
+       L 95,280
+       L 104,255
+       L 120,230
+       L 139,205
+       L 170,180
+       L 204,160
+       L 220,153
+       L 270,130
+       L 320,116
+       L 370,105
+       L 420,95
+       L 470,80"/>
+
+  <!-- 점 (1, 0) -->
+  <circle cx="120" cy="230" r="4" fill="#2563eb"/>
+  <text x="120" y="218" text-anchor="middle" font-size="12" fill="#2563eb">(1, 0)</text>
+
+  <!-- 점 (2, 1) -->
+  <circle cx="170" cy="180" r="4" fill="#2563eb"/>
+  <text x="178" y="176" text-anchor="start" font-size="12" fill="#2563eb">(2, 1)</text>
+
+  <!-- 점 (4, 2) -->
+  <circle cx="270" cy="130" r="4" fill="#2563eb"/>
+  <text x="278" y="126" text-anchor="start" font-size="12" fill="#2563eb">(4, 2)</text>
+
+  <!-- 함수식 레이블 -->
+  <text x="340" y="100" text-anchor="start" font-size="15" fill="#2563eb" font-style="italic">y = log₂x</text>
+</svg>

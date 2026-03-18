@@ -1,0 +1,129 @@
+<!--
+  일차함수 y = 2x - 3 좌표 계산 및 검증
+  축 범위: x: -3~5, y: -7~7
+  단위: 50px
+
+  좌표계 설정:
+    원점(O) = (180, 380) [SVG 좌표]
+    1단위 = 50px
+    SVG 너비 = 180 + 5*50 + 50 = 480
+    SVG 높이 = 380 + 7*50 + 20 = 750 → viewBox 기준으로 정리
+
+  SVG 좌표 변환: svgX = 180 + x*50, svgY = 380 - y*50
+
+  주요 점 계산:
+    x절편 (1.5, 0):   svgX = 180+1.5*50=255,  svgY = 380
+    y절편 (0, -3):    svgX = 180,              svgY = 380-(-3)*50=530
+    점 (-3, -9): y범위 밖이므로 y=-7일 때 x 계산
+      -7 = 2x-3 → x = -2 → (-2, -7)
+      svgX = 180+(-2)*50=80, svgY = 380-(-7)*50=730
+    점 x=5일 때: y=2*5-3=7
+      svgX = 180+5*50=430, svgY = 380-7*50=30
+
+  함수 그래프 두 끝점:
+    x=-2, y=-7: (80, 730)
+    x=5,  y=7:  (430, 30)
+
+  x축 눈금 (y=0 선): svgY=380, x=-3~5 → svgX=30~430
+  y축 눈금 (x=0 선): svgX=180, y=-7~7 → svgY=30~730
+-->
+<svg width="480" height="760" viewBox="0 0 480 760" xmlns="http://www.w3.org/2000/svg"
+     font-family="serif" font-size="14">
+
+  <!-- x축 -->
+  <line x1="20" y1="380" x2="450" y2="380" stroke="black" stroke-width="1.5"/>
+  <polygon points="450,380 442,376 442,384" fill="black"/>
+  <!-- y축 -->
+  <line x1="180" y1="740" x2="180" y2="20" stroke="black" stroke-width="1.5"/>
+  <polygon points="180,20 176,28 184,28" fill="black"/>
+
+  <!-- x축 눈금 및 레이블 -->
+  <!-- x = -3 -->
+  <line x1="30" y1="375" x2="30" y2="385" stroke="black" stroke-width="1"/>
+  <text x="30" y="398" text-anchor="middle" font-size="12">-3</text>
+  <!-- x = -2 -->
+  <line x1="80" y1="375" x2="80" y2="385" stroke="black" stroke-width="1"/>
+  <text x="80" y="398" text-anchor="middle" font-size="12">-2</text>
+  <!-- x = -1 -->
+  <line x1="130" y1="375" x2="130" y2="385" stroke="black" stroke-width="1"/>
+  <text x="130" y="398" text-anchor="middle" font-size="12">-1</text>
+  <!-- x = 1 -->
+  <line x1="230" y1="375" x2="230" y2="385" stroke="black" stroke-width="1"/>
+  <text x="230" y="398" text-anchor="middle" font-size="12">1</text>
+  <!-- x = 2 -->
+  <line x1="280" y1="375" x2="280" y2="385" stroke="black" stroke-width="1"/>
+  <text x="280" y="398" text-anchor="middle" font-size="12">2</text>
+  <!-- x = 3 -->
+  <line x1="330" y1="375" x2="330" y2="385" stroke="black" stroke-width="1"/>
+  <text x="330" y="398" text-anchor="middle" font-size="12">3</text>
+  <!-- x = 4 -->
+  <line x1="380" y1="375" x2="380" y2="385" stroke="black" stroke-width="1"/>
+  <text x="380" y="398" text-anchor="middle" font-size="12">4</text>
+  <!-- x = 5 -->
+  <line x1="430" y1="375" x2="430" y2="385" stroke="black" stroke-width="1"/>
+  <text x="430" y="398" text-anchor="middle" font-size="12">5</text>
+
+  <!-- y축 눈금 및 레이블 -->
+  <!-- y = 7 -->
+  <line x1="175" y1="30" x2="185" y2="30" stroke="black" stroke-width="1"/>
+  <text x="165" y="34" text-anchor="end" font-size="12">7</text>
+  <!-- y = 6 -->
+  <line x1="175" y1="80" x2="185" y2="80" stroke="black" stroke-width="1"/>
+  <text x="165" y="84" text-anchor="end" font-size="12">6</text>
+  <!-- y = 5 -->
+  <line x1="175" y1="130" x2="185" y2="130" stroke="black" stroke-width="1"/>
+  <text x="165" y="134" text-anchor="end" font-size="12">5</text>
+  <!-- y = 4 -->
+  <line x1="175" y1="180" x2="185" y2="180" stroke="black" stroke-width="1"/>
+  <text x="165" y="184" text-anchor="end" font-size="12">4</text>
+  <!-- y = 3 -->
+  <line x1="175" y1="230" x2="185" y2="230" stroke="black" stroke-width="1"/>
+  <text x="165" y="234" text-anchor="end" font-size="12">3</text>
+  <!-- y = 2 -->
+  <line x1="175" y1="280" x2="185" y2="280" stroke="black" stroke-width="1"/>
+  <text x="165" y="284" text-anchor="end" font-size="12">2</text>
+  <!-- y = 1 -->
+  <line x1="175" y1="330" x2="185" y2="330" stroke="black" stroke-width="1"/>
+  <text x="165" y="334" text-anchor="end" font-size="12">1</text>
+  <!-- y = -1 -->
+  <line x1="175" y1="430" x2="185" y2="430" stroke="black" stroke-width="1"/>
+  <text x="165" y="434" text-anchor="end" font-size="12">-1</text>
+  <!-- y = -2 -->
+  <line x1="175" y1="480" x2="185" y2="480" stroke="black" stroke-width="1"/>
+  <text x="165" y="484" text-anchor="end" font-size="12">-2</text>
+  <!-- y = -3 -->
+  <line x1="175" y1="530" x2="185" y2="530" stroke="black" stroke-width="1"/>
+  <text x="165" y="534" text-anchor="end" font-size="12">-3</text>
+  <!-- y = -4 -->
+  <line x1="175" y1="580" x2="185" y2="580" stroke="black" stroke-width="1"/>
+  <text x="165" y="584" text-anchor="end" font-size="12">-4</text>
+  <!-- y = -5 -->
+  <line x1="175" y1="630" x2="185" y2="630" stroke="black" stroke-width="1"/>
+  <text x="165" y="634" text-anchor="end" font-size="12">-5</text>
+  <!-- y = -6 -->
+  <line x1="175" y1="680" x2="185" y2="680" stroke="black" stroke-width="1"/>
+  <text x="165" y="684" text-anchor="end" font-size="12">-6</text>
+  <!-- y = -7 -->
+  <line x1="175" y1="730" x2="185" y2="730" stroke="black" stroke-width="1"/>
+  <text x="165" y="734" text-anchor="end" font-size="12">-7</text>
+
+  <!-- 축 레이블 -->
+  <text x="455" y="384" text-anchor="start" font-size="14">x</text>
+  <text x="184" y="16" text-anchor="start" font-size="14">y</text>
+  <text x="168" y="398" text-anchor="end" font-size="12">O</text>
+
+  <!-- y = 2x - 3 그래프 -->
+  <!-- x=-2, y=-7 → (80,730); x=5, y=7 → (430,30) -->
+  <line x1="80" y1="730" x2="430" y2="30" stroke="#2563eb" stroke-width="2"/>
+
+  <!-- x절편 (1.5, 0): svgX=180+1.5*50=255, svgY=380 -->
+  <circle cx="255" cy="380" r="4" fill="#2563eb"/>
+  <text x="255" y="373" text-anchor="middle" font-size="12" fill="#2563eb">(3/2, 0)</text>
+
+  <!-- y절편 (0, -3): svgX=180, svgY=530 -->
+  <circle cx="180" cy="530" r="4" fill="#2563eb"/>
+  <text x="190" y="534" text-anchor="start" font-size="12" fill="#2563eb">(0, -3)</text>
+
+  <!-- 함수식 레이블 -->
+  <text x="390" y="60" text-anchor="start" font-size="15" fill="#2563eb" font-style="italic">y = 2x − 3</text>
+</svg>

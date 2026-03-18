@@ -1,0 +1,112 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 30;
+  const side = 6, h = 4;
+
+  // 사각투영 오프셋
+  const dxOff = 24, dyOff = -24;
+
+  // 밑면 BCDE (정사각형)
+  const px_s = side * unit; // 180px
+  const Bx = 120, By = 300;
+  const B = { x: Bx, y: By };
+  const C = { x: Bx + px_s, y: By };
+  const D = { x: Bx + px_s + dxOff, y: By + dyOff };
+  const E = { x: Bx + dxOff, y: By + dyOff };
+
+  // 밑면 중심
+  const mcx = (B.x + C.x + D.x + E.x) / 4;
+  const mcy = (B.y + C.y + D.y + E.y) / 4;
+
+  // 꼭짓점 A: 중심에서 h단위 위로
+  const A = { x: mcx, y: mcy - h * unit };
+
+  const W = 320, maxY = 260;
+  return { A, B, C, D, E, mcx, mcy, W, maxY };
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function render(geo) {
+  const { A, B, C, D, E, mcx, mcy, W, maxY } = geo;
+  svg.setAttribute('viewBox', `90 ${A.y - 20} 280 240`);
+  svg.setAttribute('width', String(W));
+  svg.setAttribute('height', String(maxY));
+
+  // 점선 (보이지 않는 모서리): AE, DE, BE
+  for (const [p1, p2] of [[A, E], [D, E], [B, E]]) {
+    svg.appendChild(mkEl('line', {
+      x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
+      stroke: '#374151', 'stroke-width': '1.2', 'stroke-dasharray': '5,4'
+    }));
+  }
+
+  // 밑면 보이는 모서리: BC, CD
+  svg.appendChild(mkEl('line', { x1: B.x, y1: B.y, x2: C.x, y2: C.y, stroke: '#1e40af', 'stroke-width': '1.8' }));
+  svg.appendChild(mkEl('line', { x1: C.x, y1: C.y, x2: D.x, y2: D.y, stroke: '#1e40af', 'stroke-width': '1.8' }));
+
+  // 앞면 삼각형 ABC
+  svg.appendChild(mkEl('polygon', {
+    points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`,
+    fill: '#dbeafe', 'fill-opacity': '0.6', stroke: '#1e40af', 'stroke-width': '1.8'
+  }));
+
+  // 오른면 삼각형 ACD
+  svg.appendChild(mkEl('polygon', {
+    points: `${A.x},${A.y} ${C.x},${C.y} ${D.x},${D.y}`,
+    fill: '#bfdbfe', 'fill-opacity': '0.5', stroke: '#1e40af', 'stroke-width': '1.8'
+  }));
+
+  // 꼭짓점 레이블
+  const labels = [
+    { p: A, t: 'A', dx: -4, dy: -8, anchor: 'middle' },
+    { p: B, t: 'B', dx: -14, dy: 14 },
+    { p: C, t: 'C', dx: 4, dy: 14 },
+    { p: D, t: 'D', dx: 4, dy: 6 },
+    { p: E, t: 'E', dx: -14, dy: 4 },
+  ];
+  for (const lb of labels) {
+    const el = mkEl('text', {
+      x: lb.p.x + lb.dx, y: lb.p.y + lb.dy,
+      'text-anchor': lb.anchor || 'start',
+      'font-size': '13', 'font-family': 'serif', fill: '#111827'
+    });
+    el.textContent = lb.t;
+    svg.appendChild(el);
+  }
+
+  // 치수 라벨
+  const lbl6 = mkEl('text', {
+    x: (B.x + C.x) / 2, y: B.y + 18,
+    'text-anchor': 'middle', 'font-size': '12', 'font-family': 'serif', fill: '#374151'
+  });
+  lbl6.textContent = '6';
+  svg.appendChild(lbl6);
+
+  // 높이 점선 및 라벨
+  svg.appendChild(mkEl('line', {
+    x1: A.x, y1: A.y, x2: mcx, y2: mcy,
+    stroke: '#9ca3af', 'stroke-width': '1', 'stroke-dasharray': '4,3'
+  }));
+  svg.appendChild(mkEl('circle', { cx: mcx, cy: mcy, r: '2', fill: '#9ca3af' }));
+  const lbl4 = mkEl('text', {
+    x: A.x + 8, y: (A.y + mcy) / 2,
+    'font-size': '12', 'font-family': 'serif', fill: '#374151'
+  });
+  lbl4.textContent = '4';
+  svg.appendChild(lbl4);
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

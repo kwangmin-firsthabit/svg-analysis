@@ -1,0 +1,35 @@
+<!--
+  사다리꼴 ABCD, AD와 BC 평행, 높이 4 (1 unit = 40px)
+  AD (윗변) = 6, BC (아랫변) = 10, height = 160px
+  A = (160, 120), B = (80, 280), C = (480, 280), D = (400, 120)
+  검증:
+    |BC| = 400px = 10 ✓
+    |AD| = 240px = 6 ✓
+    height = 280-120 = 160px = 4 ✓
+    AD || BC (모두 수평) ✓
+-->
+<svg width="560" height="360" viewBox="0 0 560 360" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="160,120 480,120 400,280 80,280" fill="none" stroke="#000" stroke-width="2"/>
+
+  <!-- 평행 표시 (AD, BC 각각 화살표 틱) -->
+  <!-- AD 중점 (320, 120) -->
+  <g transform="translate(320,120) rotate(0)">
+    <line x1="-8" y1="-5" x2="0" y2="0" stroke="#000" stroke-width="1.5"/>
+    <line x1="-8" y1="5" x2="0" y2="0" stroke="#000" stroke-width="1.5"/>
+  </g>
+  <!-- BC 중점 (280, 280) -->
+  <g transform="translate(280,280) rotate(0)">
+    <line x1="-8" y1="-5" x2="0" y2="0" stroke="#000" stroke-width="1.5"/>
+    <line x1="-8" y1="5" x2="0" y2="0" stroke="#000" stroke-width="1.5"/>
+  </g>
+
+  <!-- 높이 표시 (점선) -->
+  <line x1="320" y1="120" x2="320" y2="280" stroke="#000" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="332" y="206" text-anchor="start" font-size="13" font-family="serif">4</text>
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="146" y="112" text-anchor="end" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="494" y="112" text-anchor="start" font-size="16" font-family="serif" font-style="italic">D</text>
+  <text x="66" y="296" text-anchor="end" font-size="16" font-family="serif" font-style="italic">B</text>
+  <text x="494" y="296" text-anchor="start" font-size="16" font-family="serif" font-style="italic">C</text>
+</svg>

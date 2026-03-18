@@ -1,0 +1,66 @@
+<svg width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    사각뿔 A-BCDE, 밑면 정사각형 한 변=6, 높이=4
+    scale=40px/unit, 경사투영 45°×0.5 → dx=dy=42px (≈ cos45°×0.5×2×40 = 28.28 ≈ 28)
+    밑면 정사각형 BCDE:
+      B(200,380) C(440,380) D(468,352) E(228,352) [oblique: dx=28,dy=-28]
+    실제 dx = cos(45°)*0.5*40 ≈ 14.14 → 사용 dx=24, dy=-24 (0.6 factor)
+    Let B(200,380), C(440,380) width=240=6*40
+    D = C + (24,-24) = (464,356)
+    E = B + (24,-24) = (224,356)
+    center of base = ((200+440+464+224)/4, (380+380+356+356)/4) = (332, 368)
+    A = apex at center_x=332, center_y=368 - 4*40=160 → A(332,208)
+    Adjust to center in viewBox: shift right 10 → B(210,380),C(450,380),D(474,356),E(234,356)
+    center=(342,368) A=(342,208)
+  -->
+
+  <!-- 숨겨진 모서리 (dashed): D-E (back base edge), A-D, A-E partially behind -->
+  <line x1="474" y1="356" x2="234" y2="356" stroke="#888780" stroke-width="1" stroke-dasharray="5 4" stroke-linecap="round" />
+  <line x1="342" y1="208" x2="234" y2="356" stroke="#888780" stroke-width="1" stroke-dasharray="5 4" stroke-linecap="round" />
+  <line x1="342" y1="208" x2="474" y2="356" stroke="#888780" stroke-width="1" stroke-dasharray="5 4" stroke-linecap="round" />
+
+  <!-- 면 채우기 -->
+  <!-- 밑면 BCDE -->
+  <polygon points="210,380 450,380 474,356 234,356" fill="#E6F1FB" stroke="none" opacity="0.5" />
+  <!-- 앞면 삼각형 A-BC -->
+  <polygon points="342,208 210,380 450,380" fill="#B5D4F4" stroke="none" opacity="0.5" />
+  <!-- 오른쪽 삼각형 A-CD -->
+  <polygon points="342,208 450,380 474,356" fill="#85B7EB" stroke="none" opacity="0.5" />
+  <!-- 왼쪽 삼각형 A-BE -->
+  <polygon points="342,208 210,380 234,356" fill="#B5D4F4" stroke="none" opacity="0.5" />
+
+  <!-- 보이는 모서리 -->
+  <!-- 밑면 앞 두 변 B-C, B-E(right), C-D -->
+  <line x1="210" y1="380" x2="450" y2="380" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="210" y1="380" x2="234" y2="356" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="450" y1="380" x2="474" y2="356" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+  <!-- 모선 A-B, A-C -->
+  <line x1="342" y1="208" x2="210" y2="380" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="342" y1="208" x2="450" y2="380" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+
+  <!-- 꼭짓점 -->
+  <circle cx="342" cy="208" r="3" fill="#2C2C2A" />
+  <circle cx="210" cy="380" r="3" fill="#2C2C2A" />
+  <circle cx="450" cy="380" r="3" fill="#2C2C2A" />
+  <circle cx="474" cy="356" r="3" fill="#2C2C2A" />
+  <circle cx="234" cy="356" r="3" fill="#888780" />
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="342" y="196" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#2C2C2A">A</text>
+  <text x="196" y="398" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#2C2C2A">B</text>
+  <text x="464" y="398" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#2C2C2A">C</text>
+  <text x="490" y="360" text-anchor="start" font-family="serif" font-style="italic" font-size="16" fill="#2C2C2A">D</text>
+  <text x="220" y="352" text-anchor="end" font-family="serif" font-style="italic" font-size="16" fill="#888780">E</text>
+
+  <!-- 치수선: 밑변 6 (B-C 아래) -->
+  <line x1="210" y1="404" x2="450" y2="404" stroke="#5F5E5A" stroke-width="0.8" stroke-linecap="round" />
+  <line x1="210" y1="398" x2="210" y2="410" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="450" y1="398" x2="450" y2="410" stroke="#5F5E5A" stroke-width="0.8" />
+  <text x="330" y="424" text-anchor="middle" font-family="serif" font-size="13" fill="#5F5E5A">6</text>
+
+  <!-- 치수선: 높이 4 (오른쪽, A에서 밑면까지) -->
+  <line x1="510" y1="208" x2="510" y2="368" stroke="#5F5E5A" stroke-width="0.8" stroke-linecap="round" />
+  <line x1="504" y1="208" x2="516" y2="208" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="504" y1="368" x2="516" y2="368" stroke="#5F5E5A" stroke-width="0.8" />
+  <text x="524" y="294" text-anchor="start" font-family="serif" font-size="13" fill="#5F5E5A">4</text>
+</svg>

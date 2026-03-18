@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+  <body>
+    <svg width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+      <script>
+        const W = 680,
+          H = 520;
+        const ox = 340,
+          oy = 260,
+          unit = 72;
+
+        function toSVG(mx, my) {
+          return { x: ox + mx * unit, y: oy - my * unit };
+        }
+        const svg = document.querySelector('svg');
+        function el(tag, attrs, txt) {
+          const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+          for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+          if (txt !== undefined) e.textContent = txt;
+          svg.appendChild(e);
+          return e;
+        }
+
+        const xMin = -3.2,
+          xMax = 3.2,
+          yMin = -5.5,
+          yMax = 5.5;
+
+        // 격자
+        for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+          const p = toSVG(x, yMin),
+            q = toSVG(x, yMax);
+          el('line', { x1: p.x, y1: p.y, x2: q.x, y2: q.y, stroke: '#D3D1C7', 'stroke-width': 0.5 });
+        }
+        for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y++) {
+          const p = toSVG(xMin, y),
+            q = toSVG(xMax, y);
+          el('line', { x1: p.x, y1: p.y, x2: q.x, y2: q.y, stroke: '#D3D1C7', 'stroke-width': 0.5 });
+        }
+
+        // 축 + 화살표 + 눈금 (생략 — 위와 동일)
+        // ...
+
+        // y = x(x-2)(x+2) = x³ - 4x
+        function f(x) {
+          return x * (x - 2) * (x + 2);
+        }
+
+        // 곡선 (500 샘플, 뷰포트 클리핑)
+        const steps = 500,
+          xFrom = xMin,
+          xTo = xMax;
+        let pathD = '',
+          penDown = false;
+        for (let i = 0; i <= steps; i++) {
+          const mx = xFrom + ((xTo - xFrom) * i) / steps;
+          const my = f(mx);
+          if (my < yMin - 0.1 || my > yMax + 0.1) {
+            penDown = false;
+            continue;
+          }
+          const p = toSVG(mx, my);
+          if (!penDown) {
+            pathD += `M${p.x},${p.y}`;
+            penDown = true;
+          } else {
+            pathD += ` L${p.x},${p.y}`;
+          }
+        }
+        el('path', {
+          d: pathD,
+          fill: 'none',
+          stroke: '#378ADD',
+          'stroke-width': 2.4,
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+        });
+
+        // x절편: x = -2, 0, 2
+        [-2, 0, 2].forEach(rx => {
+          const p = toSVG(rx, 0);
+          el('circle', { cx: p.x, cy: p.y, r: 5.5, fill: '#F3306A', stroke: '#fff', 'stroke-width': 1.5 });
+        });
+
+        // 극값: y' = 3x²-4 = 0 → x = ±2/√3
+        // 극대: x = -2/√3, 극소: x = 2/√3
+        const xExt = 2 / Math.sqrt(3);
+        const pMax = toSVG(-xExt, f(-xExt));
+        const pMin = toSVG(xExt, f(xExt));
+        [pMax, pMin].forEach(p => {
+          el('circle', { cx: p.x, cy: p.y, r: 4, fill: '#F3C230', stroke: '#fff', 'stroke-width': 1.5 });
+        });
+
+        // 극값 보조 점선
+        function dashedLine(x1, y1, x2, y2) {
+          el('line', { x1, y1, x2, y2, stroke: '#B4B2A9', 'stroke-width': 0.8, 'stroke-dasharray': '4 3' });
+        }
+        dashedLine(pMax.x, pMax.y, pMax.x, oy);
+        dashedLine(pMax.x, pMax.y, ox, pMax.y);
+        dashedLine(pMin.x, pMin.y, pMin.x, oy);
+        dashedLine(pMin.x, pMin.y, ox, pMin.y);
+      </script>
+    </svg>
+  </body>
+</html>

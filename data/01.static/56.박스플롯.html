@@ -1,0 +1,125 @@
+<svg width="100%" viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    두 반 수평 박스플롯
+    x축: 20~110 점수, origin left=80, scale=(500px/90점)=약5.556px/점
+    SVG x = 80 + (점수-20) * (500/90)
+    A반: min=42, Q1=58, med=71, Q3=84, max=98, outlier=28
+    B반: min=50, Q1=65, med=75, Q3=88, max=100
+    A반 y=140 (박스 y=110~170, height=60), B반 y=240 (박스 y=210~270, height=60)
+    x scale factor: 500/90 ≈ 5.556
+    20→80, 28→124.4, 42→192.2, 50→236.7, 58→281.1, 65→319.4
+    71→352.8, 75→375.0, 84→419.4, 88→441.7, 98→497.8, 100→508.9, 110→558.9(≈559)
+  -->
+
+  <!-- ── 격자 수직선 ── -->
+  <line x1="135" y1="60"  x2="135" y2="310" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="191" y1="60"  x2="191" y2="310" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="246" y1="60"  x2="246" y2="310" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="302" y1="60"  x2="302" y2="310" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="357" y1="60"  x2="357" y2="310" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="413" y1="60"  x2="413" y2="310" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="468" y1="60"  x2="468" y2="310" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="524" y1="60"  x2="524" y2="310" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="580" y1="60"  x2="580" y2="310" stroke="#D3D1C7" stroke-width="0.5" />
+
+  <!-- ── A반 박스플롯 (y 중심=140) ── -->
+  <!-- 이상치 outlier=28 → x=124 -->
+  <circle cx="124" cy="140" r="5" fill="none" stroke="#185FA5" stroke-width="1.5" />
+
+  <!-- 수염: min(42)=192 ~ Q1(58)=302 -->
+  <line x1="192" y1="140" x2="302" y2="140" stroke="#185FA5" stroke-width="1.5" stroke-dasharray="4 3" />
+  <!-- 수염 최솟값 세로선 -->
+  <line x1="192" y1="120" x2="192" y2="160" stroke="#185FA5" stroke-width="1.5" />
+
+  <!-- 수염: Q3(84)=469 ~ max(98)=569 -->
+  <line x1="469" y1="140" x2="569" y2="140" stroke="#185FA5" stroke-width="1.5" />
+  <!-- 수염 최댓값 세로선 -->
+  <line x1="569" y1="120" x2="569" y2="160" stroke="#185FA5" stroke-width="1.5" />
+
+  <!-- 박스: Q1(58)=302 ~ Q3(84)=469, height=60, y=110~170 -->
+  <rect x="302" y="110" width="167" height="60"
+        fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5" />
+  <!-- 중앙값(71)=357 -->
+  <line x1="357" y1="110" x2="357" y2="170" stroke="#185FA5" stroke-width="2.5" />
+
+  <!-- A반 레이블 -->
+  <text x="68" y="145" text-anchor="end" font-family="serif" font-size="15" font-weight="bold" fill="#185FA5">A반</text>
+
+  <!-- A반 수치 레이블 -->
+  <text x="124" y="103" text-anchor="middle" font-family="serif" font-size="11" fill="#888780">28</text>
+  <text x="192" y="103" text-anchor="middle" font-family="serif" font-size="11" fill="#888780">42</text>
+  <text x="302" y="103" text-anchor="middle" font-family="serif" font-size="11" fill="#888780">58</text>
+  <text x="357" y="103" text-anchor="middle" font-family="serif" font-size="11" fill="#185FA5">71</text>
+  <text x="469" y="103" text-anchor="middle" font-family="serif" font-size="11" fill="#888780">84</text>
+  <text x="569" y="103" text-anchor="middle" font-family="serif" font-size="11" fill="#888780">98</text>
+
+  <!-- ── B반 박스플롯 (y 중심=240) ── -->
+  <!-- 수염: min(50)=247 ~ Q1(65)=330 -->
+  <line x1="247" y1="240" x2="330" y2="240" stroke="#7744AA" stroke-width="1.5" />
+  <line x1="247" y1="220" x2="247" y2="260" stroke="#7744AA" stroke-width="1.5" />
+
+  <!-- 수염: Q3(88)=469+... 88→80+68*(500/90)→80+(68*5.556)→80+377.8=457.8≈458... -->
+  <!-- recalc: SVG x = 80 + (score-20)*500/90 -->
+  <!-- 50: 80+(30*5.556)=80+166.7=246.7≈247 ✓ -->
+  <!-- 65: 80+(45*5.556)=80+250=330 ✓ -->
+  <!-- 75: 80+(55*5.556)=80+305.6=385.6≈386 -->
+  <!-- 88: 80+(68*5.556)=80+377.8=457.8≈458 -->
+  <!-- 100: 80+(80*5.556)=80+444.4=524.4≈524 -->
+  <!-- 수염: Q3(88)=458 ~ max(100)=524 -->
+  <line x1="458" y1="240" x2="524" y2="240" stroke="#7744AA" stroke-width="1.5" />
+  <line x1="524" y1="220" x2="524" y2="260" stroke="#7744AA" stroke-width="1.5" />
+
+  <!-- 박스: Q1(65)=330 ~ Q3(88)=458 -->
+  <rect x="330" y="210" width="128" height="60"
+        fill="#F0E6FB" stroke="#7744AA" stroke-width="1.5" />
+  <!-- 중앙값(75)=386 -->
+  <line x1="386" y1="210" x2="386" y2="270" stroke="#7744AA" stroke-width="2.5" />
+
+  <!-- B반 레이블 -->
+  <text x="68" y="245" text-anchor="end" font-family="serif" font-size="15" font-weight="bold" fill="#7744AA">B반</text>
+
+  <!-- B반 수치 레이블 -->
+  <text x="247" y="203" text-anchor="middle" font-family="serif" font-size="11" fill="#888780">50</text>
+  <text x="330" y="203" text-anchor="middle" font-family="serif" font-size="11" fill="#888780">65</text>
+  <text x="386" y="203" text-anchor="middle" font-family="serif" font-size="11" fill="#7744AA">75</text>
+  <text x="458" y="203" text-anchor="middle" font-family="serif" font-size="11" fill="#888780">88</text>
+  <text x="524" y="203" text-anchor="middle" font-family="serif" font-size="11" fill="#888780">100</text>
+
+  <!-- ── x축 ── -->
+  <line x1="72" y1="310" x2="608" y2="310" stroke="#444441" stroke-width="1.5" stroke-linecap="round" />
+  <polyline points="602,304 609,310 602,316"
+            fill="none" stroke="#444441" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- ── x축 눈금 (10점 단위) ── -->
+  <!-- 20→80, 30→136, 40→191, 50→247, 60→302, 70→358, 80→413, 90→469, 100→524, 110→580 -->
+  <line x1="80"  y1="306" x2="80"  y2="314" stroke="#444441" stroke-width="1" />
+  <text x="80"  y="328" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">20</text>
+  <line x1="135" y1="306" x2="135" y2="314" stroke="#444441" stroke-width="1" />
+  <text x="135" y="328" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">30</text>
+  <line x1="191" y1="306" x2="191" y2="314" stroke="#444441" stroke-width="1" />
+  <text x="191" y="328" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">40</text>
+  <line x1="247" y1="306" x2="247" y2="314" stroke="#444441" stroke-width="1" />
+  <text x="247" y="328" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">50</text>
+  <line x1="302" y1="306" x2="302" y2="314" stroke="#444441" stroke-width="1" />
+  <text x="302" y="328" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">60</text>
+  <line x1="358" y1="306" x2="358" y2="314" stroke="#444441" stroke-width="1" />
+  <text x="358" y="328" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">70</text>
+  <line x1="413" y1="306" x2="413" y2="314" stroke="#444441" stroke-width="1" />
+  <text x="413" y="328" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">80</text>
+  <line x1="469" y1="306" x2="469" y2="314" stroke="#444441" stroke-width="1" />
+  <text x="469" y="328" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">90</text>
+  <line x1="524" y1="306" x2="524" y2="314" stroke="#444441" stroke-width="1" />
+  <text x="524" y="328" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">100</text>
+  <line x1="580" y1="306" x2="580" y2="314" stroke="#444441" stroke-width="1" />
+  <text x="580" y="328" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">110</text>
+
+  <!-- 축 이름 -->
+  <text x="617" y="314" font-family="serif" font-size="13" fill="#888780">점수</text>
+
+  <!-- 제목 -->
+  <text x="340" y="38" text-anchor="middle" font-family="serif" font-size="15" fill="#444441">수학 점수 박스플롯 비교 (A반 / B반)</text>
+
+  <!-- 이상치 레이블 -->
+  <text x="124" y="90" text-anchor="middle" font-family="serif" font-size="11" fill="#A32D2D">이상치</text>
+  <line x1="124" y1="93" x2="124" y2="134" stroke="#A32D2D" stroke-width="0.8" stroke-dasharray="3 2" />
+</svg>

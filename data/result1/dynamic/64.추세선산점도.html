@@ -1,0 +1,163 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const W = 400;
+  const padL = 70, padR = 30, padT = 30, padB = 50;
+  const plotW = W - padL - padR;
+  const plotH = 300;
+  const H = plotH + padT + padB;
+
+  const data = [
+    [155,52],[158,55],[160,57],[163,60],[165,62],
+    [168,65],[170,67],[173,70],[175,72],[180,78]
+  ];
+
+  const xMin = 150, xMax = 185;
+  const yMin = 45,  yMax = 85;
+
+  function px(x) { return padL + (x - xMin) / (xMax - xMin) * plotW; }
+  function py(y) { return padT + plotH - (y - yMin) / (yMax - yMin) * plotH; }
+
+  // 최소제곱법 회귀선 계산
+  const n = data.length;
+  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+  for (const [x, y] of data) {
+    sumX  += x;
+    sumY  += y;
+    sumXY += x * y;
+    sumX2 += x * x;
+  }
+  const meanX = sumX / n;
+  const meanY = sumY / n;
+  const b = (sumXY - n * meanX * meanY) / (sumX2 - n * meanX * meanX);
+  const a = meanY - b * meanX;
+
+  // 회귀선 끝점 (x축 범위 기준)
+  const regX1 = xMin;
+  const regY1 = a + b * xMin;
+  const regX2 = xMax;
+  const regY2 = a + b * xMax;
+
+  const xTicks = [150, 155, 160, 165, 170, 175, 180, 185];
+  const yTicks = [45, 50, 55, 60, 65, 70, 75, 80, 85];
+
+  return { W, H, padL, padT, plotW, plotH,
+           data, xMin, xMax, yMin, yMax,
+           regX1, regY1, regX2, regY2,
+           xTicks, yTicks, px, py };
+}
+
+function el(tag, attrs) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(content, attrs) {
+  const e = el('text', attrs);
+  e.textContent = content;
+  return e;
+}
+
+function render(geo) {
+  const { W, H, padL, padT, plotW, plotH,
+          data, xTicks, yTicks,
+          regX1, regY1, regX2, regY2, px, py } = geo;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+
+  const axisY = padT + plotH;
+  const axisX = padL;
+
+  // 그리드
+  for (const y of yTicks) {
+    svg.appendChild(el('line', {
+      x1: padL, y1: py(y), x2: padL + plotW, y2: py(y),
+      stroke: '#ddd', 'stroke-width': '0.5'
+    }));
+  }
+
+  // x축
+  svg.appendChild(el('line', {
+    x1: padL, y1: axisY, x2: padL + plotW + 10, y2: axisY,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+  svg.appendChild(el('polygon', {
+    points: `${padL+plotW+10},${axisY} ${padL+plotW+3},${axisY-4} ${padL+plotW+3},${axisY+4}`,
+    fill: '#333'
+  }));
+
+  // y축
+  svg.appendChild(el('line', {
+    x1: axisX, y1: axisY, x2: axisX, y2: padT - 10,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+  svg.appendChild(el('polygon', {
+    points: `${axisX},${padT-10} ${axisX-4},${padT-3} ${axisX+4},${padT-3}`,
+    fill: '#333'
+  }));
+
+  // x축 눈금 및 레이블
+  for (const x of xTicks) {
+    const cx = px(x);
+    svg.appendChild(el('line', {
+      x1: cx, y1: axisY, x2: cx, y2: axisY + 5,
+      stroke: '#333', 'stroke-width': '1'
+    }));
+    svg.appendChild(txt(String(x), {
+      x: cx, y: axisY + 17,
+      'text-anchor': 'middle', 'font-size': '11', fill: '#333'
+    }));
+  }
+
+  // y축 눈금 및 레이블
+  for (const y of yTicks) {
+    const cy = py(y);
+    svg.appendChild(el('line', {
+      x1: axisX - 5, y1: cy, x2: axisX, y2: cy,
+      stroke: '#333', 'stroke-width': '1'
+    }));
+    svg.appendChild(txt(String(y), {
+      x: axisX - 8, y: cy + 4,
+      'text-anchor': 'end', 'font-size': '11', fill: '#333'
+    }));
+  }
+
+  // 회귀직선
+  svg.appendChild(el('line', {
+    x1: px(regX1), y1: py(regY1),
+    x2: px(regX2), y2: py(regY2),
+    stroke: '#ef4444', 'stroke-width': '1.8', 'stroke-dasharray': '6,3'
+  }));
+
+  // 데이터 포인트
+  for (const [x, y] of data) {
+    svg.appendChild(el('circle', {
+      cx: px(x), cy: py(y), r: '5',
+      fill: '#2563eb', opacity: '0.85'
+    }));
+  }
+
+  // 축 레이블
+  svg.appendChild(txt('x', {
+    x: padL + plotW + 18, y: axisY + 4,
+    'text-anchor': 'start', 'font-size': '14', fill: '#333',
+    'font-style': 'italic'
+  }));
+  svg.appendChild(txt('y', {
+    x: axisX, y: padT - 14,
+    'text-anchor': 'middle', 'font-size': '14', fill: '#333',
+    'font-style': 'italic'
+  }));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

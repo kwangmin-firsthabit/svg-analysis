@@ -1,0 +1,54 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 활꼴, 반지름 8, 현의 길이 8 (1 unit = 25px → r = 200px, chord = 200px)
+  // chord = r → 중심각 = 2*arcsin(chord/(2r)) = 2*arcsin(0.5) = 60°
+  // O = (200,310), 현은 수평, A 왼쪽 B 오른쪽
+  // half-chord = 100px, d = r*cos(30°) = 200*0.866 = 173.2px (O에서 현까지)
+  // A = (200-100, 310-173.2) = (100, 136.8)
+  // B = (200+100, 136.8) = (300, 136.8)
+  // 검증: |AB| = 200px = 8 ✓, |OA| = sqrt(100²+173.2²) = sqrt(40000) = 200px = 8 ✓
+  const r = 200;
+  const O = { x: 200, y: 310 };
+  const halfChord = r / 2;
+  const d = r * Math.cos(Math.PI / 6);
+  const A = { x: O.x - halfChord, y: O.y - d };
+  const B = { x: O.x + halfChord, y: O.y - d };
+  return { O, A, B, r, maxY: O.y + 40 };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { O, A, B, r, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 400 ${maxY}`);
+  svg.setAttribute('width', '400');
+  svg.setAttribute('height', maxY);
+
+  svg.appendChild(el('path', {
+    d: `M ${A.x},${A.y} A ${r},${r} 0 0 1 ${B.x},${B.y}`,
+    fill: 'none', stroke: '#000', 'stroke-width': 2
+  }));
+  svg.appendChild(el('line', { x1: A.x, y1: A.y, x2: B.x, y2: B.y, stroke: '#000', 'stroke-width': 2 }));
+
+  svg.appendChild(el('circle', { cx: O.x, cy: O.y, r: 3, fill: '#000' }));
+  svg.appendChild(el('line', { x1: O.x, y1: O.y, x2: A.x, y2: A.y, stroke: '#000', 'stroke-width': 1, 'stroke-dasharray': '5,4' }));
+
+  svg.appendChild(el('text', { x: (A.x+B.x)/2, y: A.y - 10, 'text-anchor': 'middle', 'font-size': 14, 'font-family': 'serif' }, '8'));
+  svg.appendChild(el('text', { x: (O.x+A.x)/2 - 10, y: (O.y+A.y)/2, 'text-anchor': 'end', 'font-size': 13, 'font-family': 'serif' }, '8'));
+  svg.appendChild(el('text', { x: O.x, y: O.y + 18, 'text-anchor': 'middle', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'O'));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

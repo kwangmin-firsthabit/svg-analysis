@@ -1,0 +1,85 @@
+<!--
+  세로 나눗셈: 847 ÷ 7 = 121 ... 0
+
+  한국식 세로나눗셈 레이아웃:
+       1  2  1
+    7 ) 8  4  7
+        7
+        ─
+        1  4
+        1  4
+        ─
+           7
+           7
+           ─
+           0
+
+  SVG 좌표 설계:
+    viewBox: 0 0 280 340
+    기준 x 위치:
+      제수(7) x=50
+      닫는 괄호 x=65
+      피제수 첫째 자리(8) x=90
+      피제수 둘째 자리(4) x=120
+      피제수 셋째 자리(7) x=150
+    행 y 위치 (font-size=20):
+      몫 행:     y=35
+      피제수 행: y=60
+      1단계 빼는 수(7) y=85
+      구분선1: y=92
+      내림 후(14) y=110
+      2단계 빼는 수(14) y=135
+      구분선2: y=142
+      내림 후(7): y=160
+      3단계 빼는 수(7): y=185
+      구분선3: y=192
+      나머지(0): y=210
+-->
+<svg width="280" height="340" viewBox="0 0 280 340" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- 나눗셈 괄호 (ㄱ자: 위 가로선 + 세로선) -->
+  <!-- 세로선: 제수와 피제수 사이 -->
+  <line x1="68" y1="42" x2="68" y2="65" stroke="#333" stroke-width="1.8"/>
+  <!-- 위 가로선: 피제수 전체 위 -->
+  <line x1="68" y1="42" x2="175" y2="42" stroke="#333" stroke-width="1.8"/>
+
+  <!-- 제수 -->
+  <text x="50" y="65" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">7</text>
+
+  <!-- 피제수 -->
+  <text x="90"  y="65" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">8</text>
+  <text x="120" y="65" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">4</text>
+  <text x="150" y="65" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">7</text>
+
+  <!-- 몫 -->
+  <text x="90"  y="35" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">1</text>
+  <text x="120" y="35" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">2</text>
+  <text x="150" y="35" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">1</text>
+
+  <!-- 1단계: 7×1=7 -->
+  <text x="90" y="90" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">7</text>
+  <!-- 구분선1 -->
+  <line x1="75" y1="97" x2="110" y2="97" stroke="#333" stroke-width="1.5"/>
+
+  <!-- 1단계 나머지 → 내림: 14 -->
+  <text x="105" y="118" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">1</text>
+  <text x="125" y="118" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">4</text>
+
+  <!-- 2단계: 7×2=14 -->
+  <text x="105" y="143" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">1</text>
+  <text x="125" y="143" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">4</text>
+  <!-- 구분선2 -->
+  <line x1="90" y1="150" x2="140" y2="150" stroke="#333" stroke-width="1.5"/>
+
+  <!-- 2단계 나머지 → 내림: 7 -->
+  <text x="150" y="170" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">7</text>
+
+  <!-- 3단계: 7×1=7 -->
+  <text x="150" y="195" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">7</text>
+  <!-- 구분선3 -->
+  <line x1="135" y1="202" x2="165" y2="202" stroke="#333" stroke-width="1.5"/>
+
+  <!-- 나머지 0 -->
+  <text x="150" y="222" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">0</text>
+
+</svg>

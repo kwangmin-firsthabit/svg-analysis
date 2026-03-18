@@ -1,0 +1,113 @@
+<svg width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    y = sin x, 주기=2π, 진폭=1
+    scale_x=80px/π, scale_y=120px/unit, 원점 O(340,240)
+    최댓값(π/2,1)→(420,120) ✓  최솟값(3π/2,−1)→(580,360) ✓
+    주기 2π=160px ✓
+  -->
+
+  <!-- 격자 -->
+  <line x1="20" y1="60" x2="20" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="60" x2="100" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="180" y1="60" x2="180" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="260" y1="60" x2="260" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="420" y1="60" x2="420" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="500" y1="60" x2="500" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="580" y1="60" x2="580" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="660" y1="60" x2="660" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="10" y1="120" x2="670" y2="120" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="10" y1="360" x2="670" y2="360" stroke="#D3D1C7" stroke-width="0.5" />
+
+  <!-- 축 -->
+  <line x1="10" y1="240" x2="668" y2="240" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="662,235 669,240 662,245"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <line x1="340" y1="430" x2="340" y2="50" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="335,56 340,49 345,56"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <text x="676" y="245" font-family="serif" font-style="italic" font-size="16" fill="#888780">x</text>
+  <text x="332" y="42" font-family="serif" font-style="italic" font-size="16" fill="#888780">y</text>
+  <text x="322" y="258" font-family="serif" font-size="14" fill="#888780">O</text>
+
+  <!-- x축 눈금 -->
+  <line x1="20" y1="235" x2="20" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="20" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−2π</text>
+  <line x1="100" y1="235" x2="100" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="100" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−3π/2</text>
+  <line x1="180" y1="235" x2="180" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="180" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−π</text>
+  <line x1="260" y1="235" x2="260" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="260" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−π/2</text>
+  <line x1="420" y1="235" x2="420" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="420" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">π/2</text>
+  <line x1="500" y1="235" x2="500" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="500" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">π</text>
+  <line x1="580" y1="235" x2="580" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="580" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">3π/2</text>
+  <line x1="660" y1="235" x2="660" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="660" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">2π</text>
+
+  <!-- y축 눈금 -->
+  <line x1="335" y1="120" x2="345" y2="120" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="125" text-anchor="end" font-family="serif" font-size="13" fill="#888780">1</text>
+  <line x1="335" y1="360" x2="345" y2="360" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="365" text-anchor="end" font-family="serif" font-size="13" fill="#888780">−1</text>
+
+  <!-- 곡선 y=sin x -->
+  <path
+    d="
+    M  20,240 C  20,240  60,120 100,120 C 140,120 180,240 180,240
+    C 180,240 220,360 260,360 C 300,360 340,240 340,240
+    C 340,240 380,120 420,120 C 460,120 500,240 500,240
+    C 500,240 540,360 580,360 C 620,360 660,240 660,240"
+    fill="none"
+    stroke="#185FA5"
+    stroke-width="2.2"
+    stroke-linecap="round"
+  />
+
+  <!-- x절편 -->
+  <circle cx="20" cy="240" r="3.5" fill="#185FA5" />
+  <circle cx="180" cy="240" r="3.5" fill="#185FA5" />
+  <circle cx="340" cy="240" r="3.5" fill="#185FA5" />
+  <circle cx="500" cy="240" r="3.5" fill="#185FA5" />
+  <circle cx="660" cy="240" r="3.5" fill="#185FA5" />
+
+  <!-- 최댓값 -->
+  <circle cx="100" cy="120" r="4" fill="#0F6E56" />
+  <circle cx="420" cy="120" r="4" fill="#0F6E56" />
+  <text x="428" y="108" font-family="serif" font-size="12" fill="#0F6E56">(π/2, 1) 최댓값</text>
+
+  <!-- 최솟값 -->
+  <circle cx="260" cy="360" r="4" fill="#993C1D" />
+  <circle cx="580" cy="360" r="4" fill="#993C1D" />
+  <text x="588" y="376" font-family="serif" font-size="12" fill="#993C1D">(3π/2, −1) 최솟값</text>
+
+  <!-- 주기 표시 -->
+  <line x1="340" y1="400" x2="660" y2="400" stroke="#888780" stroke-width="0.9" stroke-linecap="round" />
+  <line x1="340" y1="393" x2="340" y2="407" stroke="#888780" stroke-width="0.9" />
+  <line x1="660" y1="393" x2="660" y2="407" stroke="#888780" stroke-width="0.9" />
+  <text x="500" y="420" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">주기 = 2π</text>
+
+  <!-- 진폭 표시 -->
+  <line x1="30" y1="120" x2="30" y2="240" stroke="#888780" stroke-width="0.9" stroke-linecap="round" />
+  <line x1="23" y1="120" x2="37" y2="120" stroke="#888780" stroke-width="0.9" />
+  <line x1="23" y1="240" x2="37" y2="240" stroke="#888780" stroke-width="0.9" />
+  <text x="48" y="186" font-family="serif" font-size="12" fill="#888780">진폭=1</text>
+
+  <!-- 함수식 -->
+  <text x="440" y="90" font-family="serif" font-style="italic" font-size="16" fill="#185FA5">y = sin x</text>
+</svg>

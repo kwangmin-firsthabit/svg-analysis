@@ -1,0 +1,75 @@
+<svg width="100%" viewBox="0 0 680 530" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    삼각기둥 전개도: 밑면=직각삼각형(3,4,5), 높이=10
+    scale=30px/unit → 3=90px, 4=120px, 5=150px, 10=300px
+    R1(3×10): x=130~220  R2(4×10): x=220~340  R3(5×10): x=340~490
+    위 삼각형: B(220,100) C(340,100) A(220,10) → AB=90=3, BC=120=4, AC=150=5 ✓
+    아래 삼각형: B(220,400) C(340,400) A(220,490)
+  -->
+
+  <!-- 직사각형 3면 -->
+  <rect x="130" y="100" width="90" height="300" fill="#E6F1FB" stroke="#185FA5" stroke-width="1.5" />
+  <rect x="220" y="100" width="120" height="300" fill="#EAF3DE" stroke="#3B6D11" stroke-width="1.5" />
+  <rect x="340" y="100" width="150" height="300" fill="#FAEEDA" stroke="#854F0B" stroke-width="1.5" />
+
+  <!-- 삼각형 밑면 2개 -->
+  <polygon points="220,100 340,100 220,10" fill="#F4C0D1" stroke="#993556" stroke-width="1.5" />
+  <polygon points="220,400 340,400 220,490" fill="#F4C0D1" stroke="#993556" stroke-width="1.5" />
+
+  <!-- 직사각형 내부 레이블 -->
+  <text x="175" y="254" text-anchor="middle" font-family="serif" font-size="13" fill="#0C447C">3 × 10</text>
+  <text x="280" y="254" text-anchor="middle" font-family="serif" font-size="13" fill="#27500A">4 × 10</text>
+  <text x="415" y="254" text-anchor="middle" font-family="serif" font-size="13" fill="#633806">5 × 10</text>
+
+  <!-- 치수선 (상단 가로) -->
+  <line x1="130" y1="84" x2="490" y2="84" stroke="#5F5E5A" stroke-width="0.8" stroke-linecap="round" />
+  <line x1="130" y1="78" x2="130" y2="90" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="220" y1="78" x2="220" y2="90" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="340" y1="78" x2="340" y2="90" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="490" y1="78" x2="490" y2="90" stroke="#5F5E5A" stroke-width="0.8" />
+  <text x="175" y="78" text-anchor="middle" font-family="serif" font-size="13" fill="#5F5E5A">3</text>
+  <text x="280" y="78" text-anchor="middle" font-family="serif" font-size="13" fill="#5F5E5A">4</text>
+  <text x="415" y="78" text-anchor="middle" font-family="serif" font-size="13" fill="#5F5E5A">5</text>
+
+  <!-- 치수선 (우측 세로=10) -->
+  <line x1="506" y1="100" x2="506" y2="400" stroke="#5F5E5A" stroke-width="0.8" stroke-linecap="round" />
+  <line x1="500" y1="100" x2="512" y2="100" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="500" y1="400" x2="512" y2="400" stroke="#5F5E5A" stroke-width="0.8" />
+  <text x="522" y="255" text-anchor="start" font-family="serif" font-size="13" fill="#5F5E5A">10</text>
+
+  <!-- 삼각형 변 레이블 -->
+  <text x="210" y="58" text-anchor="end" font-family="serif" font-size="12" fill="#993556">3</text>
+  <text x="296" y="46" text-anchor="middle" font-family="serif" font-size="12" fill="#993556">5</text>
+  <text x="210" y="452" text-anchor="end" font-family="serif" font-size="12" fill="#993556">3</text>
+  <text x="296" y="480" text-anchor="middle" font-family="serif" font-size="12" fill="#993556">5</text>
+
+  <!-- 직각 표시 -->
+  <polyline
+    points="220,100 230,100 230,90"
+    fill="none"
+    stroke="#993556"
+    stroke-width="1.1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <polyline
+    points="220,400 230,400 230,410"
+    fill="none"
+    stroke="#993556"
+    stroke-width="1.1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="208" y="8" text-anchor="end" font-family="serif" font-style="italic" font-size="14" fill="#993556">A</text>
+  <text x="208" y="108" text-anchor="end" font-family="serif" font-style="italic" font-size="14" fill="#993556">B</text>
+  <text x="348" y="108" text-anchor="start" font-family="serif" font-style="italic" font-size="14" fill="#993556">
+    C
+  </text>
+  <text x="208" y="398" text-anchor="end" font-family="serif" font-style="italic" font-size="14" fill="#993556">B</text>
+  <text x="348" y="398" text-anchor="start" font-family="serif" font-style="italic" font-size="14" fill="#993556">
+    C
+  </text>
+  <text x="208" y="504" text-anchor="end" font-family="serif" font-style="italic" font-size="14" fill="#993556">A</text>
+</svg>

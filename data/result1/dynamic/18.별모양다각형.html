@@ -1,0 +1,47 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 별모양 다각형: 오각별 (10개의 변, 안으로 굽은 형태)
+  // 바깥 꼭짓점: R=160px, 안쪽 꼭짓점: r=60px
+  // center = (200, 210), A(위)부터 시계방향
+  const cx = 200, cy = 210;
+  const R = 160, r = 60;
+  const n = 5;
+  const pts = [];
+  for (let k = 0; k < n; k++) {
+    const outerAngle = -Math.PI/2 + (2*Math.PI/n)*k;
+    const innerAngle = outerAngle + Math.PI/n;
+    pts.push({ x: cx + R*Math.cos(outerAngle), y: cy + R*Math.sin(outerAngle) });
+    pts.push({ x: cx + r*Math.cos(innerAngle), y: cy + r*Math.sin(innerAngle) });
+  }
+  const maxY = Math.max(...pts.map(p => p.y)) + 40;
+  return { pts, maxY };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { pts, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 400 ${maxY}`);
+  svg.setAttribute('width', '400');
+  svg.setAttribute('height', maxY);
+
+  svg.appendChild(el('polygon', {
+    points: pts.map(p => `${p.x},${p.y}`).join(' '),
+    fill: 'none', stroke: '#000', 'stroke-width': 2
+  }));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

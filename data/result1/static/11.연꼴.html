@@ -1,0 +1,53 @@
+<!--
+  연꼴 ABCD, 인접한 두 변의 길이가 각각 4와 7로 같음
+  |AB| = |AD| = 4, |CB| = |CD| = 7 (1 unit = 40px → 160px, 280px)
+  대칭축: AC (수직)
+  A = (200, 60) [위 꼭짓점], C = (200, 383) [아래 꼭짓점]
+  B = (280, 220), D = (120, 220)
+
+  |AB| = |AD| 조건:
+    A = (200,60), B = (280, by)
+    by 설정: A와 B 사이 = 160px
+    √(80² + (by-60)²) = 160 → (by-60)² = 25600-6400 = 19200 → by-60 = 138.56 → by = 198.56 ≈ 199
+
+  B = (280, 199), D = (120, 199)
+  |AB| = sqrt(80²+139²) = sqrt(6400+19321) = sqrt(25721) ≈ 160.4 ≈ 160px = 4 ✓
+
+  |CB| = |CD| = 280px = 7
+    C = (200, cy), √(80² + (cy-199)²) = 280
+    (cy-199)² = 78400-6400 = 72000 → cy-199 = 268.3 → cy = 467.3
+
+  |CB| = sqrt(80²+268.3²) = sqrt(6400+71984.9) = sqrt(78384.9) ≈ 280px = 7 ✓
+  C = (200, 467)
+
+  viewBox: 0 0 400 530
+-->
+<svg width="400" height="530" viewBox="0 0 400 530" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="200,60 280,199 200,467 120,199" fill="none" stroke="#000" stroke-width="2"/>
+
+  <!-- AB, AD 등변 틱 마크 -->
+  <g transform="translate(240,129) rotate(60)"><line x1="-6" y1="0" x2="6" y2="0" stroke="#000" stroke-width="1.5"/></g>
+  <g transform="translate(160,129) rotate(-60)"><line x1="-6" y1="0" x2="6" y2="0" stroke="#000" stroke-width="1.5"/></g>
+
+  <!-- CB, CD 등변 틱 마크 (이중) -->
+  <g transform="translate(240,333) rotate(-60)">
+    <line x1="-7" y1="-3.5" x2="7" y2="-3.5" stroke="#000" stroke-width="1.5"/>
+    <line x1="-7" y1="3.5" x2="7" y2="3.5" stroke="#000" stroke-width="1.5"/>
+  </g>
+  <g transform="translate(160,333) rotate(60)">
+    <line x1="-7" y1="-3.5" x2="7" y2="-3.5" stroke="#000" stroke-width="1.5"/>
+    <line x1="-7" y1="3.5" x2="7" y2="3.5" stroke="#000" stroke-width="1.5"/>
+  </g>
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="200" y="48" text-anchor="middle" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="294" y="203" text-anchor="start" font-size="16" font-family="serif" font-style="italic">B</text>
+  <text x="200" y="487" text-anchor="middle" font-size="16" font-family="serif" font-style="italic">C</text>
+  <text x="106" y="203" text-anchor="end" font-size="16" font-family="serif" font-style="italic">D</text>
+
+  <!-- 변의 길이 레이블 -->
+  <text x="250" y="126" text-anchor="start" font-size="14" font-family="serif">4</text>
+  <text x="150" y="126" text-anchor="end" font-size="14" font-family="serif">4</text>
+  <text x="252" y="344" text-anchor="start" font-size="14" font-family="serif">7</text>
+  <text x="148" y="344" text-anchor="end" font-size="14" font-family="serif">7</text>
+</svg>

@@ -1,0 +1,177 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 30;
+  const side = 6;
+  const s = side * unit; // 180px
+  const h = s * Math.sqrt(3) / 2; // 정삼각형 높이 ≈ 155.88px
+
+  // 일렬 배치: 4개 정삼각형을 좌우로 공유 변으로 연결
+  // T1(위쪽 꼭짓점): 0번 삼각형 - 기준
+  // 배치: 아래줄 정삼각형(꼭짓점 위) + 위줄 정삼각형(꼭짓점 아래) 교대로
+  //
+  // 나비형 배치:
+  // 중앙 열에 T0(밑면)~T1(앞면) 세로로 배치하고
+  // T1 좌우에 T2(왼면), T3(오른면) 붙임
+  //
+  // 일렬 배치 방식 (4개 삼각형 가로):
+  // T0: 꼭짓점이 위, T1: 꼭짓점이 아래, T2: 꼭짓점이 위, T3: 꼭짓점이 아래
+  // 각 삼각형이 이전 삼각형의 오른쪽 변을 공유
+
+  const pad = 40;
+
+  // T0: 꼭짓점 위 (p0=상, p1=좌하, p2=우하)
+  // x 시작: pad
+  // T0 기저선: y = pad + h, x: pad ~ pad+s
+  const t0 = [
+    [pad + s / 2, pad],            // 꼭짓점 (상단)
+    [pad, pad + h],                // 좌하
+    [pad + s, pad + h],            // 우하
+  ];
+
+  // T1: T0의 우하변(t0[2]~t0[0] 방향이 아니라 t0[1]-t0[2] 기저를 공유)
+  // T1은 꼭짓점이 아래 (기저는 t0의 아랫변, 꼭짓점은 아래)
+  // T1: p0=t0[1], p1=t0[2], p2=아래 꼭짓점
+  const t1 = [
+    [pad, pad + h],                // = t0[1]
+    [pad + s, pad + h],            // = t0[2]
+    [pad + s / 2, pad + 2 * h],    // 아래 꼭짓점
+  ];
+
+  // T2: T1의 왼쪽 변(t1[0]-t1[2])을 공유, 꼭짓점이 왼쪽
+  // T2의 꼭짓점은 t1[0]와 t1[2]의 왼쪽에 위치
+  // t1[0] = [pad, pad+h], t1[2] = [pad+s/2, pad+2h]
+  // 왼쪽 꼭짓점: 중점 - 수선 방향
+  const mx12 = (t1[0][0] + t1[2][0]) / 2;
+  const my12 = (t1[0][1] + t1[2][1]) / 2;
+  // 방향 벡터 (t1[0]→t1[2]): (s/2, h)
+  // 수직 벡터 (왼쪽): (-h, s/2), 정규화 후 * h
+  const len12 = Math.sqrt((s/2)**2 + h**2); // = s (등변이므로)
+  const t2 = [
+    t1[0],
+    t1[2],
+    [mx12 - h / len12 * s, my12 + (s / 2) / len12 * s],
+  ];
+
+  // T3: T1의 오른쪽 변(t1[1]-t1[2])을 공유, 꼭짓점이 오른쪽
+  // t1[1] = [pad+s, pad+h], t1[2] = [pad+s/2, pad+2h]
+  const mx13 = (t1[1][0] + t1[2][0]) / 2;
+  const my13 = (t1[1][1] + t1[2][1]) / 2;
+  // 방향 벡터 (t1[1]→t1[2]): (-s/2, h)
+  // 수직 벡터 (오른쪽): (h, s/2), 정규화 후 * h
+  const len13 = Math.sqrt((s/2)**2 + h**2);
+  const t3 = [
+    t1[1],
+    t1[2],
+    [mx13 + h / len13 * s, my13 + (s / 2) / len13 * s],
+  ];
+
+  // 전체 범위 계산
+  const allPts = [...t0, ...t1, ...t2, ...t3];
+  const xs = allPts.map(p => p[0]);
+  const ys = allPts.map(p => p[1]);
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+  const maxX = Math.max(...xs);
+  const maxY = Math.max(...ys);
+
+  const width = maxX - minX + pad * 2;
+  const height = maxY - minY + pad * 2;
+
+  // 오프셋 적용 (이미 pad로 시작했으므로 minX~minY가 pad 기준)
+  const offX = -minX + pad;
+  const offY = -minY + pad;
+
+  function shift(tri) {
+    return tri.map(([x, y]) => [x + offX, y + offY]);
+  }
+
+  return {
+    triangles: [shift(t0), shift(t1), shift(t2), shift(t3)],
+    s, side, h, width, height
+  };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function ptStr(pts) {
+  return pts.map(([x, y]) => `${x},${y}`).join(' ');
+}
+
+function midpoint(a, b) {
+  return [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+}
+
+function render(geo) {
+  const { triangles, s, side, width, height } = geo;
+
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('width', width);
+  svg.setAttribute('height', height);
+
+  const colors = [
+    'rgba(173,216,230,0.5)',
+    'rgba(144,238,144,0.5)',
+    'rgba(255,218,185,0.5)',
+    'rgba(221,160,221,0.5)',
+  ];
+
+  for (let i = 0; i < triangles.length; i++) {
+    svg.appendChild(el('polygon', {
+      points: ptStr(triangles[i]),
+      fill: colors[i],
+      stroke: '#1a1a2e',
+      'stroke-width': '1.5',
+      'stroke-linejoin': 'round'
+    }));
+  }
+
+  // 변 길이 레이블: 각 삼각형의 외부 변 중점에 표시
+  // T0의 왼쪽 변과 오른쪽 변 (외부)
+  const t0 = triangles[0];
+  const t1 = triangles[1];
+  const t2 = triangles[2];
+  const t3 = triangles[3];
+
+  // T0 왼쪽 변 (t0[0]-t0[1]) 중점
+  function edgeLabel(a, b, offset) {
+    const mx = (a[0] + b[0]) / 2 + offset[0];
+    const my = (a[1] + b[1]) / 2 + offset[1];
+    svg.appendChild(el('text', {
+      x: mx, y: my,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '13',
+      'font-family': 'serif',
+      'font-style': 'italic',
+      fill: '#c0392b'
+    }, `${side}`));
+  }
+
+  // T0 상단 두 변
+  edgeLabel(t0[0], t0[1], [-10, 0]);
+  edgeLabel(t0[0], t0[2], [10, 0]);
+  // T1 하단 꼭짓점 변
+  edgeLabel(t1[0], t1[2], [-12, 6]);
+  edgeLabel(t1[1], t1[2], [12, 6]);
+  // T2 외부 변
+  edgeLabel(t2[0], t2[2], [-14, -4]);
+  edgeLabel(t2[1], t2[2], [-14, 4]);
+  // T3 외부 변
+  edgeLabel(t3[0], t3[2], [14, -4]);
+  edgeLabel(t3[1], t3[2], [14, 4]);
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

@@ -1,0 +1,79 @@
+<!--
+  점도표: 학생 25명의 하루 독서 시간
+  0시간:3명, 1시간:7명, 2시간:8명, 3시간:4명, 4시간:2명, 5시간:1명
+
+  레이아웃:
+    viewBox: 0 0 340 260
+    x축 원점: (50, 220)
+    x축 범위: 0~5, 간격=50px/hour
+    원 반지름: 10px, 원 간격(중심간): 22px
+    x 위치: 50 + hour*50
+    y 시작(최하단 원 중심): 208
+    y = 208 - (i*22) where i=0,1,2,...
+
+  각 x값 원 좌표:
+    x=0(50): y=208, 186, 164  (3개)
+    x=1(100): y=208,186,...,140  (7개: 208-i*22, i=0~6)
+    x=2(150): y=208,...,62+이상 (8개: i=0~7)
+    x=3(200): y=208,186,164,142 (4개)
+    x=4(250): y=208,186 (2개)
+    x=5(300): y=208 (1개)
+-->
+<svg width="340" height="260" viewBox="0 0 340 260" xmlns="http://www.w3.org/2000/svg">
+  <!-- 점: x=0, 3개 -->
+  <circle cx="50" cy="208" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="50" cy="186" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="50" cy="164" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+
+  <!-- 점: x=1, 7개 -->
+  <circle cx="100" cy="208" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="100" cy="186" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="100" cy="164" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="100" cy="142" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="100" cy="120" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="100" cy="98" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="100" cy="76" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+
+  <!-- 점: x=2, 8개 -->
+  <circle cx="150" cy="208" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="150" cy="186" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="150" cy="164" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="150" cy="142" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="150" cy="120" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="150" cy="98" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="150" cy="76" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="150" cy="54" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+
+  <!-- 점: x=3, 4개 -->
+  <circle cx="200" cy="208" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="200" cy="186" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="200" cy="164" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="200" cy="142" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+
+  <!-- 점: x=4, 2개 -->
+  <circle cx="250" cy="208" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+  <circle cx="250" cy="186" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+
+  <!-- 점: x=5, 1개 -->
+  <circle cx="300" cy="208" r="9" fill="#4a90d9" stroke="#fff" stroke-width="1"/>
+
+  <!-- x축 -->
+  <line x1="25" y1="220" x2="325" y2="220" stroke="#333" stroke-width="1.5"/>
+
+  <!-- x축 눈금 및 레이블 -->
+  <line x1="50" y1="220" x2="50" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="50" y="238" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">0</text>
+  <line x1="100" y1="220" x2="100" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="100" y="238" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">1</text>
+  <line x1="150" y1="220" x2="150" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="150" y="238" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">2</text>
+  <line x1="200" y1="220" x2="200" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="200" y="238" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">3</text>
+  <line x1="250" y1="220" x2="250" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="250" y="238" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">4</text>
+  <line x1="300" y1="220" x2="300" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="300" y="238" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">5</text>
+
+  <!-- 축 레이블 -->
+  <text x="175" y="255" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">독서 시간 (시간)</text>
+</svg>

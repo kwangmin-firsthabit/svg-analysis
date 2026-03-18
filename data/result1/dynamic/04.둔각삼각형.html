@@ -1,0 +1,131 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 둔각삼각형 ABC, ∠A=30°, ∠B=30°, ∠C=120°
+  // 밑변 AB: A=(80, baseY), B=(280, baseY), |AB|=200px
+  // ∠A=∠B=30° 이므로 C는 AB의 수직이등분선 위
+  // height = (|AB|/2) * tan(30°) = 100 * tan(π/6) = 100/√3 ≈ 57.74px
+  // C = (180, baseY - height)
+  // 검증: tan(∠A) = height / (C.x - A.x) = 57.74/100 = 1/√3 → ∠A = arctan(1/√3) = 30° ✓
+  //        ∠A = ∠B = 30° → ∠C = 180 - 30 - 30 = 120° ✓
+
+  const baseY = 200;
+  const A = { x: 80,  y: baseY };
+  const B = { x: 280, y: baseY };
+  const height = 100 * Math.tan(Math.PI / 6);
+  const C = { x: 180, y: baseY - height };
+
+  // 각 꼭짓점의 내각 방향 벡터 (호 그리기용)
+  // ∠A: 변 AB(오른쪽), 변 AC(위 오른쪽)
+  const aToB = Math.atan2(B.y - A.y, B.x - A.x);   // ≈ 0°
+  const aToC = Math.atan2(C.y - A.y, C.x - A.x);   // ≈ -30°
+
+  // ∠B: 변 BA(왼쪽), 변 BC(위 왼쪽)
+  const bToA = Math.atan2(A.y - B.y, A.x - B.x);   // ≈ 180°
+  const bToC = Math.atan2(C.y - B.y, C.x - B.x);   // ≈ -150°
+
+  // ∠C: 변 CA(아래 왼쪽), 변 CB(아래 오른쪽)
+  const cToA = Math.atan2(A.y - C.y, A.x - C.x);
+  const cToB = Math.atan2(B.y - C.y, B.x - C.x);
+
+  const maxY = baseY + 40;
+  return { A, B, C, aToB, aToC, bToA, bToC, cToA, cToB, maxY };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function arcPath(cx, cy, r, startAngle, endAngle, sweep) {
+  // sweep=1: 시계방향, sweep=0: 반시계방향
+  const sx = cx + r * Math.cos(startAngle);
+  const sy = cy + r * Math.sin(startAngle);
+  const ex = cx + r * Math.cos(endAngle);
+  const ey = cy + r * Math.sin(endAngle);
+  // 각도 차이로 large-arc-flag 결정
+  let diff = endAngle - startAngle;
+  if (sweep === 1 && diff < 0) diff += 2 * Math.PI;
+  if (sweep === 0 && diff > 0) diff -= 2 * Math.PI;
+  const large = Math.abs(diff) > Math.PI ? 1 : 0;
+  return `M ${sx},${sy} A ${r},${r} 0 ${large} ${sweep} ${ex},${ey}`;
+}
+
+function render(geo) {
+  const { A, B, C, aToB, aToC, bToA, bToC, cToA, cToB, maxY } = geo;
+
+  svg.setAttribute('viewBox', `0 0 360 ${maxY}`);
+  svg.setAttribute('width', '360');
+  svg.setAttribute('height', maxY);
+
+  // 삼각형
+  svg.appendChild(el('polygon', {
+    points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`,
+    fill: 'none', stroke: '#000', 'stroke-width': 2
+  }));
+
+  const arcR_small = 20;
+  const arcR_large = 18;
+
+  // ∠A = 30°: aToC → aToB, 반시계(0)
+  svg.appendChild(el('path', {
+    d: arcPath(A.x, A.y, arcR_small, aToC, aToB, 0),
+    fill: 'none', stroke: '#000', 'stroke-width': 1.2
+  }));
+
+  // ∠B = 30°: bToA → bToC, 시계(1)
+  svg.appendChild(el('path', {
+    d: arcPath(B.x, B.y, arcR_small, bToA, bToC, 1),
+    fill: 'none', stroke: '#000', 'stroke-width': 1.2
+  }));
+
+  // ∠C = 120°: cToA → cToB, 시계(1) — 큰 각도이므로 large-arc
+  svg.appendChild(el('path', {
+    d: arcPath(C.x, C.y, arcR_large, cToA, cToB, 1),
+    fill: 'none', stroke: '#000', 'stroke-width': 1.2
+  }));
+
+  // 각도 레이블
+  // ∠A 레이블: 두 변의 중간 방향
+  const aMid = (aToC + aToB) / 2;
+  svg.appendChild(el('text', {
+    x: A.x + (arcR_small + 14) * Math.cos(aMid),
+    y: A.y + (arcR_small + 14) * Math.sin(aMid) + 4,
+    'text-anchor': 'middle', 'font-size': 12, 'font-family': 'serif'
+  }, '30°'));
+
+  // ∠B 레이블: 시계방향 호 기준 중간 방향
+  // bToA ≈ π(180°), bToC ≈ -5π/6(-150°) → 시계방향 sweep 30°
+  // 중간 = bToA - 15° = π - π/12 ≈ 195° (아래왼쪽 방향 ✓)
+  const bLabelAngle = bToA - Math.PI / 12;
+  svg.appendChild(el('text', {
+    x: B.x + (arcR_small + 14) * Math.cos(bLabelAngle),
+    y: B.y + (arcR_small + 14) * Math.sin(bLabelAngle) + 4,
+    'text-anchor': 'middle', 'font-size': 12, 'font-family': 'serif'
+  }, '30°'));
+
+  // ∠C = 120° 레이블: cToA ≈ 150°, cToB ≈ 30° → 평균 ≈ 90° (아래 방향, 삼각형 내부)
+  // 레이블은 호 내부 중간 방향인 90°(π/2) 방향 아래쪽에 배치
+  const cLabelAngle = (cToA + cToB) / 2;
+  svg.appendChild(el('text', {
+    x: C.x + (arcR_large + 16) * Math.cos(cLabelAngle),
+    y: C.y + (arcR_large + 16) * Math.sin(cLabelAngle) + 4,
+    'text-anchor': 'middle', 'font-size': 12, 'font-family': 'serif'
+  }, '120°'));
+
+  // 꼭짓점 레이블
+  svg.appendChild(el('text', { x: A.x - 12, y: A.y + 16, 'text-anchor': 'end', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'A'));
+  svg.appendChild(el('text', { x: B.x + 12, y: B.y + 16, 'text-anchor': 'start', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'B'));
+  svg.appendChild(el('text', { x: C.x, y: C.y - 8, 'text-anchor': 'middle', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'C'));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

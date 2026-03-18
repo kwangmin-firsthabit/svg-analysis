@@ -1,0 +1,141 @@
+<!--
+  직육면체 전개도 좌표 계산
+  가로(w)=5, 세로(d)=3, 높이(h)=4
+  1 unit = 30px → w=150px, d=90px, h=120px
+
+  십자형 전개도 배치 (세로 중심축 x=90px 기준):
+  전체 너비 = d + w + d = 90 + 150 + 90 = 330px
+  전체 높이 = h + d + h + d = 120 + 90 + 120 + 90 = 420px
+
+  세로 중심축: x=90 ~ x=240 (너비 150px)
+  좌측면 블록: x=0 ~ x=90
+  우측면 블록: x=240 ~ x=330
+
+  행별 y 좌표:
+  - 위(상단) 앞면: y=0   → 높이 120px (가로5×높이4)
+  - 앞면:          y=120 → 높이 90px  (가로5×세로3)
+  - 아래(하단) 뒷면: y=210 → 높이 120px (가로5×높이4)
+  - 뒷면:          y=330 → 높이 90px  (가로5×세로3)
+
+  좌측면: x=0, y=120, 너비 90px, 높이 90px (세로3×높이4... 실제 좌측면 w=d=90, h=h=120)
+  → 좌측면: x=0, y=120, 너비=d=90px, 높이=d=90px ...
+
+  재정리:
+  좌측면(side left): 세로3 × 높이4 = 90px × 120px → 앞면 왼쪽에 붙음
+    x = 90 - 90 = 0, y = 120, w=90, h=90
+  우측면(side right): 세로3 × 높이4 = 90px × 120px → 앞면 오른쪽에 붙음
+    x = 90 + 150 = 240, y = 120, w=90, h=90
+
+  수정: 좌측면/우측면은 세로3×높이4 = d×h = 90×120px
+  하지만 앞면 행 높이는 세로3=90px이므로, 좌우 면은 앞면과 같은 행 높이 맞춤:
+  실제 좌측면은 '높이4 × 세로3' 이지만 앞면 행(y=120, h=90)에 붙으므로
+  좌측면: x=0, y=120, w=h(높이)=120px, h=d(세로)=90px → 앞면 왼쪽
+  우측면: x=240, y=120, w=120px, h=90px → 앞면 오른쪽
+
+  수정된 전체 너비 = 120 + 150 + 120 = 390px (좌측면120 + 앞면150 + 우측면120)
+  중심축 x 시작: 120px
+  앞면: x=120, y=120, w=150, h=90
+  위(top): x=120, y=0, w=150, h=120
+  아래(bottom): x=120, y=210, w=150, h=120
+  뒷면(back): x=120, y=330, w=150, h=90
+  좌측면: x=0, y=120, w=120, h=90
+  우측면: x=270, y=120, w=120, h=90
+
+  SVG viewBox: 0 0 400 440 (여백 포함)
+  margin: 10px → 실제 좌표 + 10
+-->
+<svg xmlns="http://www.w3.org/2000/svg"
+     width="420" height="460"
+     viewBox="0 0 420 460">
+
+  <!-- 면 색상 정의 -->
+  <defs>
+    <style>
+      .face { fill: #f0f4ff; stroke: #2244aa; stroke-width: 1.5; }
+      .dim-line { stroke: #888; stroke-width: 1; stroke-dasharray: 4 3; fill: none; }
+      .dim-text { font-family: serif; font-size: 14px; fill: #333; text-anchor: middle; dominant-baseline: middle; }
+      .dim-arrow { stroke: #555; stroke-width: 1; fill: #555; }
+    </style>
+  </defs>
+
+  <!-- margin=15px 적용, 실제 도형 좌표는 +15 -->
+  <!-- g transform -->
+  <g transform="translate(15, 15)">
+
+    <!-- 위면 (top): 가로5×높이4 = 150×120 -->
+    <rect class="face" x="120" y="0" width="150" height="120"/>
+    <!-- 위면 레이블 -->
+    <text class="dim-text" x="195" y="60">위</text>
+
+    <!-- 앞면 (front): 가로5×세로3 = 150×90 -->
+    <rect class="face" x="120" y="120" width="150" height="90"/>
+    <text class="dim-text" x="195" y="165">앞</text>
+
+    <!-- 아래면 (bottom): 가로5×높이4 = 150×120 -->
+    <rect class="face" x="120" y="210" width="150" height="120"/>
+    <text class="dim-text" x="195" y="270">아래</text>
+
+    <!-- 뒷면 (back): 가로5×세로3 = 150×90 -->
+    <rect class="face" x="120" y="330" width="150" height="90"/>
+    <text class="dim-text" x="195" y="375">뒤</text>
+
+    <!-- 좌측면 (left): 높이4×세로3 = 120×90 -->
+    <rect class="face" x="0" y="120" width="120" height="90"/>
+    <text class="dim-text" x="60" y="165">왼</text>
+
+    <!-- 우측면 (right): 높이4×세로3 = 120×90 -->
+    <rect class="face" x="270" y="120" width="120" height="90"/>
+    <text class="dim-text" x="330" y="165">오른</text>
+
+    <!-- ===== 치수 레이블 ===== -->
+
+    <!-- 가로 5 (위면 상단) -->
+    <line class="dim-line" x1="120" y1="-10" x2="270" y2="-10"/>
+    <line x1="120" y1="-14" x2="120" y2="-6" stroke="#555" stroke-width="1"/>
+    <line x1="270" y1="-14" x2="270" y2="-6" stroke="#555" stroke-width="1"/>
+    <text class="dim-text" x="195" y="-22" font-size="13" fill="#1a3a8f">5</text>
+
+    <!-- 높이 4 (위면 왼쪽) -->
+    <line class="dim-line" x1="108" y1="0" x2="108" y2="120"/>
+    <line x1="104" y1="0" x2="112" y2="0" stroke="#555" stroke-width="1"/>
+    <line x1="104" y1="120" x2="112" y2="120" stroke="#555" stroke-width="1"/>
+    <text class="dim-text" x="96" y="60" font-size="13" fill="#1a3a8f">4</text>
+
+    <!-- 세로 3 (앞면 왼쪽) -->
+    <line class="dim-line" x1="108" y1="120" x2="108" y2="210"/>
+    <line x1="104" y1="120" x2="112" y2="120" stroke="#555" stroke-width="1"/>
+    <line x1="104" y1="210" x2="112" y2="210" stroke="#555" stroke-width="1"/>
+    <text class="dim-text" x="96" y="165" font-size="13" fill="#1a3a8f">3</text>
+
+    <!-- 높이 4 (아래면 왼쪽) -->
+    <line class="dim-line" x1="108" y1="210" x2="108" y2="330"/>
+    <line x1="104" y1="210" x2="112" y2="210" stroke="#555" stroke-width="1"/>
+    <line x1="104" y1="330" x2="112" y2="330" stroke="#555" stroke-width="1"/>
+    <text class="dim-text" x="96" y="270" font-size="13" fill="#1a3a8f">4</text>
+
+    <!-- 세로 3 (뒷면 왼쪽) -->
+    <line class="dim-line" x1="108" y1="330" x2="108" y2="420"/>
+    <line x1="104" y1="330" x2="112" y2="330" stroke="#555" stroke-width="1"/>
+    <line x1="104" y1="420" x2="112" y2="420" stroke="#555" stroke-width="1"/>
+    <text class="dim-text" x="96" y="375" font-size="13" fill="#1a3a8f">3</text>
+
+    <!-- 높이 4 (좌측면 위) -->
+    <line class="dim-line" x1="0" y1="108" x2="120" y2="108"/>
+    <line x1="0" y1="104" x2="0" y2="112" stroke="#555" stroke-width="1"/>
+    <line x1="120" y1="104" x2="120" y2="112" stroke="#555" stroke-width="1"/>
+    <text class="dim-text" x="60" y="100" font-size="13" fill="#1a3a8f">4</text>
+
+    <!-- 세로 3 (좌측면 왼쪽) -->
+    <line class="dim-line" x1="-10" y1="120" x2="-10" y2="210"/>
+    <line x1="-14" y1="120" x2="-6" y2="120" stroke="#555" stroke-width="1"/>
+    <line x1="-14" y1="210" x2="-6" y2="210" stroke="#555" stroke-width="1"/>
+    <text class="dim-text" x="-22" y="165" font-size="13" fill="#1a3a8f">3</text>
+
+    <!-- 높이 4 (우측면 위) -->
+    <line class="dim-line" x1="270" y1="108" x2="390" y2="108"/>
+    <line x1="270" y1="104" x2="270" y2="112" stroke="#555" stroke-width="1"/>
+    <line x1="390" y1="104" x2="390" y2="112" stroke="#555" stroke-width="1"/>
+    <text class="dim-text" x="330" y="100" font-size="13" fill="#1a3a8f">4</text>
+
+  </g>
+</svg>

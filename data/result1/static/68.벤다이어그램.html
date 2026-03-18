@@ -1,0 +1,57 @@
+<!--
+  벤 다이어그램: 수영 vs 농구 두 집합
+
+  데이터:
+    전체: 40명
+    수영: 22명
+    농구: 18명
+    교집합: 7명
+    수영만: 22 - 7 = 15
+    농구만: 18 - 7 = 11
+    전체 밖(어느 것도 아님): 40 - 22 - 18 + 7 = 7
+
+  SVG 좌표 설계:
+    viewBox: 0 0 420 280
+    전체 집합 사각형: x=20, y=20, width=380, height=240
+    왼쪽 원(수영): cx=170, cy=140, r=85
+    오른쪽 원(농구): cx=250, cy=140, r=85
+    두 원이 겹치는 교집합 중심 x: (170+250)/2 = 210
+
+  영역별 텍스트 위치:
+    수영만(15): cx=135, cy=140
+    교집합(7): cx=210, cy=140
+    농구만(11): cx=285, cy=140
+    밖(7): cx=45, cy=40 (좌상단)
+
+  원 레이블:
+    수영: cx=135, cy=70
+    농구: cx=285, cy=70
+-->
+<svg width="420" height="280" viewBox="0 0 420 280" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- 전체 집합 사각형 -->
+  <rect x="20" y="20" width="380" height="240" fill="none" stroke="#555" stroke-width="2"/>
+
+  <!-- 수영 원 -->
+  <circle cx="170" cy="140" r="85" fill="#93c5fd" opacity="0.45" stroke="#2563eb" stroke-width="2"/>
+
+  <!-- 농구 원 -->
+  <circle cx="250" cy="140" r="85" fill="#fca5a5" opacity="0.45" stroke="#ef4444" stroke-width="2"/>
+
+  <!-- 원 레이블 -->
+  <text x="130" y="72" text-anchor="middle" font-size="15" fill="#1d4ed8" font-weight="bold" font-family="sans-serif">수영</text>
+  <text x="290" y="72" text-anchor="middle" font-size="15" fill="#b91c1c" font-weight="bold" font-family="sans-serif">농구</text>
+
+  <!-- 수영만 영역 숫자 -->
+  <text x="135" y="146" text-anchor="middle" font-size="22" fill="#1e3a8a" font-weight="bold" font-family="sans-serif">15</text>
+
+  <!-- 교집합 숫자 -->
+  <text x="210" y="146" text-anchor="middle" font-size="22" fill="#374151" font-weight="bold" font-family="sans-serif">7</text>
+
+  <!-- 농구만 영역 숫자 -->
+  <text x="284" y="146" text-anchor="middle" font-size="22" fill="#7f1d1d" font-weight="bold" font-family="sans-serif">11</text>
+
+  <!-- 전체 밖(어느 것도 아님) 숫자 -->
+  <text x="50" y="50" text-anchor="middle" font-size="18" fill="#555" font-family="sans-serif">7</text>
+
+</svg>

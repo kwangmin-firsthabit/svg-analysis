@@ -1,0 +1,52 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 오목다각형 ABCD, 화살촉 모양, C에서 오목 (내각 > 180°)
+  // A=(200,60), B=(340,280), C=(200,180), D=(60,280)
+  // 오목 검증 (C에서):
+  //   BC=(-140,-100), CD=(-140,100): 외적 BC×CD = (-140)*100-(-100)*(-140) = -28000 < 0 → 오목 ✓
+  const pts = [
+    { x: 200, y:  60, label: 'A' },
+    { x: 340, y: 280, label: 'B' },
+    { x: 200, y: 180, label: 'C' },
+    { x:  60, y: 280, label: 'D' }
+  ];
+  return { pts, maxY: 280 + 60 };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { pts, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 400 ${maxY}`);
+  svg.setAttribute('width', '400');
+  svg.setAttribute('height', maxY);
+
+  svg.appendChild(el('polygon', {
+    points: pts.map(p => `${p.x},${p.y}`).join(' '),
+    fill: 'none', stroke: '#000', 'stroke-width': 2
+  }));
+
+  const labelOffsets = [[0,-18],[18,8],[18,-8],[-18,8]];
+  const anchors = ['middle','start','start','end'];
+  pts.forEach((p, i) => {
+    svg.appendChild(el('text', {
+      x: p.x + labelOffsets[i][0], y: p.y + labelOffsets[i][1] + 5,
+      'text-anchor': anchors[i], 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic'
+    }, p.label));
+  });
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

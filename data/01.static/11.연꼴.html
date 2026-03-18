@@ -1,0 +1,126 @@
+<svg width="100%" viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    scale: 40px = 1
+    AB=CD=160px=4, BC=DA=280px=7, 각도 55°
+    A(140,90)  B(300,90)  C(461,319)  D(301,319)
+    AB=160=4 ✓  BC=√(161²+229²)≈280=7 ✓  CD=160=4 ✓  DA≈280=7 ✓
+    AB∥CD ✓  BC∥DA ✓
+  -->
+
+  <!-- Diagonals (dashed) -->
+  <line
+    x1="140"
+    y1="90"
+    x2="461"
+    y2="319"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="5 4"
+    stroke-linecap="round"
+  />
+  <line
+    x1="300"
+    y1="90"
+    x2="301"
+    y2="319"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="5 4"
+    stroke-linecap="round"
+  />
+
+  <!-- Parallelogram -->
+  <polygon points="140,90 300,90 461,319 301,319" fill="none" stroke="#185FA5" stroke-width="1.8" />
+
+  <!-- Single tick marks on AB & CD (length 4) -->
+  <line x1="220" y1="82" x2="220" y2="98" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round" />
+  <line x1="381" y1="311" x2="381" y2="327" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round" />
+
+  <!-- Double tick marks on BC & DA (length 7) -->
+  <line x1="374" y1="200" x2="387" y2="209" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round" />
+  <line x1="371" y1="204" x2="384" y2="213" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round" />
+  <line x1="214" y1="200" x2="227" y2="209" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round" />
+  <line x1="211" y1="204" x2="224" y2="213" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round" />
+
+  <!-- Parallel marks on AB & CD -->
+  <line x1="208" y1="78" x2="220" y2="78" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <polyline
+    points="216,74 222,78 216,82"
+    fill="none"
+    stroke="#5F5E5A"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <line x1="369" y1="307" x2="381" y2="307" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <polyline
+    points="377,303 383,307 377,311"
+    fill="none"
+    stroke="#5F5E5A"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Parallel marks on BC & DA -->
+  <line x1="374" y1="190" x2="386" y2="207" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <polyline
+    points="381,202 386,210 378,208"
+    fill="none"
+    stroke="#5F5E5A"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <line x1="213" y1="190" x2="225" y2="207" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <polyline
+    points="220,202 225,210 217,208"
+    fill="none"
+    stroke="#5F5E5A"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Vertices -->
+  <circle cx="140" cy="90" r="3" fill="#185FA5" />
+  <circle cx="300" cy="90" r="3" fill="#185FA5" />
+  <circle cx="461" cy="319" r="3" fill="#185FA5" />
+  <circle cx="301" cy="319" r="3" fill="#185FA5" />
+
+  <!-- Vertex labels -->
+  <text x="118" y="84" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    A
+  </text>
+  <text x="322" y="84" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    B
+  </text>
+  <text x="483" y="335" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    C
+  </text>
+  <text x="279" y="341" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    D
+  </text>
+
+  <!-- Side length labels -->
+  <text x="220" y="76" text-anchor="middle" font-family="serif" font-size="14" fill="#185FA5">4</text>
+  <text x="381" y="343" text-anchor="middle" font-family="serif" font-size="14" fill="#185FA5">4</text>
+  <text
+    text-anchor="middle"
+    font-family="serif"
+    font-size="14"
+    fill="#185FA5"
+    transform="translate(406,196) rotate(55)"
+  >
+    7
+  </text>
+  <text
+    text-anchor="middle"
+    font-family="serif"
+    font-size="14"
+    fill="#185FA5"
+    transform="translate(196,196) rotate(55)"
+  >
+    7
+  </text>
+</svg>

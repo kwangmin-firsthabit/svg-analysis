@@ -1,0 +1,225 @@
+<!doctype html>
+<html>
+  <body>
+    <svg width="100%" viewBox="0 0 680 660" xmlns="http://www.w3.org/2000/svg">
+      <script>
+        // 단위: 1 = 56px
+        // C = 직각, CA = 3 (가로), CB = 4 (세로), AB = 5 (빗변)
+        const u = 56;
+        const cx = 270,
+          cy = 380;
+        const C = [cx, cy];
+        const A = [cx + 3 * u, cy];
+        const B = [cx, cy - 4 * u];
+
+        const svg = document.querySelector('svg');
+        function el(tag, attrs, txt) {
+          const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+          for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+          if (txt !== undefined) e.textContent = txt;
+          svg.appendChild(e);
+          return e;
+        }
+
+        function pts(arr) {
+          return arr.map(p => p.join(',')).join(' ');
+        }
+        function midPt(p1, p2) {
+          return [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2];
+        }
+        function quadMid(arr) {
+          return [
+            (arr[0][0] + arr[1][0] + arr[2][0] + arr[3][0]) / 4,
+            (arr[0][1] + arr[1][1] + arr[2][1] + arr[3][1]) / 4,
+          ];
+        }
+
+        // CA변 정사각형 (아래쪽, 길이 3)
+        const sqCA = [C, A, [A[0], A[1] + 3 * u], [C[0], C[1] + 3 * u]];
+
+        // CB변 정사각형 (왼쪽, 길이 4)
+        const sqCB = [B, C, [C[0] - 4 * u, C[1]], [B[0] - 4 * u, B[1]]];
+
+        // AB변 정사각형 (빗변 바깥쪽, 길이 5)
+        // AB 방향벡터: (-3u, -4u), 길이 5u
+        // 외부 법선: (aby, -abx)/|AB| * 5u = (4u, 3u) 방향
+        const abx = B[0] - A[0],
+          aby = B[1] - A[1],
+          abLen = 5 * u;
+        const nx = (aby / abLen) * 5 * u; //  4u
+        const ny = (-abx / abLen) * 5 * u; //  3u  (아래쪽)
+        const sqAB = [
+          A,
+          B,
+          [B[0] + (nx / abLen) * 5 * u, B[1] + (ny / abLen) * 5 * u],
+          [A[0] + (nx / abLen) * 5 * u, A[1] + (ny / abLen) * 5 * u],
+        ];
+
+        // 정사각형 렌더링
+        el('polygon', { points: pts(sqCA), fill: '#E6F1FB', stroke: '#185FA5', 'stroke-width': 1.5 });
+        el('polygon', { points: pts(sqCB), fill: '#EAF3DE', stroke: '#3B6D11', 'stroke-width': 1.5 });
+        el('polygon', { points: pts(sqAB), fill: '#FAEEDA', stroke: '#854F0B', 'stroke-width': 1.5 });
+
+        // 직각삼각형
+        el('polygon', {
+          points: `${C[0]},${C[1]} ${A[0]},${A[1]} ${B[0]},${B[1]}`,
+          fill: '#F1EFE8',
+          stroke: '#444441',
+          'stroke-width': 2,
+        });
+
+        // 직각 기호
+        const r = 12;
+        el('polyline', {
+          points: `${C[0] + r},${C[1]} ${C[0] + r},${C[1] - r} ${C[0]},${C[1] - r}`,
+          fill: 'none',
+          stroke: '#444441',
+          'stroke-width': 1.2,
+        });
+
+        // 변 길이 레이블 (삼각형 내부)
+        const mCA = midPt(C, A);
+        el(
+          'text',
+          {
+            x: mCA[0],
+            y: mCA[1] - 10,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 13,
+            'font-weight': 500,
+            fill: '#185FA5',
+          },
+          '3'
+        );
+        const mCB = midPt(C, B);
+        el(
+          'text',
+          {
+            x: mCB[0] + 12,
+            y: mCB[1] + 4,
+            'text-anchor': 'start',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 13,
+            'font-weight': 500,
+            fill: '#3B6D11',
+          },
+          '4'
+        );
+        const mAB = midPt(A, B);
+        el(
+          'text',
+          {
+            x: mAB[0] + 14,
+            y: mAB[1] + 4,
+            'text-anchor': 'start',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 13,
+            'font-weight': 500,
+            fill: '#854F0B',
+          },
+          '5'
+        );
+
+        // 정사각형 내부 넓이 레이블
+        const qCA = quadMid(sqCA);
+        el(
+          'text',
+          {
+            x: qCA[0],
+            y: qCA[1] - 6,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 13,
+            'font-weight': 500,
+            fill: '#0C447C',
+          },
+          '3² = 9'
+        );
+        const qCB = quadMid(sqCB);
+        el(
+          'text',
+          {
+            x: qCB[0],
+            y: qCB[1] - 6,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 13,
+            'font-weight': 500,
+            fill: '#27500A',
+          },
+          '4² = 16'
+        );
+        const qAB = quadMid(sqAB);
+        el(
+          'text',
+          {
+            x: qAB[0],
+            y: qAB[1] - 6,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 13,
+            'font-weight': 500,
+            fill: '#633806',
+          },
+          '5² = 25'
+        );
+
+        // 꼭짓점 레이블
+        el(
+          'text',
+          {
+            x: C[0] - 16,
+            y: C[1] + 16,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 14,
+            'font-weight': 500,
+            fill: '#444441',
+          },
+          'C'
+        );
+        el(
+          'text',
+          {
+            x: A[0] + 16,
+            y: A[1] + 16,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 14,
+            'font-weight': 500,
+            fill: '#444441',
+          },
+          'A'
+        );
+        el(
+          'text',
+          {
+            x: B[0] - 16,
+            y: B[1] - 8,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 14,
+            'font-weight': 500,
+            fill: '#444441',
+          },
+          'B'
+        );
+
+        // 피타고라스 공식
+        el(
+          'text',
+          {
+            x: 340,
+            y: 630,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 13,
+            fill: '#5F5E5A',
+          },
+          '3² + 4² = 5²   →   9 + 16 = 25'
+        );
+      </script>
+    </svg>
+  </body>
+</html>

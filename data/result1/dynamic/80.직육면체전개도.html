@@ -1,0 +1,109 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 25;
+  const W = 5 * unit;  // 가로 = 125px
+  const D = 3 * unit;  // 세로(깊이) = 75px
+  const H = 4 * unit;  // 높이 = 100px
+
+  // 십자형 전개도: 세로 중앙에 앞면 기준으로 정렬
+  // 가로 중심 기준: 좌측면 + 앞면 + 우측면
+  // 세로: 위면(H) + 앞면(W) + 아래면(H) + 뒷면(W)
+  const pad = 40;
+
+  // 앞면 기준 좌상단
+  const frontX = pad + D;
+  const frontY = pad + H;
+
+  const faces = {
+    top:    { x: frontX,     y: pad,              w: W, h: H },  // 위면(5×4)
+    front:  { x: frontX,     y: pad + H,          w: W, h: D },  // 앞면(5×3)
+    bottom: { x: frontX,     y: pad + H + D,      w: W, h: H },  // 아래면(5×4)
+    back:   { x: frontX,     y: pad + H + D + H,  w: W, h: D },  // 뒷면(5×3)
+    left:   { x: pad,        y: pad + H,          w: D, h: D },  // 좌측면(3×4... 실제는 깊이×높이 = D×D? )
+    right:  { x: frontX + W, y: pad + H,          w: D, h: D },  // 우측면
+  };
+
+  // 좌측면/우측면은 가로=D(깊이=3), 세로=D(앞면 세로=D)
+  // 검증: 전개도 전체 크기
+  const totalW = D + W + D + pad * 2;
+  const totalH = H + D + H + D + pad * 2;
+
+  return { faces, W, D, H, unit, totalW, totalH, pad };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function drawFace(x, y, w, h, fillColor) {
+  svg.appendChild(el('rect', {
+    x, y, width: w, height: h,
+    fill: fillColor,
+    stroke: '#1a1a2e',
+    'stroke-width': '1.5'
+  }));
+}
+
+function dimLabel(x, y, text, anchor) {
+  svg.appendChild(el('text', {
+    x, y,
+    'text-anchor': anchor || 'middle',
+    'dominant-baseline': 'central',
+    'font-size': '12',
+    'font-family': 'serif',
+    'font-style': 'italic',
+    fill: '#c0392b'
+  }, text));
+}
+
+function render(geo) {
+  const { faces, W, D, H, unit, totalW, totalH } = geo;
+
+  svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
+  svg.setAttribute('width', totalW);
+  svg.setAttribute('height', totalH);
+
+  const colors = {
+    top:    'rgba(173,216,230,0.5)',
+    front:  'rgba(144,238,144,0.5)',
+    bottom: 'rgba(173,216,230,0.5)',
+    back:   'rgba(144,238,144,0.5)',
+    left:   'rgba(255,218,185,0.5)',
+    right:  'rgba(255,218,185,0.5)',
+  };
+
+  for (const [name, f] of Object.entries(faces)) {
+    drawFace(f.x, f.y, f.w, f.h, colors[name]);
+  }
+
+  // 치수 레이블
+  const { top, front, left, right, bottom, back } = faces;
+
+  // 앞면 위 가로(5) 레이블
+  dimLabel(front.x + front.w / 2, front.y - 12, '5');
+  // 앞면 오른쪽 세로(3) 레이블
+  dimLabel(front.x + front.w + 14, front.y + front.h / 2, '3');
+  // top 오른쪽 세로(4) 레이블
+  dimLabel(top.x + top.w + 14, top.y + top.h / 2, '4');
+  // left 위 가로(3) 레이블
+  dimLabel(left.x + left.w / 2, left.y - 12, '3');
+  // right 위 가로(3) 레이블
+  dimLabel(right.x + right.w / 2, right.y - 12, '3');
+  // bottom 오른쪽 세로(4) 레이블
+  dimLabel(bottom.x + bottom.w + 14, bottom.y + bottom.h / 2, '4');
+  // back 오른쪽 세로(3) 레이블
+  dimLabel(back.x + back.w + 14, back.y + back.h / 2, '3');
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

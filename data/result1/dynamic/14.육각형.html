@@ -1,0 +1,76 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 정육각형 ABCDEF, 마주보는 세 쌍의 변 평행, R = 120px
+  // center = (200, 200), A부터 오른쪽 위에서 시계방향 (30°)
+  // 검증: |AB| = R = 120px (정육각형), 마주보는 변 평행 ✓
+  const n = 6, R = 120;
+  const cx = 200, cy = 200;
+  const labels = ['A','B','C','D','E','F'];
+  const pts = [];
+  for (let k = 0; k < n; k++) {
+    const angle = -Math.PI/2 + (Math.PI/6) + (2*Math.PI/n)*k; // 시작: 30° (오른쪽 위)
+    pts.push({ x: cx + R*Math.cos(angle), y: cy + R*Math.sin(angle), label: labels[k] });
+  }
+  return { pts, R, maxY: cy + R + 60 };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function parallelArrow(parent, x, y, angle) {
+  const g = document.createElementNS(NS, 'g');
+  g.setAttribute('transform', `translate(${x},${y}) rotate(${angle})`);
+  g.appendChild(el('line', { x1: -8, y1: -5, x2: 0, y2: 0, stroke: '#000', 'stroke-width': 1.5 }));
+  g.appendChild(el('line', { x1: -8, y1:  5, x2: 0, y2: 0, stroke: '#000', 'stroke-width': 1.5 }));
+  parent.appendChild(g);
+}
+
+function render(geo) {
+  const { pts, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 420 ${maxY}`);
+  svg.setAttribute('width', '420');
+  svg.setAttribute('height', maxY);
+
+  svg.appendChild(el('polygon', {
+    points: pts.map(p => `${p.x},${p.y}`).join(' '),
+    fill: 'none', stroke: '#000', 'stroke-width': 2
+  }));
+
+  // 평행 표시: 마주보는 변 쌍 (i, i+3)
+  for (let i = 0; i < 3; i++) {
+    const p1 = pts[i], p2 = pts[i+1];
+    const mx = (p1.x+p2.x)/2, my = (p1.y+p2.y)/2;
+    const angle = Math.atan2(p2.y-p1.y, p2.x-p1.x) * 180 / Math.PI;
+    parallelArrow(svg, mx, my, angle);
+    const q1 = pts[i+3], q2 = pts[(i+4) % 6];
+    const qx = (q1.x+q2.x)/2, qy = (q1.y+q2.y)/2;
+    parallelArrow(svg, qx, qy, angle);
+  }
+
+  pts.forEach((p, i) => {
+    const prev = pts[(i+pts.length-1)%pts.length];
+    const next = pts[(i+1)%pts.length];
+    const outDir = { x: p.x-(prev.x+next.x)/2, y: p.y-(prev.y+next.y)/2 };
+    const len = Math.sqrt(outDir.x**2+outDir.y**2);
+    const ox = (outDir.x/len)*18, oy = (outDir.y/len)*18;
+    const anchor = ox > 1 ? 'start' : ox < -1 ? 'end' : 'middle';
+    svg.appendChild(el('text', {
+      x: p.x+ox, y: p.y+oy+5,
+      'text-anchor': anchor, 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic'
+    }, p.label));
+  });
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

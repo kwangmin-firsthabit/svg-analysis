@@ -1,0 +1,85 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const W = 400;
+  const cx = 200;
+  const cy = 200;
+  const r = 150;
+  const sectors = [
+    { label: '식비',   pct: 32, color: '#4a90d9' },
+    { label: '주거',   pct: 28, color: '#e74c3c' },
+    { label: '교육',   pct: 18, color: '#27ae60' },
+    { label: '교통',   pct: 12, color: '#f39c12' },
+    { label: '기타',   pct: 10, color: '#9b59b6' },
+  ];
+  const maxY = W;
+
+  // 각도 계산 (시작: -90° = -π/2, 시계방향)
+  let angle = -Math.PI / 2;
+  const computed = sectors.map(s => {
+    const startAngle = angle;
+    const sweep = (s.pct / 100) * 2 * Math.PI;
+    const endAngle = angle + sweep;
+    const midAngle = angle + sweep / 2;
+    angle = endAngle;
+    return { ...s, startAngle, endAngle, midAngle };
+  });
+
+  return { W, cx, cy, r, computed, maxY };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { W, cx, cy, r, computed, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 ${W} ${maxY}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', maxY);
+
+  computed.forEach(s => {
+    const x1 = cx + r * Math.cos(s.startAngle);
+    const y1 = cy + r * Math.sin(s.startAngle);
+    const x2 = cx + r * Math.cos(s.endAngle);
+    const y2 = cy + r * Math.sin(s.endAngle);
+    const largeArc = s.pct > 50 ? 1 : 0;
+
+    const path = el('path', {
+      d: `M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${largeArc},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z`,
+      fill: s.color, stroke: '#fff', 'stroke-width': '2'
+    });
+    svg.appendChild(path);
+
+    // 레이블 (중간 각도, 반지름 100)
+    const lr = 100;
+    const lx = cx + lr * Math.cos(s.midAngle);
+    const ly = cy + lr * Math.sin(s.midAngle);
+
+    const t1 = el('text', {
+      x: lx.toFixed(1), y: (ly - 6).toFixed(1),
+      'text-anchor': 'middle', 'font-family': 'sans-serif',
+      'font-size': '12', 'font-weight': 'bold', fill: '#fff'
+    }, s.label);
+    svg.appendChild(t1);
+
+    const t2 = el('text', {
+      x: lx.toFixed(1), y: (ly + 10).toFixed(1),
+      'text-anchor': 'middle', 'font-family': 'sans-serif',
+      'font-size': '11', fill: '#fff'
+    }, `${s.pct}%`);
+    svg.appendChild(t2);
+  });
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

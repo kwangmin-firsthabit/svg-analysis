@@ -1,0 +1,37 @@
+<!--
+  직각사다리꼴 ABCD, 윗변 AD=3, 아랫변 BC=6, 높이 5 (1 unit = 40px)
+  ∠B = 90° (AB ⊥ BC)
+  A = (80, 80), B = (80, 280), C = (320, 280), D = (80+120, 80) = (200, 80)
+  검증:
+    |AB| = 200px = 5 (높이) ✓
+    |BC| = 240px = 6 ✓
+    |AD| = 120px = 3 ✓
+    ∠B: AB는 수직, BC는 수평 → 90° ✓
+-->
+<svg width="400" height="360" viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="80,80 200,80 320,280 80,280" fill="none" stroke="#000" stroke-width="2"/>
+
+  <!-- ∠B 직각 표시 -->
+  <polyline points="80,260 100,260 100,280" fill="none" stroke="#000" stroke-width="1.5"/>
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="66" y="78" text-anchor="end" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="214" y="78" text-anchor="start" font-size="16" font-family="serif" font-style="italic">D</text>
+  <text x="66" y="296" text-anchor="end" font-size="16" font-family="serif" font-style="italic">B</text>
+  <text x="334" y="296" text-anchor="start" font-size="16" font-family="serif" font-style="italic">C</text>
+
+  <!-- 변의 길이 레이블 -->
+  <text x="140" y="70" text-anchor="middle" font-size="14" font-family="serif">3</text>
+  <text x="200" y="304" text-anchor="middle" font-size="14" font-family="serif">6</text>
+  <text x="60" y="184" text-anchor="end" font-size="14" font-family="serif">5</text>
+
+  <!-- 평행 표시 (AD, BC) -->
+  <g transform="translate(140,80) rotate(0)">
+    <line x1="-6" y1="-4" x2="0" y2="0" stroke="#000" stroke-width="1.5"/>
+    <line x1="-6" y1="4" x2="0" y2="0" stroke="#000" stroke-width="1.5"/>
+  </g>
+  <g transform="translate(200,280) rotate(0)">
+    <line x1="-6" y1="-4" x2="0" y2="0" stroke="#000" stroke-width="1.5"/>
+    <line x1="-6" y1="4" x2="0" y2="0" stroke="#000" stroke-width="1.5"/>
+  </g>
+</svg>

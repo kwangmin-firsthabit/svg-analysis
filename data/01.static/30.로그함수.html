@@ -1,0 +1,104 @@
+<svg width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    y = log₂x, x>0, scale_x=60px/unit, scale_y=60px/unit, 원점 O(160,280)
+    (1,0)→(220,280) ✓  (2,1)→(280,220) ✓  (4,2)→(400,160) ✓
+    (½,−1)→(190,340) ✓  수직점근선 x=0→screen_x=160 ✓
+  -->
+
+  <!-- 격자 -->
+  <line x1="220" y1="50" x2="220" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="280" y1="50" x2="280" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="400" y1="50" x2="400" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="340" x2="660" y2="340" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="220" x2="660" y2="220" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="160" x2="660" y2="160" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="400" x2="660" y2="400" stroke="#D3D1C7" stroke-width="0.5" />
+
+  <!-- 수직 점근선 -->
+  <line
+    x1="160"
+    y1="50"
+    x2="160"
+    y2="420"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="6 4"
+    stroke-linecap="round"
+  />
+  <text x="152" y="46" text-anchor="middle" font-family="serif" font-size="12" fill="#B4B2A9">x=0</text>
+
+  <!-- 축 -->
+  <line x1="100" y1="280" x2="660" y2="280" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="654,275 661,280 654,285"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <line x1="160" y1="420" x2="160" y2="40" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="155,46 160,39 165,46"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <text x="672" y="285" font-family="serif" font-style="italic" font-size="16" fill="#888780">x</text>
+  <text x="152" y="32" font-family="serif" font-style="italic" font-size="16" fill="#888780">y</text>
+  <text x="142" y="298" font-family="serif" font-size="14" fill="#888780">O</text>
+
+  <!-- 눈금 -->
+  <line x1="190" y1="275" x2="190" y2="285" stroke="#888780" stroke-width="0.8" />
+  <text x="190" y="300" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">½</text>
+  <line x1="220" y1="275" x2="220" y2="285" stroke="#888780" stroke-width="0.8" />
+  <text x="220" y="300" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">1</text>
+  <line x1="280" y1="275" x2="280" y2="285" stroke="#888780" stroke-width="0.8" />
+  <text x="280" y="300" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">2</text>
+  <line x1="400" y1="275" x2="400" y2="285" stroke="#888780" stroke-width="0.8" />
+  <text x="400" y="300" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">4</text>
+  <line x1="640" y1="275" x2="640" y2="285" stroke="#888780" stroke-width="0.8" />
+  <text x="640" y="300" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">8</text>
+  <line x1="155" y1="400" x2="165" y2="400" stroke="#888780" stroke-width="0.8" />
+  <text x="146" y="405" text-anchor="end" font-family="serif" font-size="13" fill="#888780">−2</text>
+  <line x1="155" y1="340" x2="165" y2="340" stroke="#888780" stroke-width="0.8" />
+  <text x="146" y="345" text-anchor="end" font-family="serif" font-size="13" fill="#888780">−1</text>
+  <line x1="155" y1="220" x2="165" y2="220" stroke="#888780" stroke-width="0.8" />
+  <text x="146" y="225" text-anchor="end" font-family="serif" font-size="13" fill="#888780">1</text>
+  <line x1="155" y1="160" x2="165" y2="160" stroke="#888780" stroke-width="0.8" />
+  <text x="146" y="165" text-anchor="end" font-family="serif" font-size="13" fill="#888780">2</text>
+  <line x1="155" y1="100" x2="165" y2="100" stroke="#888780" stroke-width="0.8" />
+  <text x="146" y="105" text-anchor="end" font-family="serif" font-size="13" fill="#888780">3</text>
+
+  <!-- 곡선 -->
+  <path
+    d="M 163,420
+    C 164,415 168,408 175,400
+    C 182,392 187,360 190,340
+    C 198,308 210,290 220,280
+    C 240,262 262,238 280,220
+    C 320,190 360,172 400,160
+    C 480,138 560,118 640,100"
+    fill="none"
+    stroke="#185FA5"
+    stroke-width="2.2"
+    stroke-linecap="round"
+  />
+
+  <!-- 특수점 -->
+  <circle cx="220" cy="280" r="4.5" fill="#185FA5" />
+  <text x="228" y="270" font-family="serif" font-size="13" fill="#185FA5">(1, 0)</text>
+  <circle cx="280" cy="220" r="3.5" fill="#185FA5" />
+  <text x="290" y="216" font-family="serif" font-size="12" fill="#5F5E5A">(2, 1)</text>
+  <circle cx="400" cy="160" r="3.5" fill="#185FA5" />
+  <text x="410" y="156" font-family="serif" font-size="12" fill="#5F5E5A">(4, 2)</text>
+  <circle cx="190" cy="340" r="3.5" fill="#185FA5" />
+  <text x="202" y="350" font-family="serif" font-size="12" fill="#5F5E5A">(½, −1)</text>
+
+  <!-- 레이블 -->
+  <text x="116" y="418" font-family="serif" font-size="12" fill="#B4B2A9">점근선</text>
+  <text x="530" y="130" font-family="serif" font-style="italic" font-size="16" fill="#185FA5">y = log₂ x</text>
+</svg>

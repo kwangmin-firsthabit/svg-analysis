@@ -1,0 +1,24 @@
+<!--
+  활꼴, 반지름 8, 현의 길이 8 (1 unit = 25px → r = 200px, chord = 200px)
+  현 길이 = r 이므로 중심각 = 2*arcsin(chord/(2r)) = 2*arcsin(0.5) = 60°
+  center O = (200, 300)
+  현: A에서 B로, 현의 중점이 O 아래에서 d = r*cos(30°) = 200*0.866 = 173.2px 위
+  A = (200 - 100, 300 - 173.2) = (100, 126.8)
+  B = (200 + 100, 126.8) = (300, 126.8)
+  검증: |AB| = 200px = 8 ✓
+  호: 중심 O에서 A와 B 사이 작은 호 (60°)
+-->
+<svg width="400" height="380" viewBox="0 0 400 380" xmlns="http://www.w3.org/2000/svg">
+  <!-- 활꼴 (호 + 현) -->
+  <path d="M 100,127 A 200,200 0 0 1 300,127" fill="none" stroke="#000" stroke-width="2"/>
+  <line x1="100" y1="127" x2="300" y2="127" stroke="#000" stroke-width="2"/>
+
+  <!-- 현 길이 레이블 -->
+  <text x="200" y="118" text-anchor="middle" font-size="14" font-family="serif">8</text>
+
+  <!-- 반지름 표시 (O에서 A로, 참조용 점선) -->
+  <circle cx="200" cy="300" r="3" fill="#000"/>
+  <line x1="200" y1="300" x2="100" y2="127" stroke="#000" stroke-width="1" stroke-dasharray="5,4"/>
+  <text x="138" y="222" text-anchor="middle" font-size="13" font-family="serif">8</text>
+  <text x="200" y="318" text-anchor="middle" font-size="16" font-family="serif" font-style="italic">O</text>
+</svg>

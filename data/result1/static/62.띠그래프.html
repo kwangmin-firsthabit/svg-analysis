@@ -1,0 +1,103 @@
+<!--
+  띠그래프: 3학년별 장래 희망 직업 분포
+  직업 카테고리 5개: 의사, 교사, 엔지니어, 예술가, 기타
+  비율 (합계 100%):
+    1학년: 의사20%, 교사25%, 엔지니어30%, 예술가15%, 기타10%
+    2학년: 의사18%, 교사20%, 엔지니어28%, 예술가22%, 기타12%
+    3학년: 의사22%, 교사18%, 엔지니어25%, 예술가20%, 기타15%
+
+  레이아웃:
+    viewBox: 0 0 520 280
+    띠 너비(폭): 400px (x=90~490)
+    띠 높이: 42px
+    띠 y: 1학년=50, 2학년=120, 3학년=190
+    각 섹션 폭: 비율 * 400 / 100
+
+  1학년 섹션 x 누적:
+    의사(20%): x=90, w=80
+    교사(25%): x=170, w=100
+    엔지니어(30%): x=270, w=120
+    예술가(15%): x=390, w=60
+    기타(10%): x=450, w=40
+
+  2학년:
+    의사(18%): x=90, w=72
+    교사(20%): x=162, w=80
+    엔지니어(28%): x=242, w=112
+    예술가(22%): x=354, w=88
+    기타(12%): x=442, w=48
+
+  3학년:
+    의사(22%): x=90, w=88
+    교사(18%): x=178, w=72
+    엔지니어(25%): x=250, w=100
+    예술가(20%): x=350, w=80
+    기타(15%): x=430, w=60
+
+  색상: 의사=#4a90d9, 교사=#27ae60, 엔지니어=#f39c12, 예술가=#e74c3c, 기타=#9b59b6
+-->
+<svg width="520" height="280" viewBox="0 0 520 280" xmlns="http://www.w3.org/2000/svg">
+  <!-- 학년 레이블 -->
+  <text x="80" y="76" text-anchor="end" font-family="sans-serif" font-size="12" font-weight="bold" fill="#222">1학년</text>
+  <text x="80" y="146" text-anchor="end" font-family="sans-serif" font-size="12" font-weight="bold" fill="#222">2학년</text>
+  <text x="80" y="216" text-anchor="end" font-family="sans-serif" font-size="12" font-weight="bold" fill="#222">3학년</text>
+
+  <!-- 1학년 -->
+  <rect x="90" y="55" width="80" height="42" fill="#4a90d9"/>
+  <rect x="170" y="55" width="100" height="42" fill="#27ae60"/>
+  <rect x="270" y="55" width="120" height="42" fill="#f39c12"/>
+  <rect x="390" y="55" width="60" height="42" fill="#e74c3c"/>
+  <rect x="450" y="55" width="40" height="42" fill="#9b59b6"/>
+
+  <!-- 2학년 -->
+  <rect x="90" y="125" width="72" height="42" fill="#4a90d9"/>
+  <rect x="162" y="125" width="80" height="42" fill="#27ae60"/>
+  <rect x="242" y="125" width="112" height="42" fill="#f39c12"/>
+  <rect x="354" y="125" width="88" height="42" fill="#e74c3c"/>
+  <rect x="442" y="125" width="48" height="42" fill="#9b59b6"/>
+
+  <!-- 3학년 -->
+  <rect x="90" y="195" width="88" height="42" fill="#4a90d9"/>
+  <rect x="178" y="195" width="72" height="42" fill="#27ae60"/>
+  <rect x="250" y="195" width="100" height="42" fill="#f39c12"/>
+  <rect x="350" y="195" width="80" height="42" fill="#e74c3c"/>
+  <rect x="430" y="195" width="60" height="42" fill="#9b59b6"/>
+
+  <!-- 외곽선 -->
+  <rect x="90" y="55" width="400" height="42" fill="none" stroke="#333" stroke-width="1"/>
+  <rect x="90" y="125" width="400" height="42" fill="none" stroke="#333" stroke-width="1"/>
+  <rect x="90" y="195" width="400" height="42" fill="none" stroke="#333" stroke-width="1"/>
+
+  <!-- 비율 텍스트: 1학년 -->
+  <text x="130" y="80" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">20%</text>
+  <text x="220" y="80" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">25%</text>
+  <text x="330" y="80" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">30%</text>
+  <text x="420" y="80" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">15%</text>
+  <text x="470" y="80" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">10%</text>
+
+  <!-- 비율 텍스트: 2학년 -->
+  <text x="126" y="150" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">18%</text>
+  <text x="202" y="150" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">20%</text>
+  <text x="298" y="150" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">28%</text>
+  <text x="398" y="150" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">22%</text>
+  <text x="466" y="150" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">12%</text>
+
+  <!-- 비율 텍스트: 3학년 -->
+  <text x="134" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">22%</text>
+  <text x="214" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">18%</text>
+  <text x="300" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">25%</text>
+  <text x="390" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">20%</text>
+  <text x="460" y="220" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff">15%</text>
+
+  <!-- 범례 -->
+  <rect x="90" y="252" width="12" height="12" fill="#4a90d9"/>
+  <text x="106" y="263" font-family="sans-serif" font-size="10" fill="#333">의사</text>
+  <rect x="155" y="252" width="12" height="12" fill="#27ae60"/>
+  <text x="171" y="263" font-family="sans-serif" font-size="10" fill="#333">교사</text>
+  <rect x="220" y="252" width="12" height="12" fill="#f39c12"/>
+  <text x="236" y="263" font-family="sans-serif" font-size="10" fill="#333">엔지니어</text>
+  <rect x="310" y="252" width="12" height="12" fill="#e74c3c"/>
+  <text x="326" y="263" font-family="sans-serif" font-size="10" fill="#333">예술가</text>
+  <rect x="385" y="252" width="12" height="12" fill="#9b59b6"/>
+  <text x="401" y="263" font-family="sans-serif" font-size="10" fill="#333">기타</text>
+</svg>

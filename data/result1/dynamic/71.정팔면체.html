@@ -1,0 +1,193 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 30;
+  const side = 6;
+  const s = side * unit; // 180px
+
+  // 정팔면체 꼭짓점 3D 좌표
+  // 한 변 = s인 정팔면체: 중간 정사각형의 한 변 = s
+  // 정사각형 대각선 = s * sqrt(2), 반대각선 = s / sqrt(2)
+  const r = s / Math.sqrt(2); // 중간 꼭짓점의 원점 거리
+  // 정팔면체 높이(상하 각 꼭짓점까지) = s / sqrt(2)
+  const h = s / Math.sqrt(2);
+
+  // 꼭짓점: T=상단, Bot=하단
+  // 중간 4개: 앞(M1), 오른(M2), 뒤(M3), 왼(M4)
+  const pts3d = {
+    T:  [0,    h,  0  ],  // 상단
+    Bot:[0,   -h,  0  ],  // 하단
+    M1: [0,    0,  r  ],  // 앞
+    M2: [r,    0,  0  ],  // 오른쪽
+    M3: [0,    0, -r  ],  // 뒤
+    M4: [-r,   0,  0  ],  // 왼쪽
+  };
+
+  // Isometric 투영
+  function iso(x, y, z) {
+    const ix = (x - z) * Math.cos(Math.PI / 6);
+    const iy = -y + (x + z) * Math.sin(Math.PI / 6);
+    return [ix, iy];
+  }
+
+  const projected = {};
+  for (const [k, [x, y, z]] of Object.entries(pts3d)) {
+    projected[k] = iso(x, y, z);
+  }
+
+  const xs = Object.values(projected).map(p => p[0]);
+  const ys = Object.values(projected).map(p => p[1]);
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+  const maxX = Math.max(...xs);
+  const maxY2 = Math.max(...ys);
+
+  const pad = 55;
+  const ox = -minX + pad;
+  const oy = -minY + pad;
+
+  const pts = {};
+  for (const [k, [px, py]] of Object.entries(projected)) {
+    pts[k] = [px + ox, py + oy];
+  }
+
+  const width = (maxX - minX) + pad * 2;
+  const height = (maxY2 - minY) + pad * 2;
+
+  return { pts, width, height, side };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { pts, width, height, side } = geo;
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('width', width);
+  svg.setAttribute('height', height);
+
+  const { T, Bot, M1, M2, M3, M4 } = pts;
+
+  // 정팔면체 8개 면 중 등각투영 시 보이는 면:
+  // 위쪽 4면: T-M1-M2, T-M2-M3, T-M3-M4, T-M4-M1
+  // 아래쪽 4면: Bot-M1-M2, Bot-M2-M3, Bot-M3-M4, Bot-M4-M1
+  // 이소메트릭에서 앞쪽으로 보이는 면: T-M1-M2 (오른앞), T-M4-M1 (왼앞)
+  // Bot-M1-M2 (오른앞아래), Bot-M4-M1 (왼앞아래)
+  // 뒤쪽: T-M2-M3, T-M3-M4, Bot-M2-M3, Bot-M3-M4 (점선 처리 일부)
+
+  // 면 채우기 (뒷면 먼저)
+  const facesBack = [
+    [T, M2, M3, 'rgba(160,195,240,0.25)'],
+    [T, M3, M4, 'rgba(160,195,240,0.25)'],
+    [Bot, M2, M3, 'rgba(140,175,220,0.2)'],
+    [Bot, M3, M4, 'rgba(140,175,220,0.2)'],
+  ];
+  for (const [p, q, r2, fill] of facesBack) {
+    svg.appendChild(el('polygon', {
+      points: `${p[0]},${p[1]} ${q[0]},${q[1]} ${r2[0]},${r2[1]}`,
+      fill, stroke: 'none'
+    }));
+  }
+
+  // 앞면 채우기
+  const facesFront = [
+    [T, M1, M2, 'rgba(200,220,255,0.45)'],
+    [T, M4, M1, 'rgba(180,205,250,0.45)'],
+    [Bot, M1, M2, 'rgba(160,190,240,0.45)'],
+    [Bot, M4, M1, 'rgba(150,185,235,0.45)'],
+  ];
+  for (const [p, q, r2, fill] of facesFront) {
+    svg.appendChild(el('polygon', {
+      points: `${p[0]},${p[1]} ${q[0]},${q[1]} ${r2[0]},${r2[1]}`,
+      fill, stroke: 'none'
+    }));
+  }
+
+  // 숨겨진 모서리 (점선): M3-M4 (뒷변)과 관련
+  // 뒤쪽에서 완전히 가려지는 선들
+  const hiddenEdges = [
+    [M3, M4],
+    [M2, M3],
+    [Bot, M3],
+  ];
+  for (const [p, q] of hiddenEdges) {
+    svg.appendChild(el('line', {
+      x1: p[0], y1: p[1], x2: q[0], y2: q[1],
+      stroke: '#888', 'stroke-width': '1.2',
+      'stroke-dasharray': '5,4'
+    }));
+  }
+
+  // 실선 모서리
+  const solidEdges = [
+    [T, M1], [T, M2], [T, M4],
+    [M1, M2], [M4, M1], [M2, Bot], [M1, Bot], [M4, Bot],
+    [T, M3], [M3, Bot]
+  ];
+  // T-M3, M3-Bot은 시각적으로 약간 보이므로 실선으로 포함
+  // 단, M2-M3, M3-M4는 점선
+  const solidSet = new Set([
+    'T-M1','T-M2','T-M4',
+    'M1-M2','M4-M1','M2-Bot','M1-Bot','M4-Bot',
+    'T-M3','M3-Bot'
+  ]);
+  for (const [p, q] of solidEdges) {
+    svg.appendChild(el('line', {
+      x1: p[0], y1: p[1], x2: q[0], y2: q[1],
+      stroke: '#1a1a2e', 'stroke-width': '2',
+      'stroke-linecap': 'round'
+    }));
+  }
+
+  // 꼭짓점 점과 레이블
+  const labelOffset = {
+    T:   [0, -14],
+    Bot: [0,  14],
+    M1:  [4,  14],
+    M2:  [16,  0],
+    M3:  [0, -14],
+    M4:  [-16, 0],
+  };
+  const labels = { T: 'T', Bot: 'B', M1: 'M₁', M2: 'M₂', M3: 'M₃', M4: 'M₄' };
+  for (const [k, p] of Object.entries(pts)) {
+    svg.appendChild(el('circle', {
+      cx: p[0], cy: p[1], r: '3',
+      fill: '#1a1a2e'
+    }));
+    const [lx, ly] = labelOffset[k] || [0, -12];
+    svg.appendChild(el('text', {
+      x: p[0] + lx, y: p[1] + ly,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '13',
+      'font-family': 'serif',
+      'font-style': 'italic',
+      fill: '#1a1a2e'
+    }, labels[k] || k));
+  }
+
+  // 한 변 길이 표시: T-M2 변 중점 오른쪽
+  const mx = (T[0] + M2[0]) / 2;
+  const my = (T[1] + M2[1]) / 2;
+  svg.appendChild(el('text', {
+    x: mx + 16, y: my,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'central',
+    'font-size': '13',
+    'font-family': 'serif',
+    fill: '#c0392b'
+  }, `${side}`));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

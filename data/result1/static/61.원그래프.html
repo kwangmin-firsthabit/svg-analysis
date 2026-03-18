@@ -1,0 +1,67 @@
+<!--
+  원그래프: 가계 월 지출 비율
+  식비 32%, 주거 28%, 교육 18%, 교통 12%, 기타 10%
+  합계: 100%
+
+  섹터 각도 계산 (시작 -90° = -π/2, 시계방향):
+    식비 32%: 115.2° → 끝=-90+115.2=25.2°
+    주거 28%: 100.8° → 끝=25.2+100.8=126°
+    교육 18%: 64.8°  → 끝=126+64.8=190.8°
+    교통 12%: 43.2°  → 끝=190.8+43.2=234°
+    기타 10%: 36°    → 끝=234+36=270°=360-90
+
+  중심 (200,200), 반지름 150
+  섹터 끝점(x,y) = (200+150*cos(°), 200+150*sin(°))
+
+  라디안 변환: deg→rad = deg * π/180
+    시작: -90° → (-1.5708)
+    식비 끝: 25.2° → (0.4398)
+      끝점: x=200+150*cos(25.2°)=200+135.8=335.8, y=200+150*sin(25.2°)=200+63.8=263.8
+    주거 끝: 126° → (2.1991)
+      끝점: x=200+150*cos(126°)=200-88.2=111.8, y=200+150*sin(126°)=200+121.4=321.4
+    교육 끝: 190.8° → (3.3301)
+      끝점: x=200+150*cos(190.8°)=200-147.3=52.7, y=200+150*sin(190.8°)=200-28.5=171.5
+    교통 끝: 234° → (4.0841)
+      끝점: x=200+150*cos(234°)=200-88.2=111.8, y=200+150*sin(234°)=200-121.4=78.6
+    기타 끝: 270° = 시작점: x=200+150*cos(270°)=200, y=200-150=50
+
+  레이블 위치 (중간 각도, 반지름 100):
+    식비 중간각: -90+57.6=-32.4°: x=200+100*cos(-32.4°)=200+84.4=284.4, y=200+100*sin(-32.4°)=200-53.8=146.2
+    주거 중간각: 25.2+50.4=75.6°: x=200+100*cos(75.6°)=200+24.9=224.9, y=200+100*sin(75.6°)=200+96.9=296.9
+    교육 중간각: 126+32.4=158.4°: x=200+100*cos(158.4°)=200-93.1=106.9, y=200+100*sin(158.4°)=200+37.1=237.1
+    교통 중간각: 190.8+21.6=212.4°: x=200+100*cos(212.4°)=200-84.4=115.6, y=200+100*sin(212.4°)=200-53.8=146.2
+    기타 중간각: 234+18=252°: x=200+100*cos(252°)=200-30.9=169.1, y=200+100*sin(252°)=200-95.1=104.9
+-->
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- 식비 32%: -90° → 25.2° -->
+  <path d="M200,200 L200,50 A150,150 0 0,1 335,264 Z"
+    fill="#4a90d9" stroke="#fff" stroke-width="2"/>
+  <!-- 주거 28%: 25.2° → 126° -->
+  <path d="M200,200 L335,264 A150,150 0 0,1 112,321 Z"
+    fill="#e74c3c" stroke="#fff" stroke-width="2"/>
+  <!-- 교육 18%: 126° → 190.8° -->
+  <path d="M200,200 L112,321 A150,150 0 0,1 53,172 Z"
+    fill="#27ae60" stroke="#fff" stroke-width="2"/>
+  <!-- 교통 12%: 190.8° → 234° -->
+  <path d="M200,200 L53,172 A150,150 0 0,1 112,79 Z"
+    fill="#f39c12" stroke="#fff" stroke-width="2"/>
+  <!-- 기타 10%: 234° → 270° -->
+  <path d="M200,200 L112,79 A150,150 0 0,1 200,50 Z"
+    fill="#9b59b6" stroke="#fff" stroke-width="2"/>
+
+  <!-- 레이블 -->
+  <text x="284" y="146" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#fff">식비</text>
+  <text x="284" y="162" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#fff">32%</text>
+
+  <text x="228" y="293" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#fff">주거</text>
+  <text x="228" y="309" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#fff">28%</text>
+
+  <text x="107" y="234" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#fff">교육</text>
+  <text x="107" y="250" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#fff">18%</text>
+
+  <text x="122" y="142" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#fff">교통</text>
+  <text x="122" y="158" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#fff">12%</text>
+
+  <text x="169" y="102" text-anchor="middle" font-family="sans-serif" font-size="12" font-weight="bold" fill="#fff">기타</text>
+  <text x="169" y="118" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#fff">10%</text>
+</svg>

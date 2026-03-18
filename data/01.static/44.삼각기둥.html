@@ -1,0 +1,70 @@
+<svg width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    삼각기둥 ABC-DEF, 밑면 정삼각형 한 변=4, 높이=6
+    scale=50px/unit, 경사투영 45°×0.5 → dx=28, dy=-28
+    정삼각형 밑면 (front face ABC):
+      A = bottom-left, B = bottom-right, C = top-center
+      side=4, so base width=4*50=200px, height of equilateral triangle = sqrt(3)/2*4*50 ≈ 173px
+      Place front face: A(160,360) B(360,360) C(260,187)
+    Back face DEF = front + oblique offset(dx=28, dy=-28):
+      D(188,332) E(388,332) F(288,159)
+  -->
+
+  <!-- 숨겨진 모서리 (dashed) -->
+  <line x1="160" y1="360" x2="188" y2="332" stroke="#888780" stroke-width="1" stroke-dasharray="5 4" stroke-linecap="round" />
+  <line x1="188" y1="332" x2="388" y2="332" stroke="#888780" stroke-width="1" stroke-dasharray="5 4" stroke-linecap="round" />
+  <line x1="188" y1="332" x2="288" y2="159" stroke="#888780" stroke-width="1" stroke-dasharray="5 4" stroke-linecap="round" />
+
+  <!-- 면 채우기 -->
+  <!-- 뒷면 DEF -->
+  <polygon points="188,332 388,332 288,159" fill="#85B7EB" stroke="none" opacity="0.5" />
+  <!-- 오른쪽 면 BCE-BEF (B,E,F,C) -->
+  <polygon points="360,360 388,332 288,159 260,187" fill="#B5D4F4" stroke="none" opacity="0.5" />
+  <!-- 왼쪽 면 A,D,F,C -->
+  <polygon points="160,360 188,332 288,159 260,187" fill="#E6F1FB" stroke="none" opacity="0.5" />
+  <!-- 앞면 ABC -->
+  <polygon points="160,360 360,360 260,187" fill="#E6F1FB" stroke="none" opacity="0.3" />
+  <!-- 밑면 A,B,E,D (bottom) -->
+  <polygon points="160,360 360,360 388,332 188,332" fill="#B5D4F4" stroke="none" opacity="0.4" />
+
+  <!-- 보이는 모서리 -->
+  <!-- 앞면 삼각형 ABC -->
+  <line x1="160" y1="360" x2="360" y2="360" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="360" y1="360" x2="260" y2="187" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="260" y1="187" x2="160" y2="360" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+  <!-- 뒷면 보이는 모서리 E, F -->
+  <line x1="388" y1="332" x2="288" y2="159" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+  <!-- 연결 모서리 B-E, C-F -->
+  <line x1="360" y1="360" x2="388" y2="332" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="260" y1="187" x2="288" y2="159" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+  <!-- E-F visible bottom-right -->
+  <line x1="388" y1="332" x2="188" y2="332" stroke="#888780" stroke-width="1" stroke-dasharray="5 4" stroke-linecap="round" />
+
+  <!-- 꼭짓점 -->
+  <circle cx="160" cy="360" r="3" fill="#2C2C2A" />
+  <circle cx="360" cy="360" r="3" fill="#2C2C2A" />
+  <circle cx="260" cy="187" r="3" fill="#2C2C2A" />
+  <circle cx="188" cy="332" r="3" fill="#888780" />
+  <circle cx="388" cy="332" r="3" fill="#2C2C2A" />
+  <circle cx="288" cy="159" r="3" fill="#2C2C2A" />
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="144" y="378" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#2C2C2A">A</text>
+  <text x="376" y="378" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#2C2C2A">B</text>
+  <text x="260" y="178" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#2C2C2A">C</text>
+  <text x="174" y="328" text-anchor="end" font-family="serif" font-style="italic" font-size="16" fill="#888780">D</text>
+  <text x="404" y="340" text-anchor="start" font-family="serif" font-style="italic" font-size="16" fill="#2C2C2A">E</text>
+  <text x="292" y="150" text-anchor="start" font-family="serif" font-style="italic" font-size="16" fill="#2C2C2A">F</text>
+
+  <!-- 치수선: 밑변 4 (A-B 아래) -->
+  <line x1="160" y1="384" x2="360" y2="384" stroke="#5F5E5A" stroke-width="0.8" stroke-linecap="round" />
+  <line x1="160" y1="378" x2="160" y2="390" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="360" y1="378" x2="360" y2="390" stroke="#5F5E5A" stroke-width="0.8" />
+  <text x="260" y="402" text-anchor="middle" font-family="serif" font-size="13" fill="#5F5E5A">4</text>
+
+  <!-- 치수선: 높이 6 (왼쪽) -->
+  <line x1="128" y1="360" x2="128" y2="187" stroke="#5F5E5A" stroke-width="0.8" stroke-linecap="round" />
+  <line x1="122" y1="360" x2="134" y2="360" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="122" y1="187" x2="134" y2="187" stroke="#5F5E5A" stroke-width="0.8" />
+  <text x="114" y="278" text-anchor="end" font-family="serif" font-size="13" fill="#5F5E5A">6</text>
+</svg>

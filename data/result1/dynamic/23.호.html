@@ -1,0 +1,50 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 호 AB, 원주 위 A-B 곡선 거리 = 10
+  // r=6, θ=10/6≈1.667rad≈95.5° (1 unit=28px → r=168px)
+  // O=(200,230), A=200°, B=200°-95.5°=104.5° (반시계)
+  const r = 168;
+  const O = { x: 200, y: 230 };
+  const angA = 200 * Math.PI / 180;
+  const angB = 104.5 * Math.PI / 180;
+  const A = { x: O.x + r * Math.cos(angA), y: O.y + r * Math.sin(angA) };
+  const B = { x: O.x + r * Math.cos(angB), y: O.y + r * Math.sin(angB) };
+  // 검증: 호 길이 = r*θ = 168*1.667 ≈ 280px (단위 비율 유지)
+  const maxY = Math.max(A.y, B.y) + 40;
+  return { A, B, maxY, r };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { A, B, r, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 400 ${maxY}`);
+  svg.setAttribute('width', '400');
+  svg.setAttribute('height', maxY);
+
+  svg.appendChild(el('path', {
+    d: `M ${A.x},${A.y} A ${r},${r} 0 0 1 ${B.x},${B.y}`,
+    fill: 'none', stroke: '#000', 'stroke-width': 2.5
+  }));
+
+  svg.appendChild(el('circle', { cx: A.x, cy: A.y, r: 3.5, fill: '#000' }));
+  svg.appendChild(el('circle', { cx: B.x, cy: B.y, r: 3.5, fill: '#000' }));
+
+  svg.appendChild(el('text', { x: A.x - 12, y: A.y + 16, 'text-anchor': 'end',   'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'A'));
+  svg.appendChild(el('text', { x: B.x - 8,  y: B.y - 10, 'text-anchor': 'end',   'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'B'));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

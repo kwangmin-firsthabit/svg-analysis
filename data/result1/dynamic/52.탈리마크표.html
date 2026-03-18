@@ -1,0 +1,181 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const W = 480;
+  const data = [
+    { label: '봄',  count: 8 },
+    { label: '여름', count: 7 },
+    { label: '가을', count: 9 },
+    { label: '겨울', count: 6 },
+  ];
+  const marginX = 20;
+  const marginY = 20;
+  const rowH = 38;
+  const headerH = 38;
+  const colLabelW = 90;
+  const colTallyW = 260;
+  const colCountW = 90;
+  const tableW = colLabelW + colTallyW + colCountW;
+  const tableH = headerH + data.length * rowH;
+  const maxY = marginY + tableH + marginY;
+  return {
+    W, data, marginX, marginY, rowH, headerH,
+    colLabelW, colTallyW, colCountW, tableW, tableH, maxY
+  };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+// 탈리마크 그리기 (5묶음 단위)
+function drawTally(parentEl, x0, y0, count) {
+  const lineH = 22;
+  const lineGap = 8;
+  const groupW = 40; // 4선+사선 묶음 너비
+  const groupGap = 12;
+
+  let drawn = 0;
+  let cx = x0;
+
+  while (drawn < count) {
+    const groupCount = Math.min(5, count - drawn);
+    const y1 = y0 - lineH / 2;
+    const y2 = y0 + lineH / 2;
+
+    // 세로선 4개 (최대)
+    for (let k = 0; k < Math.min(4, groupCount); k++) {
+      parentEl.appendChild(el('line', {
+        x1: cx + k * lineGap, y1: y1,
+        x2: cx + k * lineGap, y2: y2,
+        stroke: '#333', 'stroke-width': '1.5'
+      }));
+    }
+
+    // 5번째 사선
+    if (groupCount === 5) {
+      parentEl.appendChild(el('line', {
+        x1: cx - 4, y1: y2,
+        x2: cx + 4 * lineGap + 4, y2: y1,
+        stroke: '#333', 'stroke-width': '1.5'
+      }));
+      cx += groupW + groupGap;
+    } else {
+      cx += (groupCount - 1) * lineGap + lineGap + groupGap;
+    }
+
+    drawn += groupCount;
+  }
+}
+
+function render(geo) {
+  const {
+    W, data, marginX, marginY, rowH, headerH,
+    colLabelW, colTallyW, colCountW, tableW, tableH, maxY
+  } = geo;
+  svg.setAttribute('viewBox', `0 0 ${W} ${maxY}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', maxY);
+
+  const x0 = marginX;
+  const y0 = marginY;
+
+  // 외곽선
+  svg.appendChild(el('rect', {
+    x: x0, y: y0, width: tableW, height: tableH,
+    fill: 'none', stroke: '#333', 'stroke-width': '1.5'
+  }));
+
+  // 헤더 배경
+  svg.appendChild(el('rect', {
+    x: x0, y: y0, width: tableW, height: headerH,
+    fill: '#e8e8e8'
+  }));
+
+  // 수직 구분선
+  svg.appendChild(el('line', {
+    x1: x0 + colLabelW, y1: y0,
+    x2: x0 + colLabelW, y2: y0 + tableH,
+    stroke: '#333', 'stroke-width': '1'
+  }));
+  svg.appendChild(el('line', {
+    x1: x0 + colLabelW + colTallyW, y1: y0,
+    x2: x0 + colLabelW + colTallyW, y2: y0 + tableH,
+    stroke: '#333', 'stroke-width': '1'
+  }));
+
+  // 수평 구분선 (헤더 아래)
+  svg.appendChild(el('line', {
+    x1: x0, y1: y0 + headerH, x2: x0 + tableW, y2: y0 + headerH,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+  for (let r = 1; r < data.length; r++) {
+    svg.appendChild(el('line', {
+      x1: x0, y1: y0 + headerH + r * rowH,
+      x2: x0 + tableW, y2: y0 + headerH + r * rowH,
+      stroke: '#333', 'stroke-width': '1'
+    }));
+  }
+
+  // 헤더 텍스트
+  svg.appendChild(el('text', {
+    x: x0 + colLabelW / 2, y: y0 + headerH / 2 + 5,
+    'text-anchor': 'middle', 'font-family': 'sans-serif',
+    'font-size': '13', 'font-weight': 'bold', fill: '#222'
+  }, '계절'));
+  svg.appendChild(el('text', {
+    x: x0 + colLabelW + colTallyW / 2, y: y0 + headerH / 2 + 5,
+    'text-anchor': 'middle', 'font-family': 'sans-serif',
+    'font-size': '13', 'font-weight': 'bold', fill: '#222'
+  }, '탈리마크'));
+  svg.appendChild(el('text', {
+    x: x0 + colLabelW + colTallyW + colCountW / 2, y: y0 + headerH / 2 + 5,
+    'text-anchor': 'middle', 'font-family': 'sans-serif',
+    'font-size': '13', 'font-weight': 'bold', fill: '#222'
+  }, '도수'));
+
+  // 이름 열 배경
+  data.forEach((d, i) => {
+    svg.appendChild(el('rect', {
+      x: x0, y: y0 + headerH + i * rowH,
+      width: colLabelW, height: rowH,
+      fill: '#f5f5f5'
+    }));
+  });
+
+  // 데이터 행
+  data.forEach((d, i) => {
+    const rowY = y0 + headerH + i * rowH;
+    const cy = rowY + rowH / 2;
+
+    // 계절 레이블
+    svg.appendChild(el('text', {
+      x: x0 + colLabelW / 2, y: cy + 5,
+      'text-anchor': 'middle', 'font-family': 'sans-serif',
+      'font-size': '13', fill: '#222'
+    }, d.label));
+
+    // 탈리마크
+    const tallyX = x0 + colLabelW + 16;
+    drawTally(svg, tallyX, cy, d.count);
+
+    // 도수
+    svg.appendChild(el('text', {
+      x: x0 + colLabelW + colTallyW + colCountW / 2, y: cy + 5,
+      'text-anchor': 'middle', 'font-family': 'sans-serif',
+      'font-size': '13', fill: '#333'
+    }, d.count));
+  });
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

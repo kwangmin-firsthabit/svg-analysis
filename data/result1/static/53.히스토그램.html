@@ -1,0 +1,66 @@
+<!--
+  히스토그램: 학생 40명 통학 시간 도수분포
+  계급: 0~10(5명), 10~20(12명), 20~30(14명), 30~40(7명), 40~50(2명)
+  최대 도수: 14
+
+  레이아웃:
+    viewBox: 0 0 400 300
+    축 원점: (60, 250)
+    x축 길이: 300px (0~50분, 5개 계급 각 60px)
+    y축 길이: 200px (0~15, 10px per unit → 계급당 13.33px)
+    막대 너비: 60px (간격 없음)
+
+  좌표 계산:
+    y = 250 - (도수 * 200 / 15)
+    0~10: x=60, w=60, h=5*200/15=66.7, y=250-66.7=183.3
+    10~20: x=120, w=60, h=12*200/15=160, y=250-160=90
+    20~30: x=180, w=60, h=14*200/15=186.7, y=250-186.7=63.3
+    30~40: x=240, w=60, h=7*200/15=93.3, y=250-93.3=156.7
+    40~50: x=300, w=60, h=2*200/15=26.7, y=250-26.7=223.3
+-->
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- 막대 (간격 없음) -->
+  <rect x="60" y="183" width="60" height="67" fill="#4a90d9" stroke="#fff" stroke-width="0.5"/>
+  <rect x="120" y="90" width="60" height="160" fill="#4a90d9" stroke="#fff" stroke-width="0.5"/>
+  <rect x="180" y="63" width="60" height="187" fill="#4a90d9" stroke="#fff" stroke-width="0.5"/>
+  <rect x="240" y="157" width="60" height="93" fill="#4a90d9" stroke="#fff" stroke-width="0.5"/>
+  <rect x="300" y="223" width="60" height="27" fill="#4a90d9" stroke="#fff" stroke-width="0.5"/>
+
+  <!-- x축 -->
+  <line x1="55" y1="250" x2="370" y2="250" stroke="#333" stroke-width="1.5"/>
+  <!-- y축 -->
+  <line x1="60" y1="30" x2="60" y2="255" stroke="#333" stroke-width="1.5"/>
+
+  <!-- x축 눈금 및 레이블 -->
+  <line x1="60" y1="250" x2="60" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="60" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">0</text>
+  <line x1="120" y1="250" x2="120" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="120" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">10</text>
+  <line x1="180" y1="250" x2="180" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="180" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">20</text>
+  <line x1="240" y1="250" x2="240" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="240" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">30</text>
+  <line x1="300" y1="250" x2="300" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="300" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">40</text>
+  <line x1="360" y1="250" x2="360" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="360" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">50</text>
+
+  <!-- y축 눈금 및 레이블 (0,5,10,15) -->
+  <line x1="54" y1="250" x2="60" y2="250" stroke="#333" stroke-width="1"/>
+  <text x="50" y="254" text-anchor="end" font-family="sans-serif" font-size="11" fill="#333">0</text>
+  <line x1="54" y1="183" x2="60" y2="183" stroke="#333" stroke-width="1"/>
+  <text x="50" y="187" text-anchor="end" font-family="sans-serif" font-size="11" fill="#333">5</text>
+  <line x1="54" y1="117" x2="60" y2="117" stroke="#333" stroke-width="1"/>
+  <text x="50" y="121" text-anchor="end" font-family="sans-serif" font-size="11" fill="#333">10</text>
+  <line x1="54" y1="50" x2="60" y2="50" stroke="#333" stroke-width="1"/>
+  <text x="50" y="54" text-anchor="end" font-family="sans-serif" font-size="11" fill="#333">15</text>
+
+  <!-- 보조 수평선 -->
+  <line x1="60" y1="183" x2="360" y2="183" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="60" y1="117" x2="360" y2="117" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="60" y1="50" x2="360" y2="50" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+
+  <!-- 축 레이블 -->
+  <text x="215" y="290" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">통학 시간 (분)</text>
+  <text x="20" y="150" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333" transform="rotate(-90,20,150)">도수 (명)</text>
+</svg>

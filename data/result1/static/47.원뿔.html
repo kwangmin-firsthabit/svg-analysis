@@ -1,0 +1,51 @@
+<!--
+  좌표 계산 검증
+  원뿔: 반지름 r=4, 높이 h=6
+  1단위 = 30px
+
+  r = 4단위 → 120px (타원 rx=120, ry=24)
+  h = 6단위 → 180px
+
+  화면 좌표:
+  중심 x = 200
+  밑면 타원 중심 y = 300
+  꼭짓점 y = 300 - 180 = 120
+
+  타원: rx=120, ry=24
+
+  꼭짓점: (200, 120)
+  밑면 왼쪽: (80, 300), 밑면 오른쪽: (320, 300)
+
+  모선 (꼭짓점→타원 접선):
+    왼쪽 모선: (200,120)→(80,300)
+    오른쪽 모선: (200,120)→(320,300)
+
+  viewBox: "50 90 320 260"
+-->
+<svg width="370" height="300" viewBox="50 90 320 300" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- 밑면 타원 뒷반 (점선) -->
+  <path d="M 80,300 A 120,24 0 0,1 320,300"
+    fill="none" stroke="#1e40af" stroke-width="1.8" stroke-dasharray="5,4"/>
+
+  <!-- 옆면 (모선 두 개 + 밑면 타원 앞반으로 닫힘) -->
+  <path d="M 200,120 L 80,300 A 120,24 0 0,0 320,300 Z"
+    fill="#dbeafe" fill-opacity="0.5" stroke="#1e40af" stroke-width="1.8"/>
+
+  <!-- 꼭짓점 점 -->
+  <circle cx="200" cy="120" r="3" fill="#1e293b"/>
+
+  <!-- 치수선 -->
+  <!-- 반지름 r=4 (밑면) -->
+  <line x1="200" y1="300" x2="320" y2="300" stroke="#374151" stroke-width="1" stroke-dasharray="4,3"/>
+  <circle cx="200" cy="300" r="2.5" fill="#374151"/>
+  <text x="260" y="316" text-anchor="middle" font-size="12" font-family="serif" fill="#374151">r=4</text>
+
+  <!-- 높이 h=6 -->
+  <line x1="200" y1="120" x2="200" y2="300" stroke="#9ca3af" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="210" y="215" font-size="12" font-family="serif" fill="#374151">h=6</text>
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="200" y="112" text-anchor="middle" font-size="12" font-family="serif" fill="#1e293b">꼭짓점</text>
+
+</svg>

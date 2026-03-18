@@ -1,0 +1,202 @@
+<!doctype html>
+<html>
+  <body>
+    <svg width="100%" viewBox="0 0 680 580" xmlns="http://www.w3.org/2000/svg">
+      <script>
+        const u = 34;
+        const a = 3,
+          b = 4,
+          c = 5,
+          h = 10;
+        const totalW = (a + b + c) * u;
+        const ox = (680 - totalW) / 2;
+        const rectTop = 200,
+          rectBot = rectTop + h * u;
+        const x0 = ox,
+          x1 = ox + a * u,
+          x2 = ox + (a + b) * u,
+          x3 = ox + (a + b + c) * u;
+
+        const svg = document.querySelector('svg');
+        function el(tag, attrs, txt) {
+          const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+          for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+          if (txt !== undefined) e.textContent = txt;
+          svg.appendChild(e);
+          return e;
+        }
+        function lbl(x, y, s, size, weight, fill, anchor) {
+          el(
+            'text',
+            {
+              x,
+              y,
+              'text-anchor': anchor || 'middle',
+              'font-family': '"Anthropic Sans",sans-serif',
+              'font-size': size || 12,
+              'font-weight': weight || 400,
+              fill: fill || '#444441',
+            },
+            s
+          );
+        }
+        function dimLine(x1, y1, x2, y2, txt, color, side) {
+          const c = color || '#185FA5';
+          el('line', { x1, y1, x2, y2, stroke: c, 'stroke-width': 0.9 });
+          const dx = x2 - x1,
+            dy = y2 - y1,
+            len = Math.sqrt(dx * dx + dy * dy);
+          if (len < 1) return;
+          const ux = dx / len,
+            uy = dy / len,
+            s = 5;
+          el('path', {
+            d: `M${x1 + ux * s + uy * s},${y1 + uy * s - ux * s} L${x1},${y1} L${x1 + ux * s - uy * s},${y1 + uy * s + ux * s}`,
+            fill: 'none',
+            stroke: c,
+            'stroke-width': 0.9,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+          el('path', {
+            d: `M${x2 - ux * s + uy * s},${y2 - uy * s - ux * s} L${x2},${y2} L${x2 - ux * s - uy * s},${y2 - uy * s + ux * s}`,
+            fill: 'none',
+            stroke: c,
+            'stroke-width': 0.9,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+          const mx = (x1 + x2) / 2,
+            my = (y1 + y2) / 2;
+          let lx = mx,
+            ly = my;
+          if (side === 'top') ly -= 10;
+          if (side === 'bottom') ly += 14;
+          if (side === 'left') lx -= 12;
+          if (side === 'right') lx += 12;
+          el(
+            'text',
+            {
+              x: lx,
+              y: ly,
+              'text-anchor': 'middle',
+              'font-family': '"Anthropic Sans",sans-serif',
+              'font-size': 11,
+              'font-weight': 500,
+              fill: c,
+            },
+            txt
+          );
+        }
+
+        // 옆면 채우기
+        el('rect', { x: x0, y: rectTop, width: a * u, height: h * u, fill: '#EAF3DE', stroke: 'none' });
+        el('rect', { x: x1, y: rectTop, width: b * u, height: h * u, fill: '#E6F1FB', stroke: 'none' });
+        el('rect', { x: x2, y: rectTop, width: c * u, height: h * u, fill: '#FAEEDA', stroke: 'none' });
+
+        // 삼각형 꼭짓점: 직각 C, CA=4(세로), CB=3(가로)
+        // 밑면: C=(x1,rectBot), B=(x1-a*u,rectBot), A=(x1,rectBot+b*u)
+        const Cb = [x1, rectBot],
+          Bb = [x1 - a * u, rectBot],
+          Ab = [x1, rectBot + b * u];
+        // 윗면: C=(x1,rectTop), B=(x1-a*u,rectTop), A=(x1,rectTop-b*u)
+        const Ct = [x1, rectTop],
+          Bt = [x1 - a * u, rectTop],
+          At = [x1, rectTop - b * u];
+
+        // 삼각형 채우기
+        el('polygon', {
+          points: `${Cb[0]},${Cb[1]} ${Bb[0]},${Bb[1]} ${Ab[0]},${Ab[1]}`,
+          fill: '#F1EFE8',
+          stroke: 'none',
+        });
+        el('polygon', {
+          points: `${Ct[0]},${Ct[1]} ${Bt[0]},${Bt[1]} ${At[0]},${At[1]}`,
+          fill: '#F1EFE8',
+          stroke: 'none',
+        });
+
+        // 옆면 테두리
+        [x0, x1, x2].forEach((x, i) => {
+          const w = [a, b, c][i] * u;
+          el('rect', {
+            x,
+            y: rectTop,
+            width: w,
+            height: h * u,
+            fill: 'none',
+            stroke: '#444441',
+            'stroke-width': 1.5,
+            'stroke-linejoin': 'round',
+          });
+        });
+
+        // 삼각형 테두리 (공유변=접는선=점선, 자유변=실선)
+        [
+          [Cb, Ab, 1],
+          [Cb, Bb, 1],
+          [Bb, Ab, 0],
+        ].forEach(([p1, p2, fold]) => {
+          el('line', {
+            x1: p1[0],
+            y1: p1[1],
+            x2: p2[0],
+            y2: p2[1],
+            stroke: '#444441',
+            'stroke-width': 1.5,
+            ...(fold ? { 'stroke-dasharray': '5 3' } : {}),
+          });
+        });
+        [
+          [Ct, At, 1],
+          [Ct, Bt, 1],
+          [Bt, At, 0],
+        ].forEach(([p1, p2, fold]) => {
+          el('line', {
+            x1: p1[0],
+            y1: p1[1],
+            x2: p2[0],
+            y2: p2[1],
+            stroke: '#444441',
+            'stroke-width': 1.5,
+            ...(fold ? { 'stroke-dasharray': '5 3' } : {}),
+          });
+        });
+
+        // 직각 기호
+        {
+          const s = 8;
+          el('polyline', {
+            points: `${Cb[0] - s},${Cb[1]} ${Cb[0] - s},${Cb[1] + s} ${Cb[0]},${Cb[1] + s}`,
+            fill: 'none',
+            stroke: '#444441',
+            'stroke-width': 1,
+          });
+        }
+        {
+          const s = 8;
+          el('polyline', {
+            points: `${Ct[0] - s},${Ct[1]} ${Ct[0] - s},${Ct[1] - s} ${Ct[0]},${Ct[1] - s}`,
+            fill: 'none',
+            stroke: '#444441',
+            'stroke-width': 1,
+          });
+        }
+
+        // 치수선
+        dimLine(x0, rectBot + 18, x1, rectBot + 18, '3', '#3B6D11', 'bottom');
+        dimLine(x1, rectBot + 18, x2, rectBot + 18, '4', '#185FA5', 'bottom');
+        dimLine(x2, rectBot + 18, x3, rectBot + 18, '5', '#854F0B', 'bottom');
+        dimLine(x0 - 18, rectTop, x0 - 18, rectBot, '10', '#444441', 'left');
+
+        // 삼각형 변 레이블
+        lbl((Cb[0] + Bb[0]) / 2, Cb[1] + 14, '3', 11, 500, '#3B6D11');
+        lbl(Cb[0] + 16, (Cb[1] + Ab[1]) / 2, '4', 11, 500, '#185FA5');
+        lbl((Bb[0] + Ab[0]) / 2 - 14, (Bb[1] + Ab[1]) / 2 + 4, '5', 11, 500, '#854F0B');
+        lbl((Ct[0] + Bt[0]) / 2, Ct[1] - 8, '3', 11, 500, '#3B6D11');
+        lbl(Ct[0] + 16, (Ct[1] + At[1]) / 2, '4', 11, 500, '#185FA5');
+        lbl((Bt[0] + At[0]) / 2 - 14, (Bt[1] + At[1]) / 2 - 4, '5', 11, 500, '#854F0B');
+      </script>
+    </svg>
+  </body>
+</html>

@@ -1,0 +1,94 @@
+<!--
+  히스토그램+도수다각형 복합 차트
+  계급: 0~10(5), 10~20(12), 20~30(14), 30~40(7), 40~50(2)
+  중앙값: 5,15,25,35,45 / 도수: 5,12,14,7,2
+  양 끝 연장점: (-5,0), (55,0)
+
+  레이아웃:
+    viewBox: 0 0 400 300
+    축 원점: (60, 250)
+    x축 스케일: 300/50=6px/분
+    y축 스케일: 200/15≈13.33px/unit
+
+  히스토그램 x좌표: 60+계급시작*6
+    0~10: x=60, w=60
+    10~20: x=120, w=60
+    20~30: x=180, w=60
+    30~40: x=240, w=60
+    40~50: x=300, w=60
+
+  도수다각형 x좌표: 60+중앙값*6
+    (-5,0): x=60+(-5*6)=30, y=250
+    (5,5): x=90, y=250-66.7=183
+    (15,12): x=150, y=90
+    (25,14): x=210, y=63
+    (35,7): x=270, y=157
+    (45,2): x=330, y=223
+    (55,0): x=390, y=250
+-->
+<svg width="400" height="300" viewBox="0 0 400 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- 히스토그램 막대 -->
+  <rect x="60" y="183" width="60" height="67" fill="#4a90d9" fill-opacity="0.6" stroke="#4a90d9" stroke-width="1"/>
+  <rect x="120" y="90" width="60" height="160" fill="#4a90d9" fill-opacity="0.6" stroke="#4a90d9" stroke-width="1"/>
+  <rect x="180" y="63" width="60" height="187" fill="#4a90d9" fill-opacity="0.6" stroke="#4a90d9" stroke-width="1"/>
+  <rect x="240" y="157" width="60" height="93" fill="#4a90d9" fill-opacity="0.6" stroke="#4a90d9" stroke-width="1"/>
+  <rect x="300" y="223" width="60" height="27" fill="#4a90d9" fill-opacity="0.6" stroke="#4a90d9" stroke-width="1"/>
+
+  <!-- 도수다각형 -->
+  <polyline
+    points="30,250 90,183 150,90 210,63 270,157 330,223 390,250"
+    fill="none"
+    stroke="#e74c3c"
+    stroke-width="2.5"
+  />
+  <circle cx="90" cy="183" r="4" fill="#e74c3c"/>
+  <circle cx="150" cy="90" r="4" fill="#e74c3c"/>
+  <circle cx="210" cy="63" r="4" fill="#e74c3c"/>
+  <circle cx="270" cy="157" r="4" fill="#e74c3c"/>
+  <circle cx="330" cy="223" r="4" fill="#e74c3c"/>
+
+  <!-- x축 -->
+  <line x1="55" y1="250" x2="370" y2="250" stroke="#333" stroke-width="1.5"/>
+  <!-- y축 -->
+  <line x1="60" y1="30" x2="60" y2="255" stroke="#333" stroke-width="1.5"/>
+
+  <!-- x축 눈금 및 레이블 -->
+  <line x1="60" y1="250" x2="60" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="60" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">0</text>
+  <line x1="120" y1="250" x2="120" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="120" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">10</text>
+  <line x1="180" y1="250" x2="180" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="180" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">20</text>
+  <line x1="240" y1="250" x2="240" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="240" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">30</text>
+  <line x1="300" y1="250" x2="300" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="300" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">40</text>
+  <line x1="360" y1="250" x2="360" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="360" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">50</text>
+
+  <!-- y축 눈금 및 레이블 -->
+  <line x1="54" y1="250" x2="60" y2="250" stroke="#333" stroke-width="1"/>
+  <text x="50" y="254" text-anchor="end" font-family="sans-serif" font-size="11" fill="#333">0</text>
+  <line x1="54" y1="183" x2="60" y2="183" stroke="#333" stroke-width="1"/>
+  <text x="50" y="187" text-anchor="end" font-family="sans-serif" font-size="11" fill="#333">5</text>
+  <line x1="54" y1="117" x2="60" y2="117" stroke="#333" stroke-width="1"/>
+  <text x="50" y="121" text-anchor="end" font-family="sans-serif" font-size="11" fill="#333">10</text>
+  <line x1="54" y1="50" x2="60" y2="50" stroke="#333" stroke-width="1"/>
+  <text x="50" y="54" text-anchor="end" font-family="sans-serif" font-size="11" fill="#333">15</text>
+
+  <!-- 보조 수평선 -->
+  <line x1="60" y1="183" x2="360" y2="183" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="60" y1="117" x2="360" y2="117" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="60" y1="50" x2="360" y2="50" stroke="#ccc" stroke-width="0.5" stroke-dasharray="3,3"/>
+
+  <!-- 범례 -->
+  <rect x="270" y="38" width="14" height="12" fill="#4a90d9" fill-opacity="0.6" stroke="#4a90d9"/>
+  <text x="287" y="49" font-family="sans-serif" font-size="11" fill="#333">히스토그램</text>
+  <line x1="270" y1="62" x2="284" y2="62" stroke="#e74c3c" stroke-width="2"/>
+  <circle cx="277" cy="62" r="3" fill="#e74c3c"/>
+  <text x="287" y="66" font-family="sans-serif" font-size="11" fill="#333">도수다각형</text>
+
+  <!-- 축 레이블 -->
+  <text x="215" y="290" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">통학 시간 (분)</text>
+  <text x="20" y="150" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333" transform="rotate(-90,20,150)">도수 (명)</text>
+</svg>

@@ -1,0 +1,77 @@
+<svg width="100%" viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    오목 십각형 (안으로 굽은 별 모양)
+    R=180px(바깥), r=75px(안), center(340,215)
+    바깥: A(340,35) C(169,159) E(234,361) G(446,361) I(511,159)
+    안(오목): B(296,154) D(269,238) F(340,290) H(411,238) J(384,154)
+  -->
+
+  <circle cx="340" cy="215" r="180" fill="none" stroke="#D3D1C7" stroke-width="0.8" stroke-dasharray="3 4" />
+  <circle cx="340" cy="215" r="75" fill="none" stroke="#D3D1C7" stroke-width="0.8" stroke-dasharray="3 4" />
+
+  <polygon
+    points="340,35 296,154 169,159 269,238 234,361 340,290 446,361 411,238 511,159 384,154"
+    fill="none"
+    stroke="#185FA5"
+    stroke-width="1.8"
+  />
+
+  <!-- Reflex markers at inner vertices -->
+  <circle cx="296" cy="154" r="4" fill="none" stroke="#A32D2D" stroke-width="1.1" />
+  <circle cx="269" cy="238" r="4" fill="none" stroke="#A32D2D" stroke-width="1.1" />
+  <circle cx="340" cy="290" r="4" fill="none" stroke="#A32D2D" stroke-width="1.1" />
+  <circle cx="411" cy="238" r="4" fill="none" stroke="#A32D2D" stroke-width="1.1" />
+  <circle cx="384" cy="154" r="4" fill="none" stroke="#A32D2D" stroke-width="1.1" />
+
+  <!-- Outer vertices -->
+  <circle cx="340" cy="35" r="3.5" fill="#185FA5" />
+  <circle cx="169" cy="159" r="3.5" fill="#185FA5" />
+  <circle cx="234" cy="361" r="3.5" fill="#185FA5" />
+  <circle cx="446" cy="361" r="3.5" fill="#185FA5" />
+  <circle cx="511" cy="159" r="3.5" fill="#185FA5" />
+
+  <!-- Inner vertices -->
+  <circle cx="296" cy="154" r="3.5" fill="#A32D2D" />
+  <circle cx="269" cy="238" r="3.5" fill="#A32D2D" />
+  <circle cx="340" cy="290" r="3.5" fill="#A32D2D" />
+  <circle cx="411" cy="238" r="3.5" fill="#A32D2D" />
+  <circle cx="384" cy="154" r="3.5" fill="#A32D2D" />
+
+  <!-- Vertex labels -->
+  <text x="340" y="18" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#185FA5">
+    A
+  </text>
+  <text x="276" y="140" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#A32D2D">
+    B
+  </text>
+  <text x="144" y="162" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#185FA5">
+    C
+  </text>
+  <text x="246" y="256" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#A32D2D">
+    D
+  </text>
+  <text x="216" y="382" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#185FA5">
+    E
+  </text>
+  <text x="340" y="316" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#A32D2D">
+    F
+  </text>
+  <text x="464" y="382" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#185FA5">
+    G
+  </text>
+  <text x="434" y="256" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#A32D2D">
+    H
+  </text>
+  <text x="536" y="162" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#185FA5">
+    I
+  </text>
+  <text x="404" y="140" text-anchor="middle" font-family="serif" font-style="italic" font-size="16" fill="#A32D2D">
+    J
+  </text>
+
+  <!-- Legend -->
+  <circle cx="68" cy="400" r="4" fill="#185FA5" />
+  <text x="82" y="405" font-family="serif" font-size="12" fill="#5F5E5A">볼록 꼭짓점 (내각 &lt; 180°)</text>
+  <circle cx="68" cy="420" r="4" fill="#A32D2D" />
+  <text x="82" y="425" font-family="serif" font-size="12" fill="#5F5E5A">오목 꼭짓점 (내각 &gt; 180°)</text>
+</svg>

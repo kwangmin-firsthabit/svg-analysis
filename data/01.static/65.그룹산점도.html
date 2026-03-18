@@ -1,0 +1,119 @@
+<svg width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <!-- Plot area: left=80, right=580, bottom=360, top=60 -->
+  <!-- x: 0..100 → 80..580, scale=5 per min -->
+  <!-- y: 50..95 → 360..60, scale=300/45=6.667 per point -->
+  <!-- px = 80 + x*5, py = 360 - (y-50)*6.667 -->
+
+  <!-- Vertical grid at x=0,20,40,60,80,100 -->
+  <line x1="80"  y1="60" x2="80"  y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="180" y1="60" x2="180" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="280" y1="60" x2="280" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="380" y1="60" x2="380" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="480" y1="60" x2="480" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="580" y1="60" x2="580" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <!-- Horizontal grid at y=50,55,60,65,70,75,80,85,90,95 -->
+  <!-- y=50→360, y=55→327, y=60→293, y=65→260, y=70→227, y=75→193, y=80→160, y=85→127, y=90→93, y=95→60 -->
+  <line x1="80" y1="360" x2="580" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="327" x2="580" y2="327" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="293" x2="580" y2="293" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="260" x2="580" y2="260" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="227" x2="580" y2="227" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="193" x2="580" y2="193" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="160" x2="580" y2="160" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="127" x2="580" y2="127" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="93"  x2="580" y2="93"  stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="60"  x2="580" y2="60"  stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <!-- x-axis -->
+  <polyline points="80,360 586,360 580,355 586,360 580,365" fill="none" stroke="#444441" stroke-width="1.5"/>
+  <!-- y-axis -->
+  <polyline points="80,360 80,54 75,60 80,54 85,60" fill="none" stroke="#444441" stroke-width="1.5"/>
+
+  <!-- x-axis ticks and labels -->
+  <line x1="80"  y1="357" x2="80"  y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="80"  y="378" font-family="serif" font-size="13" text-anchor="middle" fill="#333">0</text>
+  <line x1="180" y1="357" x2="180" y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="180" y="378" font-family="serif" font-size="13" text-anchor="middle" fill="#333">20</text>
+  <line x1="280" y1="357" x2="280" y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="280" y="378" font-family="serif" font-size="13" text-anchor="middle" fill="#333">40</text>
+  <line x1="380" y1="357" x2="380" y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="380" y="378" font-family="serif" font-size="13" text-anchor="middle" fill="#333">60</text>
+  <line x1="480" y1="357" x2="480" y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="480" y="378" font-family="serif" font-size="13" text-anchor="middle" fill="#333">80</text>
+  <line x1="580" y1="357" x2="580" y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="580" y="378" font-family="serif" font-size="13" text-anchor="middle" fill="#333">100</text>
+
+  <!-- y-axis ticks and labels -->
+  <line x1="77" y1="360" x2="83" y2="360" stroke="#444441" stroke-width="1"/>
+  <text x="70" y="364" font-family="serif" font-size="13" text-anchor="end" fill="#333">50</text>
+  <line x1="77" y1="327" x2="83" y2="327" stroke="#444441" stroke-width="1"/>
+  <text x="70" y="331" font-family="serif" font-size="13" text-anchor="end" fill="#333">55</text>
+  <line x1="77" y1="293" x2="83" y2="293" stroke="#444441" stroke-width="1"/>
+  <text x="70" y="297" font-family="serif" font-size="13" text-anchor="end" fill="#333">60</text>
+  <line x1="77" y1="260" x2="83" y2="260" stroke="#444441" stroke-width="1"/>
+  <text x="70" y="264" font-family="serif" font-size="13" text-anchor="end" fill="#333">65</text>
+  <line x1="77" y1="227" x2="83" y2="227" stroke="#444441" stroke-width="1"/>
+  <text x="70" y="231" font-family="serif" font-size="13" text-anchor="end" fill="#333">70</text>
+  <line x1="77" y1="193" x2="83" y2="193" stroke="#444441" stroke-width="1"/>
+  <text x="70" y="197" font-family="serif" font-size="13" text-anchor="end" fill="#333">75</text>
+  <line x1="77" y1="160" x2="83" y2="160" stroke="#444441" stroke-width="1"/>
+  <text x="70" y="164" font-family="serif" font-size="13" text-anchor="end" fill="#333">80</text>
+  <line x1="77" y1="127" x2="83" y2="127" stroke="#444441" stroke-width="1"/>
+  <text x="70" y="131" font-family="serif" font-size="13" text-anchor="end" fill="#333">85</text>
+  <line x1="77" y1="93"  x2="83" y2="93"  stroke="#444441" stroke-width="1"/>
+  <text x="70" y="97"  font-family="serif" font-size="13" text-anchor="end" fill="#333">90</text>
+  <line x1="77" y1="60"  x2="83" y2="60"  stroke="#444441" stroke-width="1"/>
+  <text x="70" y="64"  font-family="serif" font-size="13" text-anchor="end" fill="#333">95</text>
+
+  <!-- Axis labels -->
+  <text x="592" y="365" font-family="serif" font-size="16" font-style="italic" fill="#333">x</text>
+  <text x="72" y="44" font-family="serif" font-size="16" font-style="italic" fill="#333">y</text>
+  <text x="330" y="408" font-family="serif" font-size="13" text-anchor="middle" fill="#555">운동 시간 (분)</text>
+  <text x="28" y="210" font-family="serif" font-size="13" text-anchor="middle" fill="#555" transform="rotate(-90,28,210)">체력 점수 (점)</text>
+
+  <!-- Male data points (남학생, 파랑): px=80+x*5, py=360-(y-50)*6.667 -->
+  <!-- (30,65): px=80+150=230, py=360-100=260 -->
+  <circle cx="230" cy="260" r="5" fill="#185FA5" opacity="0.8"/>
+  <!-- (45,70): px=80+225=305, py=360-133=227 -->
+  <circle cx="305" cy="227" r="5" fill="#185FA5" opacity="0.8"/>
+  <!-- (60,75): px=80+300=380, py=360-167=193 -->
+  <circle cx="380" cy="193" r="5" fill="#185FA5" opacity="0.8"/>
+  <!-- (45,68): px=305, py=360-120=240 -->
+  <circle cx="305" cy="240" r="5" fill="#185FA5" opacity="0.8"/>
+  <!-- (75,82): px=80+375=455, py=360-213=147 -->
+  <circle cx="455" cy="147" r="5" fill="#185FA5" opacity="0.8"/>
+  <!-- (90,88): px=80+450=530, py=360-253=107 -->
+  <circle cx="530" cy="107" r="5" fill="#185FA5" opacity="0.8"/>
+  <!-- (60,78): px=380, py=360-187=173 -->
+  <circle cx="380" cy="173" r="5" fill="#185FA5" opacity="0.8"/>
+  <!-- (30,62): px=230, py=360-80=280 -->
+  <circle cx="230" cy="280" r="5" fill="#185FA5" opacity="0.8"/>
+
+  <!-- Female data points (여학생, 빨강): px=80+x*5, py=360-(y-50)*6.667 -->
+  <!-- (20,60): px=80+100=180, py=360-67=293 -->
+  <circle cx="180" cy="293" r="5" fill="#A32D2D" opacity="0.8"/>
+  <!-- (35,65): px=80+175=255, py=360-100=260 -->
+  <circle cx="255" cy="260" r="5" fill="#A32D2D" opacity="0.8"/>
+  <!-- (50,70): px=80+250=330, py=360-133=227 -->
+  <circle cx="330" cy="227" r="5" fill="#A32D2D" opacity="0.8"/>
+  <!-- (40,66): px=80+200=280, py=360-107=253 -->
+  <circle cx="280" cy="253" r="5" fill="#A32D2D" opacity="0.8"/>
+  <!-- (60,78): px=380, py=360-187=173 -->
+  <circle cx="380" cy="173" r="5" fill="#A32D2D" opacity="0.8"/>
+  <!-- (75,85): px=455, py=360-233=127 -->
+  <circle cx="455" cy="127" r="5" fill="#A32D2D" opacity="0.8"/>
+  <!-- (55,72): px=80+275=355, py=360-147=213 -->
+  <circle cx="355" cy="213" r="5" fill="#A32D2D" opacity="0.8"/>
+  <!-- (25,58): px=80+125=205, py=360-53=307 -->
+  <circle cx="205" cy="307" r="5" fill="#A32D2D" opacity="0.8"/>
+
+  <!-- Legend -->
+  <circle cx="430" cy="390" r="5" fill="#185FA5" opacity="0.8"/>
+  <text x="442" y="394" font-family="serif" font-size="14" fill="#185FA5">남학생</text>
+  <circle cx="510" cy="390" r="5" fill="#A32D2D" opacity="0.8"/>
+  <text x="522" y="394" font-family="serif" font-size="14" fill="#A32D2D">여학생</text>
+
+  <!-- Title -->
+  <text x="340" y="30" font-family="serif" font-size="17" font-weight="bold" text-anchor="middle" fill="#222">운동 시간과 체력 점수 (그룹 산점도)</text>
+</svg>

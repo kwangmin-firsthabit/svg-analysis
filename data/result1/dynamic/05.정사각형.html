@@ -1,0 +1,77 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 정사각형 ABCD, 변의 길이 3 (1 unit = 60px)
+  // A = (100,280), B = (280,280), C = (280,100), D = (100,100)
+  // side = 180px = 3 ✓
+  const s = 180;
+  const x0 = 100, y0 = 280;
+  return {
+    A: { x: x0,     y: y0     },
+    B: { x: x0 + s, y: y0     },
+    C: { x: x0 + s, y: y0 - s },
+    D: { x: x0,     y: y0 - s },
+    s,
+    maxY: y0 + 50
+  };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function rightAngle(parent, cx, cy, dx1, dy1, dx2, dy2, size = 20) {
+  const pts = `${cx + dx1*size},${cy + dy1*size} ${cx + dx1*size + dx2*size},${cy + dy1*size + dy2*size} ${cx + dx2*size},${cy + dy2*size}`;
+  parent.appendChild(el('polyline', { points: pts, fill: 'none', stroke: '#000', 'stroke-width': 1.5 }));
+}
+
+function render(geo) {
+  const { A, B, C, D, s, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 380 ${maxY}`);
+  svg.setAttribute('width', '380');
+  svg.setAttribute('height', maxY);
+
+  svg.appendChild(el('polygon', {
+    points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y} ${D.x},${D.y}`,
+    fill: 'none', stroke: '#000', 'stroke-width': 2
+  }));
+
+  // 직각 표시
+  rightAngle(svg, A.x, A.y,  0,-1,  1, 0);
+  rightAngle(svg, B.x, B.y, -1, 0,  0,-1);
+  rightAngle(svg, C.x, C.y,  0, 1, -1, 0);
+  rightAngle(svg, D.x, D.y,  1, 0,  0, 1);
+
+  // 꼭짓점 레이블
+  svg.appendChild(el('text', { x: A.x - 14, y: A.y + 16, 'text-anchor': 'end', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'A'));
+  svg.appendChild(el('text', { x: B.x + 14, y: B.y + 16, 'text-anchor': 'start', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'B'));
+  svg.appendChild(el('text', { x: C.x + 14, y: C.y - 6,  'text-anchor': 'start', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'C'));
+  svg.appendChild(el('text', { x: D.x - 14, y: D.y - 6,  'text-anchor': 'end',   'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'D'));
+
+  // 변의 길이 레이블
+  svg.appendChild(el('text', { x: (A.x+B.x)/2, y: A.y + 20, 'text-anchor': 'middle', 'font-size': 14, 'font-family': 'serif' }, '3'));
+  svg.appendChild(el('text', { x: B.x + 16, y: (B.y+C.y)/2, 'text-anchor': 'start',  'font-size': 14, 'font-family': 'serif' }, '3'));
+  svg.appendChild(el('text', { x: (C.x+D.x)/2, y: C.y - 10, 'text-anchor': 'middle', 'font-size': 14, 'font-family': 'serif' }, '3'));
+  svg.appendChild(el('text', { x: D.x - 16, y: (D.y+A.y)/2, 'text-anchor': 'end',    'font-size': 14, 'font-family': 'serif' }, '3'));
+
+  // 틱 마크
+  [[( A.x+B.x)/2, A.y, 0], [B.x, (B.y+C.y)/2, 90],
+   [(C.x+D.x)/2, C.y, 0], [D.x, (D.y+A.y)/2, 90]].forEach(([x, y, r]) => {
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('transform', `translate(${x},${y}) rotate(${r})`);
+    g.appendChild(el('line', { x1: -6, y1: 0, x2: 6, y2: 0, stroke: '#000', 'stroke-width': 1.5 }));
+    svg.appendChild(g);
+  });
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

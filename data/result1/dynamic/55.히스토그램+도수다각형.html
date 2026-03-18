@@ -1,0 +1,137 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const W = 400;
+  const histData = [
+    { start: 0,  end: 10, freq: 5 },
+    { start: 10, end: 20, freq: 12 },
+    { start: 20, end: 30, freq: 14 },
+    { start: 30, end: 40, freq: 7 },
+    { start: 40, end: 50, freq: 2 },
+  ];
+  // 도수다각형: 중앙값 기반 (양 끝 연장 포함)
+  const polyPoints = [
+    { mid: -5,  freq: 0 },
+    { mid: 5,   freq: 5 },
+    { mid: 15,  freq: 12 },
+    { mid: 25,  freq: 14 },
+    { mid: 35,  freq: 7 },
+    { mid: 45,  freq: 2 },
+    { mid: 55,  freq: 0 },
+  ];
+  const marginLeft = 60;
+  const marginRight = 20;
+  const marginTop = 30;
+  const marginBottom = 50;
+  const chartW = W - marginLeft - marginRight;
+  const chartH = 200;
+  const maxFreq = 15;
+  const xRange = 50; // 0~50분
+  const xScale = chartW / xRange;
+  const yScale = chartH / maxFreq;
+  const originX = marginLeft;
+  const originY = marginTop + chartH;
+  const maxY = originY + marginBottom;
+  return { W, histData, polyPoints, chartW, chartH, maxFreq, xScale, yScale, originX, originY, maxY };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { W, histData, polyPoints, chartW, chartH, xScale, yScale, originX, originY, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 ${W} ${maxY}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', maxY);
+
+  const px = x => originX + x * xScale;
+  const py = f => originY - f * yScale;
+
+  // 보조선
+  [5, 10, 15].forEach(v => {
+    svg.appendChild(el('line', {
+      x1: originX, y1: py(v), x2: originX + chartW, y2: py(v),
+      stroke: '#ccc', 'stroke-width': '0.5', 'stroke-dasharray': '3,3'
+    }));
+  });
+
+  // 히스토그램 막대
+  histData.forEach(d => {
+    const bx = px(d.start);
+    const bw = (d.end - d.start) * xScale;
+    const bh = d.freq * yScale;
+    const by = py(d.freq);
+    svg.appendChild(el('rect', {
+      x: bx, y: by, width: bw, height: bh,
+      fill: '#4a90d9', 'fill-opacity': '0.6',
+      stroke: '#4a90d9', 'stroke-width': '1'
+    }));
+  });
+
+  // 도수다각형
+  const ptStr = polyPoints.map(p => `${px(p.mid)},${py(p.freq)}`).join(' ');
+  svg.appendChild(el('polyline', {
+    points: ptStr,
+    fill: 'none', stroke: '#e74c3c', 'stroke-width': '2.5'
+  }));
+  polyPoints.slice(1, -1).forEach(p => {
+    svg.appendChild(el('circle', { cx: px(p.mid), cy: py(p.freq), r: '4', fill: '#e74c3c' }));
+  });
+
+  // x축
+  svg.appendChild(el('line', {
+    x1: originX - 5, y1: originY, x2: originX + chartW + 10, y2: originY,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+  // y축
+  svg.appendChild(el('line', {
+    x1: originX, y1: originY - chartH - 10, x2: originX, y2: originY + 5,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+
+  // x축 눈금 및 레이블
+  [0, 10, 20, 30, 40, 50].forEach(v => {
+    const tx = px(v);
+    svg.appendChild(el('line', { x1: tx, y1: originY, x2: tx, y2: originY + 6, stroke: '#333', 'stroke-width': '1' }));
+    svg.appendChild(el('text', { x: tx, y: originY + 18, 'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '11', fill: '#333' }, v));
+  });
+
+  // y축 눈금 및 레이블
+  [0, 5, 10, 15].forEach(v => {
+    const ty = py(v);
+    svg.appendChild(el('line', { x1: originX - 6, y1: ty, x2: originX, y2: ty, stroke: '#333', 'stroke-width': '1' }));
+    svg.appendChild(el('text', { x: originX - 10, y: ty + 4, 'text-anchor': 'end', 'font-family': 'sans-serif', 'font-size': '11', fill: '#333' }, v));
+  });
+
+  // 범례
+  const legendY = 22;
+  svg.appendChild(el('rect', { x: W - 160, y: legendY - 10, width: 14, height: 12, fill: '#4a90d9', 'fill-opacity': '0.6', stroke: '#4a90d9' }));
+  svg.appendChild(el('text', { x: W - 143, y: legendY, 'font-family': 'sans-serif', 'font-size': '11', fill: '#333' }, '히스토그램'));
+  svg.appendChild(el('line', { x1: W - 160, y1: legendY + 14, x2: W - 146, y2: legendY + 14, stroke: '#e74c3c', 'stroke-width': '2' }));
+  svg.appendChild(el('circle', { cx: W - 153, cy: legendY + 14, r: '3', fill: '#e74c3c' }));
+  svg.appendChild(el('text', { x: W - 143, y: legendY + 18, 'font-family': 'sans-serif', 'font-size': '11', fill: '#333' }, '도수다각형'));
+
+  // 축 레이블
+  svg.appendChild(el('text', {
+    x: originX + chartW / 2, y: originY + 38,
+    'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '12', fill: '#333'
+  }, '통학 시간 (분)'));
+  svg.appendChild(el('text', {
+    x: 20, y: originY - chartH / 2,
+    'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '12', fill: '#333',
+    transform: `rotate(-90,20,${originY - chartH / 2})`
+  }, '도수 (명)'));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

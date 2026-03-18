@@ -1,0 +1,54 @@
+<svg width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    y = cos x, 주기=2π, 진폭=1, y축 대칭
+    (0,1)→(340,120) ✓  cos(−x)=cos(x) ✓
+    scale_x=80px/π, scale_y=120px/unit, 원점 O(340,240)
+  -->
+
+  <!-- 격자, 축, 눈금 (sin 그래프와 동일 구조) -->
+
+  <!-- y축 대칭 강조선 -->
+  <line
+    x1="340"
+    y1="60"
+    x2="340"
+    y2="415"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="6 4"
+    stroke-linecap="round"
+  />
+
+  <!-- 곡선 y=cos x -->
+  <path
+    d="
+    M  20,120 C  60,120 100,240 100,240
+    C 140,240 180,360 180,360
+    C 220,360 260,240 260,240
+    C 300,240 340,120 340,120
+    C 380,120 420,240 420,240
+    C 460,240 500,360 500,360
+    C 540,360 580,240 580,240
+    C 620,240 660,120 660,120"
+    fill="none"
+    stroke="#185FA5"
+    stroke-width="2.2"
+    stroke-linecap="round"
+  />
+
+  <!-- (0,1) 강조 -->
+  <circle cx="340" cy="120" r="5" fill="none" stroke="#185FA5" stroke-width="1.5" />
+  <circle cx="340" cy="120" r="3" fill="#185FA5" />
+  <text x="354" y="112" font-family="serif" font-size="13" fill="#185FA5">(0, 1)</text>
+
+  <!-- 최댓값/최솟값 보조선 -->
+  <line x1="10" y1="120" x2="670" y2="120" stroke="#0F6E56" stroke-width="0.8" stroke-dasharray="4 3" />
+  <text x="12" y="112" font-family="serif" font-size="12" fill="#0F6E56">최댓값 1</text>
+  <line x1="10" y1="360" x2="670" y2="360" stroke="#993C1D" stroke-width="0.8" stroke-dasharray="4 3" />
+  <text x="12" y="352" font-family="serif" font-size="12" fill="#993C1D">최솟값 −1</text>
+
+  <!-- 주기, 대칭축, 함수식 -->
+  <text x="352" y="76" font-family="serif" font-size="12" fill="#B4B2A9">대칭축 (y축)</text>
+  <text x="500" y="426" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">주기 = 2π</text>
+  <text x="446" y="86" font-family="serif" font-style="italic" font-size="16" fill="#185FA5">y = cos x</text>
+</svg>

@@ -1,0 +1,107 @@
+<svg width="100%" viewBox="0 0 680 430" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    scale: 60px = 1
+    A(140,30)  D(320,30)  B(140,330)  C(500,330)
+    AD=180px=3 ✓  BC=360px=6 ✓  AB=300px=5 ✓
+    AD∥BC ✓  ∠B=90° ✓
+  -->
+
+  <!-- Height indicator (dashed) -->
+  <line
+    x1="500"
+    y1="30"
+    x2="500"
+    y2="330"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="5 4"
+    stroke-linecap="round"
+  />
+  <polyline
+    points="500,320 490,320 490,330"
+    fill="none"
+    stroke="#B4B2A9"
+    stroke-width="1.1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Parallel marks on AD and BC -->
+  <line x1="218" y1="18" x2="230" y2="18" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <polyline
+    points="226,14 232,18 226,22"
+    fill="none"
+    stroke="#5F5E5A"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <line x1="308" y1="343" x2="320" y2="343" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <polyline
+    points="316,339 322,343 316,347"
+    fill="none"
+    stroke="#5F5E5A"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Trapezoid -->
+  <polygon points="140,30 320,30 500,330 140,330" fill="none" stroke="#185FA5" stroke-width="1.8" />
+
+  <!-- Right angle mark at B -->
+  <polyline
+    points="140,310 160,310 160,330"
+    fill="none"
+    stroke="#A32D2D"
+    stroke-width="1.3"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Vertices -->
+  <circle cx="140" cy="30" r="3" fill="#185FA5" />
+  <circle cx="320" cy="30" r="3" fill="#185FA5" />
+  <circle cx="140" cy="330" r="3" fill="#185FA5" />
+  <circle cx="500" cy="330" r="3" fill="#185FA5" />
+
+  <!-- Vertex labels -->
+  <text x="118" y="24" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    A
+  </text>
+  <text x="334" y="24" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    D
+  </text>
+  <text x="116" y="350" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#A32D2D">
+    B
+  </text>
+  <text x="524" y="350" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    C
+  </text>
+
+  <!-- Side and height labels -->
+  <text x="230" y="18" text-anchor="middle" font-family="serif" font-size="14" fill="#185FA5">3</text>
+  <text x="320" y="360" text-anchor="middle" font-family="serif" font-size="14" fill="#185FA5">6</text>
+  <text
+    x="116"
+    y="182"
+    text-anchor="middle"
+    font-family="serif"
+    font-size="14"
+    fill="#185FA5"
+    transform="rotate(-90,116,182)"
+  >
+    5
+  </text>
+  <text
+    text-anchor="middle"
+    font-family="serif"
+    font-size="14"
+    fill="#5F5E5A"
+    transform="translate(424,172) rotate(59)"
+  >
+    CD
+  </text>
+  <text x="522" y="185" text-anchor="start" font-family="serif" font-size="13" fill="#888780">h = 5</text>
+  <text x="172" y="322" text-anchor="start" font-family="serif" font-size="13" fill="#A32D2D">90°</text>
+</svg>

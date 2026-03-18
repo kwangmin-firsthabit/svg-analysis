@@ -1,0 +1,120 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const UNIT = 60;
+  const OX = 260;
+  const OY = 310;
+  const xMin = -4, xMax = 3;
+  const yMin = -1, yMax = 5;
+  const W = OX + xMax * UNIT + 40;
+  const H = OY + (-yMin) * UNIT + 20;
+
+  const toSvgX = x => OX + x * UNIT;
+  const toSvgY = y => OY - y * UNIT;
+
+  // x<0: y = -x
+  const ptsLeft = [];
+  for (let xi = xMin * 100; xi < 0; xi += 5) {
+    const x = xi / 100;
+    const y = -x;
+    if (y >= yMin && y <= yMax) {
+      ptsLeft.push({ sx: toSvgX(x), sy: toSvgY(y) });
+    }
+  }
+
+  // x>=0: y = x²
+  const ptsRight = [];
+  for (let xi = 0; xi <= xMax * 100; xi += 5) {
+    const x = xi / 100;
+    const y = x * x;
+    if (y >= yMin && y <= yMax) {
+      ptsRight.push({ sx: toSvgX(x), sy: toSvgY(y) });
+    }
+  }
+
+  return { W, H, UNIT, OX, OY, xMin, xMax, yMin, yMax, toSvgX, toSvgY, ptsLeft, ptsRight };
+}
+
+function render(geo) {
+  const { W, H, UNIT, OX, OY, xMin, xMax, yMin, yMax, toSvgX, toSvgY, ptsLeft, ptsRight } = geo;
+
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('font-family', 'serif');
+  svg.setAttribute('font-size', '14');
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  // x축
+  svg.appendChild(el('line', { x1: 10, y1: OY, x2: W - 20, y2: OY, stroke: 'black', 'stroke-width': 1.5 }));
+  svg.appendChild(el('polygon', { points: `${W-20},${OY} ${W-28},${OY-4} ${W-28},${OY+4}`, fill: 'black' }));
+
+  // y축
+  svg.appendChild(el('line', { x1: OX, y1: H - 20, x2: OX, y2: 20, stroke: 'black', 'stroke-width': 1.5 }));
+  svg.appendChild(el('polygon', { points: `${OX},20 ${OX-4},28 ${OX+4},28`, fill: 'black' }));
+
+  // x축 눈금
+  for (let x = xMin; x <= xMax; x++) {
+    if (x === 0) continue;
+    const sx = toSvgX(x);
+    svg.appendChild(el('line', { x1: sx, y1: OY - 5, x2: sx, y2: OY + 5, stroke: 'black', 'stroke-width': 1 }));
+    const t = el('text', { x: sx, y: OY + 18, 'text-anchor': 'middle', 'font-size': 12 });
+    t.textContent = x; svg.appendChild(t);
+  }
+
+  // y축 눈금
+  for (let y = yMin; y <= yMax; y++) {
+    if (y === 0) continue;
+    const sy = toSvgY(y);
+    svg.appendChild(el('line', { x1: OX - 5, y1: sy, x2: OX + 5, y2: sy, stroke: 'black', 'stroke-width': 1 }));
+    const t = el('text', { x: OX - 8, y: sy + 4, 'text-anchor': 'end', 'font-size': 12 });
+    t.textContent = y; svg.appendChild(t);
+  }
+
+  // 축 레이블
+  const tx = el('text', { x: W - 14, y: OY + 4, 'text-anchor': 'start', 'font-size': 14 });
+  tx.textContent = 'x'; svg.appendChild(tx);
+  const ty = el('text', { x: OX + 4, y: 16, 'text-anchor': 'start', 'font-size': 14 });
+  ty.textContent = 'y'; svg.appendChild(ty);
+  const to = el('text', { x: OX - 8, y: OY + 18, 'text-anchor': 'end', 'font-size': 12 });
+  to.textContent = 'O'; svg.appendChild(to);
+
+  // x<0 구간
+  svg.appendChild(el('polyline', {
+    fill: 'none', stroke: '#2563eb', 'stroke-width': 2.5,
+    points: ptsLeft.map(p => `${p.sx.toFixed(2)},${p.sy.toFixed(2)}`).join(' ')
+  }));
+
+  // x>=0 구간
+  svg.appendChild(el('polyline', {
+    fill: 'none', stroke: '#16a34a', 'stroke-width': 2.5,
+    points: ptsRight.map(p => `${p.sx.toFixed(2)},${p.sy.toFixed(2)}`).join(' ')
+  }));
+
+  // 연결점 (0, 0)
+  svg.appendChild(el('circle', { cx: toSvgX(0), cy: toSvgY(0), r: 5, fill: '#2563eb' }));
+  const t0 = el('text', { x: toSvgX(0) + 8, y: toSvgY(0) - 4, 'text-anchor': 'start', 'font-size': 12, fill: '#2563eb' });
+  t0.textContent = '(0, 0)'; svg.appendChild(t0);
+
+  // 레이블 y = -x
+  const tl1 = el('text', { x: toSvgX(-3.5), y: toSvgY(2.8), 'text-anchor': 'start', 'font-size': 13, fill: '#2563eb', 'font-style': 'italic' });
+  tl1.textContent = 'y = −x (x < 0)'; svg.appendChild(tl1);
+
+  // 레이블 y = x²
+  const tl2 = el('text', { x: toSvgX(1.8), y: toSvgY(4), 'text-anchor': 'start', 'font-size': 13, fill: '#16a34a', 'font-style': 'italic' });
+  tl2.textContent = 'y = x² (x ≥ 0)'; svg.appendChild(tl2);
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

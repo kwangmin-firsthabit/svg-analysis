@@ -1,0 +1,123 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const W = 440;
+  const years = [2019, 2020, 2021, 2022, 2023];
+  const series = [
+    { label: '서울', color: '#1a6bb5', dash: 'none',  values: [12.4, 13.1, 12.8, 13.5, 13.2] },
+    { label: '부산', color: '#e74c3c', dash: '6,3',   values: [14.2, 14.8, 14.5, 15.1, 14.9] },
+    { label: '제주', color: '#27ae60', dash: '2,4',   values: [15.8, 16.2, 16.0, 16.5, 16.3] },
+  ];
+  const yMin = 11;
+  const yMax = 17;
+  const marginLeft = 65;
+  const marginRight = 20;
+  const marginTop = 45;
+  const marginBottom = 50;
+  const chartW = W - marginLeft - marginRight;
+  const chartH = 200;
+  const n = years.length;
+  const xStep = chartW / (n - 1);
+  const yRange = yMax - yMin;
+  const yScale = chartH / yRange;
+  const originX = marginLeft;
+  const originY = marginTop + chartH;
+  const maxY = originY + marginBottom;
+  return { W, years, series, yMin, yMax, chartW, chartH, n, xStep, yScale, originX, originY, maxY };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { W, years, series, yMin, yMax, chartW, chartH, n, xStep, yScale, originX, originY, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 ${W} ${maxY}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', maxY);
+
+  const px = i => originX + i * xStep;
+  const py = v => originY - (v - yMin) * yScale;
+
+  // 보조선 (y=11~17)
+  for (let v = yMin; v <= yMax; v++) {
+    svg.appendChild(el('line', {
+      x1: originX, y1: py(v), x2: originX + chartW, y2: py(v),
+      stroke: '#ddd', 'stroke-width': '0.5', 'stroke-dasharray': '3,3'
+    }));
+  }
+
+  // 시리즈 그리기
+  series.forEach(s => {
+    const ptStr = s.values.map((v, i) => `${px(i)},${py(v)}`).join(' ');
+    const lineAttrs = {
+      points: ptStr, fill: 'none', stroke: s.color, 'stroke-width': '2'
+    };
+    if (s.dash !== 'none') lineAttrs['stroke-dasharray'] = s.dash;
+    svg.appendChild(el('polyline', lineAttrs));
+
+    // 점 마커
+    s.values.forEach((v, i) => {
+      svg.appendChild(el('circle', { cx: px(i), cy: py(v), r: '4', fill: s.color }));
+    });
+  });
+
+  // x축
+  svg.appendChild(el('line', {
+    x1: originX - 5, y1: originY, x2: originX + chartW + 10, y2: originY,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+  // y축
+  svg.appendChild(el('line', {
+    x1: originX, y1: originY - chartH - 10, x2: originX, y2: originY + 5,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+
+  // x축 눈금 및 레이블
+  years.forEach((yr, i) => {
+    const tx = px(i);
+    svg.appendChild(el('line', { x1: tx, y1: originY, x2: tx, y2: originY + 6, stroke: '#333', 'stroke-width': '1' }));
+    svg.appendChild(el('text', { x: tx, y: originY + 18, 'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '11', fill: '#333' }, yr));
+  });
+
+  // y축 눈금 및 레이블
+  for (let v = yMin; v <= yMax; v++) {
+    const ty = py(v);
+    svg.appendChild(el('line', { x1: originX - 6, y1: ty, x2: originX, y2: ty, stroke: '#333', 'stroke-width': '1' }));
+    svg.appendChild(el('text', { x: originX - 10, y: ty + 4, 'text-anchor': 'end', 'font-family': 'sans-serif', 'font-size': '10', fill: '#333' }, v));
+  }
+
+  // 범례
+  series.forEach((s, si) => {
+    const lx = 85 + si * 90;
+    const ly = 20;
+    const lineAttrs = { x1: lx, y1: ly + 5, x2: lx + 24, y2: ly + 5, stroke: s.color, 'stroke-width': '2' };
+    if (s.dash !== 'none') lineAttrs['stroke-dasharray'] = s.dash;
+    svg.appendChild(el('line', lineAttrs));
+    svg.appendChild(el('circle', { cx: lx + 12, cy: ly + 5, r: '3', fill: s.color }));
+    svg.appendChild(el('text', { x: lx + 28, y: ly + 9, 'font-family': 'sans-serif', 'font-size': '11', fill: '#333' }, s.label));
+  });
+
+  // 축 레이블
+  svg.appendChild(el('text', {
+    x: originX + chartW / 2, y: originY + 38,
+    'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '12', fill: '#333'
+  }, '연도'));
+  svg.appendChild(el('text', {
+    x: 18, y: originY - chartH / 2,
+    'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '11', fill: '#333',
+    transform: `rotate(-90,18,${originY - chartH / 2})`
+  }, '기온 (°C)'));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

@@ -1,0 +1,73 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 직각삼각형 ABC, 직각은 C에 위치 (1cm = 40px)
+  // a = 3cm = 120px (세로, CA), b = 4cm = 160px (가로, CB), c = 5cm = 200px (빗변, AB)
+  // C = (100, 250), A = (100, 250-120) = (100, 130), B = (260, 250)
+  // 검증: |CA| = |250-130| = 120px ✓
+  //        |CB| = |260-100| = 160px ✓
+  //        |AB| = sqrt(160^2 + 120^2) = sqrt(25600+14400) = sqrt(40000) = 200px ✓
+
+  const cy = 250;
+  const C = { x: 100, y: cy };
+  const A = { x: 100, y: cy - 120 };
+  const B = { x: 260, y: cy };
+
+  const caMid = { x: C.x,               y: (C.y + A.y) / 2 };
+  const cbMid = { x: (C.x + B.x) / 2,  y: C.y };
+  const abMid = { x: (A.x + B.x) / 2,  y: (A.y + B.y) / 2 };
+
+  const maxY = cy + 40;
+  return { A, B, C, caMid, cbMid, abMid, maxY };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { A, B, C, caMid, cbMid, abMid, maxY } = geo;
+
+  svg.setAttribute('viewBox', `0 0 360 ${maxY}`);
+  svg.setAttribute('width', '360');
+  svg.setAttribute('height', maxY);
+
+  // 삼각형
+  svg.appendChild(el('polygon', {
+    points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`,
+    fill: 'none', stroke: '#000', 'stroke-width': 2
+  }));
+
+  // C에 직각 표시 (10×10 정사각형)
+  const sq = document.createElementNS(NS, 'polyline');
+  sq.setAttribute('points', `${C.x},${C.y - 14} ${C.x + 14},${C.y - 14} ${C.x + 14},${C.y}`);
+  sq.setAttribute('fill', 'none');
+  sq.setAttribute('stroke', '#000');
+  sq.setAttribute('stroke-width', 1.5);
+  svg.appendChild(sq);
+
+  // 꼭짓점 레이블
+  svg.appendChild(el('text', { x: A.x - 12, y: A.y - 6, 'text-anchor': 'end', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'A'));
+  svg.appendChild(el('text', { x: B.x + 12, y: B.y + 14, 'text-anchor': 'start', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'B'));
+  svg.appendChild(el('text', { x: C.x - 12, y: C.y + 14, 'text-anchor': 'end', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'C'));
+
+  // 변 길이 레이블
+  // CA: 세로변 왼쪽
+  svg.appendChild(el('text', { x: caMid.x - 10, y: caMid.y + 5, 'text-anchor': 'end', 'font-size': 14, 'font-family': 'serif' }, '3'));
+  // CB: 가로변 아래
+  svg.appendChild(el('text', { x: cbMid.x, y: cbMid.y + 18, 'text-anchor': 'middle', 'font-size': 14, 'font-family': 'serif' }, '4'));
+  // AB: 빗변 오른쪽
+  svg.appendChild(el('text', { x: abMid.x + 10, y: abMid.y + 5, 'text-anchor': 'start', 'font-size': 14, 'font-family': 'serif' }, '5'));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

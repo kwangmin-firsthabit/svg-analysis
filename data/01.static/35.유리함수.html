@@ -1,0 +1,135 @@
+<svg width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    y = 1/x, 원점 대칭, 점근선 x=0(y축), y=0(x축)
+    scale=60px/unit, 원점 O(340,240)
+    1사분면: (1,1)→(400,180) ✓  3사분면: (−1,−1)→(280,300) ✓
+    clipPath로 x=0 근처 불연속 처리 ✓
+  -->
+
+  <defs>
+    <clipPath id="pos"><rect x="342" y="30" width="310" height="420" /></clipPath>
+    <clipPath id="neg"><rect x="60" y="30" width="278" height="420" /></clipPath>
+  </defs>
+
+  <!-- 격자 -->
+  <line x1="160" y1="40" x2="160" y2="450" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="220" y1="40" x2="220" y2="450" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="280" y1="40" x2="280" y2="450" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="400" y1="40" x2="400" y2="450" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="460" y1="40" x2="460" y2="450" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="520" y1="40" x2="520" y2="450" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="70" y1="120" x2="620" y2="120" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="70" y1="180" x2="620" y2="180" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="70" y1="300" x2="620" y2="300" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="70" y1="360" x2="620" y2="360" stroke="#D3D1C7" stroke-width="0.5" />
+
+  <!-- 점근선 -->
+  <line
+    x1="340"
+    y1="40"
+    x2="340"
+    y2="450"
+    stroke="#A32D2D"
+    stroke-width="1"
+    stroke-dasharray="6 4"
+    stroke-linecap="round"
+  />
+  <line
+    x1="70"
+    y1="240"
+    x2="628"
+    y2="240"
+    stroke="#A32D2D"
+    stroke-width="1"
+    stroke-dasharray="6 4"
+    stroke-linecap="round"
+  />
+
+  <!-- 축 -->
+  <line x1="70" y1="240" x2="628" y2="240" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="622,235 629,240 622,245"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <line x1="340" y1="460" x2="340" y2="42" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="335,48 340,41 345,48"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <text x="638" y="245" font-family="serif" font-style="italic" font-size="16" fill="#888780">x</text>
+  <text x="332" y="34" font-family="serif" font-style="italic" font-size="16" fill="#888780">y</text>
+  <text x="322" y="258" font-family="serif" font-size="14" fill="#888780">O</text>
+
+  <!-- 눈금 -->
+  <line x1="160" y1="235" x2="160" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="160" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−3</text>
+  <line x1="220" y1="235" x2="220" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="220" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−2</text>
+  <line x1="280" y1="235" x2="280" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="280" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−1</text>
+  <line x1="400" y1="235" x2="400" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="400" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">1</text>
+  <line x1="460" y1="235" x2="460" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="460" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">2</text>
+  <line x1="520" y1="235" x2="520" y2="245" stroke="#888780" stroke-width="0.8" />
+  <text x="520" y="262" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">3</text>
+  <line x1="335" y1="180" x2="345" y2="180" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="185" text-anchor="end" font-family="serif" font-size="13" fill="#888780">1</text>
+  <line x1="335" y1="120" x2="345" y2="120" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="125" text-anchor="end" font-family="serif" font-size="13" fill="#888780">2</text>
+  <line x1="335" y1="300" x2="345" y2="300" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="305" text-anchor="end" font-family="serif" font-size="13" fill="#888780">−1</text>
+  <line x1="335" y1="360" x2="345" y2="360" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="365" text-anchor="end" font-family="serif" font-size="13" fill="#888780">−2</text>
+
+  <!-- 곡선 1사분면 -->
+  <path
+    clip-path="url(#pos)"
+    d="M 344,40 C 348,40 356,60 358,80 C 362,108 366,124 370,120
+       C 380,114 390,192 400,180 C 420,166 444,208 460,210
+       C 490,214 520,220 550,223 C 576,225 608,228 628,230"
+    fill="none"
+    stroke="#185FA5"
+    stroke-width="2.2"
+    stroke-linecap="round"
+  />
+
+  <!-- 곡선 3사분면 -->
+  <path
+    clip-path="url(#neg)"
+    d="M 336,440 C 332,440 324,420 322,400 C 318,372 314,356 310,360
+       C 300,366 290,308 280,300 C 260,290 236,272 220,270
+       C 190,266 158,260 130,257 C 104,255 72,252 52,250"
+    fill="none"
+    stroke="#185FA5"
+    stroke-width="2.2"
+    stroke-linecap="round"
+  />
+
+  <!-- 특수점 -->
+  <circle cx="400" cy="180" r="4" fill="#185FA5" />
+  <text x="412" y="176" font-family="serif" font-size="13" fill="#185FA5">(1, 1)</text>
+  <circle cx="280" cy="300" r="4" fill="#185FA5" />
+  <text x="222" y="312" font-family="serif" font-size="13" fill="#185FA5">(−1, −1)</text>
+
+  <!-- 점근선 레이블 -->
+  <text x="352" y="58" text-anchor="start" font-family="serif" font-size="12" fill="#A32D2D">점근선 x=0</text>
+  <text x="540" y="234" text-anchor="start" font-family="serif" font-size="12" fill="#A32D2D">점근선 y=0</text>
+
+  <!-- 원점 대칭 -->
+  <circle cx="340" cy="240" r="4" fill="none" stroke="#888780" stroke-width="1.2" />
+  <circle cx="340" cy="240" r="2" fill="#888780" />
+  <text x="356" y="256" font-family="serif" font-size="12" fill="#888780">대칭 중심</text>
+
+  <!-- 함수식 -->
+  <text x="540" y="100" font-family="serif" font-style="italic" font-size="16" fill="#185FA5">y = 1/x</text>
+</svg>

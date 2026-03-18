@@ -1,0 +1,161 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 20;
+  const r = 3;
+  const h = 8;
+  const rpx = r * unit;        // 60px
+  const hpx = h * unit;        // 160px
+  const circumference = 2 * Math.PI * rpx; // 2πr ≈ 376.99px
+
+  const pad = 50;
+
+  // 배치: 위쪽 원 + 직사각형(옆면) + 아래쪽 원 세로 배치
+  // 원기둥 전개도 표준 배치
+  // 직사각형: 가로 = 2πr, 세로 = h
+  const rectW = circumference;
+  const rectH = hpx;
+
+  // 직사각형 배치 (가로 중심 기준)
+  const totalW = rectW + pad * 2;
+  const rectX = pad;
+  const rectY = pad + rpx * 2 + 20; // 위 원 아래에 배치
+
+  // 위 원 중심
+  const topCircleX = rectX + rectW / 2;
+  const topCircleY = pad + rpx;
+
+  // 아래 원 중심
+  const bottomCircleX = rectX + rectW / 2;
+  const bottomCircleY = rectY + rectH + 20 + rpx;
+
+  const maxY = bottomCircleY + rpx + pad;
+  const totalH = maxY;
+
+  return {
+    rpx, hpx, circumference,
+    rectX, rectY, rectW, rectH,
+    topCircleX, topCircleY,
+    bottomCircleX, bottomCircleY,
+    totalW, totalH,
+    r, h
+  };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const {
+    rpx, hpx, circumference,
+    rectX, rectY, rectW, rectH,
+    topCircleX, topCircleY,
+    bottomCircleX, bottomCircleY,
+    totalW, totalH,
+    r, h
+  } = geo;
+
+  svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
+  svg.setAttribute('width', totalW);
+  svg.setAttribute('height', totalH);
+
+  // 위 원 (밑면)
+  svg.appendChild(el('circle', {
+    cx: topCircleX, cy: topCircleY, r: rpx,
+    fill: 'rgba(173,216,230,0.5)',
+    stroke: '#1a1a2e',
+    'stroke-width': '1.5'
+  }));
+
+  // 아래 원 (윗면)
+  svg.appendChild(el('circle', {
+    cx: bottomCircleX, cy: bottomCircleY, r: rpx,
+    fill: 'rgba(173,216,230,0.5)',
+    stroke: '#1a1a2e',
+    'stroke-width': '1.5'
+  }));
+
+  // 직사각형 (옆면)
+  svg.appendChild(el('rect', {
+    x: rectX, y: rectY, width: rectW, height: rectH,
+    fill: 'rgba(144,238,144,0.5)',
+    stroke: '#1a1a2e',
+    'stroke-width': '1.5'
+  }));
+
+  // 위 원과 직사각형 연결 점선 (좌/우)
+  for (const side of ['left', 'right']) {
+    const cx = side === 'left' ? rectX : rectX + rectW;
+    svg.appendChild(el('line', {
+      x1: cx, y1: topCircleY + rpx,
+      x2: cx, y2: rectY,
+      stroke: '#888',
+      'stroke-width': '1',
+      'stroke-dasharray': '4,3'
+    }));
+  }
+
+  // 아래 원과 직사각형 연결 점선 (좌/우)
+  for (const side of ['left', 'right']) {
+    const cx = side === 'left' ? rectX : rectX + rectW;
+    svg.appendChild(el('line', {
+      x1: cx, y1: rectY + rectH,
+      x2: cx, y2: bottomCircleY - rpx,
+      stroke: '#888',
+      'stroke-width': '1',
+      'stroke-dasharray': '4,3'
+    }));
+  }
+
+  // 레이블: r=3
+  // 위 원 반지름 표시
+  svg.appendChild(el('line', {
+    x1: topCircleX, y1: topCircleY,
+    x2: topCircleX + rpx, y2: topCircleY,
+    stroke: '#c0392b',
+    'stroke-width': '1.2'
+  }));
+  svg.appendChild(el('text', {
+    x: topCircleX + rpx / 2, y: topCircleY - 8,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'auto',
+    'font-size': '12',
+    'font-family': 'serif',
+    'font-style': 'italic',
+    fill: '#c0392b'
+  }, `r=${r}`));
+
+  // 직사각형 높이(h=8) 레이블 (왼쪽)
+  svg.appendChild(el('text', {
+    x: rectX - 14, y: rectY + rectH / 2,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'central',
+    'font-size': '12',
+    'font-family': 'serif',
+    'font-style': 'italic',
+    fill: '#c0392b'
+  }, `h=${h}`));
+
+  // 직사각형 가로(2πr) 레이블 (아래)
+  svg.appendChild(el('text', {
+    x: rectX + rectW / 2, y: rectY + rectH + 16,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'auto',
+    'font-size': '12',
+    'font-family': 'serif',
+    fill: '#c0392b'
+  }, `2\u03c0r = 6\u03c0`));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

@@ -1,0 +1,285 @@
+<!doctype html>
+<html>
+  <body>
+    <svg width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+      <script>
+        const W = 680,
+          H = 520;
+        const ox = 340,
+          oy = 300,
+          unitX = 90,
+          unitY = 70;
+
+        function toSVG(mx, my) {
+          return { x: ox + mx * unitX, y: oy - my * unitY };
+        }
+
+        const svg = document.querySelector('svg');
+        function el(tag, attrs, txt) {
+          const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+          for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+          if (txt !== undefined) e.textContent = txt;
+          svg.appendChild(e);
+          return e;
+        }
+        function dashed(x1, y1, x2, y2, stroke) {
+          el('line', { x1, y1, x2, y2, stroke: stroke || '#B4B2A9', 'stroke-width': 0.8, 'stroke-dasharray': '4 3' });
+        }
+        function label(x, y, s, size, weight, fill, anchor) {
+          el(
+            'text',
+            {
+              x,
+              y,
+              'text-anchor': anchor || 'middle',
+              'font-family': '"Anthropic Sans",sans-serif',
+              'font-size': size || 13,
+              'font-weight': weight || 400,
+              fill: fill || '#444441',
+            },
+            s
+          );
+        }
+
+        const xMin = -3.2,
+          xMax = 3.2,
+          yMin = -0.8,
+          yMax = 5.0;
+
+        for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+          const p = toSVG(x, yMin),
+            q = toSVG(x, yMax);
+          el('line', { x1: p.x, y1: p.y, x2: q.x, y2: q.y, stroke: '#D3D1C7', 'stroke-width': 0.5 });
+        }
+        for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y++) {
+          const p = toSVG(xMin, y),
+            q = toSVG(xMax, y);
+          el('line', { x1: p.x, y1: p.y, x2: q.x, y2: q.y, stroke: '#D3D1C7', 'stroke-width': 0.5 });
+        }
+
+        const axL = toSVG(xMin, 0),
+          axR = toSVG(xMax, 0);
+        const ayT = toSVG(0, yMax),
+          ayB = toSVG(0, yMin);
+        el('line', {
+          x1: axL.x,
+          y1: axL.y,
+          x2: axR.x,
+          y2: axR.y,
+          stroke: '#444441',
+          'stroke-width': 1.4,
+          'stroke-linecap': 'round',
+        });
+        el('line', {
+          x1: ayT.x,
+          y1: ayT.y,
+          x2: ayB.x,
+          y2: ayB.y,
+          stroke: '#444441',
+          'stroke-width': 1.4,
+          'stroke-linecap': 'round',
+        });
+
+        function arrowHead(x, y, dir) {
+          const s = 6;
+          let dd;
+          if (dir === 'right') dd = `M${x - s},${y - s / 2} L${x},${y} L${x - s},${y + s / 2}`;
+          if (dir === 'up') dd = `M${x - s / 2},${y + s} L${x},${y} L${x + s / 2},${y + s}`;
+          el('path', {
+            d: dd,
+            fill: 'none',
+            stroke: '#444441',
+            'stroke-width': 1.4,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+        }
+        arrowHead(axR.x + 6, axR.y, 'right');
+        arrowHead(ayT.x, ayT.y - 6, 'up');
+
+        el(
+          'text',
+          {
+            x: axR.x + 18,
+            y: axR.y + 5,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 14,
+            'font-style': 'italic',
+            fill: '#444441',
+          },
+          'x'
+        );
+        el(
+          'text',
+          {
+            x: ayT.x,
+            y: ayT.y - 14,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 14,
+            'font-style': 'italic',
+            fill: '#444441',
+          },
+          'y'
+        );
+
+        for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+          if (x === 0) continue;
+          const p = toSVG(x, 0);
+          el('line', { x1: p.x, y1: p.y - 4, x2: p.x, y2: p.y + 4, stroke: '#444441', 'stroke-width': 1 });
+          label(p.x, p.y + 18, String(x), 11, 400, '#888780');
+        }
+        for (let y = 1; y <= Math.floor(yMax); y++) {
+          const p = toSVG(0, y);
+          el('line', { x1: p.x - 4, y1: p.y, x2: p.x + 4, y2: p.y, stroke: '#444441', 'stroke-width': 1 });
+          label(p.x - 16, p.y + 4, String(y), 11, 400, '#888780');
+        }
+        label(ox - 14, oy + 16, 'O', 11, 400, '#888780');
+
+        // 포물선 아래 영역 채우기 (x ∈ [-2, 2])
+        {
+          const steps = 200,
+            x0 = -2,
+            x1 = 2;
+          let pts = `${toSVG(x0, 0).x},${toSVG(x0, 0).y}`;
+          for (let i = 0; i <= steps; i++) {
+            const mx = x0 + ((x1 - x0) * i) / steps;
+            const my = -mx * mx + 4;
+            const p = toSVG(mx, my);
+            pts += ` ${p.x},${p.y}`;
+          }
+          pts += ` ${toSVG(x1, 0).x},${toSVG(x1, 0).y}`;
+          el('polygon', { points: pts, fill: '#EAF3DE', stroke: 'none', opacity: '0.7' });
+        }
+
+        // 포물선 y = -x²+4
+        {
+          const steps = 600;
+          let pathD = '',
+            penDown = false;
+          for (let i = 0; i <= steps; i++) {
+            const mx = xMin + ((xMax - xMin) * i) / steps;
+            const my = -mx * mx + 4;
+            if (my < yMin - 0.05 || my > yMax + 0.05) {
+              penDown = false;
+              continue;
+            }
+            const p = toSVG(mx, my);
+            if (!penDown) {
+              pathD += `M${p.x},${p.y}`;
+              penDown = true;
+            } else {
+              pathD += ` L${p.x},${p.y}`;
+            }
+          }
+          el('path', {
+            d: pathD,
+            fill: 'none',
+            stroke: '#3B6D11',
+            'stroke-width': 2.2,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+        }
+
+        // 최적 직사각형: t = 2/√3, h = 8/3
+        const t = 2 / Math.sqrt(3);
+        const h = -t * t + 4;
+
+        const rL = toSVG(-t, 0),
+          rR = toSVG(t, 0);
+        const rTL = toSVG(-t, h),
+          rTR = toSVG(t, h);
+
+        el('rect', {
+          x: rTL.x,
+          y: rTL.y,
+          width: rTR.x - rTL.x,
+          height: rL.y - rTL.y,
+          fill: '#E6F1FB',
+          stroke: '#185FA5',
+          'stroke-width': 1.8,
+        });
+
+        dashed(rTL.x, rTL.y, rTL.x, oy, '#378ADD');
+        dashed(rTR.x, rTR.y, rTR.x, oy, '#378ADD');
+        dashed(rTL.x, rTL.y, ox, rTL.y, '#378ADD');
+
+        el('circle', { cx: rTL.x, cy: rTL.y, r: 4, fill: '#F3306A', stroke: '#fff', 'stroke-width': 1.5 });
+        el('circle', { cx: rTR.x, cy: rTR.y, r: 4, fill: '#F3306A', stroke: '#fff', 'stroke-width': 1.5 });
+
+        [-2, 2].forEach(rx => {
+          const p = toSVG(rx, 0);
+          el('circle', { cx: p.x, cy: p.y, r: 4, fill: '#639922', stroke: '#fff', 'stroke-width': 1.5 });
+        });
+
+        {
+          const p = toSVG(0, 4);
+          el('circle', { cx: p.x, cy: p.y, r: 4, fill: '#639922', stroke: '#fff', 'stroke-width': 1.5 });
+        }
+
+        // 치수선 — 가로
+        {
+          const y0 = rL.y + 28;
+          const x0 = rL.x,
+            x1 = rR.x,
+            xm = (x0 + x1) / 2;
+          el('line', { x1: x0, y1: y0, x2: x1, y2: y0, stroke: '#185FA5', 'stroke-width': 1 });
+          el('path', {
+            d: `M${x0 + 6},${y0 - 4} L${x0},${y0} L${x0 + 6},${y0 + 4}`,
+            fill: 'none',
+            stroke: '#185FA5',
+            'stroke-width': 1,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+          el('path', {
+            d: `M${x1 - 6},${y0 - 4} L${x1},${y0} L${x1 - 6},${y0 + 4}`,
+            fill: 'none',
+            stroke: '#185FA5',
+            'stroke-width': 1,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+          label(xm, y0 - 7, '4√3/3', 11, 500, '#185FA5');
+        }
+
+        // 치수선 — 세로
+        {
+          const x0 = rTR.x + 22;
+          const y0 = rTR.y,
+            y1 = rR.y,
+            ym = (y0 + y1) / 2;
+          el('line', { x1: x0, y1: y0, x2: x0, y2: y1, stroke: '#185FA5', 'stroke-width': 1 });
+          el('path', {
+            d: `M${x0 - 4},${y0 + 6} L${x0},${y0} L${x0 + 4},${y0 + 6}`,
+            fill: 'none',
+            stroke: '#185FA5',
+            'stroke-width': 1,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+          el('path', {
+            d: `M${x0 - 4},${y1 - 6} L${x0},${y1} L${x0 + 4},${y1 - 6}`,
+            fill: 'none',
+            stroke: '#185FA5',
+            'stroke-width': 1,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+          label(x0 + 28, ym + 4, '8/3', 11, 500, '#185FA5', 'start');
+        }
+
+        const pT = toSVG(t, 0),
+          pNT = toSVG(-t, 0);
+        label(pT.x, pT.y + 18, '2√3/3', 10, 400, '#185FA5');
+        label(pNT.x, pNT.y + 18, '−2√3/3', 10, 400, '#185FA5');
+
+        label(toSVG(2.1, 3.6).x, toSVG(2.1, 3.6).y, 'y = −x² + 4', 13, 500, '#3B6D11', 'start');
+
+        label(340, 490, '최대 넓이 = 2t(−t²+4)  →  t = 2√3/3 일 때  S = 32√3/9', 11, 400, '#5F5E5A');
+      </script>
+    </svg>
+  </body>
+</html>

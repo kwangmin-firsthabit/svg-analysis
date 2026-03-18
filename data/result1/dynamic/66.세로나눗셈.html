@@ -1,0 +1,180 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 847 ÷ 7 = 121 나머지 0
+  const dividend = 847;
+  const divisor = 7;
+
+  // 각 단계 계산
+  // 단계1: 8 ÷ 7 = 1, 빼는 수 = 7, 나머지 = 1
+  // 단계2: 14 ÷ 7 = 2, 빼는 수 = 14, 나머지 = 0
+  // 단계3: 7 ÷ 7 = 1, 빼는 수 = 7, 나머지 = 0
+
+  const steps = [
+    { digit: 1, sub: 7,  rem: 1,  bringDown: 4, partial: 14 },
+    { digit: 2, sub: 14, rem: 0,  bringDown: 7, partial: 7  },
+    { digit: 1, sub: 7,  rem: 0,  bringDown: null, partial: null }
+  ];
+
+  const W = 280;
+  const fs = 20;       // font-size
+  const lineH = 45;    // 행 높이
+  const colW = 35;     // 열 너비
+
+  // x 위치: 제수, 세 자리
+  const xDivisor = 45;
+  const xDigits = [100, 135, 170]; // 피제수/몫 각 자리 x
+
+  // y 위치
+  const yQuotient  = 38;
+  const yDividend  = 65;
+
+  // 총 높이: dividend + 3단계 * lineH + 여유
+  const H = yDividend + 3 * lineH * 2 + 30;
+
+  return { W, H, fs, lineH, colW, xDivisor, xDigits,
+           yQuotient, yDividend, divisor, steps };
+}
+
+function el(tag, attrs) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(content, attrs) {
+  const e = el('text', attrs);
+  e.textContent = String(content);
+  return e;
+}
+
+function render(geo) {
+  const { W, H, fs, xDivisor, xDigits, yQuotient, yDividend, divisor, steps } = geo;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+
+  const mono = 'monospace';
+
+  // 나눗셈 기호 (ㄱ자: 세로 + 위 가로)
+  // 세로선
+  svg.appendChild(el('line', {
+    x1: xDigits[0] - 18, y1: yQuotient + 8,
+    x2: xDigits[0] - 18, y2: yDividend + 5,
+    stroke: '#333', 'stroke-width': '1.8'
+  }));
+  // 위 가로선 (피제수 전체 위)
+  svg.appendChild(el('line', {
+    x1: xDigits[0] - 18, y1: yQuotient + 8,
+    x2: xDigits[2] + 20, y2: yQuotient + 8,
+    stroke: '#333', 'stroke-width': '1.8'
+  }));
+
+  // 제수
+  svg.appendChild(txt(divisor, {
+    x: xDivisor, y: yDividend,
+    'text-anchor': 'middle', 'font-size': fs, fill: '#333',
+    'font-family': mono
+  }));
+
+  // 피제수 (8, 4, 7)
+  const dividendDigits = [8, 4, 7];
+  for (let i = 0; i < 3; i++) {
+    svg.appendChild(txt(dividendDigits[i], {
+      x: xDigits[i], y: yDividend,
+      'text-anchor': 'middle', 'font-size': fs, fill: '#333',
+      'font-family': mono
+    }));
+  }
+
+  // 몫 (1, 2, 1)
+  const quotientDigits = [1, 2, 1];
+  for (let i = 0; i < 3; i++) {
+    svg.appendChild(txt(quotientDigits[i], {
+      x: xDigits[i], y: yQuotient,
+      'text-anchor': 'middle', 'font-size': fs, fill: '#333',
+      'font-family': mono
+    }));
+  }
+
+  // 단계별 계산 렌더링
+  // 단계1: 빼는 수 7 (첫째 자리 아래), 구분선, 내림 14
+  let curY = yDividend + 28;
+
+  // 단계1: 빼는 수 = 7
+  svg.appendChild(txt(7, {
+    x: xDigits[0], y: curY,
+    'text-anchor': 'middle', 'font-size': fs, fill: '#333', 'font-family': mono
+  }));
+  curY += 10;
+  // 구분선1
+  svg.appendChild(el('line', {
+    x1: xDigits[0] - 18, y1: curY, x2: xDigits[0] + 18, y2: curY,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+  curY += 22;
+
+  // 내림: 14
+  svg.appendChild(txt(1, {
+    x: xDigits[0], y: curY,
+    'text-anchor': 'middle', 'font-size': fs, fill: '#333', 'font-family': mono
+  }));
+  svg.appendChild(txt(4, {
+    x: xDigits[1], y: curY,
+    'text-anchor': 'middle', 'font-size': fs, fill: '#333', 'font-family': mono
+  }));
+  curY += 28;
+
+  // 단계2: 빼는 수 = 14
+  svg.appendChild(txt(1, {
+    x: xDigits[0], y: curY,
+    'text-anchor': 'middle', 'font-size': fs, fill: '#333', 'font-family': mono
+  }));
+  svg.appendChild(txt(4, {
+    x: xDigits[1], y: curY,
+    'text-anchor': 'middle', 'font-size': fs, fill: '#333', 'font-family': mono
+  }));
+  curY += 10;
+  // 구분선2
+  svg.appendChild(el('line', {
+    x1: xDigits[0] - 18, y1: curY, x2: xDigits[1] + 18, y2: curY,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+  curY += 22;
+
+  // 내림: 7
+  svg.appendChild(txt(7, {
+    x: xDigits[2], y: curY,
+    'text-anchor': 'middle', 'font-size': fs, fill: '#333', 'font-family': mono
+  }));
+  curY += 28;
+
+  // 단계3: 빼는 수 = 7
+  svg.appendChild(txt(7, {
+    x: xDigits[2], y: curY,
+    'text-anchor': 'middle', 'font-size': fs, fill: '#333', 'font-family': mono
+  }));
+  curY += 10;
+  // 구분선3
+  svg.appendChild(el('line', {
+    x1: xDigits[2] - 18, y1: curY, x2: xDigits[2] + 18, y2: curY,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+  curY += 22;
+
+  // 나머지 0
+  svg.appendChild(txt(0, {
+    x: xDigits[2], y: curY,
+    'text-anchor': 'middle', 'font-size': fs, fill: '#333', 'font-family': mono
+  }));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

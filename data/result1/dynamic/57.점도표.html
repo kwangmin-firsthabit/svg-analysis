@@ -1,0 +1,78 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const W = 340;
+  const data = [
+    { x: 0, count: 3 },
+    { x: 1, count: 7 },
+    { x: 2, count: 8 },
+    { x: 3, count: 4 },
+    { x: 4, count: 2 },
+    { x: 5, count: 1 },
+  ];
+  const maxCount = Math.max(...data.map(d => d.count));
+  const r = 9;
+  const gap = 22; // 원 중심 간격
+  const marginLeft = 50;
+  const marginRight = 20;
+  const marginBottom = 50;
+  const axisX = marginLeft;
+  const xStep = 50;
+  const axisY = marginLeft + maxCount * gap + r + 10;
+  const maxY = axisY + marginBottom;
+  return { W, data, r, gap, axisX, xStep, axisY, maxY };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { W, data, r, gap, axisX, xStep, axisY, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 ${W} ${maxY}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', maxY);
+
+  // 점 그리기
+  data.forEach(d => {
+    const cx = axisX + d.x * xStep;
+    for (let i = 0; i < d.count; i++) {
+      const cy = axisY - r - i * gap;
+      svg.appendChild(el('circle', {
+        cx, cy, r,
+        fill: '#4a90d9', stroke: '#fff', 'stroke-width': '1'
+      }));
+    }
+  });
+
+  // x축
+  svg.appendChild(el('line', {
+    x1: axisX - 25, y1: axisY, x2: W - 20, y2: axisY,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+
+  // x축 눈금 및 레이블
+  data.forEach(d => {
+    const tx = axisX + d.x * xStep;
+    svg.appendChild(el('line', { x1: tx, y1: axisY, x2: tx, y2: axisY + 6, stroke: '#333', 'stroke-width': '1' }));
+    svg.appendChild(el('text', { x: tx, y: axisY + 18, 'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '12', fill: '#333' }, d.x));
+  });
+
+  // 축 레이블
+  svg.appendChild(el('text', {
+    x: axisX + 2.5 * xStep, y: axisY + 38,
+    'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '12', fill: '#333'
+  }, '독서 시간 (시간)'));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

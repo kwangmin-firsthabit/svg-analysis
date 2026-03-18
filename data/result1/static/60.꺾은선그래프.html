@@ -1,0 +1,109 @@
+<!--
+  꺾은선그래프: 5년간(2019~2023) 3도시 연평균 기온(°C)
+  서울: 12.4, 13.1, 12.8, 13.5, 13.2
+  부산: 14.2, 14.8, 14.5, 15.1, 14.9
+  제주: 15.8, 16.2, 16.0, 16.5, 16.3
+
+  레이아웃:
+    viewBox: 0 0 440 300
+    축 원점: (65, 250)
+    x축: 2019~2023, 5개 점, 간격 80px
+    y축: 11~17°C, 범위 6°C
+    y스케일: 200/6 ≈ 33.3px/°C
+
+  x 좌표: 65 + i*80 (i=0..4)
+    2019: x=65
+    2020: x=145
+    2021: x=225
+    2022: x=305
+    2023: x=385
+
+  y 계산: y = 250 - (값-11)*33.3
+    서울: 12.4→y=203, 13.1→y=180, 12.8→y=190, 13.5→y=167, 13.2→y=177
+    부산: 14.2→y=170, 14.8→y=150, 14.5→y=160, 15.1→y=140, 14.9→y=147
+    제주: 15.8→y=143, 16.2→y=130, 16.0→y=137, 16.5→y=120, 16.3→y=127
+-->
+<svg width="440" height="300" viewBox="0 0 440 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- 보조선 -->
+  <line x1="65" y1="217" x2="395" y2="217" stroke="#ddd" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="65" y1="183" x2="395" y2="183" stroke="#ddd" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="65" y1="150" x2="395" y2="150" stroke="#ddd" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="65" y1="117" x2="395" y2="117" stroke="#ddd" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="65" y1="83" x2="395" y2="83" stroke="#ddd" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="65" y1="50" x2="395" y2="50" stroke="#ddd" stroke-width="0.5" stroke-dasharray="3,3"/>
+
+  <!-- 서울 꺾은선 (실선, 파랑) -->
+  <polyline points="65,203 145,180 225,190 305,167 385,177"
+    fill="none" stroke="#1a6bb5" stroke-width="2"/>
+  <circle cx="65" cy="203" r="4" fill="#1a6bb5"/>
+  <circle cx="145" cy="180" r="4" fill="#1a6bb5"/>
+  <circle cx="225" cy="190" r="4" fill="#1a6bb5"/>
+  <circle cx="305" cy="167" r="4" fill="#1a6bb5"/>
+  <circle cx="385" cy="177" r="4" fill="#1a6bb5"/>
+
+  <!-- 부산 꺾은선 (점선, 빨강) -->
+  <polyline points="65,170 145,150 225,160 305,140 385,147"
+    fill="none" stroke="#e74c3c" stroke-width="2" stroke-dasharray="6,3"/>
+  <circle cx="65" cy="170" r="4" fill="#e74c3c"/>
+  <circle cx="145" cy="150" r="4" fill="#e74c3c"/>
+  <circle cx="225" cy="160" r="4" fill="#e74c3c"/>
+  <circle cx="305" cy="140" r="4" fill="#e74c3c"/>
+  <circle cx="385" cy="147" r="4" fill="#e74c3c"/>
+
+  <!-- 제주 꺾은선 (점선+마름모, 초록) -->
+  <polyline points="65,143 145,130 225,137 305,120 385,127"
+    fill="none" stroke="#27ae60" stroke-width="2" stroke-dasharray="2,4"/>
+  <rect x="61" cy="139" x="61" y="139" width="8" height="8" transform="rotate(45,65,143)" fill="#27ae60"/>
+  <rect x="141" cy="126" x="141" y="126" width="8" height="8" transform="rotate(45,145,130)" fill="#27ae60"/>
+  <rect x="221" cy="133" x="221" y="133" width="8" height="8" transform="rotate(45,225,137)" fill="#27ae60"/>
+  <rect x="301" cy="116" x="301" y="116" width="8" height="8" transform="rotate(45,305,120)" fill="#27ae60"/>
+  <rect x="381" cy="123" x="381" y="123" width="8" height="8" transform="rotate(45,385,127)" fill="#27ae60"/>
+
+  <!-- x축 -->
+  <line x1="55" y1="250" x2="400" y2="250" stroke="#333" stroke-width="1.5"/>
+  <!-- y축 -->
+  <line x1="65" y1="40" x2="65" y2="254" stroke="#333" stroke-width="1.5"/>
+
+  <!-- x축 눈금 및 레이블 -->
+  <line x1="65" y1="250" x2="65" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="65" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">2019</text>
+  <line x1="145" y1="250" x2="145" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="145" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">2020</text>
+  <line x1="225" y1="250" x2="225" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="225" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">2021</text>
+  <line x1="305" y1="250" x2="305" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="305" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">2022</text>
+  <line x1="385" y1="250" x2="385" y2="256" stroke="#333" stroke-width="1"/>
+  <text x="385" y="268" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333">2023</text>
+
+  <!-- y축 눈금 및 레이블 (11~17) -->
+  <line x1="59" y1="250" x2="65" y2="250" stroke="#333" stroke-width="1"/>
+  <text x="55" y="254" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">11</text>
+  <line x1="59" y1="217" x2="65" y2="217" stroke="#333" stroke-width="1"/>
+  <text x="55" y="221" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">12</text>
+  <line x1="59" y1="183" x2="65" y2="183" stroke="#333" stroke-width="1"/>
+  <text x="55" y="187" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">13</text>
+  <line x1="59" y1="150" x2="65" y2="150" stroke="#333" stroke-width="1"/>
+  <text x="55" y="154" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">14</text>
+  <line x1="59" y1="117" x2="65" y2="117" stroke="#333" stroke-width="1"/>
+  <text x="55" y="121" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">15</text>
+  <line x1="59" y1="83" x2="65" y2="83" stroke="#333" stroke-width="1"/>
+  <text x="55" y="87" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">16</text>
+  <line x1="59" y1="50" x2="65" y2="50" stroke="#333" stroke-width="1"/>
+  <text x="55" y="54" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">17</text>
+
+  <!-- 범례 -->
+  <line x1="100" y1="25" x2="124" y2="25" stroke="#1a6bb5" stroke-width="2"/>
+  <circle cx="112" cy="25" r="3" fill="#1a6bb5"/>
+  <text x="128" y="29" font-family="sans-serif" font-size="11" fill="#333">서울</text>
+  <line x1="175" y1="25" x2="199" y2="25" stroke="#e74c3c" stroke-width="2" stroke-dasharray="6,3"/>
+  <circle cx="187" cy="25" r="3" fill="#e74c3c"/>
+  <text x="203" y="29" font-family="sans-serif" font-size="11" fill="#333">부산</text>
+  <line x1="248" y1="25" x2="272" y2="25" stroke="#27ae60" stroke-width="2" stroke-dasharray="2,4"/>
+  <rect x="256" y="21" width="8" height="8" transform="rotate(45,260,25)" fill="#27ae60"/>
+  <text x="276" y="29" font-family="sans-serif" font-size="11" fill="#333">제주</text>
+
+  <!-- 축 레이블 -->
+  <text x="225" y="285" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">연도</text>
+  <text x="18" y="150" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333" transform="rotate(-90,18,150)">기온 (°C)</text>
+</svg>

@@ -1,0 +1,158 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const scale = 60;
+  const ox = 140, oy = 320;
+
+  function toScreen(x, y) {
+    return { x: ox + x * scale, y: oy - y * scale };
+  }
+
+  // y=2^x 포인트
+  const exp2Pts = [];
+  for (let xi = -200; xi <= 180; xi++) {
+    const xv = xi / 100;
+    const yv = Math.pow(2, xv);
+    if (yv <= 5) {
+      const p = toScreen(xv, yv);
+      if (p.x >= 30 && p.x <= 440) exp2Pts.push(p);
+    }
+  }
+
+  // y=log₂x 포인트 (y=2^x 대칭)
+  const log2Pts = [];
+  for (let xi = 2; xi <= 500; xi++) {
+    const xv = xi / 100;
+    const yv = Math.log2(xv);
+    if (yv >= -1.5 && yv <= 4) {
+      const p = toScreen(xv, yv);
+      if (p.x >= 30 && p.x <= 440) log2Pts.push(p);
+    }
+  }
+
+  // y=-x+3 (k=3): x=[0.4, 3.5]
+  const lineStart = toScreen(0.4, -0.4 + 3);  // (0.4, 2.6)
+  const lineEnd = toScreen(3.2, -3.2 + 3);     // (3.2, -0.2)
+
+  // 교점: (1,2), (2,1)
+  const p1 = toScreen(1, 2);
+  const p2 = toScreen(2, 1);
+
+  // y=x 직선
+  const symStart = toScreen(-0.5, -0.5);
+  const symEnd = toScreen(3.5, 3.5);
+
+  const axisXL = toScreen(-1.5, 0);
+  const axisXR = toScreen(3.8, 0);
+  const axisYB = toScreen(0, -1.5);
+  const axisYT = toScreen(0, 4.8);
+
+  const W = 460, maxY = 400;
+  return { exp2Pts, log2Pts, lineStart, lineEnd, p1, p2, symStart, symEnd, axisXL, axisXR, axisYB, axisYT, toScreen, ox, oy, W, maxY };
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function render(geo) {
+  const { exp2Pts, log2Pts, lineStart, lineEnd, p1, p2, symStart, symEnd, axisXL, axisXR, axisYB, axisYT, toScreen, ox, oy, W, maxY } = geo;
+
+  svg.setAttribute('viewBox', '30 40 400 380');
+  svg.setAttribute('width', String(W));
+  svg.setAttribute('height', String(maxY));
+
+  // x축
+  svg.appendChild(mkEl('line', { x1: axisXL.x, y1: axisXL.y, x2: axisXR.x, y2: axisXR.y, stroke: '#374151', 'stroke-width': '1.5' }));
+  svg.appendChild(mkEl('polygon', { points: `${axisXR.x},${axisXR.y - 4} ${axisXR.x + 8},${axisXR.y} ${axisXR.x},${axisXR.y + 4}`, fill: '#374151' }));
+
+  // y축
+  svg.appendChild(mkEl('line', { x1: axisYB.x, y1: axisYB.y, x2: axisYT.x, y2: axisYT.y, stroke: '#374151', 'stroke-width': '1.5' }));
+  svg.appendChild(mkEl('polygon', { points: `${axisYT.x - 4},${axisYT.y} ${axisYT.x},${axisYT.y - 8} ${axisYT.x + 4},${axisYT.y}`, fill: '#374151' }));
+
+  // 축 레이블
+  const xLbl = mkEl('text', { x: axisXR.x + 10, y: axisXR.y + 4, 'font-size': '13', 'font-family': 'serif', fill: '#374151' });
+  xLbl.textContent = 'x';
+  svg.appendChild(xLbl);
+  const yLbl = mkEl('text', { x: axisYT.x + 5, y: axisYT.y, 'font-size': '13', 'font-family': 'serif', fill: '#374151' });
+  yLbl.textContent = 'y';
+  svg.appendChild(yLbl);
+  const oLbl = mkEl('text', { x: ox - 12, y: oy + 14, 'text-anchor': 'end', 'font-size': '11', 'font-family': 'serif', fill: '#374151' });
+  oLbl.textContent = 'O';
+  svg.appendChild(oLbl);
+
+  // 눈금
+  for (let i = -1; i <= 3; i++) {
+    if (i === 0) continue;
+    const p = toScreen(i, 0);
+    svg.appendChild(mkEl('line', { x1: p.x, y1: p.y - 4, x2: p.x, y2: p.y + 4, stroke: '#6b7280', 'stroke-width': '1' }));
+    const lbl = mkEl('text', { x: p.x, y: p.y + 14, 'text-anchor': 'middle', 'font-size': '10', 'font-family': 'serif', fill: '#6b7280' });
+    lbl.textContent = String(i);
+    svg.appendChild(lbl);
+  }
+  for (let j = -1; j <= 3; j++) {
+    if (j === 0) continue;
+    const p = toScreen(0, j);
+    svg.appendChild(mkEl('line', { x1: p.x - 4, y1: p.y, x2: p.x + 4, y2: p.y, stroke: '#6b7280', 'stroke-width': '1' }));
+    const lbl = mkEl('text', { x: p.x - 8, y: p.y + 4, 'text-anchor': 'end', 'font-size': '10', 'font-family': 'serif', fill: '#6b7280' });
+    lbl.textContent = String(j);
+    svg.appendChild(lbl);
+  }
+
+  // y=x 대칭선 (점선)
+  svg.appendChild(mkEl('line', {
+    x1: symStart.x, y1: symStart.y, x2: symEnd.x, y2: symEnd.y,
+    stroke: '#9ca3af', 'stroke-width': '1.2', 'stroke-dasharray': '6,4'
+  }));
+  const symLbl = mkEl('text', { x: symEnd.x + 4, y: symEnd.y - 4, 'font-size': '11', 'font-family': 'serif', fill: '#9ca3af' });
+  symLbl.textContent = 'y=x';
+  svg.appendChild(symLbl);
+
+  // y=2^x 곡선
+  if (exp2Pts.length > 1) {
+    let d = `M ${exp2Pts[0].x},${exp2Pts[0].y}`;
+    for (let i = 1; i < exp2Pts.length; i++) d += ` L ${exp2Pts[i].x},${exp2Pts[i].y}`;
+    svg.appendChild(mkEl('path', { d, fill: 'none', stroke: '#2563eb', 'stroke-width': '2' }));
+  }
+  const e2Lbl = mkEl('text', { x: exp2Pts[exp2Pts.length - 1].x + 4, y: exp2Pts[exp2Pts.length - 1].y, 'font-size': '12', 'font-family': 'serif', fill: '#2563eb' });
+  e2Lbl.textContent = 'y=2ˣ';
+  svg.appendChild(e2Lbl);
+
+  // y=log₂x 곡선
+  if (log2Pts.length > 1) {
+    let d = `M ${log2Pts[0].x},${log2Pts[0].y}`;
+    for (let i = 1; i < log2Pts.length; i++) d += ` L ${log2Pts[i].x},${log2Pts[i].y}`;
+    svg.appendChild(mkEl('path', { d, fill: 'none', stroke: '#16a34a', 'stroke-width': '2' }));
+  }
+  const lg2Lbl = mkEl('text', { x: log2Pts[log2Pts.length - 1].x - 4, y: log2Pts[log2Pts.length - 1].y - 8, 'text-anchor': 'end', 'font-size': '12', 'font-family': 'serif', fill: '#16a34a' });
+  lg2Lbl.textContent = 'y=log₂x';
+  svg.appendChild(lg2Lbl);
+
+  // y=-x+3 직선
+  svg.appendChild(mkEl('line', {
+    x1: lineStart.x, y1: lineStart.y, x2: lineEnd.x, y2: lineEnd.y,
+    stroke: '#dc2626', 'stroke-width': '1.8'
+  }));
+  const lineLbl = mkEl('text', { x: lineStart.x - 4, y: lineStart.y - 6, 'text-anchor': 'end', 'font-size': '12', 'font-family': 'serif', fill: '#dc2626' });
+  lineLbl.textContent = 'y=-x+3';
+  svg.appendChild(lineLbl);
+
+  // 교점
+  for (const { p, lbl } of [{ p: p1, lbl: '(1, 2)' }, { p: p2, lbl: '(2, 1)' }]) {
+    svg.appendChild(mkEl('circle', { cx: p.x, cy: p.y, r: '4.5', fill: '#dc2626' }));
+    const el = mkEl('text', { x: p.x + 8, y: p.y - 4, 'font-size': '11', 'font-family': 'serif', fill: '#111827' });
+    el.textContent = lbl;
+    svg.appendChild(el);
+  }
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

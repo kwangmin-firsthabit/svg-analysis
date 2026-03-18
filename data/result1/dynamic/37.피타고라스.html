@@ -1,0 +1,147 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 40;
+
+  // 직각삼각형 꼭짓점 (화면 좌표)
+  const ox = 200, oy = 260;
+  const A = { x: ox, y: oy };
+  const B = { x: ox + 4 * unit, y: oy };
+  const C = { x: ox, y: oy - 3 * unit };
+
+  // 변4 정사각형 (AB 아래)
+  const sq4 = [A, B, { x: B.x, y: B.y + 4 * unit }, { x: A.x, y: A.y + 4 * unit }];
+
+  // 변3 정사각형 (AC 왼쪽)
+  const sq3 = [A, { x: A.x - 3 * unit, y: A.y }, { x: C.x - 3 * unit, y: C.y }, C];
+
+  // 빗변5 정사각형 (BC 오른쪽 바깥)
+  // BC 벡터 = C - B = (-160, -120), 길이 = 200
+  // 수직 벡터 (바깥) = (120, -160) / 200 * 200 = (120, -160)
+  const bcvx = C.x - B.x, bcvy = C.y - B.y; // (-160, -120)
+  const perpx = -bcvy, perpy = bcvx; // (120, -160) - 오른쪽 방향
+  const D = { x: B.x + perpx, y: B.y + perpy }; // (480, 100)
+  const E = { x: C.x + perpx, y: C.y + perpy }; // (320, -20)
+  const sq5 = [B, D, E, C];
+
+  // 넓이 중심
+  const center4 = { x: (A.x + B.x) / 2, y: A.y + 2 * unit };
+  const center3 = { x: A.x - 1.5 * unit, y: (A.y + C.y) / 2 };
+  const center5 = {
+    x: (B.x + D.x + E.x + C.x) / 4,
+    y: (B.y + D.y + E.y + C.y) / 4,
+  };
+
+  const W = 560, maxY = 490;
+  return { A, B, C, sq3, sq4, sq5, D, E, center3, center4, center5, W, maxY };
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function ptStr(pts) {
+  return pts.map(p => `${p.x},${p.y}`).join(' ');
+}
+
+function render(geo) {
+  const { A, B, C, sq3, sq4, sq5, center3, center4, center5, W, maxY } = geo;
+  svg.setAttribute('viewBox', '60 -40 500 490');
+  svg.setAttribute('width', String(W));
+  svg.setAttribute('height', String(maxY));
+
+  // 변4 정사각형 (넓이 16)
+  svg.appendChild(mkEl('polygon', {
+    points: ptStr(sq4),
+    fill: '#dbeafe', stroke: '#2563eb', 'stroke-width': '1.5'
+  }));
+  svg.appendChild(Object.assign(document.createElementNS(NS, 'text'), {
+    textContent: '16'
+  }));
+  const t4 = mkEl('text', {
+    x: center4.x, y: center4.y,
+    'text-anchor': 'middle', 'dominant-baseline': 'middle',
+    'font-size': '22', 'font-family': 'serif', fill: '#1e40af'
+  });
+  t4.textContent = '16';
+  svg.appendChild(t4);
+
+  // 변3 정사각형 (넓이 9)
+  svg.appendChild(mkEl('polygon', {
+    points: ptStr(sq3),
+    fill: '#dcfce7', stroke: '#16a34a', 'stroke-width': '1.5'
+  }));
+  const t3 = mkEl('text', {
+    x: center3.x, y: center3.y,
+    'text-anchor': 'middle', 'dominant-baseline': 'middle',
+    'font-size': '22', 'font-family': 'serif', fill: '#15803d'
+  });
+  t3.textContent = '9';
+  svg.appendChild(t3);
+
+  // 빗변5 정사각형 (넓이 25)
+  svg.appendChild(mkEl('polygon', {
+    points: ptStr(sq5),
+    fill: '#fef9c3', stroke: '#ca8a04', 'stroke-width': '1.5'
+  }));
+  const t5 = mkEl('text', {
+    x: center5.x, y: center5.y,
+    'text-anchor': 'middle', 'dominant-baseline': 'middle',
+    'font-size': '22', 'font-family': 'serif', fill: '#92400e'
+  });
+  t5.textContent = '25';
+  svg.appendChild(t5);
+
+  // 직각삼각형
+  svg.appendChild(mkEl('polygon', {
+    points: ptStr([A, B, C]),
+    fill: '#f0fdf4', stroke: '#111827', 'stroke-width': '2'
+  }));
+
+  // 직각 표시
+  svg.appendChild(mkEl('path', {
+    d: `M ${A.x},${A.y - 20} L ${A.x + 20},${A.y - 20} L ${A.x + 20},${A.y}`,
+    fill: 'none', stroke: '#111827', 'stroke-width': '1.5'
+  }));
+
+  // 꼭짓점 레이블
+  const labels = [
+    { x: A.x - 10, y: A.y + 18, t: 'A' },
+    { x: B.x + 8, y: B.y + 16, t: 'B' },
+    { x: C.x - 14, y: C.y - 6, t: 'C' },
+  ];
+  for (const lb of labels) {
+    const el = mkEl('text', {
+      x: lb.x, y: lb.y, 'font-size': '14', 'font-family': 'serif', fill: '#111827'
+    });
+    el.textContent = lb.t;
+    svg.appendChild(el);
+  }
+
+  // 변 길이 라벨
+  const sideLabels = [
+    { x: (A.x + B.x) / 2, y: A.y + 16, t: '4' },
+    { x: A.x - 8, y: (A.y + C.y) / 2, t: '3', anchor: 'end' },
+    { x: (B.x + C.x) / 2 - 8, y: (B.y + C.y) / 2 - 8, t: '5' },
+  ];
+  for (const lb of sideLabels) {
+    const el = mkEl('text', {
+      x: lb.x, y: lb.y,
+      'text-anchor': lb.anchor || 'middle',
+      'font-size': '13', 'font-family': 'serif', fill: '#374151'
+    });
+    el.textContent = lb.t;
+    svg.appendChild(el);
+  }
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

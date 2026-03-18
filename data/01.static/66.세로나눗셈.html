@@ -1,0 +1,78 @@
+<svg width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
+  <!-- Korean long division: 847 ÷ 7 = 121 -->
+  <!-- Layout centered around x=340 -->
+  <!--
+    Layout:
+        1  2  1        ← quotient above bracket
+    7 ) 8  4  7        ← divisor ) dividend
+        7              ← 7×1=7
+       ------
+        1  4           ← 14 (remainder after subtraction)
+        1  4           ← 7×2=14
+       ------
+           7           ← remainder 7
+           7           ← 7×1=7
+          ----
+           0           ← final remainder
+  -->
+
+  <!-- Font size 24, column spacing 32px -->
+  <!-- Center columns at: c1=280 (divisor area), c2=320, c3=352, c4=384 -->
+  <!-- Actually layout: divisor at ~270, bracket at 290, digits at 320,352,384 -->
+
+  <!-- Bracket/vinculum: vertical line + top horizontal line -->
+  <!-- Divisor "7" at x=255 -->
+  <!-- Dividend digits at x=310(8), x=345(4), x=380(7) -->
+  <!-- Quotient digits at x=310(1), x=345(2), x=380(1) — above bracket -->
+
+  <!-- Quotient row -->
+  <text x="310" y="68" font-family="serif" font-size="24" text-anchor="middle" fill="#222">1</text>
+  <text x="345" y="68" font-family="serif" font-size="24" text-anchor="middle" fill="#222">2</text>
+  <text x="380" y="68" font-family="serif" font-size="24" text-anchor="middle" fill="#222">1</text>
+
+  <!-- Division bracket: vertical line left of dividend, horizontal line on top -->
+  <!-- Vertical line: x=290, from y=72 to y=100 -->
+  <line x1="292" y1="74" x2="292" y2="102" stroke="#333" stroke-width="2"/>
+  <!-- Horizontal top line over dividend -->
+  <line x1="292" y1="74" x2="400" y2="74" stroke="#333" stroke-width="2"/>
+
+  <!-- Divisor -->
+  <text x="268" y="100" font-family="serif" font-size="24" text-anchor="middle" fill="#222">7</text>
+
+  <!-- Dividend -->
+  <text x="310" y="100" font-family="serif" font-size="24" text-anchor="middle" fill="#222">8</text>
+  <text x="345" y="100" font-family="serif" font-size="24" text-anchor="middle" fill="#222">4</text>
+  <text x="380" y="100" font-family="serif" font-size="24" text-anchor="middle" fill="#222">7</text>
+
+  <!-- Step 1: 8 ÷ 7 = 1, write 7 below 8 -->
+  <text x="310" y="132" font-family="serif" font-size="24" text-anchor="middle" fill="#555">7</text>
+  <!-- Subtraction line under step 1 -->
+  <line x1="296" y1="140" x2="332" y2="140" stroke="#555" stroke-width="1.5"/>
+
+  <!-- Step 2: 14 brought down and divided -->
+  <!-- 14 remainder: 8-7=1, bring down 4 → 14 -->
+  <text x="328" y="164" font-family="serif" font-size="24" text-anchor="middle" fill="#222">1</text>
+  <text x="345" y="164" font-family="serif" font-size="24" text-anchor="middle" fill="#222">4</text>
+  <!-- 7×2=14 -->
+  <text x="328" y="196" font-family="serif" font-size="24" text-anchor="middle" fill="#555">1</text>
+  <text x="345" y="196" font-family="serif" font-size="24" text-anchor="middle" fill="#555">4</text>
+  <!-- Subtraction line -->
+  <line x1="314" y1="204" x2="362" y2="204" stroke="#555" stroke-width="1.5"/>
+
+  <!-- Step 3: 7 remainder and divide -->
+  <!-- 14-14=0, bring down 7 → 7 -->
+  <text x="380" y="228" font-family="serif" font-size="24" text-anchor="middle" fill="#222">7</text>
+  <!-- 7×1=7 -->
+  <text x="380" y="260" font-family="serif" font-size="24" text-anchor="middle" fill="#555">7</text>
+  <!-- Subtraction line -->
+  <line x1="364" y1="268" x2="396" y2="268" stroke="#555" stroke-width="1.5"/>
+
+  <!-- Final remainder: 0 -->
+  <text x="380" y="298" font-family="serif" font-size="24" text-anchor="middle" fill="#222">0</text>
+
+  <!-- Result summary -->
+  <text x="340" y="345" font-family="serif" font-size="18" text-anchor="middle" fill="#185FA5">847 ÷ 7 = 121  (나머지 0)</text>
+
+  <!-- Title -->
+  <text x="340" y="30" font-family="serif" font-size="18" font-weight="bold" text-anchor="middle" fill="#222">세로 나눗셈: 847 ÷ 7</text>
+</svg>

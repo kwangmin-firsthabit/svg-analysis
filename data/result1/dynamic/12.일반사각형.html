@@ -1,0 +1,71 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 일반 사각형 ABCD, AB=3, BC=5, CD=4, DA=6 (1 unit = 40px)
+  // A = (80,300), B = (200,300) → |AB|=120px=3✓
+  // BC 방향 70°: C = (200+200*cos70°, 300-200*sin70°) = (268.4, 112.1)
+  // D: |CD|=160px, |DA|=240px 교점
+  //   d(C,A) ≈ 265.9px, a≈72.8, h≈142.5
+  //   D ≈ (317.5, 264.7)
+  // 검증: |CD|≈160px=4✓ |DA|≈240px=6✓
+  const A = { x: 80,   y: 300 };
+  const B = { x: 200,  y: 300 };
+  const ang = 70 * Math.PI / 180;
+  const C = { x: B.x + 200 * Math.cos(ang), y: B.y - 200 * Math.sin(ang) };
+
+  // 두 원의 교점 (D): circle(C, 160) ∩ circle(A, 240)
+  const dx = A.x - C.x, dy = A.y - C.y;
+  const d = Math.sqrt(dx*dx + dy*dy);
+  const r1 = 160, r2 = 240;
+  const a = (r1*r1 - r2*r2 + d*d) / (2*d);
+  const h = Math.sqrt(r1*r1 - a*a);
+  const mx = C.x + a * (dx/d);
+  const my = C.y + a * (dy/d);
+  const px = -(dy/d), py = dx/d; // perpendicular
+  const D = { x: mx + h*px, y: my + h*py };
+
+  return { A, B, C, D, maxY: Math.max(A.y, B.y, C.y, D.y) + 50 };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { A, B, C, D, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 420 ${maxY}`);
+  svg.setAttribute('width', '420');
+  svg.setAttribute('height', maxY);
+
+  svg.appendChild(el('polygon', {
+    points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y} ${D.x},${D.y}`,
+    fill: 'none', stroke: '#000', 'stroke-width': 2
+  }));
+
+  svg.appendChild(el('text', { x: A.x-14, y: A.y+16, 'text-anchor': 'end',   'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'A'));
+  svg.appendChild(el('text', { x: B.x+14, y: B.y+16, 'text-anchor': 'start', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'B'));
+  svg.appendChild(el('text', { x: C.x+14, y: C.y-6,  'text-anchor': 'start', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'C'));
+  svg.appendChild(el('text', { x: D.x+14, y: D.y+5,  'text-anchor': 'start', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'D'));
+
+  const sides = [[A,B,'3'],[B,C,'5'],[C,D,'4'],[D,A,'6']];
+  sides.forEach(([p1, p2, label]) => {
+    const mx = (p1.x+p2.x)/2;
+    const my = (p1.y+p2.y)/2;
+    const nx = -(p2.y-p1.y), ny = p2.x-p1.x;
+    const len = Math.sqrt(nx*nx+ny*ny);
+    const ox = (nx/len)*14, oy = (ny/len)*14;
+    svg.appendChild(el('text', { x: mx+ox, y: my+oy+5, 'text-anchor': 'middle', 'font-size': 14, 'font-family': 'serif' }, label));
+  });
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

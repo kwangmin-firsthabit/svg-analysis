@@ -1,0 +1,73 @@
+<svg id="vis" width="100%" viewBox="0 0 680 560" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const ox = 340, oy = 300, scale = 60, H = 560;
+
+// 축
+svg.appendChild(el('line', { x1: 30, y1: oy, x2: 650, y2: oy, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('line', { x1: ox, y1: H - 20, x2: ox, y2: 20, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' }));
+addText(658, oy, 'x', { fill: '#374151', 'font-weight': '600' });
+addText(ox, 12, 'y', { fill: '#374151', 'font-weight': '600' });
+
+// x < 0 구간: y = -x (선형)
+const ptsNeg = [];
+for (let px = 60; px <= ox - 1; px += 2) {
+  const mx = (px - ox) / scale;
+  const my = -mx;
+  const py = Math.round(oy - my * scale);
+  ptsNeg.push(`${px},${py}`);
+}
+svg.appendChild(el('polyline', { points: ptsNeg.join(' '), fill: 'none', stroke: '#2563EB', 'stroke-width': '2' }));
+
+// x >= 0 구간: y = x² (포물선)
+const ptsPos = [];
+for (let px = ox; px <= 620; px += 2) {
+  const mx = (px - ox) / scale;
+  const my = mx * mx;
+  const py = Math.round(oy - my * scale);
+  if (py >= 20) ptsPos.push(`${px},${py}`);
+}
+svg.appendChild(el('polyline', { points: ptsPos.join(' '), fill: 'none', stroke: '#2563EB', 'stroke-width': '2' }));
+
+// x=0 연결점 (0, 0) — 닫힌 점
+svg.appendChild(el('circle', { cx: ox, cy: oy, r: '4', fill: '#2563EB', stroke: '#fff', 'stroke-width': '1.5' }));
+
+// 눈금 x축
+for (let v = -3; v <= 3; v++) {
+  if (v === 0) continue;
+  const px = Math.round(ox + v * scale);
+  svg.appendChild(el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: '#374151', 'stroke-width': '1' }));
+  addText(px, oy + 16, v < 0 ? `−${Math.abs(v)}` : String(v));
+}
+
+// 눈금 y축
+for (let v = 1; v <= 6; v++) {
+  const py = Math.round(oy - v * scale);
+  if (py < 25) continue;
+  svg.appendChild(el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: '#374151', 'stroke-width': '1' }));
+  addText(ox - 14, py, String(v));
+}
+
+// 각 구간 레이블
+addText(160, 140, 'y = −x', { fill: '#1E293B', 'font-size': '13', 'font-weight': '600' });
+addText(520, 130, 'y = x²', { fill: '#1E293B', 'font-size': '13', 'font-weight': '600' });
+
+// 원점 레이블
+addText(ox + 10, oy + 16, 'O', { 'text-anchor': 'start' });
+</script>

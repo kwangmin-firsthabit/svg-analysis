@@ -1,0 +1,37 @@
+<!--
+  정사각형 ABCD, 변의 길이 3 (1 unit = 60px)
+  A = (100, 280), B = (280, 280), C = (280, 100), D = (100, 100)
+  side = 180px = 3 ✓
+  직각: 각 꼭짓점에 직각 표시
+-->
+<svg width="380" height="380" viewBox="0 0 380 380" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="100,280 280,280 280,100 100,100" fill="none" stroke="#000" stroke-width="2" />
+
+  <!-- 직각 표시 -->
+  <polyline points="100,260 120,260 120,280" fill="none" stroke="#000" stroke-width="1.5" />
+  <polyline points="260,280 260,260 280,260" fill="none" stroke="#000" stroke-width="1.5" />
+  <polyline points="280,120 260,120 260,100" fill="none" stroke="#000" stroke-width="1.5" />
+  <polyline points="120,100 120,120 100,120" fill="none" stroke="#000" stroke-width="1.5" />
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="86" y="298" text-anchor="end" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="294" y="298" text-anchor="start" font-size="16" font-family="serif" font-style="italic">B</text>
+  <text x="294" y="98" text-anchor="start" font-size="16" font-family="serif" font-style="italic">C</text>
+  <text x="86" y="98" text-anchor="end" font-size="16" font-family="serif" font-style="italic">D</text>
+
+  <!-- 변의 길이 레이블 -->
+  <text x="190" y="304" text-anchor="middle" font-size="14" font-family="serif">3</text>
+  <text x="304" y="194" text-anchor="start" font-size="14" font-family="serif">3</text>
+  <text x="190" y="92" text-anchor="middle" font-size="14" font-family="serif">3</text>
+  <text x="76" y="194" text-anchor="end" font-size="14" font-family="serif">3</text>
+
+  <!-- 등변 틱 마크 -->
+  <g transform="translate(190,280) rotate(0)"><line x1="-6" y1="0" x2="6" y2="0" stroke="#000" stroke-width="1.5" /></g>
+  <g transform="translate(280,190) rotate(90)">
+    <line x1="-6" y1="0" x2="6" y2="0" stroke="#000" stroke-width="1.5" />
+  </g>
+  <g transform="translate(190,100) rotate(0)"><line x1="-6" y1="0" x2="6" y2="0" stroke="#000" stroke-width="1.5" /></g>
+  <g transform="translate(100,190) rotate(90)">
+    <line x1="-6" y1="0" x2="6" y2="0" stroke="#000" stroke-width="1.5" />
+  </g>
+</svg>

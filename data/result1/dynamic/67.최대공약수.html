@@ -1,0 +1,114 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 84와 60의 최대공약수 (ㄴ자 방식)
+  // 공약수 단계: [공약수, 첫째 수, 둘째 수]
+  const rows = [
+    { div: 2, a: 84, b: 60 },
+    { div: 2, a: 42, b: 30 },
+    { div: 3, a: 21, b: 15 },
+  ];
+  const finalA = 7, finalB = 5;
+  const gcd = 2 * 2 * 3; // = 12
+
+  const W = 260;
+  const fs = 20;
+  const rowH = 44;  // 행 높이
+  const startY = 55; // 첫 행 텍스트 y
+
+  // x 위치
+  const xDiv = 38;   // 공약수
+  const xA   = 108;  // 첫째 수
+  const xB   = 178;  // 둘째 수
+
+  const totalRows = rows.length;
+  const H = startY + totalRows * rowH + rowH + 60; // 마지막 행 + GCD 식
+
+  return { W, H, fs, rowH, startY, xDiv, xA, xB, rows, finalA, finalB, gcd };
+}
+
+function el(tag, attrs) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(content, attrs) {
+  const e = el('text', attrs);
+  e.textContent = String(content);
+  return e;
+}
+
+function render(geo) {
+  const { W, H, fs, rowH, startY, xDiv, xA, xB, rows, finalA, finalB, gcd } = geo;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+
+  const mono = 'monospace';
+  const lineX = xDiv + 22; // ㄴ 세로선 x
+
+  for (let i = 0; i < rows.length; i++) {
+    const { div, a, b } = rows[i];
+    const rowY = startY + i * rowH;
+    const lineBottom = rowY + rowH - 6;
+
+    // ㄴ자: 세로선
+    const lineTop = i === 0 ? rowY - 16 : rowY - rowH + rowH - 6;
+    svg.appendChild(el('line', {
+      x1: lineX, y1: rowY - 16,
+      x2: lineX, y2: lineBottom,
+      stroke: '#333', 'stroke-width': '1.8'
+    }));
+    // ㄴ자: 가로선
+    svg.appendChild(el('line', {
+      x1: lineX, y1: lineBottom,
+      x2: xB + 25, y2: lineBottom,
+      stroke: '#333', 'stroke-width': '1.8'
+    }));
+
+    // 공약수
+    svg.appendChild(txt(div, {
+      x: xDiv, y: rowY,
+      'text-anchor': 'middle', 'font-size': fs, fill: '#333', 'font-family': mono
+    }));
+
+    // 두 수
+    svg.appendChild(txt(a, {
+      x: xA, y: rowY,
+      'text-anchor': 'middle', 'font-size': fs, fill: '#333', 'font-family': mono
+    }));
+    svg.appendChild(txt(b, {
+      x: xB, y: rowY,
+      'text-anchor': 'middle', 'font-size': fs, fill: '#333', 'font-family': mono
+    }));
+  }
+
+  // 마지막 행 (몫)
+  const lastRowY = startY + rows.length * rowH;
+  svg.appendChild(txt(finalA, {
+    x: xA, y: lastRowY,
+    'text-anchor': 'middle', 'font-size': fs, fill: '#333', 'font-family': mono
+  }));
+  svg.appendChild(txt(finalB, {
+    x: xB, y: lastRowY,
+    'text-anchor': 'middle', 'font-size': fs, fill: '#333', 'font-family': mono
+  }));
+
+  // GCD 계산식
+  svg.appendChild(txt('2 × 2 × 3 = 12', {
+    x: W / 2, y: lastRowY + 45,
+    'text-anchor': 'middle', 'font-size': '15', fill: '#555',
+    'font-family': 'sans-serif'
+  }));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

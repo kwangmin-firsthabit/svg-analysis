@@ -1,0 +1,83 @@
+<!--
+  좌표 계산 · 검증
+  viewBox: 0 0 440 120
+  수직선: y=70
+  x_left=40px (값 -3), x_right=400px (값 7)
+  픽셀/단위: (400-40)/(7-(-3)) = 360/10 = 36px
+
+  눈금 위치:
+    x=-3 → 40px
+    x=-2 → 40 + 1*36 = 76px
+    x=-1 → 40 + 2*36 = 112px  ← 닫힌 점(●)
+    x= 0 → 40 + 3*36 = 148px
+    x= 1 → 40 + 4*36 = 184px
+    x= 2 → 40 + 5*36 = 220px
+    x= 3 → 40 + 6*36 = 256px
+    x= 4 → 40 + 7*36 = 292px  ← 열린 점(○)
+    x= 5 → 40 + 8*36 = 328px
+    x= 6 → 40 + 9*36 = 364px
+    x= 7 → 40 + 10*36 = 400px
+
+  굵은 선: 112px ~ 292px
+  검증: -1에서 닫힌 점(포함), 4에서 열린 점(미포함) → -1 ≤ x < 4 정확
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="440" height="120" viewBox="0 0 440 120">
+  <defs>
+    <marker id="arr-r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#111"/>
+    </marker>
+    <marker id="arr-l" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+      <polygon points="8 0, 0 3, 8 6" fill="#111"/>
+    </marker>
+  </defs>
+
+  <!-- 상단 부등식 텍스트 -->
+  <text x="220" y="22" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#111">-1 &#x2264; x &lt; 4</text>
+
+  <!-- 수직선 (양방향 화살표) -->
+  <line x1="28" y1="70" x2="412" y2="70" stroke="#111" stroke-width="1.5"
+        marker-start="url(#arr-l)" marker-end="url(#arr-r)"/>
+
+  <!-- 굵은 선: x=-1(112px) ~ x=4(292px) -->
+  <line x1="112" y1="70" x2="292" y2="70" stroke="#111" stroke-width="5"/>
+
+  <!-- 눈금 세로선 및 레이블 -->
+  <line x1="40" y1="64" x2="40" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="40" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#111">-3</text>
+
+  <line x1="76" y1="64" x2="76" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="76" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#111">-2</text>
+
+  <line x1="112" y1="64" x2="112" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="112" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#111">-1</text>
+
+  <line x1="148" y1="64" x2="148" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="148" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#111">0</text>
+
+  <line x1="184" y1="64" x2="184" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="184" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#111">1</text>
+
+  <line x1="220" y1="64" x2="220" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="220" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#111">2</text>
+
+  <line x1="256" y1="64" x2="256" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="256" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#111">3</text>
+
+  <line x1="292" y1="64" x2="292" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="292" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#111">4</text>
+
+  <line x1="328" y1="64" x2="328" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="328" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#111">5</text>
+
+  <line x1="364" y1="64" x2="364" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="364" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#111">6</text>
+
+  <line x1="400" y1="64" x2="400" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="400" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="12" fill="#111">7</text>
+
+  <!-- 닫힌 점(●): x=-1 → 112px -->
+  <circle cx="112" cy="70" r="6" fill="#111" stroke="#111" stroke-width="2"/>
+
+  <!-- 열린 점(○): x=4 → 292px -->
+  <circle cx="292" cy="70" r="6" fill="white" stroke="#111" stroke-width="2.5"/>
+</svg>

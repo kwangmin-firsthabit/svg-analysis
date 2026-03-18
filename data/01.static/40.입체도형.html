@@ -1,0 +1,77 @@
+<svg width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    원뿔: r=3, h=6, scale=40px/unit → r=120px, h=240px
+    반구: r=3 → 120px
+    밑면 중심(340,260), 꼭짓점(340,20), 반구 바닥(340,380)
+  -->
+
+  <defs>
+    <clipPath id="hemi-clip"><rect x="200" y="260" width="280" height="140" /></clipPath>
+  </defs>
+
+  <!-- 반구 fill -->
+  <ellipse cx="340" cy="260" rx="120" ry="120" fill="#B5D4F4" stroke="none" clip-path="url(#hemi-clip)" />
+
+  <!-- 반구 윤곽 -->
+  <path d="M 220,260 A 120,120 0 0,0 460,260" fill="none" stroke="#185FA5" stroke-width="1.8" stroke-linecap="round" />
+
+  <!-- 원뿔 fill -->
+  <polygon points="340,20 220,260 460,260" fill="#E6F1FB" stroke="none" />
+
+  <!-- 원뿔 모선 -->
+  <line x1="340" y1="20" x2="220" y2="260" stroke="#185FA5" stroke-width="1.8" stroke-linecap="round" />
+  <line x1="340" y1="20" x2="460" y2="260" stroke="#185FA5" stroke-width="1.8" stroke-linecap="round" />
+
+  <!-- 공유 밑면 타원 -->
+  <ellipse cx="340" cy="260" rx="120" ry="20" fill="#85B7EB" stroke="#185FA5" stroke-width="1.5" />
+
+  <circle cx="340" cy="20" r="3.5" fill="#185FA5" />
+
+  <!-- 중심축 dashed -->
+  <line
+    x1="340"
+    y1="20"
+    x2="340"
+    y2="380"
+    stroke="#888780"
+    stroke-width="0.8"
+    stroke-dasharray="5 4"
+    stroke-linecap="round"
+  />
+
+  <!-- 치수선 (오른쪽) -->
+  <line x1="476" y1="20" x2="510" y2="20" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="476" y1="260" x2="510" y2="260" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="500" y1="24" x2="500" y2="256" stroke="#5F5E5A" stroke-width="0.8" stroke-linecap="round" />
+  <line x1="494" y1="24" x2="506" y2="24" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="494" y1="256" x2="506" y2="256" stroke="#5F5E5A" stroke-width="0.8" />
+  <text x="516" y="145" font-family="serif" font-size="14" fill="#5F5E5A">h = 6</text>
+
+  <line x1="476" y1="380" x2="510" y2="380" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="500" y1="264" x2="500" y2="376" stroke="#5F5E5A" stroke-width="0.8" stroke-linecap="round" />
+  <line x1="494" y1="376" x2="506" y2="376" stroke="#5F5E5A" stroke-width="0.8" />
+  <text x="516" y="326" font-family="serif" font-size="14" fill="#5F5E5A">r = 3</text>
+
+  <!-- 반지름 선분 -->
+  <line
+    x1="340"
+    y1="260"
+    x2="460"
+    y2="260"
+    stroke="#185FA5"
+    stroke-width="1"
+    stroke-dasharray="4 3"
+    stroke-linecap="round"
+  />
+  <text x="395" y="252" text-anchor="middle" font-family="serif" font-size="13" fill="#185FA5">r = 3</text>
+
+  <!-- 레이블 (왼쪽) -->
+  <line x1="340" y1="20" x2="170" y2="50" stroke="#888780" stroke-width="0.5" stroke-dasharray="3 3" />
+  <text x="78" y="54" font-family="serif" font-size="13" fill="#5F5E5A">꼭짓점</text>
+  <line x1="280" y1="260" x2="160" y2="300" stroke="#888780" stroke-width="0.5" stroke-dasharray="3 3" />
+  <text x="68" y="304" font-family="serif" font-size="13" fill="#5F5E5A">공유 밑면</text>
+  <line x1="240" y1="330" x2="160" y2="360" stroke="#888780" stroke-width="0.5" stroke-dasharray="3 3" />
+  <text x="68" y="364" font-family="serif" font-size="13" fill="#5F5E5A">반구 (r=3)</text>
+  <line x1="290" y1="140" x2="170" y2="140" stroke="#888780" stroke-width="0.5" stroke-dasharray="3 3" />
+  <text x="68" y="144" font-family="serif" font-size="13" fill="#5F5E5A">원뿔 (h=6)</text>
+</svg>

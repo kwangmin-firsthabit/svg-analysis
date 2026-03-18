@@ -1,0 +1,22 @@
+<!--
+  오목다각형 ABCD, 화살촉 모양 (한 내각 > 180°)
+  A = (200, 60) [위 꼭짓점]
+  B = (340, 280) [오른쪽]
+  C = (200, 180) [안쪽 오목 꼭짓점 — 내각 > 180°]
+  D = (60, 280) [왼쪽]
+  내각 검증 (C에서 오목):
+    벡터 BC = C - B = (-140, -100)
+    벡터 CD = D - C = (-140, 100)
+    외적 BC × CD = (-140)*100 - (-100)*(-140) = -14000 - 14000 = -28000 < 0 → 오목 ✓
+    (다른 꼭짓점에서 외적 부호는 반대 → 오목다각형)
+-->
+<svg width="400" height="360" viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="200,60 340,280 200,180 60,280"
+           fill="none" stroke="#000" stroke-width="2"/>
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="200" y="48" text-anchor="middle" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="354" y="286" text-anchor="start" font-size="16" font-family="serif" font-style="italic">B</text>
+  <text x="214" y="178" text-anchor="start" font-size="16" font-family="serif" font-style="italic">C</text>
+  <text x="46"  y="286" text-anchor="end"   font-size="16" font-family="serif" font-style="italic">D</text>
+</svg>

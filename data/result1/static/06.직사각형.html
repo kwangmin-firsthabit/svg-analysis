@@ -1,0 +1,26 @@
+<!--
+  직사각형 ABCD, 가로 8, 세로 5 (1 unit = 36px)
+  A = (80, 280), B = (368, 280), C = (368, 100), D = (80, 100)
+  |AB| = 288px = 8 ✓, |BC| = 180px = 5 ✓
+-->
+<svg width="460" height="360" viewBox="0 0 460 360" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="80,280 368,280 368,100 80,100" fill="none" stroke="#000" stroke-width="2"/>
+
+  <!-- 직각 표시 -->
+  <polyline points="80,260 100,260 100,280" fill="none" stroke="#000" stroke-width="1.5"/>
+  <polyline points="348,280 348,260 368,260" fill="none" stroke="#000" stroke-width="1.5"/>
+  <polyline points="368,120 348,120 348,100" fill="none" stroke="#000" stroke-width="1.5"/>
+  <polyline points="100,100 100,120 80,120" fill="none" stroke="#000" stroke-width="1.5"/>
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="66" y="298" text-anchor="end" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="382" y="298" text-anchor="start" font-size="16" font-family="serif" font-style="italic">B</text>
+  <text x="382" y="98" text-anchor="start" font-size="16" font-family="serif" font-style="italic">C</text>
+  <text x="66" y="98" text-anchor="end" font-size="16" font-family="serif" font-style="italic">D</text>
+
+  <!-- 변의 길이 레이블 -->
+  <text x="224" y="304" text-anchor="middle" font-size="14" font-family="serif">8</text>
+  <text x="388" y="194" text-anchor="start" font-size="14" font-family="serif">5</text>
+  <text x="224" y="90" text-anchor="middle" font-size="14" font-family="serif">8</text>
+  <text x="60" y="194" text-anchor="end" font-size="14" font-family="serif">5</text>
+</svg>

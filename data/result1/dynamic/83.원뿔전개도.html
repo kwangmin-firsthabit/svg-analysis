@@ -1,0 +1,182 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 20;
+  const r = 4;       // 밑면 반지름
+  const l = 10;      // 모선 길이 = 부채꼴 반지름
+  const rpx = r * unit;  // 80px
+  const lpx = l * unit;  // 200px
+
+  // 부채꼴 중심각: θ = 2π × (r/l) = 2π × 0.4 (라디안)
+  // = 360° × 0.4 = 144°
+  const thetaRad = 2 * Math.PI * (r / l); // 144° in radians
+  const thetaDeg = thetaRad * 180 / Math.PI; // 144°
+
+  // 검증: 호의 길이 = l × θ = 200 × (2π×0.4) = 160π ≈ 502.65 = 2πr = 2π×80 ≈ 502.65 ✓
+
+  const pad = 50;
+
+  // 부채꼴 배치: 중심을 상단 중앙에 두고 아래쪽으로 144° 부채꼴
+  // 부채꼴은 좌우 대칭으로 배치 (각도를 좌우 절반씩)
+  // 시작각: 90° - 144°/2 = 90° - 72° = 18° (오른쪽 위 방향)
+  // 끝각: 90° + 72° = 162°
+  // SVG에서 각도는 3시 방향이 0°, 시계방향
+  // 중심에서 아래쪽으로 펼치므로:
+  // 시작각 = 90° - thetaDeg/2, 끝각 = 90° + thetaDeg/2 (SVG 각도)
+  const halfTheta = thetaDeg / 2; // 72°
+  const startAngleDeg = 90 - halfTheta;  // 18°
+  const endAngleDeg = 90 + halfTheta;    // 162°
+
+  const sectorCX = pad + lpx; // 부채꼴 중심 x
+  const sectorCY = pad;       // 부채꼴 중심 y (상단)
+
+  function degToRad(deg) { return deg * Math.PI / 180; }
+
+  const startRad = degToRad(startAngleDeg);
+  const endRad = degToRad(endAngleDeg);
+
+  const startX = sectorCX + lpx * Math.cos(startRad);
+  const startY = sectorCY + lpx * Math.sin(startRad);
+  const endX = sectorCX + lpx * Math.cos(endRad);
+  const endY = sectorCY + lpx * Math.sin(endRad);
+
+  // 부채꼴 경로: 중심 → 시작점 → 호(대호=0, 144°<180°이므로 largeArcFlag=0) → 끝점 → 중심
+  const largeArc = thetaDeg > 180 ? 1 : 0;
+
+  // 부채꼴 최대 y: 중심에서 아래쪽으로 호가 내려가는 최대 y
+  // 호의 최저점: sectorCY + lpx (중심 아래 정점, 90° 방향)
+  const sectorBottomY = sectorCY + lpx;
+
+  // 원(밑면) 배치: 부채꼴 아래에 배치
+  const circleGap = 40;
+  const circleCX = sectorCX;
+  const circleCY = sectorBottomY + circleGap + rpx;
+
+  const totalW = (pad + lpx) * 2;
+  const totalH = circleCY + rpx + pad;
+
+  return {
+    rpx, lpx, r, l,
+    thetaDeg, thetaRad,
+    sectorCX, sectorCY,
+    startX, startY, endX, endY,
+    largeArc,
+    sectorBottomY,
+    circleCX, circleCY,
+    totalW, totalH
+  };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const {
+    rpx, lpx, r, l,
+    thetaDeg,
+    sectorCX, sectorCY,
+    startX, startY, endX, endY,
+    largeArc,
+    circleCX, circleCY,
+    totalW, totalH
+  } = geo;
+
+  svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
+  svg.setAttribute('width', totalW);
+  svg.setAttribute('height', totalH);
+
+  // 부채꼴 경로
+  const pathD = [
+    `M ${sectorCX} ${sectorCY}`,
+    `L ${startX} ${startY}`,
+    `A ${lpx} ${lpx} 0 ${largeArc} 1 ${endX} ${endY}`,
+    'Z'
+  ].join(' ');
+
+  svg.appendChild(el('path', {
+    d: pathD,
+    fill: 'rgba(255,218,185,0.55)',
+    stroke: '#1a1a2e',
+    'stroke-width': '1.5',
+    'stroke-linejoin': 'round'
+  }));
+
+  // 밑면 원
+  svg.appendChild(el('circle', {
+    cx: circleCX, cy: circleCY, r: rpx,
+    fill: 'rgba(173,216,230,0.5)',
+    stroke: '#1a1a2e',
+    'stroke-width': '1.5'
+  }));
+
+  // 레이블: l=10 (모선, 부채꼴 왼쪽 반지름 중점)
+  const lMidX = (sectorCX + startX) / 2;
+  const lMidY = (sectorCY + startY) / 2;
+  svg.appendChild(el('text', {
+    x: lMidX - 12, y: lMidY,
+    'text-anchor': 'end',
+    'dominant-baseline': 'central',
+    'font-size': '12',
+    'font-family': 'serif',
+    'font-style': 'italic',
+    fill: '#c0392b'
+  }, `l=${l}`));
+
+  // 레이블: r=4 (밑면 원 반지름)
+  svg.appendChild(el('line', {
+    x1: circleCX, y1: circleCY,
+    x2: circleCX + rpx, y2: circleCY,
+    stroke: '#c0392b',
+    'stroke-width': '1.2'
+  }));
+  svg.appendChild(el('text', {
+    x: circleCX + rpx / 2, y: circleCY - 10,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'auto',
+    'font-size': '12',
+    'font-family': 'serif',
+    'font-style': 'italic',
+    fill: '#c0392b'
+  }, `r=${r}`));
+
+  // 레이블: θ=144° (부채꼴 중심각)
+  // 중심 근처에 표시
+  svg.appendChild(el('text', {
+    x: sectorCX + 10, y: sectorCY + 22,
+    'text-anchor': 'start',
+    'dominant-baseline': 'auto',
+    'font-size': '12',
+    'font-family': 'serif',
+    fill: '#2c3e50'
+  }, `\u03b8=${Math.round(thetaDeg)}\u00b0`));
+
+  // 부채꼴 중심각 호 표시 (작은 호)
+  const arcR = 22;
+  function degToRad(deg) { return deg * Math.PI / 180; }
+  const halfTheta = thetaDeg / 2;
+  const aStart = degToRad(90 - halfTheta);
+  const aEnd = degToRad(90 + halfTheta);
+  const ax1 = sectorCX + arcR * Math.cos(aStart);
+  const ay1 = sectorCY + arcR * Math.sin(aStart);
+  const ax2 = sectorCX + arcR * Math.cos(aEnd);
+  const ay2 = sectorCY + arcR * Math.sin(aEnd);
+  svg.appendChild(el('path', {
+    d: `M ${ax1} ${ay1} A ${arcR} ${arcR} 0 0 1 ${ax2} ${ay2}`,
+    fill: 'none',
+    stroke: '#2c3e50',
+    'stroke-width': '1'
+  }));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

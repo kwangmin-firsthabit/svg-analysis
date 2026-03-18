@@ -1,0 +1,165 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 30;
+  const side = 4;
+  const s = side * unit; // 120px
+  const phi = (1 + Math.sqrt(5)) / 2; // 황금비
+
+  // 정십이면체 20개 꼭짓점을 황금비로 계산
+  // 한 변 길이 = s 기준으로 정규화
+  // 표준 정십이면체 꼭짓점 (한 변 = 2/phi 기준)
+  // 스케일 팩터: 한 변 = 2/phi 에서 s로 맞춤
+  const rawEdge = 2 / phi;
+  const scale = s / rawEdge;
+
+  // 정십이면체의 20개 꼭짓점 좌표 (정규 형태)
+  // 3개 그룹:
+  // 1. (±1, ±1, ±1) - 8개
+  // 2. (0, ±1/phi, ±phi) + 순열 - 12개
+  const raw = [];
+  // 그룹 1: (±1, ±1, ±1)
+  for (let sx = -1; sx <= 1; sx += 2)
+    for (let sy = -1; sy <= 1; sy += 2)
+      for (let sz = -1; sz <= 1; sz += 2)
+        raw.push([sx, sy, sz]);
+  // 그룹 2: (0, ±1/phi, ±phi) and cyclic permutations
+  const invphi = 1 / phi;
+  for (let sy = -1; sy <= 1; sy += 2)
+    for (let sz = -1; sz <= 1; sz += 2) {
+      raw.push([0, sy * invphi, sz * phi]);
+      raw.push([sy * invphi, sz * phi, 0]);
+      raw.push([sz * phi, 0, sy * invphi]);
+    }
+  // scale 적용
+  const verts3d = raw.map(([x, y, z]) => [x * scale, y * scale, z * scale]);
+
+  // Isometric 투영
+  function iso(x, y, z) {
+    const ix = (x - z) * Math.cos(Math.PI / 6);
+    const iy = -y + (x + z) * Math.sin(Math.PI / 6);
+    return [ix, iy];
+  }
+
+  const projected = verts3d.map(([x, y, z]) => iso(x, y, z));
+
+  // 엣지 계산: 한 변 길이 s에 가까운 점쌍을 연결
+  const edges = [];
+  const tol = s * 0.05;
+  for (let i = 0; i < verts3d.length; i++) {
+    for (let j = i + 1; j < verts3d.length; j++) {
+      const dx = verts3d[i][0] - verts3d[j][0];
+      const dy = verts3d[i][1] - verts3d[j][1];
+      const dz = verts3d[i][2] - verts3d[j][2];
+      const d = Math.sqrt(dx*dx + dy*dy + dz*dz);
+      if (Math.abs(d - s) < tol) edges.push([i, j]);
+    }
+  }
+
+  // 중심 이동 및 패딩
+  const xs = projected.map(p => p[0]);
+  const ys = projected.map(p => p[1]);
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+  const maxX = Math.max(...xs);
+  const maxY2 = Math.max(...ys);
+
+  const pad = 50;
+  const ox = -minX + pad;
+  const oy = -minY + pad;
+  const pts = projected.map(([px, py]) => [px + ox, py + oy]);
+
+  const width = (maxX - minX) + pad * 2;
+  const height = (maxY2 - minY) + pad * 2;
+
+  // 각 꼭짓점의 3D y 좌표로 앞/뒤 판단
+  const yVals = verts3d.map(v => v[1]);
+  const midY = (Math.max(...yVals) + Math.min(...yVals)) / 2;
+
+  return { pts, verts3d, edges, width, height, side, midY };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { pts, verts3d, edges, width, height, side, midY } = geo;
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('width', width);
+  svg.setAttribute('height', height);
+
+  // 각 엣지를 y 평균값으로 앞/뒤 판단
+  for (const [i, j] of edges) {
+    const avgY = (verts3d[i][1] + verts3d[j][1]) / 2;
+    const isHidden = avgY < midY;
+    const p = pts[i], q = pts[j];
+    if (isHidden) {
+      svg.appendChild(el('line', {
+        x1: p[0], y1: p[1], x2: q[0], y2: q[1],
+        stroke: '#aaa', 'stroke-width': '1',
+        'stroke-dasharray': '4,3'
+      }));
+    }
+  }
+
+  for (const [i, j] of edges) {
+    const avgY = (verts3d[i][1] + verts3d[j][1]) / 2;
+    const isHidden = avgY < midY;
+    const p = pts[i], q = pts[j];
+    if (!isHidden) {
+      svg.appendChild(el('line', {
+        x1: p[0], y1: p[1], x2: q[0], y2: q[1],
+        stroke: '#1a1a2e', 'stroke-width': '1.8',
+        'stroke-linecap': 'round'
+      }));
+    }
+  }
+
+  // 꼭짓점 점
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
+    svg.appendChild(el('circle', {
+      cx: p[0], cy: p[1], r: '2.5',
+      fill: '#1a1a2e'
+    }));
+  }
+
+  // 한 변 길이 표시: 상단 오른쪽 엣지 하나
+  // 가장 위에 있는 엣지를 찾아 표시
+  let topEdge = null;
+  let topY = Infinity;
+  for (const [i, j] of edges) {
+    const my = (pts[i][1] + pts[j][1]) / 2;
+    if (my < topY) {
+      topY = my;
+      topEdge = [i, j];
+    }
+  }
+  if (topEdge) {
+    const [i, j] = topEdge;
+    const p = pts[i], q = pts[j];
+    const mx = (p[0] + q[0]) / 2;
+    const my = (p[1] + q[1]) / 2;
+    svg.appendChild(el('text', {
+      x: mx + 12, y: my - 8,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '13',
+      'font-family': 'serif',
+      fill: '#c0392b'
+    }, `${side}`));
+  }
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

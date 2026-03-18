@@ -1,0 +1,23 @@
+<!--
+  볼록다각형 ABCDE, 모든 내각 < 180°인 임의의 오각형
+  A = (200, 60), B = (340, 130), C = (310, 280), D = (130, 300), E = (70, 170)
+  내각 검증 (각도 순서: A,B,C,D,E):
+  - 모든 외적의 z성분이 같은 부호 → 볼록 ✓ (좌회전)
+    벡터 EA=(130,-110), AB=(140,70): 외적 130*70-(-110)*140 = 9100+15400 = 24500 > 0
+    벡터 AB=(140,70), BC=(-30,150): 외적 140*150-70*(-30) = 21000+2100 = 23100 > 0
+    벡터 BC=(-30,150), CD=(-180,20): 외적 -30*20-150*(-180) = -600+27000 = 26400 > 0
+    벡터 CD=(-180,20), DE=(-60,-130): 외적 -180*(-130)-20*(-60) = 23400+1200 = 24600 > 0
+    벡터 DE=(-60,-130), EA=(130,-110): 외적 -60*(-110)-(-130)*130 = 6600+16900 = 23500 > 0
+  모두 양수 → 볼록 ✓
+-->
+<svg width="420" height="380" viewBox="0 0 420 380" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="200,60 340,130 310,280 130,300 70,170"
+           fill="none" stroke="#000" stroke-width="2"/>
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="200" y="48" text-anchor="middle" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="354" y="134" text-anchor="start" font-size="16" font-family="serif" font-style="italic">B</text>
+  <text x="324" y="290" text-anchor="start" font-size="16" font-family="serif" font-style="italic">C</text>
+  <text x="122" y="316" text-anchor="end"   font-size="16" font-family="serif" font-style="italic">D</text>
+  <text x="56"  y="174" text-anchor="end"   font-size="16" font-family="serif" font-style="italic">E</text>
+</svg>

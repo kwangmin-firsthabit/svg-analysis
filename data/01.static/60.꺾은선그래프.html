@@ -1,0 +1,98 @@
+<svg width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="340" y="30" text-anchor="middle" font-family="serif" font-size="16" font-weight="bold" fill="#222">도시별 연평균 기온 변화 (2019~2023)</text>
+
+  <!-- Chart area: x 80~600, y 60~340
+       y-axis: 10~18°C (range 8), height 280px, scale=280/8=35px/°C
+       yPos(v) = 340 - (v-10)*35
+       x-axis: 5 years, spacing = 520/4 = 130px
+       xPos: 2019=80, 2020=210, 2021=340, 2022=470, 2023=600 -->
+
+  <!-- Horizontal grid lines at 10,11,...,18 -->
+  <line x1="80" y1="340" x2="600" y2="340" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="80" y1="305" x2="600" y2="305" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="80" y1="270" x2="600" y2="270" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="80" y1="235" x2="600" y2="235" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="80" y1="200" x2="600" y2="200" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="80" y1="165" x2="600" y2="165" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="80" y1="130" x2="600" y2="130" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="80" y1="95" x2="600" y2="95" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="80" y1="60" x2="600" y2="60" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+
+  <!-- Vertical grid lines -->
+  <line x1="80" y1="60" x2="80" y2="340" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="210" y1="60" x2="210" y2="340" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="340" y1="60" x2="340" y2="340" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="470" y1="60" x2="470" y2="340" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="600" y1="60" x2="600" y2="340" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+
+  <!-- Y-axis labels -->
+  <text x="72" y="344" text-anchor="end" font-family="serif" font-size="12" fill="#888780">10</text>
+  <text x="72" y="309" text-anchor="end" font-family="serif" font-size="12" fill="#888780">11</text>
+  <text x="72" y="274" text-anchor="end" font-family="serif" font-size="12" fill="#888780">12</text>
+  <text x="72" y="239" text-anchor="end" font-family="serif" font-size="12" fill="#888780">13</text>
+  <text x="72" y="204" text-anchor="end" font-family="serif" font-size="12" fill="#888780">14</text>
+  <text x="72" y="169" text-anchor="end" font-family="serif" font-size="12" fill="#888780">15</text>
+  <text x="72" y="134" text-anchor="end" font-family="serif" font-size="12" fill="#888780">16</text>
+  <text x="72" y="99" text-anchor="end" font-family="serif" font-size="12" fill="#888780">17</text>
+  <text x="72" y="64" text-anchor="end" font-family="serif" font-size="12" fill="#888780">18</text>
+  <text x="36" y="200" text-anchor="middle" font-family="serif" font-size="12" fill="#888780" transform="rotate(-90,36,200)">(°C)</text>
+
+  <!-- X-axis labels -->
+  <text x="80" y="358" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">2019</text>
+  <text x="210" y="358" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">2020</text>
+  <text x="340" y="358" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">2021</text>
+  <text x="470" y="358" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">2022</text>
+  <text x="600" y="358" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">2023</text>
+
+  <!-- 서울 line: 12.5,13.1,12.8,13.4,13.2
+       yPos: 340-(12.5-10)*35=252.5, 340-(13.1-10)*35=231.5, 340-(12.8-10)*35=242, 340-(13.4-10)*35=221, 340-(13.2-10)*35=228 -->
+  <polyline points="80,252.5 210,231.5 340,242 470,221 600,228"
+    fill="none" stroke="#185FA5" stroke-width="2"/>
+  <circle cx="80" cy="252.5" r="4" fill="#185FA5"/>
+  <circle cx="210" cy="231.5" r="4" fill="#185FA5"/>
+  <circle cx="340" cy="242" r="4" fill="#185FA5"/>
+  <circle cx="470" cy="221" r="4" fill="#185FA5"/>
+  <circle cx="600" cy="228" r="4" fill="#185FA5"/>
+
+  <!-- 부산 line: 15.2,15.8,15.5,16.0,15.9
+       yPos: 340-(15.2-10)*35=158, 340-(15.8-10)*35=137, 340-(15.5-10)*35=147.5, 340-(16.0-10)*35=130, 340-(15.9-10)*35=133.5 -->
+  <polyline points="80,158 210,137 340,147.5 470,130 600,133.5"
+    fill="none" stroke="#A32D2D" stroke-width="2"/>
+  <circle cx="80" cy="158" r="4" fill="#A32D2D"/>
+  <circle cx="210" cy="137" r="4" fill="#A32D2D"/>
+  <circle cx="340" cy="147.5" r="4" fill="#A32D2D"/>
+  <circle cx="470" cy="130" r="4" fill="#A32D2D"/>
+  <circle cx="600" cy="133.5" r="4" fill="#A32D2D"/>
+
+  <!-- 대구 line: 14.8,15.3,15.0,15.7,15.5
+       yPos: 340-(14.8-10)*35=172, 340-(15.3-10)*35=154.5, 340-(15.0-10)*35=165, 340-(15.7-10)*35=140.5, 340-(15.5-10)*35=147.5 -->
+  <polyline points="80,172 210,154.5 340,165 470,140.5 600,147.5"
+    fill="none" stroke="#0F6E56" stroke-width="2"/>
+  <circle cx="80" cy="172" r="4" fill="#0F6E56"/>
+  <circle cx="210" cy="154.5" r="4" fill="#0F6E56"/>
+  <circle cx="340" cy="165" r="4" fill="#0F6E56"/>
+  <circle cx="470" cy="140.5" r="4" fill="#0F6E56"/>
+  <circle cx="600" cy="147.5" r="4" fill="#0F6E56"/>
+
+  <!-- Y-axis -->
+  <line x1="80" y1="340" x2="80" y2="52" stroke="#444441" stroke-width="1.5"/>
+  <polyline points="74,60 80,48 86,60" fill="none" stroke="#444441" stroke-width="1.5"/>
+
+  <!-- X-axis -->
+  <line x1="80" y1="340" x2="608" y2="340" stroke="#444441" stroke-width="1.5"/>
+  <polyline points="600,334 612,340 600,346" fill="none" stroke="#444441" stroke-width="1.5"/>
+
+  <!-- Legend -->
+  <line x1="200" y1="388" x2="220" y2="388" stroke="#185FA5" stroke-width="2"/>
+  <circle cx="210" cy="388" r="4" fill="#185FA5"/>
+  <text x="225" y="392" font-family="serif" font-size="12" fill="#444">서울</text>
+
+  <line x1="280" y1="388" x2="300" y2="388" stroke="#A32D2D" stroke-width="2"/>
+  <circle cx="290" cy="388" r="4" fill="#A32D2D"/>
+  <text x="305" y="392" font-family="serif" font-size="12" fill="#444">부산</text>
+
+  <line x1="360" y1="388" x2="380" y2="388" stroke="#0F6E56" stroke-width="2"/>
+  <circle cx="370" cy="388" r="4" fill="#0F6E56"/>
+  <text x="385" y="392" font-family="serif" font-size="12" fill="#444">대구</text>
+</svg>

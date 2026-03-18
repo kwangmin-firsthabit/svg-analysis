@@ -1,0 +1,89 @@
+<svg width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    y = x(x−2)(x+2) = x³−4x
+    scale_x=90px/unit, scale_y=35px/unit, 원점 O(340,280)
+    x절편: (−2,0)→(160,280) (0,0)→(340,280) (2,0)→(520,280)
+    극대(−1.155,3.079)→(236,172)  극소(1.155,−3.079)→(444,388)
+  -->
+
+  <!-- 격자 -->
+  <line x1="160" y1="50" x2="160" y2="500" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="250" y1="50" x2="250" y2="500" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="430" y1="50" x2="430" y2="500" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="520" y1="50" x2="520" y2="500" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="80" y1="175" x2="600" y2="175" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="80" y1="385" x2="600" y2="385" stroke="#D3D1C7" stroke-width="0.5" />
+
+  <!-- 축 -->
+  <line x1="70" y1="280" x2="620" y2="280" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="614,275 621,280 614,285"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <line x1="340" y1="510" x2="340" y2="40" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="335,46 340,39 345,46"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <text x="630" y="285" font-family="serif" font-style="italic" font-size="16" fill="#888780">x</text>
+  <text x="332" y="32" font-family="serif" font-style="italic" font-size="16" fill="#888780">y</text>
+  <text x="322" y="298" font-family="serif" font-size="14" fill="#888780">O</text>
+
+  <!-- 눈금 -->
+  <line x1="160" y1="275" x2="160" y2="285" stroke="#888780" stroke-width="0.8" />
+  <text x="160" y="300" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−2</text>
+  <line x1="250" y1="275" x2="250" y2="285" stroke="#888780" stroke-width="0.8" />
+  <text x="250" y="300" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−1</text>
+  <line x1="430" y1="275" x2="430" y2="285" stroke="#888780" stroke-width="0.8" />
+  <text x="430" y="300" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">1</text>
+  <line x1="520" y1="275" x2="520" y2="285" stroke="#888780" stroke-width="0.8" />
+  <text x="520" y="300" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">2</text>
+  <line x1="335" y1="175" x2="345" y2="175" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="180" text-anchor="end" font-family="serif" font-size="13" fill="#888780">3</text>
+  <line x1="335" y1="385" x2="345" y2="385" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="390" text-anchor="end" font-family="serif" font-size="13" fill="#888780">−3</text>
+
+  <!-- 곡선 -->
+  <path
+    d="M 106,60
+    C 150,60  160,220  160,280
+    C 160,340 220,420  340,280
+    C 460,140 520,220  520,280
+    C 520,340 540,460  574,500"
+    fill="none"
+    stroke="#185FA5"
+    stroke-width="2.2"
+    stroke-linecap="round"
+  />
+
+  <!-- x절편 -->
+  <circle cx="160" cy="280" r="4" fill="#185FA5" />
+  <text x="152" y="268" text-anchor="middle" font-family="serif" font-size="13" fill="#185FA5">(−2, 0)</text>
+  <circle cx="340" cy="280" r="4.5" fill="#185FA5" />
+  <text x="352" y="268" font-family="serif" font-size="13" fill="#185FA5">(0, 0)</text>
+  <circle cx="520" cy="280" r="4" fill="#185FA5" />
+  <text x="528" y="268" font-family="serif" font-size="13" fill="#185FA5">(2, 0)</text>
+
+  <!-- 극값 -->
+  <circle cx="236" cy="172" r="3.5" fill="#0F6E56" />
+  <line x1="190" y1="172" x2="230" y2="172" stroke="#B4B2A9" stroke-width="0.8" stroke-dasharray="3 3" />
+  <text x="188" y="168" text-anchor="end" font-family="serif" font-size="12" fill="#0F6E56">극대</text>
+  <circle cx="444" cy="388" r="3.5" fill="#993C1D" />
+  <line x1="450" y1="388" x2="490" y2="388" stroke="#B4B2A9" stroke-width="0.8" stroke-dasharray="3 3" />
+  <text x="494" y="392" font-family="serif" font-size="12" fill="#993C1D">극소</text>
+
+  <!-- 함수식 -->
+  <text x="560" y="100" text-anchor="middle" font-family="serif" font-style="italic" font-size="15" fill="#185FA5">
+    y = x(x−2)(x+2)
+  </text>
+</svg>
+```

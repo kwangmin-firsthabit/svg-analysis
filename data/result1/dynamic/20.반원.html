@@ -1,0 +1,47 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 반원, 지름 AB = 10 (1 unit = 30px → r = 150px, 지름 = 300px)
+  // A = (80,250), B = (380,250), 반원 위쪽
+  const r = 150;
+  const A = { x:  80, y: 250 };
+  const B = { x: 380, y: 250 };
+  const cx = (A.x + B.x) / 2;
+  const cy = A.y;
+  return { A, B, cx, cy, r, maxY: cy + 40 };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { A, B, cx, cy, r, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 460 ${maxY}`);
+  svg.setAttribute('width', '460');
+  svg.setAttribute('height', maxY);
+
+  svg.appendChild(el('path', {
+    d: `M ${A.x},${A.y} A ${r},${r} 0 0 1 ${B.x},${B.y}`,
+    fill: 'none', stroke: '#000', 'stroke-width': 2
+  }));
+  svg.appendChild(el('line', { x1: A.x, y1: A.y, x2: B.x, y2: B.y, stroke: '#000', 'stroke-width': 2 }));
+  svg.appendChild(el('circle', { cx: A.x, cy: A.y, r: 3, fill: '#000' }));
+  svg.appendChild(el('circle', { cx: B.x, cy: B.y, r: 3, fill: '#000' }));
+
+  svg.appendChild(el('text', { x: A.x - 14, y: A.y + 18, 'text-anchor': 'end',   'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'A'));
+  svg.appendChild(el('text', { x: B.x + 14, y: B.y + 18, 'text-anchor': 'start', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'B'));
+  svg.appendChild(el('text', { x: cx, y: cy + 22, 'text-anchor': 'middle', 'font-size': 14, 'font-family': 'serif' }, '10'));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

@@ -1,0 +1,99 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const W = 420;
+  // 줄기별 데이터: 왼쪽(남학생, 역순), 오른쪽(여학생)
+  const rows = [
+    { stem: '14', left: [],              right: ['8'] },
+    { stem: '15', left: ['8', '2'],      right: ['1', '3', '5', '7', '9'] },
+    { stem: '16', left: ['8', '7', '5', '3', '1'], right: ['2', '4', '5', '8'] },
+    { stem: '17', left: ['5', '2', '0'], right: [] },
+  ];
+  const headerH = 48;
+  const rowH = 38;
+  const divX = 210;
+  const topMargin = 20;
+  const bottomMargin = 20;
+  const maxY = topMargin + headerH + rows.length * rowH + bottomMargin;
+  return { W, rows, headerH, rowH, divX, topMargin, maxY };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { W, rows, headerH, rowH, divX, topMargin, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 ${W} ${maxY}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', maxY);
+
+  // 중앙 구분선
+  svg.appendChild(el('line', {
+    x1: divX, y1: topMargin, x2: divX, y2: maxY - 20,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+
+  // 헤더
+  svg.appendChild(el('text', {
+    x: 100, y: topMargin + 18,
+    'text-anchor': 'middle',
+    'font-family': 'sans-serif', 'font-size': '13', 'font-weight': 'bold', fill: '#1a6bb5'
+  }, '남학생'));
+  svg.appendChild(el('text', {
+    x: divX, y: topMargin + 18,
+    'text-anchor': 'middle',
+    'font-family': 'sans-serif', 'font-size': '13', 'font-weight': 'bold', fill: '#444'
+  }, '줄기'));
+  svg.appendChild(el('text', {
+    x: W - 100, y: topMargin + 18,
+    'text-anchor': 'middle',
+    'font-family': 'sans-serif', 'font-size': '13', 'font-weight': 'bold', fill: '#c0392b'
+  }, '여학생'));
+  svg.appendChild(el('line', {
+    x1: 30, y1: topMargin + 22, x2: W - 30, y2: topMargin + 22,
+    stroke: '#555', 'stroke-width': '1'
+  }));
+
+  // 데이터 행
+  rows.forEach((row, i) => {
+    const y = topMargin + headerH + i * rowH + rowH / 2 + 6;
+
+    // 줄기
+    svg.appendChild(el('text', {
+      x: divX, y,
+      'text-anchor': 'middle',
+      'font-family': 'monospace', 'font-size': '14', fill: '#222'
+    }, row.stem));
+
+    // 왼쪽 잎 (역순, right-align)
+    if (row.left.length > 0) {
+      svg.appendChild(el('text', {
+        x: divX - 16, y,
+        'text-anchor': 'end',
+        'font-family': 'monospace', 'font-size': '14', fill: '#1a6bb5'
+      }, row.left.join('  ')));
+    }
+
+    // 오른쪽 잎 (left-align)
+    if (row.right.length > 0) {
+      svg.appendChild(el('text', {
+        x: divX + 16, y,
+        'text-anchor': 'start',
+        'font-family': 'monospace', 'font-size': '14', fill: '#c0392b'
+      }, row.right.join('  ')));
+    }
+  });
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

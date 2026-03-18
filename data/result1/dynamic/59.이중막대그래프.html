@@ -1,0 +1,113 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const W = 420;
+  const series = [
+    { label: '2022년', color: '#4a90d9', values: [120, 145, 132, 178] },
+    { label: '2023년', color: '#e74c3c', values: [135, 162, 148, 195] },
+  ];
+  const qLabels = ['Q1', 'Q2', 'Q3', 'Q4'];
+  const maxVal = 200;
+  const marginLeft = 60;
+  const marginRight = 20;
+  const marginTop = 50;
+  const marginBottom = 50;
+  const chartW = W - marginLeft - marginRight;
+  const chartH = 200;
+  const n = 4; // 분기
+  const groupPitch = chartW / n;
+  const barW = 30;
+  const barGap = 4;
+  const yScale = chartH / maxVal;
+  const originX = marginLeft;
+  const originY = marginTop + chartH;
+  const maxY = originY + marginBottom;
+  return { W, series, qLabels, maxVal, chartW, chartH, n, groupPitch, barW, barGap, yScale, originX, originY, maxY };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { W, series, qLabels, chartW, chartH, n, groupPitch, barW, barGap, yScale, originX, originY, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 ${W} ${maxY}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', maxY);
+
+  // 보조선
+  [50, 100, 150, 200].forEach(v => {
+    const y = originY - v * yScale;
+    svg.appendChild(el('line', {
+      x1: originX, y1: y, x2: originX + chartW, y2: y,
+      stroke: '#ddd', 'stroke-width': '0.5', 'stroke-dasharray': '3,3'
+    }));
+  });
+
+  // 막대 그리기
+  const totalBarW = series.length * barW + (series.length - 1) * barGap;
+  for (let q = 0; q < n; q++) {
+    const groupCenterX = originX + q * groupPitch + groupPitch / 2;
+    const groupStartX = groupCenterX - totalBarW / 2;
+    series.forEach((s, si) => {
+      const bx = groupStartX + si * (barW + barGap);
+      const bh = s.values[q] * yScale;
+      const by = originY - bh;
+      svg.appendChild(el('rect', { x: bx, y: by, width: barW, height: bh, fill: s.color }));
+    });
+  }
+
+  // x축
+  svg.appendChild(el('line', {
+    x1: originX - 5, y1: originY, x2: originX + chartW + 5, y2: originY,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+  // y축
+  svg.appendChild(el('line', {
+    x1: originX, y1: originY - chartH - 10, x2: originX, y2: originY + 5,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+
+  // x축 레이블
+  qLabels.forEach((lbl, q) => {
+    const tx = originX + q * groupPitch + groupPitch / 2;
+    svg.appendChild(el('text', { x: tx, y: originY + 16, 'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '12', fill: '#333' }, lbl));
+  });
+
+  // y축 눈금 및 레이블
+  [0, 50, 100, 150, 200].forEach(v => {
+    const ty = originY - v * yScale;
+    svg.appendChild(el('line', { x1: originX - 6, y1: ty, x2: originX, y2: ty, stroke: '#333', 'stroke-width': '1' }));
+    svg.appendChild(el('text', { x: originX - 10, y: ty + 4, 'text-anchor': 'end', 'font-family': 'sans-serif', 'font-size': '10', fill: '#333' }, v));
+  });
+
+  // 범례
+  series.forEach((s, si) => {
+    const lx = 90 + si * 90;
+    svg.appendChild(el('rect', { x: lx, y: 22, width: 12, height: 12, fill: s.color }));
+    svg.appendChild(el('text', { x: lx + 16, y: 33, 'font-family': 'sans-serif', 'font-size': '11', fill: '#333' }, s.label));
+  });
+
+  // 축 레이블
+  svg.appendChild(el('text', {
+    x: originX + chartW / 2, y: originY + 38,
+    'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '12', fill: '#333'
+  }, '분기'));
+  svg.appendChild(el('text', {
+    x: 18, y: originY - chartH / 2,
+    'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '11', fill: '#333',
+    transform: `rotate(-90,18,${originY - chartH / 2})`
+  }, '매출액 (억)'));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

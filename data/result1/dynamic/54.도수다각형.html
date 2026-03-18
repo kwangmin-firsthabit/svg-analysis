@@ -1,0 +1,116 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const W = 400;
+  // 중앙값과 도수 (양 끝 연장점 포함)
+  const points = [
+    { mid: -5, freq: 0 },
+    { mid: 5,  freq: 5 },
+    { mid: 15, freq: 12 },
+    { mid: 25, freq: 14 },
+    { mid: 35, freq: 7 },
+    { mid: 45, freq: 2 },
+    { mid: 55, freq: 0 },
+  ];
+  const marginLeft = 65;
+  const marginRight = 20;
+  const marginTop = 30;
+  const marginBottom = 50;
+  const chartW = 280;
+  const chartH = 200;
+  const maxFreq = 15;
+  // x: 0~60분 범위 → xScale = chartW/60
+  const xScale = chartW / 60;
+  const yScale = chartH / maxFreq;
+  const originX = marginLeft;
+  const originY = marginTop + chartH;
+  const maxY = originY + marginBottom;
+  return { W, points, chartW, chartH, maxFreq, xScale, yScale, originX, originY, maxY };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { W, points, chartW, chartH, maxFreq, xScale, yScale, originX, originY, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 ${W} ${maxY}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', maxY);
+
+  // 좌표 변환
+  const px = mid => originX + (mid + 5) * xScale; // -5→0 오프셋
+  const py = freq => originY - freq * yScale;
+
+  // 보조 수평선
+  [5, 10, 15].forEach(v => {
+    svg.appendChild(el('line', {
+      x1: originX, y1: py(v), x2: originX + chartW + 10, y2: py(v),
+      stroke: '#ccc', 'stroke-width': '0.5', 'stroke-dasharray': '3,3'
+    }));
+  });
+
+  // 꺾은선
+  const ptStr = points.map(p => `${px(p.mid)},${py(p.freq)}`).join(' ');
+  svg.appendChild(el('polyline', {
+    points: ptStr,
+    fill: 'none', stroke: '#e74c3c', 'stroke-width': '2'
+  }));
+
+  // 꼭짓점 (양 끝 제외)
+  points.slice(1, -1).forEach(p => {
+    svg.appendChild(el('circle', {
+      cx: px(p.mid), cy: py(p.freq), r: '4',
+      fill: '#e74c3c'
+    }));
+  });
+
+  // x축
+  svg.appendChild(el('line', {
+    x1: originX - 15, y1: originY, x2: originX + chartW + 15, y2: originY,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+  // y축
+  svg.appendChild(el('line', {
+    x1: originX, y1: originY - chartH - 10, x2: originX, y2: originY + 5,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+
+  // x축 눈금 및 레이블 (0~50, 간격10)
+  for (let v = 0; v <= 50; v += 10) {
+    const tx = originX + (v + 5) * xScale;
+    svg.appendChild(el('line', { x1: tx, y1: originY, x2: tx, y2: originY + 6, stroke: '#333', 'stroke-width': '1' }));
+    svg.appendChild(el('text', { x: tx, y: originY + 18, 'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '11', fill: '#333' }, v));
+  }
+
+  // y축 눈금 및 레이블
+  [0, 5, 10, 15].forEach(v => {
+    const ty = py(v);
+    svg.appendChild(el('line', { x1: originX - 6, y1: ty, x2: originX, y2: ty, stroke: '#333', 'stroke-width': '1' }));
+    svg.appendChild(el('text', { x: originX - 10, y: ty + 4, 'text-anchor': 'end', 'font-family': 'sans-serif', 'font-size': '11', fill: '#333' }, v));
+  });
+
+  // 축 레이블
+  svg.appendChild(el('text', {
+    x: originX + chartW / 2, y: originY + 38,
+    'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '12', fill: '#333'
+  }, '통학 시간 (분)'));
+
+  svg.appendChild(el('text', {
+    x: 20, y: originY - chartH / 2,
+    'text-anchor': 'middle', 'font-family': 'sans-serif', 'font-size': '12', fill: '#333',
+    transform: `rotate(-90,20,${originY - chartH / 2})`
+  }, '도수 (명)'));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

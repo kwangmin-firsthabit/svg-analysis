@@ -1,0 +1,82 @@
+<!--
+  좌표 계산 검증
+  원뿔: 밑면 반지름 r=3, 높이 h=6
+  반구: 반지름 r=3 (원뿔 밑면을 공유, 아래로 붙음)
+
+  2D 단면도 방식 (중심 단면):
+  1단위 = 40px
+
+  전체 높이: 원뿔 h=6 + 반구 r=3 = 총 9단위 = 360px
+  전체 너비: 2r = 6단위 = 240px
+
+  화면 좌표:
+  ox=200 (중앙), 원뿔 꼭짓점 oy_top=60
+  밑면 y: 60+6*40=300
+  반구 바닥 y: 300+3*40=420
+
+  원뿔 (단면: 삼각형):
+    꼭짓점: (200, 60)
+    밑면 왼쪽: (200-120, 300)=(80, 300)
+    밑면 오른쪽: (200+120, 300)=(320, 300)
+
+  공유 밑면 타원 (3D 느낌):
+    중심: (200, 300), rx=120, ry=20 (타원)
+
+  반구 (단면: 반원):
+    중심: (200, 300), r=120
+    아래 반원: M 80,300 A 120,120 0 0,0 320,300
+
+  viewBox: "40 30 340 420"
+-->
+<svg width="380" height="450" viewBox="40 30 340 420" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- 반구 (아래 반원 단면) -->
+  <path d="M 80,300 A 120,120 0 0,1 320,300"
+    fill="#e0f2fe" stroke="#0369a1" stroke-width="2"/>
+
+  <!-- 반구 내부 채우기 (반원형) -->
+  <path d="M 80,300 A 120,120 0 0,1 320,300 Z"
+    fill="#bae6fd" fill-opacity="0.4"/>
+
+  <!-- 원뿔 단면 (삼각형) -->
+  <polygon points="200,60 80,300 320,300"
+    fill="#fef9c3" fill-opacity="0.6" stroke="#ca8a04" stroke-width="2"/>
+
+  <!-- 밑면 타원 (공유 밑면, 3D 느낌) -->
+  <ellipse cx="200" cy="300" rx="120" ry="18"
+    fill="#fde68a" fill-opacity="0.5" stroke="#ca8a04" stroke-width="1.5"/>
+
+  <!-- 중심축 (점선) -->
+  <line x1="200" y1="50" x2="200" y2="430"
+    stroke="#9ca3af" stroke-width="1" stroke-dasharray="5,4"/>
+
+  <!-- 꼭짓점 점 -->
+  <circle cx="200" cy="60" r="3" fill="#1e293b"/>
+
+  <!-- 치수선 및 라벨 -->
+  <!-- 원뿔 높이 h=6 -->
+  <line x1="340" y1="60" x2="340" y2="300" stroke="#374151" stroke-width="1" marker-start="url(#arr)" marker-end="url(#arr)"/>
+  <line x1="200" y1="60" x2="348" y2="60" stroke="#9ca3af" stroke-width="0.8" stroke-dasharray="3,3"/>
+  <line x1="200" y1="300" x2="348" y2="300" stroke="#9ca3af" stroke-width="0.8" stroke-dasharray="3,3"/>
+  <text x="356" y="183" text-anchor="start" font-size="13" font-family="serif" fill="#374151">h=6</text>
+
+  <!-- 반구 높이 r=3 -->
+  <line x1="340" y1="300" x2="340" y2="420" stroke="#374151" stroke-width="1"/>
+  <line x1="200" y1="420" x2="348" y2="420" stroke="#9ca3af" stroke-width="0.8" stroke-dasharray="3,3"/>
+  <text x="356" y="364" text-anchor="start" font-size="13" font-family="serif" fill="#374151">r=3</text>
+
+  <!-- 반지름선 (밑면) -->
+  <line x1="200" y1="300" x2="320" y2="300" stroke="#374151" stroke-width="1" stroke-dasharray="4,3"/>
+  <text x="260" y="316" text-anchor="middle" font-size="13" font-family="serif" fill="#374151">r=3</text>
+
+  <!-- 화살표 마커 정의 -->
+  <defs>
+    <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
+      <path d="M 0,1 L 3,3 L 0,5" fill="none" stroke="#374151" stroke-width="1"/>
+    </marker>
+  </defs>
+
+  <!-- 레이블 -->
+  <text x="200" y="48" text-anchor="middle" font-size="12" font-family="serif" fill="#1e293b">꼭짓점</text>
+
+</svg>

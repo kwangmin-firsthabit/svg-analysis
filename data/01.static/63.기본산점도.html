@@ -1,0 +1,111 @@
+<svg width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+  <!-- Grid lines -->
+  <!-- Vertical grid lines at x = 1..8 -->
+  <!-- Plot area: left=80, right=600, bottom=360, top=60 -->
+  <!-- x: 0..9 mapped to 80..600, y: 30..100 mapped to 360..60 -->
+
+  <!-- Vertical grid -->
+  <line x1="143" y1="60" x2="143" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="206" y1="60" x2="206" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="269" y1="60" x2="269" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="332" y1="60" x2="332" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="395" y1="60" x2="395" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="458" y1="60" x2="458" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="521" y1="60" x2="521" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="584" y1="60" x2="584" y2="360" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <!-- Horizontal grid at y = 40,50,60,70,80,90,100 -->
+  <!-- y=40: py=360-10*(40-30)/70*300 = 360-(10/70)*300=360-42.86=317.14 -->
+  <!-- scale: px = 80 + x/9*520, py = 360 - (y-30)/70*300 -->
+  <!-- y=40 → py=360-42.86=317.1 -->
+  <!-- y=50 → py=360-85.71=274.3 -->
+  <!-- y=60 → py=360-128.57=231.4 -->
+  <!-- y=70 → py=360-171.43=188.6 -->
+  <!-- y=80 → py=360-214.29=145.7 -->
+  <!-- y=90 → py=360-257.14=102.9 -->
+  <!-- y=100 → py=360-300=60 -->
+  <line x1="80" y1="317" x2="600" y2="317" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="274" x2="600" y2="274" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="231" x2="600" y2="231" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="189" x2="600" y2="189" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="146" x2="600" y2="146" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="103" x2="600" y2="103" stroke="#D3D1C7" stroke-width="0.5"/>
+  <line x1="80" y1="60" x2="600" y2="60" stroke="#D3D1C7" stroke-width="0.5"/>
+
+  <!-- x-axis with arrowhead -->
+  <polyline points="80,360 606,360 600,355 606,360 600,365" fill="none" stroke="#444441" stroke-width="1.5"/>
+  <!-- y-axis with arrowhead -->
+  <polyline points="80,360 80,54 75,60 80,54 85,60" fill="none" stroke="#444441" stroke-width="1.5"/>
+
+  <!-- x-axis tick marks and labels -->
+  <!-- x=1 → px=80+1/9*520=137.8 ≈138 -->
+  <line x1="143" y1="357" x2="143" y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="143" y="378" font-family="serif" font-size="14" text-anchor="middle" fill="#333">1</text>
+  <line x1="206" y1="357" x2="206" y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="206" y="378" font-family="serif" font-size="14" text-anchor="middle" fill="#333">2</text>
+  <line x1="269" y1="357" x2="269" y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="269" y="378" font-family="serif" font-size="14" text-anchor="middle" fill="#333">3</text>
+  <line x1="332" y1="357" x2="332" y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="332" y="378" font-family="serif" font-size="14" text-anchor="middle" fill="#333">4</text>
+  <line x1="395" y1="357" x2="395" y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="395" y="378" font-family="serif" font-size="14" text-anchor="middle" fill="#333">5</text>
+  <line x1="458" y1="357" x2="458" y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="458" y="378" font-family="serif" font-size="14" text-anchor="middle" fill="#333">6</text>
+  <line x1="521" y1="357" x2="521" y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="521" y="378" font-family="serif" font-size="14" text-anchor="middle" fill="#333">7</text>
+  <line x1="584" y1="357" x2="584" y2="363" stroke="#444441" stroke-width="1"/>
+  <text x="584" y="378" font-family="serif" font-size="14" text-anchor="middle" fill="#333">8</text>
+
+  <!-- y-axis tick marks and labels -->
+  <line x1="77" y1="317" x2="83" y2="317" stroke="#444441" stroke-width="1"/>
+  <text x="68" y="321" font-family="serif" font-size="14" text-anchor="end" fill="#333">40</text>
+  <line x1="77" y1="274" x2="83" y2="274" stroke="#444441" stroke-width="1"/>
+  <text x="68" y="278" font-family="serif" font-size="14" text-anchor="end" fill="#333">50</text>
+  <line x1="77" y1="231" x2="83" y2="231" stroke="#444441" stroke-width="1"/>
+  <text x="68" y="235" font-family="serif" font-size="14" text-anchor="end" fill="#333">60</text>
+  <line x1="77" y1="189" x2="83" y2="189" stroke="#444441" stroke-width="1"/>
+  <text x="68" y="193" font-family="serif" font-size="14" text-anchor="end" fill="#333">70</text>
+  <line x1="77" y1="146" x2="83" y2="146" stroke="#444441" stroke-width="1"/>
+  <text x="68" y="150" font-family="serif" font-size="14" text-anchor="end" fill="#333">80</text>
+  <line x1="77" y1="103" x2="83" y2="103" stroke="#444441" stroke-width="1"/>
+  <text x="68" y="107" font-family="serif" font-size="14" text-anchor="end" fill="#333">90</text>
+  <line x1="77" y1="60" x2="83" y2="60" stroke="#444441" stroke-width="1"/>
+  <text x="68" y="64" font-family="serif" font-size="14" text-anchor="end" fill="#333">100</text>
+
+  <!-- Axis labels -->
+  <text x="612" y="365" font-family="serif" font-size="16" font-style="italic" fill="#333">x</text>
+  <text x="72" y="44" font-family="serif" font-size="16" font-style="italic" fill="#333">y</text>
+
+  <!-- Axis description labels -->
+  <text x="340" y="400" font-family="serif" font-size="13" text-anchor="middle" fill="#555">공부 시간 (시간)</text>
+  <text x="30" y="210" font-family="serif" font-size="13" text-anchor="middle" fill="#555" transform="rotate(-90,30,210)">시험 점수 (점)</text>
+
+  <!-- Data points: (x, y) → (px, py) where px=80+x/9*520, py=360-(y-30)/70*300 -->
+  <!-- (1,45): px=80+57.8=137.8, py=360-64.3=295.7 -->
+  <circle cx="138" cy="296" r="5" fill="#185FA5" opacity="0.7"/>
+  <!-- (2,52): px=80+115.6=195.6, py=360-94.3=265.7 -->
+  <circle cx="196" cy="266" r="5" fill="#185FA5" opacity="0.7"/>
+  <!-- (2,58): px=195.6, py=360-120=240 -->
+  <circle cx="196" cy="240" r="5" fill="#185FA5" opacity="0.7"/>
+  <!-- (3,61): px=80+173.3=253.3, py=360-132.9=227.1 -->
+  <circle cx="253" cy="227" r="5" fill="#185FA5" opacity="0.7"/>
+  <!-- (3,70): px=253.3, py=360-171.4=188.6 -->
+  <circle cx="253" cy="189" r="5" fill="#185FA5" opacity="0.7"/>
+  <!-- (4,72): px=80+231.1=311.1, py=360-180=180 -->
+  <circle cx="311" cy="180" r="5" fill="#185FA5" opacity="0.7"/>
+  <!-- (4,78): px=311.1, py=360-205.7=154.3 -->
+  <circle cx="311" cy="154" r="5" fill="#185FA5" opacity="0.7"/>
+  <!-- (5,80): px=80+288.9=368.9, py=360-214.3=145.7 -->
+  <circle cx="369" cy="146" r="5" fill="#185FA5" opacity="0.7"/>
+  <!-- (5,85): px=368.9, py=360-235.7=124.3 -->
+  <circle cx="369" cy="124" r="5" fill="#185FA5" opacity="0.7"/>
+  <!-- (6,88): px=80+346.7=426.7, py=360-248.6=111.4 -->
+  <circle cx="427" cy="111" r="5" fill="#185FA5" opacity="0.7"/>
+  <!-- (7,91): px=80+404.4=484.4, py=360-261.4=98.6 -->
+  <circle cx="484" cy="99" r="5" fill="#185FA5" opacity="0.7"/>
+  <!-- (8,95): px=80+462.2=542.2, py=360-278.6=81.4 -->
+  <circle cx="542" cy="81" r="5" fill="#185FA5" opacity="0.7"/>
+
+  <!-- Title -->
+  <text x="340" y="30" font-family="serif" font-size="17" font-weight="bold" text-anchor="middle" fill="#222">공부 시간과 시험 점수 (산점도)</text>
+</svg>

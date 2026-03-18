@@ -1,0 +1,111 @@
+<svg id="vis" width="100%" viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arrow" markerWidth="8" markerHeight="8" refX="4" refY="4" orient="auto">
+    <path d="M1,1 L7,4 L1,7 Z" fill="#1D4ED8"/>
+  </marker>
+</defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 정삼각형 꼭짓점 (side=240px, 1unit=40px => 6cm)
+const side = 240;
+const h = side * Math.sqrt(3) / 2; // ≈ 207.85
+const A = { x: 340, y: 60 };
+const B = { x: 220, y: 268 };
+const C = { x: 460, y: 268 };
+
+// 삼각형 polygon
+const poly = el('polygon', {
+  points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`,
+  fill: '#3B82F6',
+  'fill-opacity': '0.12',
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5',
+  'stroke-linejoin': 'round'
+});
+svg.appendChild(poly);
+
+// 꼭짓점 원
+function addVertex(x, y) {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3.5', fill: '#1D4ED8' }));
+}
+addVertex(A.x, A.y);
+addVertex(B.x, B.y);
+addVertex(C.x, C.y);
+
+// 꼭짓점 레이블
+addText(A.x, A.y - 20, 'A', { 'font-size': '15', 'font-weight': '600' });
+addText(B.x - 20, B.y + 18, 'B', { 'font-size': '15', 'font-weight': '600' });
+addText(C.x + 20, C.y + 18, 'C', { 'font-size': '15', 'font-weight': '600' });
+
+// 변 중점 계산
+function midpoint(p1, p2) {
+  return { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+}
+
+// 법선 방향 (바깥쪽 오프셋)
+function outerNormal(p1, p2, offset) {
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  // 삼각형 무게중심
+  const cx = (A.x + B.x + C.x) / 3;
+  const cy = (A.y + B.y + C.y) / 3;
+  const mx = (p1.x + p2.x) / 2;
+  const my = (p1.y + p2.y) / 2;
+  // 무게중심에서 중점 방향 반대
+  const nx = mx - cx;
+  const ny = my - cy;
+  const nl = Math.sqrt(nx * nx + ny * ny);
+  return { x: mx + (nx / nl) * offset, y: my + (ny / nl) * offset };
+}
+
+// 변 레이블 "6"
+const mAB = outerNormal(A, B, 18);
+const mBC = outerNormal(B, C, 16);
+const mCA = outerNormal(C, A, 18);
+
+addText(mAB.x, mAB.y, '6', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+addText(mBC.x, mBC.y, '6', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+addText(mCA.x, mCA.y, '6', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// tick mark (등변 표시) - 각 변 중점에 단일 선분
+function drawTick(p1, p2, tickLen) {
+  const mx = (p1.x + p2.x) / 2;
+  const my = (p1.y + p2.y) / 2;
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  // 변 방향에 수직인 단위벡터
+  const px = -dy / len;
+  const py = dx / len;
+  const half = tickLen / 2;
+  svg.appendChild(el('line', {
+    x1: mx + px * half,
+    y1: my + py * half,
+    x2: mx - px * half,
+    y2: my - py * half,
+    stroke: '#1D4ED8',
+    'stroke-width': '1.8',
+    'stroke-linecap': 'round'
+  }));
+}
+
+drawTick(A, B, 12);
+drawTick(B, C, 12);
+drawTick(C, A, 12);
+</script>

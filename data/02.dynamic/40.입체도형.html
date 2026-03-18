@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+  <body>
+    <svg width="100%" viewBox="0 0 680 580" xmlns="http://www.w3.org/2000/svg">
+      <script>
+        const u = 52;
+        const r = 3 * u;
+        const hCone = 6 * u;
+        const hHemi = 3 * u;
+        const cx = 340,
+          cy = 240;
+        const apexX = cx,
+          apexY = cy - hCone;
+        const ry = r * 0.28; // 밑면 타원 원근감
+
+        const svg = document.querySelector('svg');
+        function el(tag, attrs, txt) {
+          const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+          for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+          if (txt !== undefined) e.textContent = txt;
+          svg.appendChild(e);
+          return e;
+        }
+        function label(x, y, s, size, weight, fill, anchor) {
+          el(
+            'text',
+            {
+              x,
+              y,
+              'text-anchor': anchor || 'middle',
+              'font-family': '"Anthropic Sans",sans-serif',
+              'font-size': size || 13,
+              'font-weight': weight || 400,
+              fill: fill || '#444441',
+            },
+            s
+          );
+        }
+        function dashed(x1, y1, x2, y2, stroke) {
+          el('line', { x1, y1, x2, y2, stroke: stroke || '#B4B2A9', 'stroke-width': 0.8, 'stroke-dasharray': '4 3' });
+        }
+
+        // 반구 (아래): 정면 반원 arc
+        el('path', {
+          d: `M${cx - r},${cy} A${r},${r} 0 0,0 ${cx + r},${cy}`,
+          fill: '#E6F1FB',
+          stroke: '#185FA5',
+          'stroke-width': 1.6,
+        });
+
+        // 원뿔 채우기
+        el('polygon', {
+          points: `${cx - r},${cy} ${cx + r},${cy} ${apexX},${apexY}`,
+          fill: '#EAF3DE',
+          stroke: 'none',
+        });
+
+        // 밑면 타원 뒷부분 (점선)
+        el('path', {
+          d: `M${cx - r},${cy} A${r},${ry} 0 0,1 ${cx + r},${cy}`,
+          fill: 'none',
+          stroke: '#3B6D11',
+          'stroke-width': 1,
+          'stroke-dasharray': '5 3',
+        });
+
+        // 밑면 타원 앞부분
+        el('path', {
+          d: `M${cx - r},${cy} A${r},${ry} 0 0,0 ${cx + r},${cy}`,
+          fill: 'none',
+          stroke: '#3B6D11',
+          'stroke-width': 1.4,
+        });
+
+        // 원뿔 모선
+        el('line', {
+          x1: cx - r,
+          y1: cy,
+          x2: apexX,
+          y2: apexY,
+          stroke: '#3B6D11',
+          'stroke-width': 1.6,
+          'stroke-linecap': 'round',
+        });
+        el('line', {
+          x1: cx + r,
+          y1: cy,
+          x2: apexX,
+          y2: apexY,
+          stroke: '#3B6D11',
+          'stroke-width': 1.6,
+          'stroke-linecap': 'round',
+        });
+
+        // 반구 위 타원 테두리 (밑면 앞부분 재렌더)
+        el('path', {
+          d: `M${cx - r},${cy} A${r},${ry} 0 0,0 ${cx + r},${cy}`,
+          fill: 'none',
+          stroke: '#185FA5',
+          'stroke-width': 1.4,
+        });
+
+        // 중심축 점선
+        dashed(cx, apexY - 14, cx, cy + r + 14, '#888780');
+
+        // 치수선: r=3 (밑면 가로)
+        {
+          const y0 = cy + 18;
+          el('line', { x1: cx, y1: y0, x2: cx + r, y2: y0, stroke: '#185FA5', 'stroke-width': 1 });
+          el('path', {
+            d: `M${cx + 4},${y0 - 4} L${cx},${y0} L${cx + 4},${y0 + 4}`,
+            fill: 'none',
+            stroke: '#185FA5',
+            'stroke-width': 1,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+          el('path', {
+            d: `M${cx + r - 4},${y0 - 4} L${cx + r},${y0} L${cx + r - 4},${y0 + 4}`,
+            fill: 'none',
+            stroke: '#185FA5',
+            'stroke-width': 1,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+          label(cx + r / 2, y0 - 7, 'r = 3', 11, 500, '#185FA5');
+        }
+
+        // 치수선: h=6 (원뿔 높이, 오른쪽)
+        {
+          const x0 = cx + r + 28;
+          el('line', { x1: x0, y1: apexY, x2: x0, y2: cy, stroke: '#3B6D11', 'stroke-width': 1 });
+          el('path', {
+            d: `M${x0 - 4},${apexY + 6} L${x0},${apexY} L${x0 + 4},${apexY + 6}`,
+            fill: 'none',
+            stroke: '#3B6D11',
+            'stroke-width': 1,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+          el('path', {
+            d: `M${x0 - 4},${cy - 6} L${x0},${cy} L${x0 + 4},${cy - 6}`,
+            fill: 'none',
+            stroke: '#3B6D11',
+            'stroke-width': 1,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+          label(x0 + 22, (apexY + cy) / 2 + 4, 'h = 6', 11, 500, '#3B6D11', 'start');
+        }
+
+        // 치수선: r=3 (반구 높이, 왼쪽)
+        {
+          const x0 = cx - r - 28,
+            hemiBot = cy + r;
+          el('line', { x1: x0, y1: cy, x2: x0, y2: hemiBot, stroke: '#185FA5', 'stroke-width': 1 });
+          el('path', {
+            d: `M${x0 - 4},${cy + 6} L${x0},${cy} L${x0 + 4},${cy + 6}`,
+            fill: 'none',
+            stroke: '#185FA5',
+            'stroke-width': 1,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+          el('path', {
+            d: `M${x0 - 4},${hemiBot - 6} L${x0},${hemiBot} L${x0 + 4},${hemiBot - 6}`,
+            fill: 'none',
+            stroke: '#185FA5',
+            'stroke-width': 1,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+          label(x0 - 22, (cy + hemiBot) / 2 + 4, 'r = 3', 11, 500, '#185FA5', 'end');
+        }
+
+        // 꼭짓점, 밑면 중심
+        el('circle', { cx: apexX, cy: apexY, r: 3.5, fill: '#639922', stroke: '#fff', 'stroke-width': 1.5 });
+        el('circle', { cx: cx, cy: cy, r: 3, fill: '#888780', stroke: '#fff', 'stroke-width': 1.2 });
+      </script>
+    </svg>
+  </body>
+</html>

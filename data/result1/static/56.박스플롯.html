@@ -1,0 +1,90 @@
+<!--
+  박스플롯(수평): A반 vs B반 수학 점수
+  A반: 최솟값42, Q1=58, 중앙값71, Q3=84, 최댓값98, 이상치28
+  B반: 최솟값50, Q1=65, 중앙값75, Q3=88, 최댓값100
+
+  레이아웃:
+    viewBox: 0 0 480 260
+    x축 범위: 20~100점, 스케일=4px/점
+    x원점: x=60(점수0 위치)
+    px(점수) = 60 + 점수*4
+
+  A반 y중심: 90, B반 y중심: 170
+  박스 높이: 40px
+
+  좌표 계산:
+    이상치28:  px=60+28*4=172
+    A최솟값42: px=60+42*4=228
+    A Q1=58:   px=60+58*4=292
+    A중앙=71:  px=60+71*4=344
+    A Q3=84:   px=60+84*4=396
+    A최댓값98: px=60+98*4=452
+
+    B최솟값50: px=60+50*4=260
+    B Q1=65:   px=60+65*4=320
+    B중앙=75:  px=60+75*4=360
+    B Q3=88:   px=60+88*4=412
+    B최댓값100: px=60+100*4=460
+
+  x축 눈금: 20,30,40,50,60,70,80,90,100
+    px=60+점수*4
+-->
+<svg width="480" height="260" viewBox="0 0 480 260" xmlns="http://www.w3.org/2000/svg">
+  <!-- A반 박스플롯 -->
+  <!-- 수염(whisker): Q1→최솟값 / Q3→최댓값 -->
+  <!-- IQR=26, 1.5*IQR=39, 낮은whisker=58-39=19 → 이상치조건:28<19는 아니므로 실제 최솟값42까지 -->
+  <!-- 왼쪽 수염 (최솟값→Q1) -->
+  <line x1="228" y1="90" x2="292" y2="90" stroke="#1a6bb5" stroke-width="2"/>
+  <line x1="228" y1="78" x2="228" y2="102" stroke="#1a6bb5" stroke-width="1.5"/>
+  <!-- 오른쪽 수염 (Q3→최댓값) -->
+  <line x1="396" y1="90" x2="452" y2="90" stroke="#1a6bb5" stroke-width="2"/>
+  <line x1="452" y1="78" x2="452" y2="102" stroke="#1a6bb5" stroke-width="1.5"/>
+  <!-- 박스 (Q1~Q3) -->
+  <rect x="292" y="70" width="104" height="40" fill="#aed6f1" stroke="#1a6bb5" stroke-width="2"/>
+  <!-- 중앙값 선 -->
+  <line x1="344" y1="70" x2="344" y2="110" stroke="#1a6bb5" stroke-width="2.5"/>
+  <!-- 이상치 -->
+  <circle cx="172" cy="90" r="5" fill="none" stroke="#1a6bb5" stroke-width="1.5"/>
+
+  <!-- B반 박스플롯 -->
+  <!-- 왼쪽 수염 (최솟값→Q1) -->
+  <line x1="260" y1="170" x2="320" y2="170" stroke="#c0392b" stroke-width="2"/>
+  <line x1="260" y1="158" x2="260" y2="182" stroke="#c0392b" stroke-width="1.5"/>
+  <!-- 오른쪽 수염 (Q3→최댓값) -->
+  <line x1="412" y1="170" x2="460" y2="170" stroke="#c0392b" stroke-width="2"/>
+  <line x1="460" y1="158" x2="460" y2="182" stroke="#c0392b" stroke-width="1.5"/>
+  <!-- 박스 (Q1~Q3) -->
+  <rect x="320" y="150" width="92" height="40" fill="#f5b7b1" stroke="#c0392b" stroke-width="2"/>
+  <!-- 중앙값 선 -->
+  <line x1="360" y1="150" x2="360" y2="190" stroke="#c0392b" stroke-width="2.5"/>
+
+  <!-- x축 -->
+  <line x1="55" y1="220" x2="470" y2="220" stroke="#333" stroke-width="1.5"/>
+
+  <!-- x축 눈금 및 레이블 (20~100, 간격10) -->
+  <line x1="140" y1="220" x2="140" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="140" y="238" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">20</text>
+  <line x1="180" y1="220" x2="180" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="180" y="238" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">30</text>
+  <line x1="220" y1="220" x2="220" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="220" y="238" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">40</text>
+  <line x1="260" y1="220" x2="260" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="260" y="238" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">50</text>
+  <line x1="300" y1="220" x2="300" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="300" y="238" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">60</text>
+  <line x1="340" y1="220" x2="340" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="340" y="238" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">70</text>
+  <line x1="380" y1="220" x2="380" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="380" y="238" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">80</text>
+  <line x1="420" y1="220" x2="420" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="420" y="238" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">90</text>
+  <line x1="460" y1="220" x2="460" y2="226" stroke="#333" stroke-width="1"/>
+  <text x="460" y="238" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">100</text>
+
+  <!-- y축 행 레이블 -->
+  <text x="50" y="94" text-anchor="end" font-family="sans-serif" font-size="12" font-weight="bold" fill="#1a6bb5">A반</text>
+  <text x="50" y="174" text-anchor="end" font-family="sans-serif" font-size="12" font-weight="bold" fill="#c0392b">B반</text>
+
+  <!-- 점수 레이블 -->
+  <text x="215" y="255" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">점수</text>
+</svg>

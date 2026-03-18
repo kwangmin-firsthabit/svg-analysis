@@ -1,0 +1,32 @@
+<!--
+  일반 사각형 ABCD, 변의 길이 AB=3, BC=5, CD=4, DA=6 (1 unit = 40px)
+  A = (80, 300), B = (200, 300) → |AB| = 120px = 3 ✓
+  BC 방향 70°: C = (200 + 200*cos(70°), 300 - 200*sin(70°)) = (268.4, 112.2)
+  D: |CD|=160px, |DA|=240px 교점
+    d(C,A) = sqrt(188.4²+187.8²) = sqrt(35494.6+35268.8) = sqrt(70763.4) ≈ 265.9px
+    두 원의 교점 계산:
+      a = (160²-240²+265.9²)/(2*265.9) = (25600-57600+70703.8)/531.8 = 38703.8/531.8 ≈ 72.8
+      h = sqrt(160²-72.8²) = sqrt(25600-5299.8) = sqrt(20300.2) ≈ 142.5px
+      방향 CA: ((80-268.4)/265.9, (300-112.2)/265.9) = (-0.709, 0.707)
+      수직: (0.707, 0.709)
+      M = (268.4+72.8*(-0.709), 112.2+72.8*0.707) = (268.4-51.6, 112.2+51.5) = (216.8, 163.7)
+      D = M + 142.5*(0.707, 0.709) = (216.8+100.7, 163.7+101) = (317.5, 264.7)
+  검증:
+    |CD| = sqrt((317.5-268.4)²+(264.7-112.2)²) = sqrt(49.1²+152.5²) = sqrt(2411+23256) = sqrt(25667) ≈ 160 ✓
+    |DA| = sqrt((80-317.5)²+(300-264.7)²) = sqrt(237.5²+35.3²) = sqrt(56406+1246) = sqrt(57652) ≈ 240 ✓
+-->
+<svg width="420" height="400" viewBox="0 0 420 400" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="80,300 200,300 268,112 318,265" fill="none" stroke="#000" stroke-width="2"/>
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="66" y="316" text-anchor="end" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="214" y="316" text-anchor="start" font-size="16" font-family="serif" font-style="italic">B</text>
+  <text x="274" y="100" text-anchor="start" font-size="16" font-family="serif" font-style="italic">C</text>
+  <text x="332" y="269" text-anchor="start" font-size="16" font-family="serif" font-style="italic">D</text>
+
+  <!-- 변의 길이 레이블 -->
+  <text x="140" y="320" text-anchor="middle" font-size="14" font-family="serif">3</text>
+  <text x="246" y="212" text-anchor="end" font-size="14" font-family="serif">5</text>
+  <text x="302" y="182" text-anchor="start" font-size="14" font-family="serif">4</text>
+  <text x="190" y="282" text-anchor="end" font-size="14" font-family="serif">6</text>
+</svg>

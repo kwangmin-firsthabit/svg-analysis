@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+  <body>
+    <svg width="100%" xmlns="http://www.w3.org/2000/svg" id="main-svg"></svg>
+    <script>
+      (function () {
+        const svg = document.getElementById('main-svg');
+        const NS = 'http://www.w3.org/2000/svg';
+        function mk(tag, attrs, txt) {
+          const e = document.createElementNS(NS, tag);
+          for (const k in attrs) e.setAttribute(k, attrs[k]);
+          if (txt != null) e.textContent = txt;
+          svg.appendChild(e);
+          return e;
+        }
+        const FF = 'serif';
+
+        // Data
+        const headers = ['학생', '국어', '수학', '영어', '과학'];
+        const rows = [
+          ['A', 85, 90, 88, 76],
+          ['B', 92, 76, 95, 80],
+          ['C', 78, 84, 70, 92],
+          ['D', 88, 91, 83, 74],
+          ['E', 95, 82, 79, 86],
+        ];
+        const title = '학생별 과목 점수표';
+
+        function computeGeometry() {
+          const marginL = 50;
+          const tableW = 580;
+          const col0W = 100;   // 학생
+          const colW  = 120;   // each subject column
+          const headerH = 36;
+          const rowH    = 32;
+          const titleY  = 36;
+          const tableTopY = 52;
+          const colXs = [
+            marginL,
+            marginL + col0W,
+            marginL + col0W + colW,
+            marginL + col0W + colW * 2,
+            marginL + col0W + colW * 3,
+          ];
+          const colCenters = [
+            marginL + col0W / 2,
+            marginL + col0W + colW / 2,
+            marginL + col0W + colW * 1.5,
+            marginL + col0W + colW * 2.5,
+            marginL + col0W + colW * 3.5,
+          ];
+          const totalH = tableTopY + headerH + rowH * rows.length;
+          return { marginL, tableW, colXs, colCenters, col0W, colW,
+                   headerH, rowH, titleY, tableTopY, totalH };
+        }
+
+        function render(geo) {
+          const { marginL, tableW, colXs, colCenters,
+                  headerH, rowH, titleY, tableTopY } = geo;
+
+          // Title
+          mk('text', {
+            x: 340, y: titleY,
+            'font-family': FF, 'font-size': 16, 'font-weight': 'bold',
+            fill: '#2C2C2A', 'text-anchor': 'middle'
+          }, title);
+
+          // Header row
+          mk('rect', {
+            x: marginL, y: tableTopY, width: tableW, height: headerH,
+            fill: '#E6F1FB', stroke: '#2C2C2A', 'stroke-width': 1
+          });
+          // Header cell dividers
+          for (let i = 1; i < colXs.length; i++) {
+            mk('line', {
+              x1: colXs[i], y1: tableTopY,
+              x2: colXs[i], y2: tableTopY + headerH,
+              stroke: '#2C2C2A', 'stroke-width': 1
+            });
+          }
+          // Header text
+          headers.forEach((h, i) => {
+            mk('text', {
+              x: colCenters[i], y: tableTopY + headerH / 2 + 5,
+              'font-family': FF, 'font-size': 14, 'font-weight': 'bold',
+              fill: '#444441', 'text-anchor': 'middle'
+            }, h);
+          });
+
+          // Data rows
+          rows.forEach((row, ri) => {
+            const rowY = tableTopY + headerH + ri * rowH;
+            const fillColor = ri % 2 === 0 ? '#F7F6F3' : 'white';
+            mk('rect', {
+              x: marginL, y: rowY, width: tableW, height: rowH,
+              fill: fillColor, stroke: '#2C2C2A', 'stroke-width': 1
+            });
+            // Column dividers
+            for (let i = 1; i < colXs.length; i++) {
+              mk('line', {
+                x1: colXs[i], y1: rowY,
+                x2: colXs[i], y2: rowY + rowH,
+                stroke: '#2C2C2A', 'stroke-width': 1
+              });
+            }
+            // Cell text
+            row.forEach((cell, ci) => {
+              mk('text', {
+                x: colCenters[ci], y: rowY + rowH / 2 + 5,
+                'font-family': FF, 'font-size': 13,
+                fill: '#2C2C2A', 'text-anchor': 'middle'
+              }, String(cell));
+            });
+          });
+        }
+
+        const geo = computeGeometry();
+        render(geo);
+
+        svg.setAttribute('viewBox', `0 0 680 ${geo.totalH + 20}`);
+      })();
+    </script>
+  </body>
+</html>

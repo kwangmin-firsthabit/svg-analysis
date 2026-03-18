@@ -1,0 +1,92 @@
+<svg width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    R=8, 현 AB=8, scale=28px/1 → R=224px, AB=224px
+    arcsin(0.5)=30° → 중심각=60°
+    O(340,310)  A(228,116)  B(452,116)
+    OA=OB=224px ✓  AB=224px=8 ✓  sagitta=30px
+  -->
+
+  <!-- Full circle (dashed reference) -->
+  <circle cx="340" cy="310" r="224" fill="none" stroke="#D3D1C7" stroke-width="1" stroke-dasharray="4 5" />
+
+  <!-- Chord AB -->
+  <line x1="228" y1="116" x2="452" y2="116" stroke="#185FA5" stroke-width="1.8" stroke-linecap="round" />
+
+  <!-- Arc A→B (60°, 위쪽 작은 호) -->
+  <path d="M 228,116 A 224,224 0 0,1 452,116" fill="none" stroke="#185FA5" stroke-width="1.8" stroke-linecap="round" />
+
+  <!-- Radii O→A, O→B (dashed) -->
+  <line
+    x1="340"
+    y1="310"
+    x2="228"
+    y2="116"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="5 4"
+    stroke-linecap="round"
+  />
+  <line
+    x1="340"
+    y1="310"
+    x2="452"
+    y2="116"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="5 4"
+    stroke-linecap="round"
+  />
+
+  <!-- Sagitta (dashed) -->
+  <line
+    x1="340"
+    y1="116"
+    x2="340"
+    y2="86"
+    stroke="#888780"
+    stroke-width="1"
+    stroke-dasharray="4 3"
+    stroke-linecap="round"
+  />
+
+  <!-- 60° arc at O -->
+  <path d="M 284,192 A 130,130 0 0,1 396,192" fill="none" stroke="#5F5E5A" stroke-width="0.9" />
+  <text x="340" y="212" text-anchor="middle" font-family="serif" font-size="13" fill="#5F5E5A">60°</text>
+
+  <!-- Points -->
+  <circle cx="340" cy="310" r="3.5" fill="#185FA5" />
+  <circle cx="228" cy="116" r="3.5" fill="#185FA5" />
+  <circle cx="452" cy="116" r="3.5" fill="#185FA5" />
+  <circle cx="340" cy="86" r="3" fill="#185FA5" />
+
+  <!-- Labels -->
+  <text x="340" y="336" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    O
+  </text>
+  <text x="204" y="120" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    A
+  </text>
+  <text x="476" y="120" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    B
+  </text>
+  <text x="340" y="106" text-anchor="middle" font-family="serif" font-size="14" fill="#185FA5">8</text>
+  <text
+    text-anchor="middle"
+    font-family="serif"
+    font-size="13"
+    fill="#888780"
+    transform="translate(270,220) rotate(-61)"
+  >
+    r = 8
+  </text>
+  <text
+    text-anchor="middle"
+    font-family="serif"
+    font-size="13"
+    fill="#888780"
+    transform="translate(410,220) rotate(61)"
+  >
+    r = 8
+  </text>
+  <text x="358" y="104" text-anchor="start" font-family="serif" font-size="12" fill="#888780">활꼴</text>
+</svg>

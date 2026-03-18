@@ -1,0 +1,81 @@
+<!--
+  좌표 계산 검증
+  삼각기둥 전개도: 밑변 3,4,5 (직각삼각형), 높이 h=10
+
+  1단위 = 30px
+
+  중앙에 직사각형 3개 나란히:
+    rect1: 3×10 = (90×300px)
+    rect2: 4×10 = (120×300px)
+    rect3: 5×10 = (150×300px)
+
+  전체 너비: (3+4+5)*30 = 360px
+
+  위치 (ox=60, oy=80 = 직사각형 상단):
+    rect1 (3): x=60, y=80, w=90, h=300
+    rect2 (4): x=150, y=80, w=120, h=300
+    rect3 (5): x=270, y=80, w=150, h=300
+
+  직각삼각형 (위 아래에 각각 붙음):
+    삼각형 꼭짓점: 직각=왼쪽 아래, 가로4=오른쪽, 세로3=위
+    위 삼각형: rect1과 rect2 경계(x=150)를 기준으로 배치
+      직각 꼭짓점 = rect1 상단 오른쪽 = (150, 80)
+      가로4 꼭짓점 = rect2 상단 오른쪽 = (270, 80)
+      세로3 꼭짓점 = (150, 80-90) = (150, -10)
+      → 위 삼각형: (150,80), (270,80), (150,-10)
+
+    아래 삼각형: 위와 같은 구조, rect 하단
+      직각 꼭짓점 = (150, 380)
+      가로4 꼭짓점 = (270, 380)
+      세로3 꼭짓점 = (150, 380+90) = (150, 470)
+      → 아래 삼각형: (150,380), (270,380), (150,470)
+
+  viewBox: "40 -30 450 540"
+-->
+<svg width="490" height="560" viewBox="40 -30 450 540" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- 직사각형 3개 (면) -->
+  <!-- 변3: 3×10 -->
+  <rect x="60" y="80" width="90" height="300"
+    fill="#dbeafe" stroke="#1e40af" stroke-width="1.8"/>
+  <!-- 변4: 4×10 -->
+  <rect x="150" y="80" width="120" height="300"
+    fill="#dcfce7" stroke="#15803d" stroke-width="1.8"/>
+  <!-- 변5: 5×10 -->
+  <rect x="270" y="80" width="150" height="300"
+    fill="#fef9c3" stroke="#ca8a04" stroke-width="1.8"/>
+
+  <!-- 위 삼각형 -->
+  <polygon points="150,80 270,80 150,-10"
+    fill="#e0f2fe" stroke="#0369a1" stroke-width="1.8"/>
+  <!-- 직각 표시 (위 삼각형) -->
+  <path d="M 150,68 L 162,68 L 162,80" fill="none" stroke="#0369a1" stroke-width="1.2"/>
+
+  <!-- 아래 삼각형 -->
+  <polygon points="150,380 270,380 150,470"
+    fill="#e0f2fe" stroke="#0369a1" stroke-width="1.8"/>
+  <!-- 직각 표시 (아래 삼각형) -->
+  <path d="M 150,392 L 162,392 L 162,380" fill="none" stroke="#0369a1" stroke-width="1.2"/>
+
+  <!-- 치수 라벨 -->
+  <!-- 변3 (직사각형 너비) -->
+  <text x="105" y="440" text-anchor="middle" font-size="13" font-family="serif" fill="#1e40af">3</text>
+  <!-- 변4 (직사각형 너비) -->
+  <text x="210" y="440" text-anchor="middle" font-size="13" font-family="serif" fill="#15803d">4</text>
+  <!-- 변5 (직사각형 너비) -->
+  <text x="345" y="440" text-anchor="middle" font-size="13" font-family="serif" fill="#ca8a04">5</text>
+  <!-- 높이 10 (왼쪽) -->
+  <text x="48" y="234" text-anchor="end" font-size="13" font-family="serif" fill="#374151">10</text>
+
+  <!-- 삼각형 변 라벨 -->
+  <!-- 위 삼각형 -->
+  <text x="140" y="36" text-anchor="end" font-size="12" font-family="serif" fill="#0369a1">3</text>
+  <text x="214" y="76" text-anchor="middle" font-size="12" font-family="serif" fill="#0369a1">4</text>
+  <text x="218" y="34" font-size="12" font-family="serif" fill="#0369a1">5</text>
+
+  <!-- 아래 삼각형 -->
+  <text x="140" y="432" text-anchor="end" font-size="12" font-family="serif" fill="#0369a1">3</text>
+  <text x="214" y="394" text-anchor="middle" font-size="12" font-family="serif" fill="#0369a1">4</text>
+  <text x="218" y="436" font-size="12" font-family="serif" fill="#0369a1">5</text>
+
+</svg>

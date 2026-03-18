@@ -1,0 +1,27 @@
+<!--
+  호 AB, 원주 위 두 점 A, B 사이 곡선 거리 = 10
+  호의 길이 l = r*θ = 10 (단위: 변수)
+  시각화를 위해 r = 6, θ = 10/6 ≈ 1.667 rad ≈ 95.5° 선택 (1 unit = 30px → r=180px)
+  center O = (200, 230)
+  A 각도: 180° + θ/2 (rad) → 180° + 47.75° = 227.75° 에서 시계방향
+  실제 배치: A = 200°에서, B = 200°-95.5° = 104.5°
+  A = (200+180*cos(200°), 230-180*sin(200°)) ≈ (200-169.1, 230+61.6) = (30.9, 291.6)
+  B = (200+180*cos(104.5°), 230-180*sin(104.5°)) ≈ (200-45.3, 230-174.1) = (154.7, 55.9)
+  호 길이 검증: l = 180*(95.5°*π/180°) = 180*1.667 ≈ 300px (시각적 표현용, 단위는 정규화)
+
+  더 명확한 시각화: r=6 단위, 호길이=10 단위 → θ=10/6≈95.5°
+  1 unit = 28px → r=168px, 호길이=280px
+-->
+<svg width="400" height="360" viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
+  <!-- 호 AB (작은 호, large-arc-flag=0) -->
+  <path d="M 54,290 A 168,168 0 0 1 164,52"
+        fill="none" stroke="#000" stroke-width="2.5"/>
+
+  <!-- 꼭짓점 -->
+  <circle cx="54"  cy="290" r="3.5" fill="#000"/>
+  <circle cx="164" cy="52"  r="3.5" fill="#000"/>
+
+  <!-- 레이블 -->
+  <text x="40"  y="308" text-anchor="end"   font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="170" y="42"  text-anchor="start" font-size="16" font-family="serif" font-style="italic">B</text>
+</svg>

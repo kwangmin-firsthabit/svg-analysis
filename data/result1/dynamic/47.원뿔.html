@@ -1,0 +1,87 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 30;
+  const r = 4, h = 6;
+
+  const cx = 200;
+  const px_r = r * unit;  // 120px
+  const px_h = h * unit;  // 180px
+  const ry = 24;          // 타원 세로반지름
+
+  const botY = 300;
+  const topY = botY - px_h; // 120
+
+  const W = 380, maxY = botY + 60;
+  return { cx, topY, botY, px_r, ry, r, h, W, maxY };
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function render(geo) {
+  const { cx, topY, botY, px_r, ry, r, h, W, maxY } = geo;
+  svg.setAttribute('viewBox', `50 ${topY - 30} 320 ${maxY - topY + 30}`);
+  svg.setAttribute('width', String(W));
+  svg.setAttribute('height', String(maxY));
+
+  // 밑면 타원 뒷반 (점선)
+  svg.appendChild(mkEl('path', {
+    d: `M ${cx - px_r},${botY} A ${px_r},${ry} 0 0,1 ${cx + px_r},${botY}`,
+    fill: 'none', stroke: '#1e40af', 'stroke-width': '1.8', 'stroke-dasharray': '5,4'
+  }));
+
+  // 옆면 + 밑면 앞반
+  svg.appendChild(mkEl('path', {
+    d: `M ${cx},${topY} L ${cx - px_r},${botY} A ${px_r},${ry} 0 0,0 ${cx + px_r},${botY} Z`,
+    fill: '#dbeafe', 'fill-opacity': '0.5', stroke: '#1e40af', 'stroke-width': '1.8'
+  }));
+
+  // 꼭짓점
+  svg.appendChild(mkEl('circle', { cx, cy: topY, r: '3', fill: '#1e293b' }));
+
+  // 반지름선 (밑면)
+  svg.appendChild(mkEl('line', {
+    x1: cx, y1: botY, x2: cx + px_r, y2: botY,
+    stroke: '#374151', 'stroke-width': '1', 'stroke-dasharray': '4,3'
+  }));
+  svg.appendChild(mkEl('circle', { cx, cy: botY, r: '2.5', fill: '#374151' }));
+  const rLbl = mkEl('text', {
+    x: cx + px_r / 2, y: botY + 18,
+    'text-anchor': 'middle', 'font-size': '12', 'font-family': 'serif', fill: '#374151'
+  });
+  rLbl.textContent = `r=${r}`;
+  svg.appendChild(rLbl);
+
+  // 높이 점선 + 라벨
+  svg.appendChild(mkEl('line', {
+    x1: cx, y1: topY, x2: cx, y2: botY,
+    stroke: '#9ca3af', 'stroke-width': '1', 'stroke-dasharray': '4,3'
+  }));
+  const hLbl = mkEl('text', {
+    x: cx + 8, y: (topY + botY) / 2,
+    'font-size': '12', 'font-family': 'serif', fill: '#374151'
+  });
+  hLbl.textContent = `h=${h}`;
+  svg.appendChild(hLbl);
+
+  // 꼭짓점 라벨
+  const tLbl = mkEl('text', {
+    x: cx, y: topY - 8,
+    'text-anchor': 'middle', 'font-size': '12', 'font-family': 'serif', fill: '#1e293b'
+  });
+  tLbl.textContent = '꼭짓점';
+  svg.appendChild(tLbl);
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

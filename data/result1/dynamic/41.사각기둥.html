@@ -1,0 +1,106 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 30;
+  const w = 4, d = 3, h = 6; // 가로, 세로(깊이), 높이
+
+  // 사각투영 오프셋 (45°, 비율 0.5)
+  const dx = Math.round(d * unit * Math.cos(Math.PI / 4) * 0.5); // ≈32
+  const dy = Math.round(-d * unit * Math.sin(Math.PI / 4) * 0.5); // ≈-32
+
+  const ax = 80, ay = 280; // A 기준점
+
+  // 앞면 꼭짓점
+  const A = { x: ax, y: ay };
+  const B = { x: ax + w * unit, y: ay };
+  const F = { x: B.x, y: ay - h * unit };
+  const E = { x: ax, y: ay - h * unit };
+
+  // 뒷면 (오프셋)
+  const D = { x: A.x + dx, y: A.y + dy };
+  const C = { x: B.x + dx, y: B.y + dy };
+  const G = { x: F.x + dx, y: F.y + dy };
+  const H = { x: E.x + dx, y: E.y + dy };
+
+  const W = 310, maxY = 340;
+  return { A, B, C, D, E, F, G, H, W, maxY };
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function poly(pts, fill, stroke) {
+  return mkEl('polygon', {
+    points: pts.map(p => `${p.x},${p.y}`).join(' '),
+    fill, stroke, 'stroke-width': '1.8'
+  });
+}
+
+function render(geo) {
+  const { A, B, C, D, E, F, G, H, W, maxY } = geo;
+  svg.setAttribute('viewBox', '40 40 260 290');
+  svg.setAttribute('width', String(W));
+  svg.setAttribute('height', String(maxY));
+
+  // 점선 모서리
+  for (const [p1, p2] of [[A, D], [D, C], [D, H]]) {
+    svg.appendChild(mkEl('line', {
+      x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
+      stroke: '#374151', 'stroke-width': '1.2', 'stroke-dasharray': '5,4'
+    }));
+  }
+
+  // 앞면
+  svg.appendChild(poly([A, B, F, E], '#dbeafe', '#1e40af'));
+  // 오른면
+  svg.appendChild(poly([B, C, G, F], '#bfdbfe', '#1e40af'));
+  // 위면
+  svg.appendChild(poly([E, F, G, H], '#eff6ff', '#1e40af'));
+
+  // 꼭짓점 레이블
+  const labels = [
+    { p: A, t: 'A', dx: -14, dy: 14 },
+    { p: B, t: 'B', dx: 4, dy: 14 },
+    { p: C, t: 'C', dx: 4, dy: 10 },
+    { p: D, t: 'D', dx: -14, dy: 6 },
+    { p: E, t: 'E', dx: -14, dy: -4 },
+    { p: F, t: 'F', dx: 4, dy: -4 },
+    { p: G, t: 'G', dx: 4, dy: -4 },
+    { p: H, t: 'H', dx: -14, dy: -4 },
+  ];
+  for (const lb of labels) {
+    const el = mkEl('text', {
+      x: lb.p.x + lb.dx, y: lb.p.y + lb.dy,
+      'font-size': '13', 'font-family': 'serif', fill: '#111827'
+    });
+    el.textContent = lb.t;
+    svg.appendChild(el);
+  }
+
+  // 치수 라벨
+  const dimLabels = [
+    { x: (A.x + B.x) / 2, y: A.y + 18, t: '4', anchor: 'middle' },
+    { x: A.x - 10, y: (A.y + E.y) / 2, t: '6', anchor: 'end' },
+    { x: A.x + (D.x - A.x) / 2 + 4, y: A.y + (D.y - A.y) / 2 + 2, t: '3', anchor: 'start' },
+  ];
+  for (const lb of dimLabels) {
+    const el = mkEl('text', {
+      x: lb.x, y: lb.y, 'text-anchor': lb.anchor,
+      'font-size': '12', 'font-family': 'serif', fill: '#374151'
+    });
+    el.textContent = lb.t;
+    svg.appendChild(el);
+  }
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

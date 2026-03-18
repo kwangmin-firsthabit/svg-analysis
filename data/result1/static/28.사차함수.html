@@ -1,0 +1,121 @@
+<!--
+  사차함수 y = x⁴ - 2x² 좌표 계산 및 검증
+  축 범위: x: -2~2, y: -2~4
+  단위: 60px
+
+  좌표계 설정:
+    원점(O) = (150, 270) [SVG 좌표]
+    1단위 = 60px
+    SVG 너비: 150 + 2*60 + 40 = 310
+    SVG 높이: 270 + 2*60 + 20 = 410
+
+  SVG 변환: svgX = 150 + x*60, svgY = 270 - y*60
+
+  주요 점:
+    극소점 (-1, -1): y'=4x³-4x=0 → x=0,±1. y(-1)=1-2=-1
+      svgX=150-60=90, svgY=270+60=330
+    극소점 (1, -1):
+      svgX=150+60=210, svgY=330
+    극대점 (0, 0):
+      svgX=150, svgY=270
+    y절편 (0, 0): 동일
+
+  샘플 (step 0.1):
+    x=-2.0: y=16-8=8  → 범위 밖(y>4)
+    y=4: x⁴-2x²=4 → x⁴-2x²-4=0 → t²-2t-4=0(t=x²) → t=(2+√20)/2=1+√5≈3.236 → x≈±1.799
+
+    x=-1.8: y=10.4976-6.48=4.018≈4.02  svgX=42,  svgY=270-4.02*60=270-241.2=28.8≈29
+    x=-1.6: y=6.5536-5.12=1.4336       svgX=54,  svgY=270-1.4336*60=270-86=184
+    x=-1.4: y=3.8416-3.92=-0.0784      svgX=66,  svgY=270+0.0784*60=270+4.7=274.7≈275
+    x=-1.2: y=2.0736-2.88=-0.8064      svgX=78,  svgY=270+0.8064*60=270+48.4=318.4≈318
+    x=-1.0: y=1-2=-1                   svgX=90,  svgY=270+60=330
+    x=-0.8: y=0.4096-1.28=-0.8704      svgX=102, svgY=270+52.2=322.2≈322
+    x=-0.6: y=0.1296-0.72=-0.5904      svgX=114, svgY=270+35.4=305.4≈305
+    x=-0.4: y=0.0256-0.32=-0.2944      svgX=126, svgY=270+17.7=287.7≈288
+    x=-0.2: y=0.0016-0.08=-0.0784      svgX=138, svgY=270+4.7=274.7≈275
+    x= 0.0: y=0                        svgX=150, svgY=270
+    x= 0.2: y=-0.0784                  svgX=162, svgY=275
+    x= 0.4: y=-0.2944                  svgX=174, svgY=288
+    x= 0.6: y=-0.5904                  svgX=186, svgY=305
+    x= 0.8: y=-0.8704                  svgX=198, svgY=322
+    x= 1.0: y=-1                       svgX=210, svgY=330
+    x= 1.2: y=-0.8064                  svgX=222, svgY=318
+    x= 1.4: y=-0.0784                  svgX=234, svgY=275
+    x= 1.6: y=1.4336                   svgX=246, svgY=184
+    x= 1.8: y=4.018                    svgX=258, svgY=29
+-->
+<svg width="310" height="410" viewBox="0 0 310 410" xmlns="http://www.w3.org/2000/svg"
+     font-family="serif" font-size="14">
+
+  <!-- x축 -->
+  <line x1="20" y1="270" x2="290" y2="270" stroke="black" stroke-width="1.5"/>
+  <polygon points="290,270 282,266 282,274" fill="black"/>
+  <!-- y축 -->
+  <line x1="150" y1="390" x2="150" y2="20" stroke="black" stroke-width="1.5"/>
+  <polygon points="150,20 146,28 154,28" fill="black"/>
+
+  <!-- x축 눈금 -->
+  <line x1="30" y1="265" x2="30" y2="275" stroke="black" stroke-width="1"/>
+  <text x="30" y="288" text-anchor="middle" font-size="12">-2</text>
+  <line x1="90" y1="265" x2="90" y2="275" stroke="black" stroke-width="1"/>
+  <text x="90" y="288" text-anchor="middle" font-size="12">-1</text>
+  <line x1="210" y1="265" x2="210" y2="275" stroke="black" stroke-width="1"/>
+  <text x="210" y="288" text-anchor="middle" font-size="12">1</text>
+  <line x1="270" y1="265" x2="270" y2="275" stroke="black" stroke-width="1"/>
+  <text x="270" y="288" text-anchor="middle" font-size="12">2</text>
+
+  <!-- y축 눈금 -->
+  <line x1="145" y1="390" x2="155" y2="390" stroke="black" stroke-width="1"/>
+  <text x="140" y="394" text-anchor="end" font-size="12">-2</text>
+  <line x1="145" y1="330" x2="155" y2="330" stroke="black" stroke-width="1"/>
+  <text x="140" y="334" text-anchor="end" font-size="12">-1</text>
+  <line x1="145" y1="210" x2="155" y2="210" stroke="black" stroke-width="1"/>
+  <text x="140" y="214" text-anchor="end" font-size="12">1</text>
+  <line x1="145" y1="150" x2="155" y2="150" stroke="black" stroke-width="1"/>
+  <text x="140" y="154" text-anchor="end" font-size="12">2</text>
+  <line x1="145" y1="90" x2="155" y2="90" stroke="black" stroke-width="1"/>
+  <text x="140" y="94" text-anchor="end" font-size="12">3</text>
+  <line x1="145" y1="30" x2="155" y2="30" stroke="black" stroke-width="1"/>
+  <text x="140" y="34" text-anchor="end" font-size="12">4</text>
+
+  <!-- 축 레이블 -->
+  <text x="294" y="274" text-anchor="start" font-size="14">x</text>
+  <text x="154" y="16" text-anchor="start" font-size="14">y</text>
+  <text x="140" y="288" text-anchor="end" font-size="12">O</text>
+
+  <!-- y = x⁴ - 2x² 곡선 -->
+  <path fill="none" stroke="#2563eb" stroke-width="2.5"
+    d="M 42,29
+       L 54,184
+       L 66,275
+       L 78,318
+       L 90,330
+       L 102,322
+       L 114,305
+       L 126,288
+       L 138,275
+       L 150,270
+       L 162,275
+       L 174,288
+       L 186,305
+       L 198,322
+       L 210,330
+       L 222,318
+       L 234,275
+       L 246,184
+       L 258,29"/>
+
+  <!-- 극소점 (-1, -1) -->
+  <circle cx="90" cy="330" r="5" fill="#dc2626"/>
+  <text x="76" y="348" text-anchor="end" font-size="12" fill="#dc2626">(-1, -1)</text>
+
+  <!-- 극소점 (1, -1) -->
+  <circle cx="210" cy="330" r="5" fill="#dc2626"/>
+  <text x="218" y="348" text-anchor="start" font-size="12" fill="#dc2626">(1, -1)</text>
+
+  <!-- 극대점 (0, 0) -->
+  <circle cx="150" cy="270" r="4" fill="#2563eb"/>
+
+  <!-- 함수식 레이블 -->
+  <text x="220" y="60" text-anchor="start" font-size="14" fill="#2563eb" font-style="italic">y = x⁴ − 2x²</text>
+</svg>

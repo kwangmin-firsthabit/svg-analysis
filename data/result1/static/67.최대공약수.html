@@ -1,0 +1,72 @@
+<!--
+  최대공약수: 84와 60의 최대공약수 (ㄴ자 공약수 방식)
+
+  계산:
+    2 ) 84  60
+    2 ) 42  30
+    3 ) 21  15
+        7   5
+    GCD = 2 × 2 × 3 = 12
+
+  ㄴ자 모양 설계:
+    각 행마다 왼쪽에 공약수, 오른쪽에 두 수
+    ㄴ자 = 세로선(왼쪽) + 가로선(아래)
+
+  SVG 좌표:
+    viewBox: 0 0 260 240
+    행 높이: 45px
+    행 y 시작: y=55 (첫째 행 텍스트 기준)
+    공약수 x: 40
+    첫째 피연산수 x: 100
+    둘째 피연산수 x: 165
+
+    ㄴ자 라인 (각 행):
+      세로선: x=60, y_top ~ y_bottom
+      가로선: x=60 ~ x=185, y=y_bottom
+
+    행 1: y=55, 구분선 y=60~100, 가로 y=100
+    행 2: y=100, 구분선 y=100~145, 가로 y=145  (실제로는 각 행 공약수 위에 걸쳐짐)
+
+    정리:
+      행1 텍스트 y=60: 공약수=2, 두 수=84, 60
+        ㄴ 세로: x=60, y=40 ~ 80; 가로: x=60~190, y=80
+      행2 텍스트 y=105: 공약수=2, 두 수=42, 30
+        ㄴ 세로: x=60, y=85 ~ 125; 가로: x=60~190, y=125
+      행3 텍스트 y=150: 공약수=3, 두 수=21, 15
+        ㄴ 세로: x=60, y=130 ~ 170; 가로: x=60~190, y=170
+      행4 텍스트 y=195: 두 수=7, 5 (몫)
+
+    GCD 표시: y=230
+-->
+<svg width="260" height="240" viewBox="0 0 260 240" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- 행 1: 2 ) 84  60 -->
+  <!-- ㄴ자: 세로선 위에서 내려오고 아래에서 꺾임 -->
+  <line x1="60" y1="38"  x2="60" y2="78"  stroke="#333" stroke-width="1.8"/>
+  <line x1="60" y1="78"  x2="195" y2="78" stroke="#333" stroke-width="1.8"/>
+  <text x="40"  y="68" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">2</text>
+  <text x="100" y="68" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">84</text>
+  <text x="165" y="68" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">60</text>
+
+  <!-- 행 2: 2 ) 42  30 -->
+  <line x1="60" y1="82"  x2="60"  y2="122" stroke="#333" stroke-width="1.8"/>
+  <line x1="60" y1="122" x2="195" y2="122" stroke="#333" stroke-width="1.8"/>
+  <text x="40"  y="112" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">2</text>
+  <text x="100" y="112" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">42</text>
+  <text x="165" y="112" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">30</text>
+
+  <!-- 행 3: 3 ) 21  15 -->
+  <line x1="60" y1="126" x2="60"  y2="166" stroke="#333" stroke-width="1.8"/>
+  <line x1="60" y1="166" x2="195" y2="166" stroke="#333" stroke-width="1.8"/>
+  <text x="40"  y="156" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">3</text>
+  <text x="100" y="156" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">21</text>
+  <text x="165" y="156" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">15</text>
+
+  <!-- 행 4: 몫 7  5 -->
+  <text x="100" y="200" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">7</text>
+  <text x="165" y="200" text-anchor="middle" font-size="20" fill="#333" font-family="monospace">5</text>
+
+  <!-- GCD 계산식 -->
+  <text x="130" y="230" text-anchor="middle" font-size="15" fill="#555" font-family="sans-serif">2 × 2 × 3 = 12</text>
+
+</svg>

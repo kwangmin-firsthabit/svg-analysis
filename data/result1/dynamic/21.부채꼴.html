@@ -1,0 +1,67 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 부채꼴 AOB, 반지름 6, 중심각 60° (1 unit = 30px → r = 180px)
+  // O = (200,280), OA 방향 120°, OB 방향 60° (수평 기준 반시계)
+  // A = O + r*(cos120°, -sin120°), B = O + r*(cos60°, -sin60°)
+  const r = 180;
+  const O = { x: 200, y: 280 };
+  const angA = 120 * Math.PI / 180;
+  const angB = 60  * Math.PI / 180;
+  const A = { x: O.x + r * Math.cos(angA), y: O.y - r * Math.sin(angA) };
+  const B = { x: O.x + r * Math.cos(angB), y: O.y - r * Math.sin(angB) };
+  // 검증: ∠AOB = 120°-60° = 60° ✓
+  return { O, A, B, r, maxY: O.y + 40 };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { O, A, B, r, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 400 ${maxY}`);
+  svg.setAttribute('width', '400');
+  svg.setAttribute('height', maxY);
+
+  svg.appendChild(el('path', {
+    d: `M ${O.x},${O.y} L ${A.x},${A.y} A ${r},${r} 0 0 1 ${B.x},${B.y} Z`,
+    fill: 'none', stroke: '#000', 'stroke-width': 2
+  }));
+
+  svg.appendChild(el('circle', { cx: O.x, cy: O.y, r: 3, fill: '#000' }));
+
+  // 중심각 호
+  const arcR = 30;
+  const sx = O.x + arcR * Math.cos(120 * Math.PI / 180);
+  const sy = O.y - arcR * Math.sin(120 * Math.PI / 180);
+  const ex = O.x + arcR * Math.cos(60  * Math.PI / 180);
+  const ey = O.y - arcR * Math.sin(60  * Math.PI / 180);
+  svg.appendChild(el('path', {
+    d: `M ${sx},${sy} A ${arcR},${arcR} 0 0 1 ${ex},${ey}`,
+    fill: 'none', stroke: '#000', 'stroke-width': 1.2
+  }));
+  svg.appendChild(el('text', { x: O.x + 38, y: O.y - 16, 'text-anchor': 'start', 'font-size': 13, 'font-family': 'serif' }, '60°'));
+
+  svg.appendChild(el('text', { x: O.x - 14, y: O.y + 18, 'text-anchor': 'end',   'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'O'));
+  svg.appendChild(el('text', { x: A.x - 14, y: A.y - 6,  'text-anchor': 'end',   'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'A'));
+  svg.appendChild(el('text', { x: B.x + 14, y: B.y - 6,  'text-anchor': 'start', 'font-size': 16, 'font-family': 'serif', 'font-style': 'italic' }, 'B'));
+
+  // 반지름 레이블
+  svg.appendChild(el('text', {
+    x: (O.x + A.x) / 2 - 12, y: (O.y + A.y) / 2,
+    'text-anchor': 'end', 'font-size': 14, 'font-family': 'serif'
+  }, '6'));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

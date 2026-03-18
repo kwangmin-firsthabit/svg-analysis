@@ -1,0 +1,127 @@
+<!--
+  유리함수 y = 1/x 좌표 계산 및 검증
+  축 범위: x: -4~4, y: -4~4
+  단위: 60px
+
+  좌표계 설정:
+    원점(O) = (260, 260) [SVG 좌표]
+    1단위 = 60px
+    SVG 너비: 260 + 4*60 + 40 = 540
+    SVG 높이: 260 + 4*60 + 20 = 520
+
+  SVG 변환: svgX = 260 + x*60, svgY = 260 - y*60
+
+  1사분면 (x>0, y>0):
+    x=0.25: y=4,   svgX=260+15=275,  svgY=260-240=20
+    x=0.33: y=3,   svgX=260+20=280,  svgY=260-180=80
+    x=0.5:  y=2,   svgX=260+30=290,  svgY=260-120=140
+    x=1.0:  y=1,   svgX=260+60=320,  svgY=260-60=200
+    x=2.0:  y=0.5, svgX=260+120=380, svgY=260-30=230
+    x=3.0:  y=0.33,svgX=260+180=440, svgY=260-20=240
+    x=4.0:  y=0.25,svgX=260+240=500, svgY=260-15=245
+
+  3사분면 (x<0, y<0):
+    x=-0.25: y=-4,  svgX=260-15=245,  svgY=260+240=500
+    x=-0.33: y=-3,  svgX=260-20=240,  svgY=260+180=440
+    x=-0.5:  y=-2,  svgX=260-30=230,  svgY=260+120=380
+    x=-1.0:  y=-1,  svgX=260-60=200,  svgY=260+60=320
+    x=-2.0:  y=-0.5,svgX=260-120=140, svgY=260+30=290
+    x=-3.0:  y=-0.33,svgX=260-180=80, svgY=260+20=280
+    x=-4.0:  y=-0.25,svgX=260-240=20, svgY=260+15=275
+-->
+<svg width="540" height="520" viewBox="0 0 540 520" xmlns="http://www.w3.org/2000/svg"
+     font-family="serif" font-size="14">
+
+  <!-- x축 -->
+  <line x1="10" y1="260" x2="520" y2="260" stroke="black" stroke-width="1.5"/>
+  <polygon points="520,260 512,256 512,264" fill="black"/>
+  <!-- y축 -->
+  <line x1="260" y1="505" x2="260" y2="10" stroke="black" stroke-width="1.5"/>
+  <polygon points="260,10 256,18 264,18" fill="black"/>
+
+  <!-- x축 눈금 -->
+  <line x1="20" y1="255" x2="20" y2="265" stroke="black" stroke-width="1"/>
+  <text x="20" y="278" text-anchor="middle" font-size="12">-4</text>
+  <line x1="80" y1="255" x2="80" y2="265" stroke="black" stroke-width="1"/>
+  <text x="80" y="278" text-anchor="middle" font-size="12">-3</text>
+  <line x1="140" y1="255" x2="140" y2="265" stroke="black" stroke-width="1"/>
+  <text x="140" y="278" text-anchor="middle" font-size="12">-2</text>
+  <line x1="200" y1="255" x2="200" y2="265" stroke="black" stroke-width="1"/>
+  <text x="200" y="278" text-anchor="middle" font-size="12">-1</text>
+  <line x1="320" y1="255" x2="320" y2="265" stroke="black" stroke-width="1"/>
+  <text x="320" y="278" text-anchor="middle" font-size="12">1</text>
+  <line x1="380" y1="255" x2="380" y2="265" stroke="black" stroke-width="1"/>
+  <text x="380" y="278" text-anchor="middle" font-size="12">2</text>
+  <line x1="440" y1="255" x2="440" y2="265" stroke="black" stroke-width="1"/>
+  <text x="440" y="278" text-anchor="middle" font-size="12">3</text>
+  <line x1="500" y1="255" x2="500" y2="265" stroke="black" stroke-width="1"/>
+  <text x="500" y="278" text-anchor="middle" font-size="12">4</text>
+
+  <!-- y축 눈금 -->
+  <line x1="255" y1="20" x2="265" y2="20" stroke="black" stroke-width="1"/>
+  <text x="250" y="24" text-anchor="end" font-size="12">4</text>
+  <line x1="255" y1="80" x2="265" y2="80" stroke="black" stroke-width="1"/>
+  <text x="250" y="84" text-anchor="end" font-size="12">3</text>
+  <line x1="255" y1="140" x2="265" y2="140" stroke="black" stroke-width="1"/>
+  <text x="250" y="144" text-anchor="end" font-size="12">2</text>
+  <line x1="255" y1="200" x2="265" y2="200" stroke="black" stroke-width="1"/>
+  <text x="250" y="204" text-anchor="end" font-size="12">1</text>
+  <line x1="255" y1="320" x2="265" y2="320" stroke="black" stroke-width="1"/>
+  <text x="250" y="324" text-anchor="end" font-size="12">-1</text>
+  <line x1="255" y1="380" x2="265" y2="380" stroke="black" stroke-width="1"/>
+  <text x="250" y="384" text-anchor="end" font-size="12">-2</text>
+  <line x1="255" y1="440" x2="265" y2="440" stroke="black" stroke-width="1"/>
+  <text x="250" y="444" text-anchor="end" font-size="12">-3</text>
+  <line x1="255" y1="500" x2="265" y2="500" stroke="black" stroke-width="1"/>
+  <text x="250" y="504" text-anchor="end" font-size="12">-4</text>
+
+  <!-- 축 레이블 -->
+  <text x="524" y="264" text-anchor="start" font-size="14">x</text>
+  <text x="264" y="8" text-anchor="start" font-size="14">y</text>
+  <text x="250" y="278" text-anchor="end" font-size="12">O</text>
+
+  <!-- y = 1/x 1사분면 곡선 -->
+  <path fill="none" stroke="#2563eb" stroke-width="2.5"
+    d="M 275,20
+       L 280,80
+       L 283,104
+       L 286,120
+       L 290,140
+       L 296,158
+       L 302,170
+       L 308,180
+       L 320,200
+       L 335,212
+       L 350,222
+       L 365,229
+       L 380,230
+       L 400,236
+       L 420,241
+       L 440,240
+       L 470,245
+       L 500,245"/>
+
+  <!-- y = 1/x 3사분면 곡선 -->
+  <path fill="none" stroke="#2563eb" stroke-width="2.5"
+    d="M 245,500
+       L 240,440
+       L 237,416
+       L 234,400
+       L 230,380
+       L 224,362
+       L 218,350
+       L 212,340
+       L 200,320
+       L 185,308
+       L 170,298
+       L 155,291
+       L 140,290
+       L 120,284
+       L 100,279
+       L 80,280
+       L 50,275
+       L 20,275"/>
+
+  <!-- 함수식 레이블 -->
+  <text x="410" y="205" text-anchor="start" font-size="15" fill="#2563eb" font-style="italic">y = 1/x</text>
+</svg>

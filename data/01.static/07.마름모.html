@@ -1,0 +1,108 @@
+<svg width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    scale: 40px = 1  →  side = 240px = 6
+    반대각선 a=192, b=144
+    192²+144² = 57600 = 240² ✓
+    A(340,68)  B(196,260)  C(340,452)  D(484,260)
+    AB=BC=CD=DA=240px ✓
+  -->
+
+  <!-- Diagonals (dashed) -->
+  <line
+    x1="340"
+    y1="68"
+    x2="340"
+    y2="452"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="6 4"
+    stroke-linecap="round"
+  />
+  <line
+    x1="196"
+    y1="260"
+    x2="484"
+    y2="260"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="6 4"
+    stroke-linecap="round"
+  />
+
+  <!-- Right angle mark at center -->
+  <polyline
+    points="340,270 350,270 350,260"
+    fill="none"
+    stroke="#B4B2A9"
+    stroke-width="1.1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Rhombus -->
+  <polygon points="340,68 196,260 340,452 484,260" fill="none" stroke="#185FA5" stroke-width="1.8" />
+
+  <!-- Equal tick marks -->
+  <line x1="260" y1="168" x2="276" y2="160" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round" />
+  <line x1="260" y1="352" x2="276" y2="360" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round" />
+  <line x1="404" y1="360" x2="420" y2="352" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round" />
+  <line x1="404" y1="160" x2="420" y2="168" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round" />
+
+  <!-- Vertices -->
+  <circle cx="340" cy="68" r="3" fill="#185FA5" />
+  <circle cx="196" cy="260" r="3" fill="#185FA5" />
+  <circle cx="340" cy="452" r="3" fill="#185FA5" />
+  <circle cx="484" cy="260" r="3" fill="#185FA5" />
+
+  <!-- Vertex labels -->
+  <text x="340" y="48" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    A
+  </text>
+  <text x="168" y="266" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    B
+  </text>
+  <text x="340" y="478" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    C
+  </text>
+  <text x="512" y="266" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    D
+  </text>
+
+  <!-- Side length labels -->
+  <text
+    text-anchor="middle"
+    font-family="serif"
+    font-size="14"
+    fill="#185FA5"
+    transform="translate(256,156) rotate(-53)"
+  >
+    6
+  </text>
+  <text
+    text-anchor="middle"
+    font-family="serif"
+    font-size="14"
+    fill="#185FA5"
+    transform="translate(256,366) rotate(53)"
+  >
+    6
+  </text>
+  <text
+    text-anchor="middle"
+    font-family="serif"
+    font-size="14"
+    fill="#185FA5"
+    transform="translate(424,366) rotate(-53)"
+  >
+    6
+  </text>
+  <text
+    text-anchor="middle"
+    font-family="serif"
+    font-size="14"
+    fill="#185FA5"
+    transform="translate(424,156) rotate(53)"
+  >
+    6
+  </text>
+</svg>

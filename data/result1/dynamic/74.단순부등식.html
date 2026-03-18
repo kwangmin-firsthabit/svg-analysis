@@ -1,0 +1,98 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+    <marker id="arrowhead-left" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+      <polygon points="10 0, 0 3.5, 10 7" fill="#333" />
+    </marker>
+  </defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const width = 400;
+  const padding = 40;
+  const xMin = -1;
+  const xMax = 6;
+  const cy = 80;
+  const maxY = 120;
+
+  const scale = (width - padding * 2) / (xMax - xMin);
+  const toSvg = (x) => padding + (x - xMin) * scale;
+
+  const lineStart = toSvg(xMin);
+  const lineEnd = toSvg(xMax);
+  const openPointX = toSvg(2);
+  const thickStart = toSvg(2);
+  const thickEnd = toSvg(xMax);
+
+  const ticks = [];
+  for (let x = xMin; x <= xMax; x++) {
+    ticks.push({ x: toSvg(x), label: String(x) });
+  }
+
+  return { width, cy, maxY, lineStart, lineEnd, openPointX, thickStart, thickEnd, ticks };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { width, cy, maxY, lineStart, lineEnd, openPointX, thickStart, thickEnd, ticks } = geo;
+
+  svg.setAttribute('viewBox', `0 0 ${width} ${maxY}`);
+  svg.setAttribute('width', String(width));
+  svg.setAttribute('height', String(maxY));
+
+  // 상단 부등식 텍스트
+  svg.appendChild(el('text', {
+    x: String(width / 2), y: '40',
+    'text-anchor': 'middle', 'font-size': '18', 'font-family': 'serif', fill: '#333'
+  }, 'x > 2'));
+
+  // 기본 수직선
+  svg.appendChild(el('line', {
+    x1: String(lineStart), y1: String(cy),
+    x2: String(lineEnd), y2: String(cy),
+    stroke: '#333', 'stroke-width': '1.5',
+    'marker-end': 'url(#arrowhead)'
+  }));
+
+  // 두꺼운 범위 선 (x=2 오른쪽)
+  svg.appendChild(el('line', {
+    x1: String(thickStart), y1: String(cy),
+    x2: String(thickEnd), y2: String(cy),
+    stroke: '#2563eb', 'stroke-width': '4',
+    'marker-end': 'url(#arrowhead)'
+  }));
+
+  // 눈금
+  for (const tick of ticks) {
+    svg.appendChild(el('line', {
+      x1: String(tick.x), y1: String(cy - 5),
+      x2: String(tick.x), y2: String(cy + 5),
+      stroke: '#333', 'stroke-width': '1.5'
+    }));
+    svg.appendChild(el('text', {
+      x: String(tick.x), y: String(cy + 20),
+      'text-anchor': 'middle', 'font-size': '13', 'font-family': 'sans-serif', fill: '#333'
+    }, tick.label));
+  }
+
+  // 열린 점 (○) at x=2
+  svg.appendChild(el('circle', {
+    cx: String(openPointX), cy: String(cy), r: '5',
+    fill: 'white', stroke: '#2563eb', 'stroke-width': '2.5'
+  }));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

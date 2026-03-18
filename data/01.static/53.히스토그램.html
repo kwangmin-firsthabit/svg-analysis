@@ -1,0 +1,88 @@
+<svg width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    학생 40명의 통학 시간 히스토그램
+    계급: 0~10 5명, 10~20 12명, 20~30 14명, 30~40 7명, 40~50 2명
+    origin: (100, 330), scaleX=100px/10min, scaleY=18px/명
+  -->
+
+  <!-- ── 격자 ── -->
+  <line x1="100" y1="330" x2="600" y2="330" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="294" x2="600" y2="294" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="258" x2="600" y2="258" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="222" x2="600" y2="222" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="186" x2="600" y2="186" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="150" x2="600" y2="150" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="114" x2="600" y2="114" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="78"  x2="600" y2="78"  stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="42"  x2="600" y2="42"  stroke="#D3D1C7" stroke-width="0.5" />
+
+  <!-- ── 히스토그램 막대 ── -->
+  <!-- 0~10: 5명  → height=90, y=330-90=240 -->
+  <rect x="100" y="240" width="100" height="90"
+        fill="#B5D4F4" stroke="#185FA5" stroke-width="1" />
+  <!-- 10~20: 12명 → height=216, y=330-216=114 -->
+  <rect x="200" y="114" width="100" height="216"
+        fill="#B5D4F4" stroke="#185FA5" stroke-width="1" />
+  <!-- 20~30: 14명 → height=252, y=330-252=78 -->
+  <rect x="300" y="78"  width="100" height="252"
+        fill="#B5D4F4" stroke="#185FA5" stroke-width="1" />
+  <!-- 30~40: 7명  → height=126, y=330-126=204 -->
+  <rect x="400" y="204" width="100" height="126"
+        fill="#B5D4F4" stroke="#185FA5" stroke-width="1" />
+  <!-- 40~50: 2명  → height=36,  y=330-36=294 -->
+  <rect x="500" y="294" width="100" height="36"
+        fill="#B5D4F4" stroke="#185FA5" stroke-width="1" />
+
+  <!-- ── 막대 위 도수 레이블 ── -->
+  <text x="150" y="232" text-anchor="middle" font-family="serif" font-size="13" fill="#185FA5">5</text>
+  <text x="250" y="106" text-anchor="middle" font-family="serif" font-size="13" fill="#185FA5">12</text>
+  <text x="350" y="70"  text-anchor="middle" font-family="serif" font-size="13" fill="#185FA5">14</text>
+  <text x="450" y="196" text-anchor="middle" font-family="serif" font-size="13" fill="#185FA5">7</text>
+  <text x="550" y="286" text-anchor="middle" font-family="serif" font-size="13" fill="#185FA5">2</text>
+
+  <!-- ── x축 ── -->
+  <line x1="92" y1="330" x2="618" y2="330" stroke="#444441" stroke-width="1.5" stroke-linecap="round" />
+  <polyline points="612,324 619,330 612,336"
+            fill="none" stroke="#444441" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- ── y축 ── -->
+  <line x1="100" y1="338" x2="100" y2="32" stroke="#444441" stroke-width="1.5" stroke-linecap="round" />
+  <polyline points="94,38 100,31 106,38"
+            fill="none" stroke="#444441" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- ── x축 눈금 및 레이블 ── -->
+  <line x1="100" y1="326" x2="100" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="100" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">0</text>
+  <line x1="200" y1="326" x2="200" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="200" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">10</text>
+  <line x1="300" y1="326" x2="300" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="300" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">20</text>
+  <line x1="400" y1="326" x2="400" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="400" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">30</text>
+  <line x1="500" y1="326" x2="500" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="500" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">40</text>
+  <line x1="600" y1="326" x2="600" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="600" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">50</text>
+
+  <!-- ── y축 눈금 및 레이블 ── -->
+  <line x1="96" y1="294" x2="104" y2="294" stroke="#444441" stroke-width="1" />
+  <text x="88" y="298" text-anchor="end" font-family="serif" font-size="13" fill="#888780">2</text>
+  <line x1="96" y1="258" x2="104" y2="258" stroke="#444441" stroke-width="1" />
+  <text x="88" y="262" text-anchor="end" font-family="serif" font-size="13" fill="#888780">4</text>
+  <line x1="96" y1="222" x2="104" y2="222" stroke="#444441" stroke-width="1" />
+  <text x="88" y="226" text-anchor="end" font-family="serif" font-size="13" fill="#888780">6</text>
+  <line x1="96" y1="186" x2="104" y2="186" stroke="#444441" stroke-width="1" />
+  <text x="88" y="190" text-anchor="end" font-family="serif" font-size="13" fill="#888780">8</text>
+  <line x1="96" y1="150" x2="104" y2="150" stroke="#444441" stroke-width="1" />
+  <text x="88" y="154" text-anchor="end" font-family="serif" font-size="13" fill="#888780">10</text>
+  <line x1="96" y1="114" x2="104" y2="114" stroke="#444441" stroke-width="1" />
+  <text x="88" y="118" text-anchor="end" font-family="serif" font-size="13" fill="#888780">12</text>
+  <line x1="96" y1="78" x2="104" y2="78" stroke="#444441" stroke-width="1" />
+  <text x="88" y="82" text-anchor="end" font-family="serif" font-size="13" fill="#888780">14</text>
+  <line x1="96" y1="42" x2="104" y2="42" stroke="#444441" stroke-width="1" />
+  <text x="88" y="46" text-anchor="end" font-family="serif" font-size="13" fill="#888780">16</text>
+
+  <!-- ── 축 이름 레이블 ── -->
+  <text x="630" y="334" font-family="serif" font-size="13" fill="#888780">통학 시간(분)</text>
+  <text x="108" y="28" font-family="serif" font-size="13" fill="#888780">도수(명)</text>
+</svg>

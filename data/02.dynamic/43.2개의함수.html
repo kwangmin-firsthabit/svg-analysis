@@ -1,0 +1,403 @@
+<!doctype html>
+<html>
+  <body>
+    <svg width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg" id="main-svg"></svg>
+    <script>
+      (function () {
+        const svg = document.getElementById('main-svg');
+        const ox = 200,
+          oy = 320,
+          ux = 72,
+          uy = 72;
+
+        function sv(mx, my) {
+          return [ox + mx * ux, oy - my * uy];
+        }
+
+        function mk(tag, attrs, txt) {
+          const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+          for (const k in attrs) e.setAttribute(k, attrs[k]);
+          if (txt != null) e.textContent = txt;
+          svg.appendChild(e);
+          return e;
+        }
+
+        const xMin = -1.4,
+          xMax = 5.5,
+          yMin = -1.2,
+          yMax = 5.5;
+        const FF = '"Anthropic Sans",sans-serif';
+
+        // 격자
+        for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+          const [x1, y1] = sv(x, yMin),
+            [x2, y2] = sv(x, yMax);
+          mk('line', { x1, y1, x2, y2, stroke: '#D3D1C7', 'stroke-width': 0.5 });
+        }
+        for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y++) {
+          const [x1, y1] = sv(xMin, y),
+            [x2, y2] = sv(xMax, y);
+          mk('line', { x1, y1, x2, y2, stroke: '#D3D1C7', 'stroke-width': 0.5 });
+        }
+
+        // x축
+        {
+          const [x1, y1] = sv(xMin, 0),
+            [x2, y2] = sv(xMax, 0);
+          mk('line', { x1, y1, x2, y2, stroke: '#444441', 'stroke-width': 1.4, 'stroke-linecap': 'round' });
+        }
+        // y축
+        {
+          const [x1, y1] = sv(0, yMin),
+            [x2, y2] = sv(0, yMax);
+          mk('line', { x1, y1, x2, y2, stroke: '#444441', 'stroke-width': 1.4, 'stroke-linecap': 'round' });
+        }
+
+        // 화살표
+        function arr(x, y, dir) {
+          const s = 6;
+          let d;
+          if (dir === 'r') d = `M${x - s},${y - s / 2}L${x},${y}L${x - s},${y + s / 2}`;
+          if (dir === 'u') d = `M${x - s / 2},${y + s}L${x},${y}L${x + s / 2},${y + s}`;
+          mk('path', {
+            d,
+            fill: 'none',
+            stroke: '#444441',
+            'stroke-width': 1.4,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+        }
+        {
+          const [x, y] = sv(xMax, 0);
+          arr(x + 6, y, 'r');
+        }
+        {
+          const [x, y] = sv(0, yMax);
+          arr(x, y - 6, 'u');
+        }
+
+        // 축 레이블
+        {
+          const [x, y] = sv(xMax, 0);
+          mk(
+            'text',
+            {
+              x: x + 18,
+              y: y + 5,
+              'text-anchor': 'middle',
+              'font-family': FF,
+              'font-size': 14,
+              'font-style': 'italic',
+              fill: '#444441',
+            },
+            'x'
+          );
+        }
+        {
+          const [x, y] = sv(0, yMax);
+          mk(
+            'text',
+            {
+              x: x,
+              y: y - 14,
+              'text-anchor': 'middle',
+              'font-family': FF,
+              'font-size': 14,
+              'font-style': 'italic',
+              fill: '#444441',
+            },
+            'y'
+          );
+        }
+
+        // 눈금
+        for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+          if (x === 0) continue;
+          const [px, py] = sv(x, 0);
+          mk('line', { x1: px, y1: py - 4, x2: px, y2: py + 4, stroke: '#444441', 'stroke-width': 1 });
+          mk(
+            'text',
+            { x: px, y: py + 18, 'text-anchor': 'middle', 'font-family': FF, 'font-size': 11, fill: '#888780' },
+            String(x)
+          );
+        }
+        for (let y = 1; y <= Math.floor(yMax); y++) {
+          const [px, py] = sv(0, y);
+          mk('line', { x1: px - 4, y1: py, x2: px + 4, y2: py, stroke: '#444441', 'stroke-width': 1 });
+          mk(
+            'text',
+            { x: px - 16, y: py + 4, 'text-anchor': 'middle', 'font-family': FF, 'font-size': 11, fill: '#888780' },
+            String(y)
+          );
+        }
+        {
+          const [px, py] = sv(0, 0);
+          mk(
+            'text',
+            { x: px - 14, y: py + 16, 'text-anchor': 'middle', 'font-family': FF, 'font-size': 11, fill: '#888780' },
+            'O'
+          );
+        }
+
+        // y=x 대칭축
+        {
+          const [x1, y1] = sv(xMin, xMin),
+            [x2, y2] = sv(yMax, yMax);
+          mk('line', { x1, y1, x2, y2, stroke: '#B4B2A9', 'stroke-width': 0.9, 'stroke-dasharray': '5 4' });
+        }
+        {
+          const [x, y] = sv(3.9, 3.9);
+          mk(
+            'text',
+            { x: x + 8, y: y - 6, 'text-anchor': 'start', 'font-family': FF, 'font-size': 11, fill: '#888780' },
+            'y = x'
+          );
+        }
+
+        // y=2^x
+        {
+          let d = '',
+            pen = false;
+          for (let i = 0; i <= 600; i++) {
+            const mx = xMin + ((xMax - xMin) * i) / 600,
+              my = Math.pow(2, mx);
+            if (my < yMin - 0.2 || my > yMax + 0.2) {
+              pen = false;
+              continue;
+            }
+            const [sx, sy] = sv(mx, my);
+            if (!pen) {
+              d = `M${sx},${sy}`;
+              pen = true;
+            } else {
+              d += `L${sx},${sy}`;
+            }
+          }
+          mk('path', {
+            d,
+            fill: 'none',
+            stroke: '#D85A30',
+            'stroke-width': 2.2,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+        }
+
+        // y=log2(x)
+        {
+          let d = '',
+            pen = false;
+          for (let i = 0; i <= 600; i++) {
+            const mx = 0.03 + ((xMax - 0.03) * i) / 600,
+              my = Math.log2(mx);
+            if (my < yMin - 0.2 || my > yMax + 0.2) {
+              pen = false;
+              continue;
+            }
+            const [sx, sy] = sv(mx, my);
+            if (!pen) {
+              d = `M${sx},${sy}`;
+              pen = true;
+            } else {
+              d += `L${sx},${sy}`;
+            }
+          }
+          mk('path', {
+            d,
+            fill: 'none',
+            stroke: '#1D9E75',
+            'stroke-width': 2.2,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+        }
+
+        // 이분법
+        function bisect(f, a, b) {
+          let fa = f(a);
+          for (let i = 0; i < 100; i++) {
+            const m = (a + b) / 2,
+              fm = f(m);
+            if (Math.abs(fm) < 1e-9) return m;
+            if (fa * fm < 0) {
+              b = m;
+            } else {
+              a = m;
+              fa = fm;
+            }
+          }
+          return (a + b) / 2;
+        }
+        const k = 3;
+        const xA = bisect(x => Math.pow(2, x) + x - k, -5, 2);
+        const yA = Math.pow(2, xA);
+        const xB = bisect(x => Math.log2(x) + x - k, 0.01, k);
+        const yB = Math.log2(xB);
+
+        // y=-x+k 직선
+        {
+          let d = '',
+            pen = false;
+          for (let i = 0; i <= 300; i++) {
+            const mx = xMin + ((xMax - xMin) * i) / 300,
+              my = -mx + k;
+            if (my < yMin - 0.2 || my > yMax + 0.2) {
+              pen = false;
+              continue;
+            }
+            const [sx, sy] = sv(mx, my);
+            if (!pen) {
+              d = `M${sx},${sy}`;
+              pen = true;
+            } else {
+              d += `L${sx},${sy}`;
+            }
+          }
+          mk('path', {
+            d,
+            fill: 'none',
+            stroke: '#7F77DD',
+            'stroke-width': 2.0,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+        }
+
+        // 보조 점선
+        function dl(mx1, my1, mx2, my2, stroke) {
+          const [x1, y1] = sv(mx1, my1),
+            [x2, y2] = sv(mx2, my2);
+          mk('line', { x1, y1, x2, y2, stroke: stroke || '#B4B2A9', 'stroke-width': 0.8, 'stroke-dasharray': '4 3' });
+        }
+        dl(xA, yA, xA, 0, '#D85A30');
+        dl(xA, yA, 0, yA, '#D85A30');
+        dl(xB, yB, xB, 0, '#1D9E75');
+        dl(xB, yB, 0, yB, '#1D9E75');
+
+        // 두 교점 연결
+        {
+          const [x1, y1] = sv(xA, yA),
+            [x2, y2] = sv(xB, yB);
+          mk('line', { x1, y1, x2, y2, stroke: '#AFA9EC', 'stroke-width': 0.9, 'stroke-dasharray': '3 3' });
+        }
+
+        // 교점
+        {
+          const [cx, cy] = sv(xA, yA);
+          mk('circle', { cx, cy, r: 5.5, fill: '#F0997B', stroke: '#fff', 'stroke-width': 1.5 });
+        }
+        {
+          const [cx, cy] = sv(xB, yB);
+          mk('circle', { cx, cy, r: 5.5, fill: '#5DCAA5', stroke: '#fff', 'stroke-width': 1.5 });
+        }
+
+        // 좌표 레이블
+        {
+          const [px, py] = sv(xA, yA);
+          mk(
+            'text',
+            {
+              x: px - 10,
+              y: py - 12,
+              'text-anchor': 'end',
+              'font-family': FF,
+              'font-size': 11,
+              'font-weight': 500,
+              fill: '#993C1D',
+            },
+            `(${xA.toFixed(3)}, ${yA.toFixed(3)})`
+          );
+        }
+        {
+          const [px, py] = sv(xB, yB);
+          mk(
+            'text',
+            {
+              x: px + 10,
+              y: py - 12,
+              'text-anchor': 'start',
+              'font-family': FF,
+              'font-size': 11,
+              'font-weight': 500,
+              fill: '#0F6E56',
+            },
+            `(${xB.toFixed(3)}, ${yB.toFixed(3)})`
+          );
+        }
+
+        // x₁+x₂=k
+        {
+          const [ax, ay] = sv(xA, yA),
+            [bx, by] = sv(xB, yB);
+          mk(
+            'text',
+            {
+              x: (ax + bx) / 2,
+              y: (ay + by) / 2 - 14,
+              'text-anchor': 'middle',
+              'font-family': FF,
+              'font-size': 11,
+              'font-weight': 500,
+              fill: '#7F77DD',
+            },
+            'x\u2081 + x\u2082 = ' + k
+          );
+        }
+
+        // 함수식 레이블
+        {
+          const [x, y] = sv(-0.9, 4.0);
+          mk(
+            'text',
+            {
+              x,
+              y,
+              'text-anchor': 'start',
+              'font-family': FF,
+              'font-size': 13,
+              'font-style': 'italic',
+              'font-weight': 500,
+              fill: '#993C1D',
+            },
+            'y = 2\u02E3'
+          );
+        }
+        {
+          const [x, y] = sv(4.2, 1.5);
+          mk(
+            'text',
+            {
+              x,
+              y,
+              'text-anchor': 'start',
+              'font-family': FF,
+              'font-size': 13,
+              'font-style': 'italic',
+              'font-weight': 500,
+              fill: '#0F6E56',
+            },
+            'y = log\u2082x'
+          );
+        }
+        {
+          const [x, y] = sv(3.3, 3.6);
+          mk(
+            'text',
+            {
+              x,
+              y,
+              'text-anchor': 'start',
+              'font-family': FF,
+              'font-size': 13,
+              'font-style': 'italic',
+              'font-weight': 500,
+              fill: '#534AB7',
+            },
+            'y = \u2212x + 3'
+          );
+        }
+      })();
+    </script>
+  </body>
+</html>

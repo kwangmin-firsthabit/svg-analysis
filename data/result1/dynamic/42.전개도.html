@@ -1,0 +1,121 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 30;
+  // 삼각기둥 전개도: 변 a=3, b=4, c=5, 높이 h=10
+  const a = 3, b = 4, c = 5, h = 10;
+
+  const px_a = a * unit; // 90
+  const px_b = b * unit; // 120
+  const px_c = c * unit; // 150
+  const px_h = h * unit; // 300
+
+  const ox = 60;   // 시작 x
+  const oy = 80;   // 직사각형 상단 y
+
+  // 직사각형 위치
+  const rect1 = { x: ox, y: oy, w: px_a, h: px_h };             // 변3
+  const rect2 = { x: ox + px_a, y: oy, w: px_b, h: px_h };     // 변4
+  const rect3 = { x: ox + px_a + px_b, y: oy, w: px_c, h: px_h }; // 변5
+
+  // 직각삼각형: 직각=(rect1우상), 가로=(rect2우상), 세로=(rect1우상 위)
+  // 직각 꼭짓점 = (ox+px_a, oy)
+  const rjx = ox + px_a, rjy = oy;
+  const tri_top = [
+    { x: rjx, y: rjy },             // 직각
+    { x: rjx + px_b, y: rjy },      // 가로4 끝
+    { x: rjx, y: rjy - px_a },      // 세로3 끝
+  ];
+  const tri_bot = [
+    { x: rjx, y: oy + px_h },
+    { x: rjx + px_b, y: oy + px_h },
+    { x: rjx, y: oy + px_h + px_a },
+  ];
+
+  const W = 500, maxY = 580;
+  return { rect1, rect2, rect3, tri_top, tri_bot, oy, px_h, px_a, px_b, px_c, ox, W, maxY };
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function render(geo) {
+  const { rect1, rect2, rect3, tri_top, tri_bot, oy, px_h, px_a, px_b, px_c, ox, W, maxY } = geo;
+  svg.setAttribute('viewBox', '40 -30 450 540');
+  svg.setAttribute('width', String(W));
+  svg.setAttribute('height', String(maxY));
+
+  // 직사각형 3개
+  const rects = [
+    { r: rect1, fill: '#dbeafe', stroke: '#1e40af' },
+    { r: rect2, fill: '#dcfce7', stroke: '#15803d' },
+    { r: rect3, fill: '#fef9c3', stroke: '#ca8a04' },
+  ];
+  for (const { r, fill, stroke } of rects) {
+    svg.appendChild(mkEl('rect', {
+      x: r.x, y: r.y, width: r.w, height: r.h,
+      fill, stroke, 'stroke-width': '1.8'
+    }));
+  }
+
+  // 삼각형 (위, 아래)
+  for (const pts of [tri_top, tri_bot]) {
+    svg.appendChild(mkEl('polygon', {
+      points: pts.map(p => `${p.x},${p.y}`).join(' '),
+      fill: '#e0f2fe', stroke: '#0369a1', 'stroke-width': '1.8'
+    }));
+    // 직각 표시
+    const [rj, , se] = pts;
+    const isTop = pts === tri_top;
+    const dy = isTop ? -12 : 12;
+    svg.appendChild(mkEl('path', {
+      d: `M ${rj.x},${rj.y + dy} L ${rj.x + 12},${rj.y + dy} L ${rj.x + 12},${rj.y}`,
+      fill: 'none', stroke: '#0369a1', 'stroke-width': '1.2'
+    }));
+  }
+
+  // 치수 라벨
+  const dims = [
+    { x: rect1.x + rect1.w / 2, y: rect1.y + rect1.h + 18, t: '3', fill: '#1e40af' },
+    { x: rect2.x + rect2.w / 2, y: rect2.y + rect2.h + 18, t: '4', fill: '#15803d' },
+    { x: rect3.x + rect3.w / 2, y: rect3.y + rect3.h + 18, t: '5', fill: '#ca8a04' },
+    { x: ox - 12, y: oy + px_h / 2, t: '10', fill: '#374151', anchor: 'end' },
+  ];
+  for (const lb of dims) {
+    const el = mkEl('text', {
+      x: lb.x, y: lb.y,
+      'text-anchor': lb.anchor || 'middle',
+      'font-size': '13', 'font-family': 'serif', fill: lb.fill
+    });
+    el.textContent = lb.t;
+    svg.appendChild(el);
+  }
+
+  // 삼각형 변 라벨 (위)
+  const [t0, t1, t2] = tri_top;
+  const triLabels = [
+    { x: t0.x - 10, y: (t0.y + t2.y) / 2, t: '3', anchor: 'end' },
+    { x: (t0.x + t1.x) / 2, y: t0.y - 6, t: '4', anchor: 'middle' },
+    { x: (t1.x + t2.x) / 2 + 8, y: (t1.y + t2.y) / 2, t: '5', anchor: 'start' },
+  ];
+  for (const lb of triLabels) {
+    const el = mkEl('text', {
+      x: lb.x, y: lb.y, 'text-anchor': lb.anchor,
+      'font-size': '12', 'font-family': 'serif', fill: '#0369a1'
+    });
+    el.textContent = lb.t;
+    svg.appendChild(el);
+  }
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

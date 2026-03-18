@@ -1,0 +1,82 @@
+<!--
+  이중막대그래프: 2022 vs 2023 분기별 매출액(억)
+  2022: Q1=120, Q2=145, Q3=132, Q4=178
+  2023: Q1=135, Q2=162, Q3=148, Q4=195
+  최대값: 195
+
+  레이아웃:
+    viewBox: 0 0 420 300
+    축 원점: (60, 250)
+    y축 길이: 200px, y스케일: 200/200=1px/억 (0~200)
+    각 분기 그룹 너비: 80px, 막대 너비: 30px, 간격:4px
+    그룹 시작 x: 60 + q*90 + 5 (q=0..3)
+
+  x 좌표:
+    Q1: 2022=x=65, 2023=x=99
+    Q2: 2022=x=155, 2023=x=189
+    Q3: 2022=x=245, 2023=x=279
+    Q4: 2022=x=335, 2023=x=369
+
+  y 계산: y = 250 - value*1 (단, 200억 → 200px, 즉 1px/억)
+    2022 Q1(120): y=130, h=120
+    2022 Q2(145): y=105, h=145
+    2022 Q3(132): y=118, h=132
+    2022 Q4(178): y=72, h=178
+    2023 Q1(135): y=115, h=135
+    2023 Q2(162): y=88, h=162
+    2023 Q3(148): y=102, h=148
+    2023 Q4(195): y=55, h=195
+-->
+<svg width="420" height="300" viewBox="0 0 420 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- 보조선 -->
+  <line x1="60" y1="200" x2="410" y2="200" stroke="#ddd" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="60" y1="150" x2="410" y2="150" stroke="#ddd" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="60" y1="100" x2="410" y2="100" stroke="#ddd" stroke-width="0.5" stroke-dasharray="3,3"/>
+  <line x1="60" y1="50" x2="410" y2="50" stroke="#ddd" stroke-width="0.5" stroke-dasharray="3,3"/>
+
+  <!-- Q1 -->
+  <rect x="68" y="130" width="30" height="120" fill="#4a90d9"/>
+  <rect x="102" y="115" width="30" height="135" fill="#e74c3c"/>
+  <!-- Q2 -->
+  <rect x="158" y="105" width="30" height="145" fill="#4a90d9"/>
+  <rect x="192" y="88" width="30" height="162" fill="#e74c3c"/>
+  <!-- Q3 -->
+  <rect x="248" y="118" width="30" height="132" fill="#4a90d9"/>
+  <rect x="282" y="102" width="30" height="148" fill="#e74c3c"/>
+  <!-- Q4 -->
+  <rect x="338" y="72" width="30" height="178" fill="#4a90d9"/>
+  <rect x="372" y="55" width="30" height="195" fill="#e74c3c"/>
+
+  <!-- x축 -->
+  <line x1="55" y1="250" x2="415" y2="250" stroke="#333" stroke-width="1.5"/>
+  <!-- y축 -->
+  <line x1="60" y1="40" x2="60" y2="254" stroke="#333" stroke-width="1.5"/>
+
+  <!-- x축 레이블 -->
+  <text x="98" y="264" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">Q1</text>
+  <text x="188" y="264" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">Q2</text>
+  <text x="278" y="264" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">Q3</text>
+  <text x="368" y="264" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">Q4</text>
+
+  <!-- y축 눈금 및 레이블 (0,50,100,150,200) -->
+  <line x1="54" y1="250" x2="60" y2="250" stroke="#333" stroke-width="1"/>
+  <text x="50" y="254" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">0</text>
+  <line x1="54" y1="200" x2="60" y2="200" stroke="#333" stroke-width="1"/>
+  <text x="50" y="204" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">50</text>
+  <line x1="54" y1="150" x2="60" y2="150" stroke="#333" stroke-width="1"/>
+  <text x="50" y="154" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">100</text>
+  <line x1="54" y1="100" x2="60" y2="100" stroke="#333" stroke-width="1"/>
+  <text x="50" y="104" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">150</text>
+  <line x1="54" y1="50" x2="60" y2="50" stroke="#333" stroke-width="1"/>
+  <text x="50" y="54" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">200</text>
+
+  <!-- 범례 -->
+  <rect x="100" y="22" width="12" height="12" fill="#4a90d9"/>
+  <text x="116" y="33" font-family="sans-serif" font-size="11" fill="#333">2022년</text>
+  <rect x="175" y="22" width="12" height="12" fill="#e74c3c"/>
+  <text x="191" y="33" font-family="sans-serif" font-size="11" fill="#333">2023년</text>
+
+  <!-- 축 레이블 -->
+  <text x="230" y="285" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">분기</text>
+  <text x="18" y="150" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333" transform="rotate(-90,18,150)">매출액 (억)</text>
+</svg>

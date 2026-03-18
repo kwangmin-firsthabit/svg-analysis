@@ -1,0 +1,42 @@
+<svg width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    원뿔: 밑면 반지름 r=4, 높이 h=6
+    scale=40px/unit → rx=4*40=160px, h=6*40=240px
+    center_x=340, apex_y=80, base_y=320
+    ellipse ry = rx*0.3 = 48
+  -->
+
+  <!-- 밑면 타원 뒷부분 (dashed) -->
+  <path d="M 180,320 A 160,48 0 0,1 500,320" fill="none" stroke="#888780" stroke-width="1" stroke-dasharray="5 4" stroke-linecap="round" />
+
+  <!-- 원뿔 면 채우기 -->
+  <polygon points="340,80 180,320 500,320" fill="#E6F1FB" stroke="none" opacity="0.6" />
+
+  <!-- 밑면 타원 앞부분 채우기 -->
+  <path d="M 180,320 A 160,48 0 0,0 500,320" fill="#B5D4F4" stroke="none" opacity="0.5" />
+
+  <!-- 모선 -->
+  <line x1="340" y1="80" x2="180" y2="320" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="340" y1="80" x2="500" y2="320" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+
+  <!-- 밑면 타원 앞부분 테두리 -->
+  <path d="M 180,320 A 160,48 0 0,0 500,320" fill="none" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+
+  <!-- 중심축 (dashed) -->
+  <line x1="340" y1="48" x2="340" y2="368" stroke="#888780" stroke-width="0.8" stroke-dasharray="5 4" stroke-linecap="round" />
+
+  <!-- 반지름 선분 (밑면) -->
+  <line x1="340" y1="320" x2="500" y2="320" stroke="#888780" stroke-width="0.8" stroke-dasharray="5 4" stroke-linecap="round" />
+
+  <!-- 꼭짓점 -->
+  <circle cx="340" cy="80" r="3" fill="#2C2C2A" />
+
+  <!-- 치수선: r=4 -->
+  <text x="420" y="312" text-anchor="middle" font-family="serif" font-size="13" fill="#5F5E5A">r = 4</text>
+
+  <!-- 치수선: h=6 (오른쪽) -->
+  <line x1="530" y1="80" x2="530" y2="320" stroke="#5F5E5A" stroke-width="0.8" stroke-linecap="round" />
+  <line x1="524" y1="80" x2="536" y2="80" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="524" y1="320" x2="536" y2="320" stroke="#5F5E5A" stroke-width="0.8" />
+  <text x="544" y="205" text-anchor="start" font-family="serif" font-size="13" fill="#5F5E5A">h = 6</text>
+</svg>

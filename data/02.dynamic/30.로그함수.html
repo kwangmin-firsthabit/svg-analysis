@@ -1,0 +1,296 @@
+<!doctype html>
+<html>
+  <body>
+    <svg width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+      <script>
+        const W = 680,
+          H = 520;
+        const ox = 160,
+          oy = 280,
+          unit = 100;
+
+        function toSVG(mx, my) {
+          return { x: ox + mx * unit, y: oy - my * unit };
+        }
+
+        const svg = document.querySelector('svg');
+        function el(tag, attrs, txt) {
+          const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+          for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+          if (txt !== undefined) e.textContent = txt;
+          svg.appendChild(e);
+          return e;
+        }
+
+        const xMin = -0.4,
+          xMax = 5.2,
+          yMin = -3.5,
+          yMax = 3.5;
+
+        // 격자
+        for (let x = 0; x <= Math.floor(xMax); x++) {
+          const p = toSVG(x, yMin),
+            q = toSVG(x, yMax);
+          el('line', { x1: p.x, y1: p.y, x2: q.x, y2: q.y, stroke: '#D3D1C7', 'stroke-width': 0.5 });
+        }
+        for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y++) {
+          const p = toSVG(xMin, y),
+            q = toSVG(xMax, y);
+          el('line', { x1: p.x, y1: p.y, x2: q.x, y2: q.y, stroke: '#D3D1C7', 'stroke-width': 0.5 });
+        }
+
+        // 축
+        const xa = toSVG(xMin, 0),
+          xb = toSVG(xMax, 0);
+        el('line', {
+          x1: xa.x,
+          y1: xa.y,
+          x2: xb.x,
+          y2: xb.y,
+          stroke: '#444441',
+          'stroke-width': 1.4,
+          'stroke-linecap': 'round',
+        });
+        const ya = toSVG(0, yMin),
+          yb = toSVG(0, yMax);
+        el('line', {
+          x1: ya.x,
+          y1: ya.y,
+          x2: yb.x,
+          y2: yb.y,
+          stroke: '#444441',
+          'stroke-width': 1.4,
+          'stroke-linecap': 'round',
+        });
+
+        // 화살표
+        function arrowHead(x, y, dir) {
+          const s = 6;
+          let d;
+          if (dir === 'right') d = `M${x - s},${y - s / 2} L${x},${y} L${x - s},${y + s / 2}`;
+          if (dir === 'up') d = `M${x - s / 2},${y + s} L${x},${y} L${x + s / 2},${y + s}`;
+          el('path', {
+            d,
+            fill: 'none',
+            stroke: '#444441',
+            'stroke-width': 1.4,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+        }
+        arrowHead(xb.x + 6, xb.y, 'right');
+        arrowHead(yb.x, yb.y - 6, 'up');
+
+        // 축 레이블
+        el(
+          'text',
+          {
+            x: xb.x + 18,
+            y: xb.y + 5,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 14,
+            'font-style': 'italic',
+            fill: '#444441',
+          },
+          'x'
+        );
+        el(
+          'text',
+          {
+            x: yb.x,
+            y: yb.y - 14,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 14,
+            'font-style': 'italic',
+            fill: '#444441',
+          },
+          'y'
+        );
+
+        // 눈금
+        for (let x = 1; x <= Math.floor(xMax); x++) {
+          const p = toSVG(x, 0);
+          el('line', { x1: p.x, y1: p.y - 4, x2: p.x, y2: p.y + 4, stroke: '#444441', 'stroke-width': 1 });
+          el(
+            'text',
+            {
+              x: p.x,
+              y: p.y + 18,
+              'text-anchor': 'middle',
+              'font-family': '"Anthropic Sans",sans-serif',
+              'font-size': 11,
+              fill: '#888780',
+            },
+            String(x)
+          );
+        }
+        for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y++) {
+          if (y === 0) continue;
+          const p = toSVG(0, y);
+          el('line', { x1: p.x - 4, y1: p.y, x2: p.x + 4, y2: p.y, stroke: '#444441', 'stroke-width': 1 });
+          el(
+            'text',
+            {
+              x: p.x - 18,
+              y: p.y + 4,
+              'text-anchor': 'middle',
+              'font-family': '"Anthropic Sans",sans-serif',
+              'font-size': 11,
+              fill: '#888780',
+            },
+            String(y)
+          );
+        }
+        el(
+          'text',
+          {
+            x: ox - 16,
+            y: oy + 16,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 11,
+            fill: '#888780',
+          },
+          'O'
+        );
+
+        // 점근선 x=0 점선
+        const asymT = toSVG(0, yMax),
+          asymB = toSVG(0, yMin);
+        el('line', {
+          x1: asymT.x,
+          y1: asymT.y,
+          x2: asymB.x,
+          y2: asymB.y,
+          stroke: '#F3306A',
+          'stroke-width': 1.2,
+          'stroke-dasharray': '6 4',
+          'stroke-linecap': 'round',
+        });
+
+        // y = log2(x) 곡선 (600 샘플, x > 0)
+        function f(x) {
+          return Math.log2(x);
+        }
+        const steps = 600,
+          xFrom = 0.03,
+          xTo = xMax;
+        let pathD = '',
+          penDown = false;
+        for (let i = 0; i <= steps; i++) {
+          const mx = xFrom + ((xTo - xFrom) * i) / steps;
+          const my = f(mx);
+          if (my < yMin - 0.05 || my > yMax + 0.05) {
+            penDown = false;
+            continue;
+          }
+          const p = toSVG(mx, my);
+          if (!penDown) {
+            pathD += `M${p.x},${p.y}`;
+            penDown = true;
+          } else {
+            pathD += ` L${p.x},${p.y}`;
+          }
+        }
+        el('path', {
+          d: pathD,
+          fill: 'none',
+          stroke: '#378ADD',
+          'stroke-width': 2.4,
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+        });
+
+        // 보조 점선
+        function dashedLine(x1, y1, x2, y2) {
+          el('line', { x1, y1, x2, y2, stroke: '#B4B2A9', 'stroke-width': 0.8, 'stroke-dasharray': '4 3' });
+        }
+
+        // 대표점: (1/4,-2), (1/2,-1), (1,0), (2,1), (4,2)
+        [
+          [0.25, -2],
+          [0.5, -1],
+          [1, 0],
+          [2, 1],
+          [4, 2],
+        ].forEach(([mx, my]) => {
+          const p = toSVG(mx, my);
+          const isBase = mx === 1;
+          if (!isBase) {
+            dashedLine(p.x, p.y, p.x, oy);
+            dashedLine(p.x, p.y, ox, p.y);
+          } else {
+            dashedLine(p.x, p.y, p.x, oy);
+          }
+          el('circle', {
+            cx: p.x,
+            cy: p.y,
+            r: isBase ? 5.5 : 3.5,
+            fill: isBase ? '#F3306A' : '#B5D4F4',
+            stroke: isBase ? '#fff' : '#378ADD',
+            'stroke-width': 1.5,
+          });
+        });
+
+        // 레이블
+        const lblPos = toSVG(3.6, 2.4);
+        el(
+          'text',
+          {
+            x: lblPos.x,
+            y: lblPos.y,
+            'text-anchor': 'start',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 15,
+            'font-style': 'italic',
+            'font-weight': 500,
+            fill: '#185FA5',
+          },
+          'y = log₂x'
+        );
+
+        const p10 = toSVG(1, 0);
+        el(
+          'text',
+          {
+            x: p10.x + 12,
+            y: p10.y - 10,
+            'text-anchor': 'start',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 12,
+            fill: '#A32D2D',
+          },
+          '(1, 0)'
+        );
+
+        el(
+          'text',
+          {
+            x: ox + 10,
+            y: toSVG(0, yMax - 0.4).y,
+            'text-anchor': 'start',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 11,
+            fill: '#993356',
+          },
+          '점근선 x = 0'
+        );
+
+        el(
+          'text',
+          {
+            x: toSVG(3.0, -3.1).x,
+            y: toSVG(3.0, -3.1).y,
+            'text-anchor': 'start',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 11,
+            fill: '#888780',
+          },
+          '(정의역: x > 0)'
+        );
+      </script>
+    </svg>
+  </body>
+</html>

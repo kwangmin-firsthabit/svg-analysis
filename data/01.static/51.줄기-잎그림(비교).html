@@ -1,0 +1,67 @@
+<svg width="100%" viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Title -->
+  <text x="340" y="36" font-family="serif" font-size="16" font-weight="bold"
+        fill="#2C2C2A" text-anchor="middle">남·여학생 키(cm) 줄기-잎 그림 (비교)</text>
+
+  <!--
+    Layout:
+      Left leaves (남): x=80~280  (right-aligned at x=270)
+      Stem column: x=280~400 (center x=340)
+      Right leaves (여): x=400~600 (left-aligned at x=410)
+  -->
+
+  <!-- Outer border -->
+  <rect x="80" y="52" width="520" height="220" fill="white" stroke="#2C2C2A" stroke-width="1"/>
+
+  <!-- Header background -->
+  <rect x="80" y="52" width="520" height="32" fill="#E6F1FB" stroke="#2C2C2A" stroke-width="1"/>
+
+  <!-- Vertical separators -->
+  <line x1="280" y1="52" x2="280" y2="272" stroke="#2C2C2A" stroke-width="1.5"/>
+  <line x1="400" y1="52" x2="400" y2="272" stroke="#2C2C2A" stroke-width="1.5"/>
+
+  <!-- Header labels -->
+  <text x="180" y="73" font-family="serif" font-size="14" font-weight="bold" fill="#444441" text-anchor="middle">남 (잎)</text>
+  <text x="340" y="73" font-family="serif" font-size="14" font-weight="bold" fill="#444441" text-anchor="middle">줄기</text>
+  <text x="500" y="73" font-family="serif" font-size="14" font-weight="bold" fill="#444441" text-anchor="middle">여 (잎)</text>
+
+  <!-- Row 1: stem 14 — #F7F6F3 -->
+  <!-- 남: none, 여: 8 -->
+  <rect x="80" y="84" width="520" height="44" fill="#F7F6F3" stroke="#2C2C2A" stroke-width="1"/>
+  <line x1="280" y1="84" x2="280" y2="128" stroke="#2C2C2A" stroke-width="1.5"/>
+  <line x1="400" y1="84" x2="400" y2="128" stroke="#2C2C2A" stroke-width="1.5"/>
+  <text x="340" y="111" font-family="serif" font-size="14" fill="#2C2C2A" text-anchor="middle">14</text>
+  <text x="410" y="111" font-family="serif" font-size="13" fill="#2C2C2A">8</text>
+
+  <!-- Row 2: stem 15 — white -->
+  <!-- 남: 8 2 (right-aligned, largest on right), 여: 1 3 5 7 9 -->
+  <rect x="80" y="128" width="520" height="44" fill="white" stroke="#2C2C2A" stroke-width="1"/>
+  <line x1="280" y1="128" x2="280" y2="172" stroke="#2C2C2A" stroke-width="1.5"/>
+  <line x1="400" y1="128" x2="400" y2="172" stroke="#2C2C2A" stroke-width="1.5"/>
+  <text x="340" y="155" font-family="serif" font-size="14" fill="#2C2C2A" text-anchor="middle">15</text>
+  <!-- left leaves right-aligned: 8 2 → reading from stem outward: 2, 8 → display "8   2" right-aligned -->
+  <text x="270" y="155" font-family="serif" font-size="13" fill="#2C2C2A" text-anchor="end">8   2</text>
+  <text x="410" y="155" font-family="serif" font-size="13" fill="#2C2C2A">1   3   5   7   9</text>
+
+  <!-- Row 3: stem 16 — #F7F6F3 -->
+  <!-- 남: 8 7 5 3 1, 여: 2 4 5 8 -->
+  <rect x="80" y="172" width="520" height="44" fill="#F7F6F3" stroke="#2C2C2A" stroke-width="1"/>
+  <line x1="280" y1="172" x2="280" y2="216" stroke="#2C2C2A" stroke-width="1.5"/>
+  <line x1="400" y1="172" x2="400" y2="216" stroke="#2C2C2A" stroke-width="1.5"/>
+  <text x="340" y="199" font-family="serif" font-size="14" fill="#2C2C2A" text-anchor="middle">16</text>
+  <text x="270" y="199" font-family="serif" font-size="13" fill="#2C2C2A" text-anchor="end">8   7   5   3   1</text>
+  <text x="410" y="199" font-family="serif" font-size="13" fill="#2C2C2A">2   4   5   8</text>
+
+  <!-- Row 4: stem 17 — white -->
+  <!-- 남: 5 2 0, 여: none -->
+  <rect x="80" y="216" width="520" height="56" fill="white" stroke="#2C2C2A" stroke-width="1"/>
+  <line x1="280" y1="216" x2="280" y2="272" stroke="#2C2C2A" stroke-width="1.5"/>
+  <line x1="400" y1="216" x2="400" y2="272" stroke="#2C2C2A" stroke-width="1.5"/>
+  <text x="340" y="249" font-family="serif" font-size="14" fill="#2C2C2A" text-anchor="middle">17</text>
+  <text x="270" y="249" font-family="serif" font-size="13" fill="#2C2C2A" text-anchor="end">5   2   0</text>
+
+  <!-- Note -->
+  <text x="340" y="290" font-family="serif" font-size="12" fill="#444441" text-anchor="middle">남: 2 | 15 는 152cm, 여: 15 | 1 는 151cm를 나타냄</text>
+
+</svg>

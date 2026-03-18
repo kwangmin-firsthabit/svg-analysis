@@ -1,0 +1,95 @@
+<!--
+  막대그래프: 월별 강수량(mm)
+  1:32, 2:44, 3:65, 4:82, 5:95, 6:138, 7:287, 8:312, 9:148, 10:55, 11:48, 12:21
+  최대값: 312mm
+
+  레이아웃:
+    viewBox: 0 0 520 320
+    축 원점: (55, 270)
+    x축 길이: 420px, y축 길이: 240px
+    y 스케일: 240/320 = 0.75px/mm (최대 320mm → 240px)
+    막대 너비: 28px, 간격: 7px (그룹 피치=35px)
+    막대 x: 55 + (i*35) + 5  (i=0..11)
+
+  y 계산: height = 강수량 * 0.75
+    1월(32):  h=24, y=270-24=246
+    2월(44):  h=33, y=237
+    3월(65):  h=48.75≈49, y=221
+    4월(82):  h=61.5≈62, y=208
+    5월(95):  h=71.25≈71, y=199
+    6월(138): h=103.5≈104, y=166
+    7월(287): h=215.25≈215, y=55
+    8월(312): h=234, y=36
+    9월(148): h=111, y=159
+    10월(55): h=41.25≈41, y=229
+    11월(48): h=36, y=234
+    12월(21): h=15.75≈16, y=254
+-->
+<svg width="520" height="320" viewBox="0 0 520 320" xmlns="http://www.w3.org/2000/svg">
+  <!-- 보조 수평선 -->
+  <line x1="55" y1="210" x2="475" y2="210" stroke="#ddd" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="55" y1="150" x2="475" y2="150" stroke="#ddd" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="55" y1="90" x2="475" y2="90" stroke="#ddd" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <line x1="55" y1="30" x2="475" y2="30" stroke="#ddd" stroke-width="0.5" stroke-dasharray="4,3"/>
+
+  <!-- 막대 (색상: 여름 짙은 파랑, 나머지 연한 파랑) -->
+  <!-- 1월 -->
+  <rect x="60" y="246" width="28" height="24" fill="#7fb3d3"/>
+  <!-- 2월 -->
+  <rect x="95" y="237" width="28" height="33" fill="#7fb3d3"/>
+  <!-- 3월 -->
+  <rect x="130" y="221" width="28" height="49" fill="#7fb3d3"/>
+  <!-- 4월 -->
+  <rect x="165" y="208" width="28" height="62" fill="#7fb3d3"/>
+  <!-- 5월 -->
+  <rect x="200" y="199" width="28" height="71" fill="#7fb3d3"/>
+  <!-- 6월 -->
+  <rect x="235" y="166" width="28" height="104" fill="#4a90d9"/>
+  <!-- 7월 -->
+  <rect x="270" y="55" width="28" height="215" fill="#1a5fa8"/>
+  <!-- 8월 -->
+  <rect x="305" y="36" width="28" height="234" fill="#1a5fa8"/>
+  <!-- 9월 -->
+  <rect x="340" y="159" width="28" height="111" fill="#4a90d9"/>
+  <!-- 10월 -->
+  <rect x="375" y="229" width="28" height="41" fill="#7fb3d3"/>
+  <!-- 11월 -->
+  <rect x="410" y="234" width="28" height="36" fill="#7fb3d3"/>
+  <!-- 12월 -->
+  <rect x="445" y="254" width="28" height="16" fill="#7fb3d3"/>
+
+  <!-- x축 -->
+  <line x1="50" y1="270" x2="480" y2="270" stroke="#333" stroke-width="1.5"/>
+  <!-- y축 -->
+  <line x1="55" y1="25" x2="55" y2="274" stroke="#333" stroke-width="1.5"/>
+
+  <!-- x축 레이블 -->
+  <text x="74" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">1</text>
+  <text x="109" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">2</text>
+  <text x="144" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">3</text>
+  <text x="179" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">4</text>
+  <text x="214" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">5</text>
+  <text x="249" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">6</text>
+  <text x="284" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">7</text>
+  <text x="319" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">8</text>
+  <text x="354" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">9</text>
+  <text x="389" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">10</text>
+  <text x="424" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">11</text>
+  <text x="459" y="284" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#333">12</text>
+
+  <!-- y축 눈금 및 레이블 (0,80,160,240,320) -->
+  <line x1="49" y1="270" x2="55" y2="270" stroke="#333" stroke-width="1"/>
+  <text x="46" y="274" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">0</text>
+  <line x1="49" y1="210" x2="55" y2="210" stroke="#333" stroke-width="1"/>
+  <text x="46" y="214" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">80</text>
+  <line x1="49" y1="150" x2="55" y2="150" stroke="#333" stroke-width="1"/>
+  <text x="46" y="154" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">160</text>
+  <line x1="49" y1="90" x2="55" y2="90" stroke="#333" stroke-width="1"/>
+  <text x="46" y="94" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">240</text>
+  <line x1="49" y1="30" x2="55" y2="30" stroke="#333" stroke-width="1"/>
+  <text x="46" y="34" text-anchor="end" font-family="sans-serif" font-size="10" fill="#333">320</text>
+
+  <!-- 축 레이블 -->
+  <text x="265" y="304" text-anchor="middle" font-family="sans-serif" font-size="12" fill="#333">월</text>
+  <text x="16" y="150" text-anchor="middle" font-family="sans-serif" font-size="11" fill="#333" transform="rotate(-90,16,150)">강수량 (mm)</text>
+</svg>

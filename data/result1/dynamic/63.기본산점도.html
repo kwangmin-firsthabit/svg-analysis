@@ -1,0 +1,135 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const W = 400;
+  const padL = 65, padR = 30, padT = 30, padB = 50;
+  const plotW = W - padL - padR;
+
+  const data = [
+    [1,45],[2,52],[2,58],[3,61],[3,70],
+    [4,72],[4,78],[5,80],[5,85],[6,88],[7,91],[8,95]
+  ];
+
+  const xMin = 0, xMax = 9;
+  const yMin = 40, yMax = 100;
+  const plotH = 300;
+  const H = plotH + padT + padB;
+
+  function px(x) { return padL + (x - xMin) / (xMax - xMin) * plotW; }
+  function py(y) { return padT + plotH - (y - yMin) / (yMax - yMin) * plotH; }
+
+  // 축 눈금
+  const xTicks = [1,2,3,4,5,6,7,8];
+  const yTicks = [40,50,60,70,80,90,100];
+
+  return { W, H, padL, padR, padT, padB, plotW, plotH,
+           data, xMin, xMax, yMin, yMax, xTicks, yTicks, px, py };
+}
+
+function el(tag, attrs) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(content, attrs) {
+  const e = el('text', attrs);
+  e.textContent = content;
+  return e;
+}
+
+function render(geo) {
+  const { W, H, padL, padT, plotW, plotH, data,
+          xTicks, yTicks, px, py } = geo;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+
+  const axisY = padT + plotH;
+  const axisX = padL;
+
+  // 그리드
+  for (const y of yTicks) {
+    if (y === geo.yMin) continue;
+    svg.appendChild(el('line', {
+      x1: padL, y1: py(y), x2: padL + plotW, y2: py(y),
+      stroke: '#ddd', 'stroke-width': '0.5'
+    }));
+  }
+
+  // x축
+  svg.appendChild(el('line', {
+    x1: padL, y1: axisY, x2: padL + plotW + 10, y2: axisY,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+  svg.appendChild(el('polygon', {
+    points: `${padL+plotW+10},${axisY} ${padL+plotW+3},${axisY-4} ${padL+plotW+3},${axisY+4}`,
+    fill: '#333'
+  }));
+
+  // y축
+  svg.appendChild(el('line', {
+    x1: axisX, y1: axisY, x2: axisX, y2: padT - 10,
+    stroke: '#333', 'stroke-width': '1.5'
+  }));
+  svg.appendChild(el('polygon', {
+    points: `${axisX},${padT-10} ${axisX-4},${padT-3} ${axisX+4},${padT-3}`,
+    fill: '#333'
+  }));
+
+  // x축 눈금 및 레이블
+  for (const x of xTicks) {
+    const cx = px(x);
+    svg.appendChild(el('line', {
+      x1: cx, y1: axisY, x2: cx, y2: axisY + 5,
+      stroke: '#333', 'stroke-width': '1'
+    }));
+    svg.appendChild(txt(String(x), {
+      x: cx, y: axisY + 17,
+      'text-anchor': 'middle', 'font-size': '12', fill: '#333'
+    }));
+  }
+
+  // y축 눈금 및 레이블
+  for (const y of yTicks) {
+    const cy = py(y);
+    svg.appendChild(el('line', {
+      x1: axisX - 5, y1: cy, x2: axisX, y2: cy,
+      stroke: '#333', 'stroke-width': '1'
+    }));
+    svg.appendChild(txt(String(y), {
+      x: axisX - 8, y: cy + 4,
+      'text-anchor': 'end', 'font-size': '12', fill: '#333'
+    }));
+  }
+
+  // 데이터 포인트
+  for (const [x, y] of data) {
+    svg.appendChild(el('circle', {
+      cx: px(x), cy: py(y), r: '5',
+      fill: '#2563eb', opacity: '0.85'
+    }));
+  }
+
+  // 축 레이블
+  svg.appendChild(txt('x', {
+    x: padL + plotW + 18, y: axisY + 4,
+    'text-anchor': 'start', 'font-size': '14', fill: '#333',
+    'font-style': 'italic'
+  }));
+  svg.appendChild(txt('y', {
+    x: axisX, y: padT - 14,
+    'text-anchor': 'middle', 'font-size': '14', fill: '#333',
+    'font-style': 'italic'
+  }));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

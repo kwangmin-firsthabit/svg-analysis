@@ -1,0 +1,28 @@
+<!--
+  부채꼴 AOB, 반지름 6, 중심각 60° (1 unit = 30px → r = 180px)
+  center O = (200, 280)
+  OA 방향: 위쪽 왼쪽 (120°에서 시작)
+  OA: 각도 120° → A = (200+180*cos120°, 280-180*sin120°) = (200-90, 280-155.9) = (110, 124.1)
+  OB: 각도 60° → B = (200+180*cos60°, 280-180*sin60°) = (200+90, 280-155.9) = (290, 124.1)
+  중심각 ∠AOB = 60° ✓ (120°-60° = 60°)
+-->
+<svg width="400" height="360" viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
+  <!-- 부채꼴 -->
+  <path d="M 200,280 L 110,124 A 180,180 0 0 1 290,124 Z"
+        fill="none" stroke="#000" stroke-width="2"/>
+
+  <!-- 중심점 -->
+  <circle cx="200" cy="280" r="3" fill="#000"/>
+
+  <!-- 중심각 표시 -->
+  <path d="M 200,280 m 30,0 A 30,30 0 0 1 215,254" fill="none" stroke="#000" stroke-width="1.2"/>
+  <text x="230" y="268" text-anchor="start" font-size="13" font-family="serif">60°</text>
+
+  <!-- 레이블 -->
+  <text x="186" y="298" text-anchor="end" font-size="16" font-family="serif" font-style="italic">O</text>
+  <text x="96"  y="122" text-anchor="end" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="304" y="122" text-anchor="start" font-size="16" font-family="serif" font-style="italic">B</text>
+
+  <!-- 반지름 레이블 -->
+  <text x="148" y="192" text-anchor="middle" font-size="14" font-family="serif">6</text>
+</svg>

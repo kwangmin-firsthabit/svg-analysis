@@ -1,0 +1,75 @@
+<svg width="100%" viewBox="0 0 680 450" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    AB = BC (이등변), 정점 B
+    A(190,370)  B(340,70)  C(490,370)
+    AB = BC = √(150²+300²) ≈ 335.4px  ✓
+    AC = 300px (밑변)
+  -->
+
+  <polygon points="340,70 190,370 490,370" fill="none" stroke="#185FA5" stroke-width="1.8" />
+
+  <!-- Equal-side tick marks on AB and BC -->
+  <line x1="257" y1="224" x2="273" y2="216" stroke="#185FA5" stroke-width="1.5" stroke-linecap="round" />
+  <line x1="407" y1="216" x2="423" y2="224" stroke="#185FA5" stroke-width="1.5" stroke-linecap="round" />
+
+  <!-- Vertices -->
+  <circle cx="340" cy="70" r="3" fill="#185FA5" />
+  <circle cx="190" cy="370" r="3" fill="#185FA5" />
+  <circle cx="490" cy="370" r="3" fill="#185FA5" />
+
+  <!-- Vertex labels -->
+  <text x="340" y="50" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    B
+  </text>
+  <text x="163" y="388" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    A
+  </text>
+  <text x="517" y="388" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    C
+  </text>
+
+  <!-- Axis of symmetry (dashed) -->
+  <line
+    x1="340"
+    y1="70"
+    x2="340"
+    y2="370"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="6 4"
+    stroke-linecap="round"
+  />
+
+  <!-- Side labels -->
+  <text
+    text-anchor="middle"
+    font-family="serif"
+    font-size="14"
+    fill="#185FA5"
+    transform="translate(255,212) rotate(-63)"
+  >
+    AB
+  </text>
+  <text
+    text-anchor="middle"
+    font-family="serif"
+    font-size="14"
+    fill="#185FA5"
+    transform="translate(425,212) rotate(63)"
+  >
+    BC
+  </text>
+  <text x="340" y="400" text-anchor="middle" font-family="serif" font-size="14" fill="#5F5E5A">밑변 AC</text>
+
+  <text x="340" y="240" text-anchor="middle" font-family="serif" font-size="13" fill="#B4B2A9">( AB = BC )</text>
+
+  <!-- Base angle arcs -->
+  <path d="M213,357 A28,28 0 0,1 218,342" fill="none" stroke="#5F5E5A" stroke-width="0.9" />
+  <path d="M462,342 A28,28 0 0,1 467,357" fill="none" stroke="#5F5E5A" stroke-width="0.9" />
+
+  <!-- Double tick marks on equal base angles -->
+  <line x1="218" y1="348" x2="226" y2="355" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <line x1="222" y1="344" x2="230" y2="351" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <line x1="462" y1="351" x2="454" y2="344" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <line x1="458" y1="355" x2="450" y2="348" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+</svg>

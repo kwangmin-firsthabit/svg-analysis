@@ -1,0 +1,46 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  // 정팔각형, 반지름 10인 원에 내접 (1 unit = 20px → R = 200px)
+  // 꼭짓점 8개: 22.5°에서 시작, 45°씩
+  // center = (200, 210)
+  // 검증: 변의 길이 = 2*R*sin(π/8) = 2*200*0.3827 ≈ 153.1px ✓
+  const n = 8, R = 200;
+  const cx = 200, cy = 210;
+  const pts = [];
+  for (let k = 0; k < n; k++) {
+    const angle = Math.PI/8 + (2*Math.PI/n)*k; // 22.5° 시작
+    pts.push({ x: cx + R*Math.cos(angle), y: cy - R*Math.sin(angle) });
+  }
+  const minY = Math.min(...pts.map(p => p.y));
+  const maxY = Math.max(...pts.map(p => p.y)) + 40;
+  return { pts, minY, maxY };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { pts, maxY } = geo;
+  svg.setAttribute('viewBox', `0 0 400 ${maxY}`);
+  svg.setAttribute('width', '400');
+  svg.setAttribute('height', maxY);
+
+  svg.appendChild(el('polygon', {
+    points: pts.map(p => `${p.x},${p.y}`).join(' '),
+    fill: 'none', stroke: '#000', 'stroke-width': 2
+  }));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

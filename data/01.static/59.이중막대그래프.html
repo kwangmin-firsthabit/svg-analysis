@@ -1,0 +1,81 @@
+<svg width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="340" y="30" text-anchor="middle" font-family="serif" font-size="16" font-weight="bold" fill="#222">분기별 매출액 비교 (2022년 vs 2023년)</text>
+
+  <!-- Grid lines: y-axis 0~220억, chart area y: 60~320 (260px), scale = 260/220 = 1.1818px/억 -->
+  <!-- grid at 50 → y = 320 - 50*1.1818 = 261 -->
+  <line x1="80" y1="261" x2="600" y2="261" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- 100 → 320 - 118 = 202 -->
+  <line x1="80" y1="202" x2="600" y2="202" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- 150 → 320 - 177 = 143 -->
+  <line x1="80" y1="143" x2="600" y2="143" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- 200 → 320 - 236 = 84 -->
+  <line x1="80" y1="84" x2="600" y2="84" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+
+  <!-- Y-axis labels -->
+  <text x="72" y="324" text-anchor="end" font-family="serif" font-size="12" fill="#888780">0</text>
+  <text x="72" y="265" text-anchor="end" font-family="serif" font-size="12" fill="#888780">50</text>
+  <text x="72" y="206" text-anchor="end" font-family="serif" font-size="12" fill="#888780">100</text>
+  <text x="72" y="147" text-anchor="end" font-family="serif" font-size="12" fill="#888780">150</text>
+  <text x="72" y="88" text-anchor="end" font-family="serif" font-size="12" fill="#888780">200</text>
+  <text x="72" y="55" text-anchor="end" font-family="serif" font-size="12" fill="#888780">(억)</text>
+
+  <!-- Group layout: 4 groups, each 120px wide, starting at x=80
+       group centers: 140, 260, 380, 500
+       bar width=38, gap between bars in group=6
+       left bar x = center - 38 - 3 = center - 41
+       right bar x = center + 3
+       Data 2022: 120,145,132,178 / 2023: 135,162,148,195 -->
+
+  <!-- 1분기: center=140 -->
+  <!-- 2022: 120 → h=120*1.1818=142, y=320-142=178 -->
+  <rect x="99" y="178" width="38" height="142" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="118" y="175" text-anchor="middle" font-family="serif" font-size="10" fill="#333">120</text>
+  <!-- 2023: 135 → h=160, y=160 -->
+  <rect x="143" y="160" width="38" height="160" fill="#85B7EB" stroke="#185FA5" stroke-width="1"/>
+  <text x="162" y="157" text-anchor="middle" font-family="serif" font-size="10" fill="#333">135</text>
+
+  <!-- 2분기: center=260 -->
+  <!-- 2022: 145 → h=171, y=149 -->
+  <rect x="219" y="149" width="38" height="171" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="238" y="146" text-anchor="middle" font-family="serif" font-size="10" fill="#333">145</text>
+  <!-- 2023: 162 → h=191, y=129 -->
+  <rect x="263" y="129" width="38" height="191" fill="#85B7EB" stroke="#185FA5" stroke-width="1"/>
+  <text x="282" y="126" text-anchor="middle" font-family="serif" font-size="10" fill="#333">162</text>
+
+  <!-- 3분기: center=380 -->
+  <!-- 2022: 132 → h=156, y=164 -->
+  <rect x="339" y="164" width="38" height="156" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="358" y="161" text-anchor="middle" font-family="serif" font-size="10" fill="#333">132</text>
+  <!-- 2023: 148 → h=175, y=145 -->
+  <rect x="383" y="145" width="38" height="175" fill="#85B7EB" stroke="#185FA5" stroke-width="1"/>
+  <text x="402" y="142" text-anchor="middle" font-family="serif" font-size="10" fill="#333">148</text>
+
+  <!-- 4분기: center=500 -->
+  <!-- 2022: 178 → h=210, y=110 -->
+  <rect x="459" y="110" width="38" height="210" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="478" y="107" text-anchor="middle" font-family="serif" font-size="10" fill="#333">178</text>
+  <!-- 2023: 195 → h=230, y=90 -->
+  <rect x="503" y="90" width="38" height="230" fill="#85B7EB" stroke="#185FA5" stroke-width="1"/>
+  <text x="522" y="87" text-anchor="middle" font-family="serif" font-size="10" fill="#333">195</text>
+
+  <!-- X-axis tick labels -->
+  <text x="140" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">1분기</text>
+  <text x="260" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">2분기</text>
+  <text x="380" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">3분기</text>
+  <text x="500" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">4분기</text>
+
+  <!-- Y-axis -->
+  <line x1="80" y1="320" x2="80" y2="60" stroke="#444441" stroke-width="1.5"/>
+  <polyline points="74,68 80,56 86,68" fill="none" stroke="#444441" stroke-width="1.5"/>
+
+  <!-- X-axis -->
+  <line x1="80" y1="320" x2="608" y2="320" stroke="#444441" stroke-width="1.5"/>
+  <polyline points="600,314 612,320 600,326" fill="none" stroke="#444441" stroke-width="1.5"/>
+
+  <!-- Legend -->
+  <rect x="480" y="355" width="16" height="12" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="500" y="365" font-family="serif" font-size="12" fill="#444">2022년</text>
+  <rect x="560" y="355" width="16" height="12" fill="#85B7EB" stroke="#185FA5" stroke-width="1"/>
+  <text x="580" y="365" font-family="serif" font-size="12" fill="#444">2023년</text>
+</svg>

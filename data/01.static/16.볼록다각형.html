@@ -1,0 +1,46 @@
+<svg width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    볼록 오각형 (모든 내각 < 180°)
+    A(320,50) B(520,160) C(480,360) D(280,400) E(100,240)
+    외적 검증 (반시계 순):
+    A→B→C: 44400>0 ✓  B→C→D: 38400>0 ✓  C→D→E: 39200>0 ✓
+    D→E→A: 69400>0 ✓  E→A→B: 62200>0 ✓  모든 내각 < 180° ✓
+  -->
+
+  <polygon points="320,50 520,160 480,360 280,400 100,240" fill="none" stroke="#185FA5" stroke-width="1.8" />
+
+  <!-- Interior angle arcs -->
+  <path d="M 340,70 A 28,28 0 0,1 302,74" fill="none" stroke="#5F5E5A" stroke-width="0.9" />
+  <path d="M 494,172 A 28,28 0 0,1 498,142" fill="none" stroke="#5F5E5A" stroke-width="0.9" />
+  <path d="M 456,344 A 28,28 0 0,1 492,332" fill="none" stroke="#5F5E5A" stroke-width="0.9" />
+  <path d="M 262,376 A 28,28 0 0,1 298,378" fill="none" stroke="#5F5E5A" stroke-width="0.9" />
+  <path d="M 122,218 A 28,28 0 0,1 114,252" fill="none" stroke="#5F5E5A" stroke-width="0.9" />
+
+  <text x="340" y="230" text-anchor="middle" font-family="serif" font-size="13" fill="#B4B2A9">
+    모든 내각 &lt; 180°
+  </text>
+
+  <!-- Vertices -->
+  <circle cx="320" cy="50" r="3" fill="#185FA5" />
+  <circle cx="520" cy="160" r="3" fill="#185FA5" />
+  <circle cx="480" cy="360" r="3" fill="#185FA5" />
+  <circle cx="280" cy="400" r="3" fill="#185FA5" />
+  <circle cx="100" cy="240" r="3" fill="#185FA5" />
+
+  <!-- Vertex labels -->
+  <text x="320" y="32" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    A
+  </text>
+  <text x="544" y="166" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    B
+  </text>
+  <text x="504" y="374" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    C
+  </text>
+  <text x="274" y="424" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    D
+  </text>
+  <text x="74" y="246" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    E
+  </text>
+</svg>

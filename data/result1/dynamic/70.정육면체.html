@@ -1,0 +1,166 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 30;
+  const side = 5;
+  const s = side * unit; // 150px
+
+  // 정육면체 8개 꼭짓점 3D 좌표 (한 변 = s)
+  // A=앞왼아래, B=앞오른아래, C=뒤오른아래, D=뒤왼아래
+  // E=앞왼위, F=앞오른위, G=뒤오른위, H=뒤왼위
+  const pts3d = {
+    A: [0, 0, s],   // 앞왼아래
+    B: [s, 0, s],   // 앞오른아래
+    C: [s, 0, 0],   // 뒤오른아래
+    D: [0, 0, 0],   // 뒤왼아래
+    E: [0, s, s],   // 앞왼위
+    F: [s, s, s],   // 앞오른위
+    G: [s, s, 0],   // 뒤오른위
+    H: [0, s, 0],   // 뒤왼위
+  };
+
+  // Isometric 투영
+  function iso(x, y, z) {
+    const ix = (x - z) * Math.cos(Math.PI / 6);
+    const iy = -y + (x + z) * Math.sin(Math.PI / 6);
+    return [ix, iy];
+  }
+
+  const projected = {};
+  for (const [k, [x, y, z]] of Object.entries(pts3d)) {
+    projected[k] = iso(x, y, z);
+  }
+
+  const xs = Object.values(projected).map(p => p[0]);
+  const ys = Object.values(projected).map(p => p[1]);
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+  const maxX = Math.max(...xs);
+  const maxY2 = Math.max(...ys);
+
+  const pad = 60;
+  const ox = -minX + pad;
+  const oy = -minY + pad;
+
+  const pts = {};
+  for (const [k, [px, py]] of Object.entries(projected)) {
+    pts[k] = [px + ox, py + oy];
+  }
+
+  const width = (maxX - minX) + pad * 2;
+  const height = (maxY2 - minY) + pad * 2;
+
+  return { pts, width, height, side };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { pts, width, height, side } = geo;
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('width', width);
+  svg.setAttribute('height', height);
+
+  const { A, B, C, D, E, F, G, H } = pts;
+
+  // 보이는 3면: 상면(E,F,G,H), 왼앞면(A,E,H,D), 오른앞면(B,F,G,C)
+  // 상면
+  svg.appendChild(el('polygon', {
+    points: [E, F, G, H].map(p => `${p[0]},${p[1]}`).join(' '),
+    fill: 'rgba(180,210,255,0.5)',
+    stroke: 'none'
+  }));
+  // 왼앞면
+  svg.appendChild(el('polygon', {
+    points: [A, E, H, D].map(p => `${p[0]},${p[1]}`).join(' '),
+    fill: 'rgba(140,185,240,0.45)',
+    stroke: 'none'
+  }));
+  // 오른앞면
+  svg.appendChild(el('polygon', {
+    points: [B, F, G, C].map(p => `${p[0]},${p[1]}`).join(' '),
+    fill: 'rgba(100,160,225,0.45)',
+    stroke: 'none'
+  }));
+
+  // 숨겨진 선(점선): D-A, D-C, D-H → 아래 뒤쪽 교차점
+  const hiddenEdges = [
+    [D, A], [D, C], [D, H]
+  ];
+  for (const [p, q] of hiddenEdges) {
+    svg.appendChild(el('line', {
+      x1: p[0], y1: p[1], x2: q[0], y2: q[1],
+      stroke: '#888', 'stroke-width': '1.2',
+      'stroke-dasharray': '5,4'
+    }));
+  }
+
+  // 실선 엣지
+  const solidEdges = [
+    [A, B], [B, C], [A, E], [B, F], [C, G],
+    [E, F], [F, G], [G, H], [E, H], [H, A], [H, D]
+  ];
+  // H-D는 보이는 모서리
+  // A-B, B-C는 아래 앞 모서리
+  for (const [p, q] of solidEdges) {
+    svg.appendChild(el('line', {
+      x1: p[0], y1: p[1], x2: q[0], y2: q[1],
+      stroke: '#1a1a2e', 'stroke-width': '2',
+      'stroke-linecap': 'round'
+    }));
+  }
+
+  // 꼭짓점 레이블
+  const labelOffset = {
+    A: [-14, 8],
+    B: [14, 8],
+    C: [16, 0],
+    D: [-16, 0],
+    E: [-14, -10],
+    F: [14, -10],
+    G: [16, -8],
+    H: [-16, -8],
+  };
+  for (const [k, p] of Object.entries(pts)) {
+    svg.appendChild(el('circle', {
+      cx: p[0], cy: p[1], r: '3',
+      fill: '#1a1a2e'
+    }));
+    const [lx, ly] = labelOffset[k] || [0, -12];
+    svg.appendChild(el('text', {
+      x: p[0] + lx, y: p[1] + ly,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '13',
+      'font-family': 'serif',
+      'font-style': 'italic',
+      fill: '#1a1a2e'
+    }, k));
+  }
+
+  // 한 변 길이 표시: E-F 변 중점 위
+  const mx = (E[0] + F[0]) / 2;
+  const my = (E[1] + F[1]) / 2;
+  svg.appendChild(el('text', {
+    x: mx, y: my - 14,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'central',
+    'font-size': '13',
+    'font-family': 'serif',
+    fill: '#c0392b'
+  }, `${side}`));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

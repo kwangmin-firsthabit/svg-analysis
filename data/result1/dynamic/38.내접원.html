@@ -1,0 +1,129 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 40;
+  // 직각삼각형: a=6(세로), b=8(가로), c=10(빗변)
+  const a = 6, b = 8, c = 10;
+  const r = (a + b - c) / 2; // = 2
+
+  const ox = 60, oy = 320;
+  const A = { x: ox, y: oy };                    // 직각
+  const B = { x: ox + b * unit, y: oy };          // 가로 끝
+  const C = { x: ox, y: oy - a * unit };          // 세로 끝
+
+  // 내접원 중심: (r, r) 단위
+  const ic = { x: ox + r * unit, y: oy - r * unit };
+  const ir = r * unit;
+
+  // 접점
+  const tAB = { x: ic.x, y: oy };             // AB(가로변) 위
+  const tAC = { x: ox, y: ic.y };             // AC(세로변) 위
+
+  // BC 위 접점 (수선의 발)
+  // t = ((ic-B)·(C-B)) / |C-B|²
+  const cbx = C.x - B.x, cby = C.y - B.y;
+  const len2 = cbx * cbx + cby * cby;
+  const t = ((ic.x - B.x) * cbx + (ic.y - B.y) * cby) / len2;
+  const tBC = { x: B.x + t * cbx, y: B.y + t * cby };
+
+  const W = 480, maxY = 360;
+  return { A, B, C, ic, ir, tAB, tAC, tBC, W, maxY };
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function render(geo) {
+  const { A, B, C, ic, ir, tAB, tAC, tBC, W, maxY } = geo;
+  svg.setAttribute('viewBox', '30 50 420 310');
+  svg.setAttribute('width', String(W));
+  svg.setAttribute('height', String(maxY));
+
+  // 직각삼각형
+  svg.appendChild(mkEl('polygon', {
+    points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`,
+    fill: '#f0f9ff', stroke: '#1e293b', 'stroke-width': '2'
+  }));
+
+  // 직각 표시
+  svg.appendChild(mkEl('path', {
+    d: `M ${A.x},${A.y - 20} L ${A.x + 20},${A.y - 20} L ${A.x + 20},${A.y}`,
+    fill: 'none', stroke: '#1e293b', 'stroke-width': '1.5'
+  }));
+
+  // 내접원
+  svg.appendChild(mkEl('circle', {
+    cx: ic.x, cy: ic.y, r: ir,
+    fill: '#fef3c7', 'fill-opacity': '0.5',
+    stroke: '#d97706', 'stroke-width': '1.8'
+  }));
+
+  // 접점
+  for (const tp of [tAB, tAC, tBC]) {
+    svg.appendChild(mkEl('circle', { cx: tp.x, cy: tp.y, r: '3', fill: '#dc2626' }));
+  }
+
+  // 내접원 중심
+  svg.appendChild(mkEl('circle', { cx: ic.x, cy: ic.y, r: '3', fill: '#1e293b' }));
+  const iLabel = mkEl('text', {
+    x: ic.x + 8, y: ic.y - 4,
+    'font-size': '13', 'font-family': 'serif', fill: '#1e293b'
+  });
+  iLabel.textContent = 'I';
+  svg.appendChild(iLabel);
+
+  // 반지름선 (중심→접점)
+  for (const tp of [tAB, tAC]) {
+    svg.appendChild(mkEl('line', {
+      x1: ic.x, y1: ic.y, x2: tp.x, y2: tp.y,
+      stroke: '#d97706', 'stroke-width': '1', 'stroke-dasharray': '4,3'
+    }));
+  }
+
+  // 꼭짓점 레이블
+  const vLabels = [
+    { x: A.x - 14, y: A.y + 16, t: 'A' },
+    { x: B.x + 6, y: B.y + 14, t: 'B' },
+    { x: C.x - 14, y: C.y - 4, t: 'C' },
+  ];
+  for (const lb of vLabels) {
+    const el = mkEl('text', { x: lb.x, y: lb.y, 'font-size': '14', 'font-family': 'serif', fill: '#111827' });
+    el.textContent = lb.t;
+    svg.appendChild(el);
+  }
+
+  // 변 길이 라벨
+  const sLabels = [
+    { x: (A.x + B.x) / 2, y: A.y + 16, t: '8', anchor: 'middle' },
+    { x: A.x - 8, y: (A.y + C.y) / 2, t: '6', anchor: 'end' },
+    { x: (B.x + C.x) / 2 + 12, y: (B.y + C.y) / 2, t: '10', anchor: 'start' },
+  ];
+  for (const lb of sLabels) {
+    const el = mkEl('text', {
+      x: lb.x, y: lb.y, 'text-anchor': lb.anchor,
+      'font-size': '13', 'font-family': 'serif', fill: '#374151'
+    });
+    el.textContent = lb.t;
+    svg.appendChild(el);
+  }
+
+  // 반지름 라벨
+  const rLabel = mkEl('text', {
+    x: (ic.x + tAC.x) / 2 + 4, y: ic.y - 4,
+    'text-anchor': 'middle', 'font-size': '12', 'font-family': 'serif', fill: '#d97706'
+  });
+  rLabel.textContent = 'r=2';
+  svg.appendChild(rLabel);
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

@@ -1,0 +1,83 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 40;
+  const r = 5;
+
+  const cx = 220, cy = 220;
+  const px_r = r * unit; // 200px
+
+  // 적도 타원
+  const eq_rx = px_r;
+  const eq_ry = Math.round(px_r * 0.2); // 40px
+
+  const W = 450, maxY = 450;
+  return { cx, cy, px_r, eq_rx, eq_ry, r, W, maxY };
+}
+
+function mkEl(tag, attrs) {
+  const el = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
+  return el;
+}
+
+function render(geo) {
+  const { cx, cy, px_r, eq_rx, eq_ry, r, W, maxY } = geo;
+  svg.setAttribute('viewBox', `${cx - px_r - 20} ${cy - px_r - 20} ${(px_r + 20) * 2} ${(px_r + 20) * 2}`);
+  svg.setAttribute('width', String(W));
+  svg.setAttribute('height', String(maxY));
+
+  // 구 원
+  svg.appendChild(mkEl('circle', {
+    cx, cy, r: px_r,
+    fill: '#dbeafe', 'fill-opacity': '0.4', stroke: '#1e40af', 'stroke-width': '2'
+  }));
+
+  // 적도 뒷반 (점선)
+  svg.appendChild(mkEl('path', {
+    d: `M ${cx - eq_rx},${cy} A ${eq_rx},${eq_ry} 0 0,1 ${cx + eq_rx},${cy}`,
+    fill: 'none', stroke: '#1e40af', 'stroke-width': '1.5', 'stroke-dasharray': '6,4'
+  }));
+
+  // 적도 앞반 (실선)
+  svg.appendChild(mkEl('path', {
+    d: `M ${cx - eq_rx},${cy} A ${eq_rx},${eq_ry} 0 0,0 ${cx + eq_rx},${cy}`,
+    fill: 'none', stroke: '#1e40af', 'stroke-width': '1.5'
+  }));
+
+  // 중심 O
+  svg.appendChild(mkEl('circle', { cx, cy, r: '3.5', fill: '#1e293b' }));
+  const oLbl = mkEl('text', {
+    x: cx + 8, y: cy - 4,
+    'font-size': '14', 'font-family': 'serif', fill: '#1e293b'
+  });
+  oLbl.textContent = 'O';
+  svg.appendChild(oLbl);
+
+  // 반지름선 (중심→오른쪽)
+  svg.appendChild(mkEl('line', {
+    x1: cx, y1: cy, x2: cx + px_r, y2: cy,
+    stroke: '#374151', 'stroke-width': '1.5'
+  }));
+  const rLbl = mkEl('text', {
+    x: cx + px_r / 2, y: cy - 8,
+    'text-anchor': 'middle', 'font-size': '13', 'font-family': 'serif', fill: '#374151'
+  });
+  rLbl.textContent = `r=${r}`;
+  svg.appendChild(rLbl);
+
+  // 수직 반지름선 (중심→위, 점선)
+  svg.appendChild(mkEl('line', {
+    x1: cx, y1: cy, x2: cx, y2: cy - px_r,
+    stroke: '#9ca3af', 'stroke-width': '1', 'stroke-dasharray': '4,3'
+  }));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+  <body>
+    <svg width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+      <script>
+        const W = 680,
+          H = 420;
+        const ox = 340,
+          oy = 300,
+          unit = 70;
+
+        function toSVG(mx, my) {
+          return { x: ox + mx * unit, y: oy - my * unit };
+        }
+
+        const svg = document.querySelector('svg');
+        function el(tag, attrs, txt) {
+          const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+          for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+          if (txt !== undefined) e.textContent = txt;
+          svg.appendChild(e);
+          return e;
+        }
+
+        const xMin = -4.2,
+          xMax = 4.2,
+          yMin = -0.8,
+          yMax = 4.5;
+
+        // 격자, 축, 화살표, 눈금 ...
+
+        // y = |x| — 좌·우 직선 가지
+        const pL = toSVG(xMin, -xMin),
+          pV = toSVG(0, 0),
+          pR = toSVG(xMax, xMax);
+        el('line', {
+          x1: pL.x,
+          y1: pL.y,
+          x2: pV.x,
+          y2: pV.y,
+          stroke: '#378ADD',
+          'stroke-width': 2.4,
+          'stroke-linecap': 'round',
+        });
+        el('line', {
+          x1: pV.x,
+          y1: pV.y,
+          x2: pR.x,
+          y2: pR.y,
+          stroke: '#378ADD',
+          'stroke-width': 2.4,
+          'stroke-linecap': 'round',
+        });
+
+        // 꺾임 각도 호 (90°)
+        // 좌측 단위벡터 SVG: (−1/√2, −1/√2), 우측: (+1/√2, −1/√2)
+        const r = 28;
+        const u1x = -1 / Math.SQRT2,
+          u1y = -1 / Math.SQRT2;
+        const u2x = 1 / Math.SQRT2,
+          u2y = -1 / Math.SQRT2;
+        el('path', {
+          d: `M${pV.x + u1x * r},${pV.y + u1y * r} A${r},${r} 0 0,1 ${pV.x + u2x * r},${pV.y + u2y * r}`,
+          fill: 'none',
+          stroke: '#F3C230',
+          'stroke-width': 1.4,
+        });
+
+        // 꺾임점 (0,0)
+        el('circle', { cx: pV.x, cy: pV.y, r: 5.5, fill: '#F3306A', stroke: '#fff', 'stroke-width': 1.5 });
+
+        // 대칭축 x=0 점선, 대표점, 기울기 보조 삼각형, 레이블 ...
+      </script>
+    </svg>
+  </body>
+</html>

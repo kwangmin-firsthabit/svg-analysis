@@ -1,0 +1,45 @@
+<svg width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    원기둥: 밑면 반지름 r=3, 높이 h=8
+    scale=35px/unit → rx=3*35=105px, h=8*35=280px
+    center_x=340, top_y=80, bottom_y=360
+    ellipse ry = rx*0.3 = 31.5 ≈ 32
+  -->
+
+  <!-- 밑면 타원 뒷부분 (dashed) -->
+  <path d="M 235,360 A 105,32 0 0,1 445,360" fill="none" stroke="#888780" stroke-width="1" stroke-dasharray="5 4" stroke-linecap="round" />
+
+  <!-- 옆면 채우기 -->
+  <polygon points="235,360 235,80 445,80 445,360" fill="#E6F1FB" stroke="none" opacity="0.5" />
+
+  <!-- 윗면 타원 채우기 -->
+  <ellipse cx="340" cy="80" rx="105" ry="32" fill="#85B7EB" stroke="none" opacity="0.5" />
+
+  <!-- 밑면 타원 앞부분 -->
+  <path d="M 235,360 A 105,32 0 0,0 445,360" fill="#B5D4F4" stroke="none" opacity="0.5" />
+
+  <!-- 옆면 윤곽 -->
+  <line x1="235" y1="360" x2="235" y2="80" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="445" y1="360" x2="445" y2="80" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+
+  <!-- 밑면 타원 앞부분 테두리 -->
+  <path d="M 235,360 A 105,32 0 0,0 445,360" fill="none" stroke="#2C2C2A" stroke-width="1.6" stroke-linecap="round" />
+
+  <!-- 윗면 타원 테두리 -->
+  <ellipse cx="340" cy="80" rx="105" ry="32" fill="none" stroke="#2C2C2A" stroke-width="1.6" />
+
+  <!-- 중심축 (dashed) -->
+  <line x1="340" y1="48" x2="340" y2="392" stroke="#888780" stroke-width="0.8" stroke-dasharray="5 4" stroke-linecap="round" />
+
+  <!-- 반지름 선분 (윗면) -->
+  <line x1="340" y1="80" x2="445" y2="80" stroke="#888780" stroke-width="0.8" stroke-dasharray="5 4" stroke-linecap="round" />
+
+  <!-- 치수선: r=3 (윗면 반지름) -->
+  <text x="392" y="72" text-anchor="middle" font-family="serif" font-size="13" fill="#5F5E5A">r = 3</text>
+
+  <!-- 치수선: h=8 (오른쪽) -->
+  <line x1="466" y1="80" x2="466" y2="360" stroke="#5F5E5A" stroke-width="0.8" stroke-linecap="round" />
+  <line x1="460" y1="80" x2="472" y2="80" stroke="#5F5E5A" stroke-width="0.8" />
+  <line x1="460" y1="360" x2="472" y2="360" stroke="#5F5E5A" stroke-width="0.8" />
+  <text x="480" y="225" text-anchor="start" font-family="serif" font-size="13" fill="#5F5E5A">h = 8</text>
+</svg>

@@ -1,0 +1,54 @@
+<svg width="100%" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    지름 AB=10, scale=40px/1 → R=200px
+    A(140,280)  O(340,280)  B(540,280)
+    반호: M140,280 A200,200 0 0,1 540,280
+  -->
+
+  <!-- Semicircle arc -->
+  <path d="M 140,280 A 200,200 0 0,1 540,280" fill="none" stroke="#185FA5" stroke-width="1.8" stroke-linecap="round" />
+
+  <!-- Diameter AB -->
+  <line x1="140" y1="280" x2="540" y2="280" stroke="#185FA5" stroke-width="1.8" stroke-linecap="round" />
+
+  <!-- Radius to top (dashed) -->
+  <line
+    x1="340"
+    y1="280"
+    x2="340"
+    y2="80"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="5 4"
+    stroke-linecap="round"
+  />
+
+  <!-- Points -->
+  <circle cx="140" cy="280" r="3.5" fill="#185FA5" />
+  <circle cx="540" cy="280" r="3.5" fill="#185FA5" />
+  <circle cx="340" cy="280" r="3.5" fill="#185FA5" />
+  <circle cx="340" cy="80" r="3" fill="#B4B2A9" />
+
+  <!-- Labels -->
+  <text x="140" y="312" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    A
+  </text>
+  <text x="540" y="312" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    B
+  </text>
+  <text x="340" y="312" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    O
+  </text>
+  <text x="340" y="264" text-anchor="middle" font-family="serif" font-size="14" fill="#185FA5">10</text>
+  <text x="356" y="188" text-anchor="start" font-family="serif" font-size="13" fill="#888780">r = 5</text>
+
+  <!-- Right angle mark at top point -->
+  <polyline
+    points="320,80 320,100 340,100"
+    fill="none"
+    stroke="#5F5E5A"
+    stroke-width="1.1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

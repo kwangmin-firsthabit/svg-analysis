@@ -1,0 +1,93 @@
+<!--
+  좌표 계산 검증
+  1단위 = 40px
+  직각삼각형: A=(0,0) B=(4,0) C=(0,3) → 화면 좌표계로 변환 (y축 반전)
+
+  전체 배치: 왼쪽에 변3 정사각형, 아래에 변4 정사각형, 오른쪽 위에 빗변5 정사각형
+
+  직각삼각형 꼭짓점 (수학 좌표 → 화면 픽셀):
+    A = (0, 0) → px: 오리진 기준
+    B = (4, 0) → 오른쪽
+    C = (0, 3) → 위
+
+  화면 좌표 (원점을 캔버스 중앙 적절히 배치):
+  변4 정사각형: A 아래로 붙음. 단위=40px
+  오리진 픽셀: ox=200, oy=260
+
+  직각삼각형 꼭짓점:
+    A = (ox, oy) = (200, 260)
+    B = (ox+4*40, oy) = (360, 260)
+    C = (ox, oy-3*40) = (200, 140)
+
+  변4 정사각형 (AB 아래로): A=(200,260), B=(360,260), B'=(360,420), A'=(200,420)
+    넓이 = 16
+
+  변3 정사각형 (AC 왼쪽으로): A=(200,260), C=(200,140)
+    왼쪽으로 붙음: A'=(200-120,260)=(80,260), C'=(80,140)
+    꼭짓점: A(200,260) → A'(80,260) → C'(80,140) → C(200,140)
+    넓이 = 9
+
+  빗변5 정사각형 (BC 오른쪽 바깥으로):
+    B=(360,260), C=(200,140)
+    벡터 BC = (-160, -120), 길이=200 (5단위*40=200) ✓
+    BC에 수직 바깥 방향 단위벡터 = (-120/200, 160/200) → 바깥: (-(-120/200), -(160/200))
+
+    BC 벡터 = C-B = (-160,-120)
+    수직 벡터 (오른쪽 바깥) = (120, -160) (단위: 크기 200)
+    정규화하면 (120/200, -160/200) = (0.6, -0.8)
+
+    D = B + (120, -160) = (360+120, 260-160) = (480, 100)
+    E = C + (120, -160) = (200+120, 140-160) = (320, -20)
+
+    정사각형: B(360,260) → D(480,100) → E(320,-20) → C(200,140)
+    넓이 = 25
+
+  캔버스 크기: 전체 점 범위
+    x: 80 ~ 480 → 여유 포함 560
+    y: -20 ~ 420 → 여유 포함 +20 top margin
+    viewBox: "60 -40 500 490"
+-->
+<svg width="560" height="490" viewBox="60 -40 500 490" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- 변4 정사각형 (넓이 16) -->
+  <polygon points="200,260 360,260 360,420 200,420"
+    fill="#dbeafe" stroke="#2563eb" stroke-width="1.5"/>
+  <!-- 넓이 라벨 -->
+  <text x="280" y="350" text-anchor="middle" dominant-baseline="middle"
+    font-size="22" font-family="serif" fill="#1e40af">16</text>
+
+  <!-- 변3 정사각형 (넓이 9) -->
+  <polygon points="200,260 80,260 80,140 200,140"
+    fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <!-- 넓이 라벨 -->
+  <text x="140" y="200" text-anchor="middle" dominant-baseline="middle"
+    font-size="22" font-family="serif" fill="#15803d">9</text>
+
+  <!-- 빗변5 정사각형 (넓이 25) -->
+  <polygon points="360,260 480,100 320,-20 200,140"
+    fill="#fef9c3" stroke="#ca8a04" stroke-width="1.5"/>
+  <!-- 넓이 라벨 -->
+  <text x="340" y="95" text-anchor="middle" dominant-baseline="middle"
+    font-size="22" font-family="serif" fill="#92400e">25</text>
+
+  <!-- 직각삼각형 (중앙) -->
+  <polygon points="200,260 360,260 200,140"
+    fill="#f0fdf4" stroke="#111827" stroke-width="2"/>
+
+  <!-- 직각 표시 -->
+  <path d="M 200,240 L 220,240 L 220,260" fill="none" stroke="#111827" stroke-width="1.5"/>
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="190" y="280" text-anchor="middle" font-size="14" font-family="serif" fill="#111827">A</text>
+  <text x="370" y="275" text-anchor="start" font-size="14" font-family="serif" fill="#111827">B</text>
+  <text x="185" y="132" text-anchor="end" font-size="14" font-family="serif" fill="#111827">C</text>
+
+  <!-- 변 길이 라벨 -->
+  <!-- AB = 4 (아래) -->
+  <text x="280" y="278" text-anchor="middle" font-size="13" font-family="serif" fill="#374151">4</text>
+  <!-- AC = 3 (왼쪽) -->
+  <text x="192" y="202" text-anchor="end" font-size="13" font-family="serif" fill="#374151">3</text>
+  <!-- BC = 5 (빗변) -->
+  <text x="295" y="192" text-anchor="middle" font-size="13" font-family="serif" fill="#374151">5</text>
+
+</svg>

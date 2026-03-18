@@ -1,0 +1,72 @@
+<!--
+  좌표 계산 · 검증
+  viewBox: 0 0 400 120
+  수직선: y=70
+  x_left=40px (값 -1), x_right=360px (값 6)
+  픽셀/단위: (360-40)/(6-(-1)) = 320/7 ≈ 45.714px
+
+  눈금 위치:
+    x=-1 → 40px
+    x= 0 → 40 + 1*45.714 = 85.714px
+    x= 1 → 40 + 2*45.714 = 131.429px
+    x= 2 → 40 + 3*45.714 = 177.143px  ← 열린 점(○)
+    x= 3 → 40 + 4*45.714 = 222.857px
+    x= 4 → 40 + 5*45.714 = 268.571px
+    x= 5 → 40 + 6*45.714 = 314.286px
+    x= 6 → 40 + 7*45.714 = 360px
+
+  굵은 선: 177.143px ~ 화살표 끝(370px)
+  검증: 2에서 열린 점, 오른쪽 방향이므로 x>2 표현 정확
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="120" viewBox="0 0 400 120">
+  <defs>
+    <marker id="arr-r" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#111"/>
+    </marker>
+    <marker id="arr-l" markerWidth="8" markerHeight="6" refX="0" refY="3" orient="auto">
+      <polygon points="8 0, 0 3, 8 6" fill="#111"/>
+    </marker>
+    <marker id="arr-r-thick" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" fill="#111"/>
+    </marker>
+  </defs>
+
+  <!-- 상단 부등식 텍스트 -->
+  <text x="200" y="22" text-anchor="middle" font-family="Georgia, serif" font-size="16" fill="#111">x &gt; 2</text>
+
+  <!-- 수직선 (기본 선, 양방향 화살표) -->
+  <line x1="30" y1="70" x2="370" y2="70" stroke="#111" stroke-width="1.5"
+        marker-start="url(#arr-l)" marker-end="url(#arr-r)"/>
+
+  <!-- 굵은 선: x=2(177.143px) ~ 오른쪽 끝 (화살표 포함) -->
+  <line x1="177.143" y1="70" x2="368" y2="70" stroke="#111" stroke-width="5"
+        marker-end="url(#arr-r-thick)"/>
+
+  <!-- 눈금 세로선 및 레이블 -->
+  <line x1="40" y1="64" x2="40" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="40" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#111">-1</text>
+
+  <line x1="85.714" y1="64" x2="85.714" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="85.714" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#111">0</text>
+
+  <line x1="131.429" y1="64" x2="131.429" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="131.429" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#111">1</text>
+
+  <line x1="177.143" y1="64" x2="177.143" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="177.143" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#111">2</text>
+
+  <line x1="222.857" y1="64" x2="222.857" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="222.857" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#111">3</text>
+
+  <line x1="268.571" y1="64" x2="268.571" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="268.571" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#111">4</text>
+
+  <line x1="314.286" y1="64" x2="314.286" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="314.286" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#111">5</text>
+
+  <line x1="360" y1="64" x2="360" y2="76" stroke="#111" stroke-width="1.5"/>
+  <text x="360" y="91" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#111">6</text>
+
+  <!-- 열린 점(○): x=2 → 177.143px, 굵은 선 위에 흰 원 -->
+  <circle cx="177.143" cy="70" r="6" fill="white" stroke="#111" stroke-width="2.5"/>
+</svg>

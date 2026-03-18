@@ -1,0 +1,61 @@
+<!--
+  둔각삼각형 ABC, ∠A = 30°, ∠B = 30°, ∠C = 120°
+  AB = 8 units, 1 unit = 25px → AB = 200px
+  A = (80, 280), B = (280, 280)
+  C는 AB의 수직이등분선 위 (∠A = ∠B = 30° 이므로 이등변삼각형)
+  Cx = (80+280)/2 = 180
+  높이 h: tan(30°) = h / (AB/2) → h = 100 * tan(30°) = 100 / sqrt(3) ≈ 57.74px
+  C = (180, 280 - 57.74) = (180, 222.26) → (180, 222)
+
+  검증: ∠A = arctan(h / (Cx-Ax)) = arctan(57.74/100) = arctan(0.5774) = 30° ✓
+  검증: ∠B = arctan(57.74/100) = 30° ✓ (대칭)
+  검증: ∠C = 180° - 30° - 30° = 120° ✓
+
+  각도 호 표시:
+  A = (80, 280): ∠A = 30°
+    AB 방향: 0° (오른쪽), AC 방향: atan2(222-280, 180-80) = atan2(-58, 100) ≈ -30°
+    호: 반지름 24px, -30°에서 0°까지 (반시계 방향 sweep)
+    시작점: A + 24*(cos(-30°), sin(-30°)) = (80+20.78, 280-12) = (100.78, 268)
+    끝점: A + 24*(cos(0°), sin(0°)) = (104, 280)
+    large-arc-flag=0, sweep-flag=1 (시계방향)
+
+  B = (280, 280): ∠B = 30°
+    BA 방향: 180°, BC 방향: atan2(222-280, 180-280) = atan2(-58, -100) ≈ 180°+30° = 210° (-150°)
+    호: 반지름 24px, 180°에서 210°까지 (시계방향)
+    시작점: B + 24*(cos(180°), sin(180°)) = (280-24, 280) = (256, 280)
+    끝점: B + 24*(cos(210°), sin(210°)) = (280-20.78, 280-12) = (259.22, 268)
+    large-arc-flag=0, sweep-flag=1
+
+  C = (180, 222): ∠C = 120°
+    CA 방향: atan2(280-222, 80-180) = atan2(58, -100) ≈ 180°-30° = 150°
+    CB 방향: atan2(280-222, 280-180) = atan2(58, 100) ≈ 30°
+    호: 반지름 20px, 30°에서 150°까지 (큰 호 아닌 둔각 쪽 = 내각 쪽)
+    시작점: C + 20*(cos(30°), sin(30°)) = (180+17.32, 222+10) = (197.32, 232)
+    끝점: C + 20*(cos(150°), sin(150°)) = (180-17.32, 222+10) = (162.68, 232)
+    내각 120° → large-arc-flag=1, sweep-flag=0 (반시계방향으로 큰 호)
+    실제로 30°→150° 차이=120° → large-arc-flag=0, sweep-flag=1로도 가능
+    30°에서 150°로 반시계(sweep=0): 120° 호 → large-arc-flag=0 ✓
+-->
+<svg width="360" height="320" viewBox="0 0 360 320" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="80,280 280,280 180,222" fill="none" stroke="#000" stroke-width="2" />
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="68" y="296" text-anchor="end" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="292" y="296" text-anchor="start" font-size="16" font-family="serif" font-style="italic">B</text>
+  <text x="180" y="208" text-anchor="middle" font-size="16" font-family="serif" font-style="italic">C</text>
+
+  <!-- ∠A = 30° 호 -->
+  <!-- A=(80,280), 시작: AC방향 -30° → 끝: AB방향 0°, sweep=1(시계) -->
+  <path d="M 100.78,268 A 24,24 0 0 1 104,280" fill="none" stroke="#000" stroke-width="1.2" />
+  <text x="108" y="270" text-anchor="start" font-size="12" font-family="serif">30°</text>
+
+  <!-- ∠B = 30° 호 -->
+  <!-- B=(280,280), 시작: BA방향 180° → 끝: BC방향 210°, sweep=1(시계) -->
+  <path d="M 256,280 A 24,24 0 0 1 259.22,268" fill="none" stroke="#000" stroke-width="1.2" />
+  <text x="248" y="270" text-anchor="end" font-size="12" font-family="serif">30°</text>
+
+  <!-- ∠C = 120° 호 -->
+  <!-- C=(180,222), 시작: CB방향 30° → 끝: CA방향 150°, sweep=0(반시계), large-arc=0 (120° < 180°) -->
+  <path d="M 197.32,232 A 20,20 0 0 0 162.68,232" fill="none" stroke="#000" stroke-width="1.2" />
+  <text x="180" y="250" text-anchor="middle" font-size="12" font-family="serif">120°</text>
+</svg>

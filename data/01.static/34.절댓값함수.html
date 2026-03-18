@@ -1,0 +1,107 @@
+<svg width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    y = |x|, V자 꺾임, 꼭짓점(0,0)
+    scale=70px/unit, 원점 O(340,380)
+    좌: (60,98)→(340,380)  우: (340,380)→(618,98)
+    기울기 좌=−1, 우=+1 ✓
+  -->
+
+  <!-- 격자 -->
+  <line x1="130" y1="50" x2="130" y2="395" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="200" y1="50" x2="200" y2="395" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="270" y1="50" x2="270" y2="395" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="410" y1="50" x2="410" y2="395" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="480" y1="50" x2="480" y2="395" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="550" y1="50" x2="550" y2="395" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="60" y1="310" x2="640" y2="310" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="60" y1="240" x2="640" y2="240" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="60" y1="170" x2="640" y2="170" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="60" y1="100" x2="640" y2="100" stroke="#D3D1C7" stroke-width="0.5" />
+
+  <!-- 축 -->
+  <line x1="50" y1="380" x2="648" y2="380" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="642,375 649,380 642,385"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <line x1="340" y1="410" x2="340" y2="46" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="335,52 340,45 345,52"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <text x="658" y="385" font-family="serif" font-style="italic" font-size="16" fill="#888780">x</text>
+  <text x="332" y="38" font-family="serif" font-style="italic" font-size="16" fill="#888780">y</text>
+  <text x="322" y="398" font-family="serif" font-size="14" fill="#888780">O</text>
+
+  <!-- 눈금 -->
+  <line x1="130" y1="375" x2="130" y2="385" stroke="#888780" stroke-width="0.8" />
+  <text x="130" y="400" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−3</text>
+  <line x1="200" y1="375" x2="200" y2="385" stroke="#888780" stroke-width="0.8" />
+  <text x="200" y="400" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−2</text>
+  <line x1="270" y1="375" x2="270" y2="385" stroke="#888780" stroke-width="0.8" />
+  <text x="270" y="400" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−1</text>
+  <line x1="410" y1="375" x2="410" y2="385" stroke="#888780" stroke-width="0.8" />
+  <text x="410" y="400" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">1</text>
+  <line x1="480" y1="375" x2="480" y2="385" stroke="#888780" stroke-width="0.8" />
+  <text x="480" y="400" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">2</text>
+  <line x1="550" y1="375" x2="550" y2="385" stroke="#888780" stroke-width="0.8" />
+  <text x="550" y="400" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">3</text>
+  <line x1="335" y1="310" x2="345" y2="310" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="315" text-anchor="end" font-family="serif" font-size="13" fill="#888780">1</text>
+  <line x1="335" y1="240" x2="345" y2="240" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="245" text-anchor="end" font-family="serif" font-size="13" fill="#888780">2</text>
+  <line x1="335" y1="170" x2="345" y2="170" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="175" text-anchor="end" font-family="serif" font-size="13" fill="#888780">3</text>
+  <line x1="335" y1="100" x2="345" y2="100" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="105" text-anchor="end" font-family="serif" font-size="13" fill="#888780">4</text>
+
+  <!-- V자 그래프 -->
+  <line x1="62" y1="98" x2="340" y2="380" stroke="#185FA5" stroke-width="2.2" stroke-linecap="round" />
+  <line x1="340" y1="380" x2="618" y2="98" stroke="#185FA5" stroke-width="2.2" stroke-linecap="round" />
+
+  <!-- 꼭짓점 -->
+  <circle cx="340" cy="380" r="5" fill="none" stroke="#185FA5" stroke-width="1.5" />
+  <circle cx="340" cy="380" r="3" fill="#185FA5" />
+  <text x="354" y="372" font-family="serif" font-size="13" fill="#185FA5">(0, 0)</text>
+
+  <!-- 기울기 삼각형 -->
+  <line
+    x1="410"
+    y1="310"
+    x2="480"
+    y2="310"
+    stroke="#0F6E56"
+    stroke-width="1"
+    stroke-dasharray="4 3"
+    stroke-linecap="round"
+  />
+  <line
+    x1="480"
+    y1="310"
+    x2="480"
+    y2="240"
+    stroke="#0F6E56"
+    stroke-width="1"
+    stroke-dasharray="4 3"
+    stroke-linecap="round"
+  />
+  <text x="445" y="328" text-anchor="middle" font-family="serif" font-size="12" fill="#0F6E56">1</text>
+  <text x="496" y="280" text-anchor="start" font-family="serif" font-size="12" fill="#0F6E56">1</text>
+  <text x="460" y="262" text-anchor="middle" font-family="serif" font-size="12" fill="#0F6E56">기울기 1</text>
+  <text x="220" y="262" text-anchor="middle" font-family="serif" font-size="12" fill="#0F6E56">기울기 −1</text>
+
+  <!-- 꺾임 레이블 -->
+  <text x="340" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#A32D2D">x=0에서 꺾임</text>
+
+  <!-- 함수식 -->
+  <text x="530" y="160" font-family="serif" font-style="italic" font-size="16" fill="#185FA5">y = |x|</text>
+</svg>

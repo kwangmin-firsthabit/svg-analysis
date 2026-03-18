@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+  <body>
+    <svg width="100%" xmlns="http://www.w3.org/2000/svg" id="main-svg"></svg>
+    <script>
+      (function () {
+        const svg = document.getElementById('main-svg');
+        const NS = 'http://www.w3.org/2000/svg';
+        function mk(tag, attrs, txt) {
+          const e = document.createElementNS(NS, tag);
+          for (const k in attrs) e.setAttribute(k, attrs[k]);
+          if (txt != null) e.textContent = txt;
+          svg.appendChild(e);
+          return e;
+        }
+        const FF = 'serif';
+
+        // Data: each entry is { stem, leaves[] }
+        const stemLeaves = [
+          { stem: 5, leaves: [2, 5] },
+          { stem: 6, leaves: [1, 3, 7, 8] },
+          { stem: 7, leaves: [1, 3, 4, 6, 8] },
+          { stem: 8, leaves: [1, 2, 5, 7, 8] },
+          { stem: 9, leaves: [1, 3, 5, 8] },
+        ];
+        const title = '수학 점수 줄기-잎 그림';
+        const noteText = '5 | 2 는 52점을 나타냄';
+
+        function computeGeometry() {
+          const marginL = 80;
+          const tableW  = 520;
+          const stemColW = 200;  // stem column (left portion)
+          const stemDivX = marginL + stemColW;  // x=280
+          const headerH  = 32;
+          const rowH     = 36;
+          const titleY   = 36;
+          const tableTopY = 76;
+          const stemCenterX = marginL + stemColW / 2;   // 180
+          const leafStartX  = stemDivX + 20;            // 300
+          const totalH = tableTopY + headerH + rowH * stemLeaves.length + 30;
+          return { marginL, tableW, stemColW, stemDivX,
+                   headerH, rowH, titleY, tableTopY,
+                   stemCenterX, leafStartX, totalH };
+        }
+
+        function render(geo) {
+          const { marginL, tableW, stemDivX,
+                  headerH, rowH, titleY, tableTopY,
+                  stemCenterX, leafStartX } = geo;
+
+          // Title
+          mk('text', {
+            x: 340, y: titleY,
+            'font-family': FF, 'font-size': 16, 'font-weight': 'bold',
+            fill: '#2C2C2A', 'text-anchor': 'middle'
+          }, title);
+
+          // Outer border
+          const tableH = headerH + rowH * stemLeaves.length;
+          mk('rect', {
+            x: marginL, y: tableTopY, width: tableW, height: tableH,
+            fill: 'white', stroke: '#2C2C2A', 'stroke-width': 1
+          });
+
+          // Header row
+          mk('rect', {
+            x: marginL, y: tableTopY, width: tableW, height: headerH,
+            fill: '#E6F1FB', stroke: '#2C2C2A', 'stroke-width': 1
+          });
+          mk('line', {
+            x1: stemDivX, y1: tableTopY,
+            x2: stemDivX, y2: tableTopY + tableH,
+            stroke: '#2C2C2A', 'stroke-width': 1.5
+          });
+          mk('text', {
+            x: stemCenterX, y: tableTopY + headerH / 2 + 5,
+            'font-family': FF, 'font-size': 14, 'font-weight': 'bold',
+            fill: '#444441', 'text-anchor': 'middle'
+          }, '줄기');
+          mk('text', {
+            x: stemDivX + (marginL + tableW - stemDivX) / 2,
+            y: tableTopY + headerH / 2 + 5,
+            'font-family': FF, 'font-size': 14, 'font-weight': 'bold',
+            fill: '#444441', 'text-anchor': 'middle'
+          }, '잎');
+
+          // Data rows
+          stemLeaves.forEach((row, ri) => {
+            const rowY = tableTopY + headerH + ri * rowH;
+            const fillColor = ri % 2 === 0 ? '#F7F6F3' : 'white';
+            mk('rect', {
+              x: marginL, y: rowY, width: tableW, height: rowH,
+              fill: fillColor, stroke: '#2C2C2A', 'stroke-width': 1
+            });
+            mk('line', {
+              x1: stemDivX, y1: rowY,
+              x2: stemDivX, y2: rowY + rowH,
+              stroke: '#2C2C2A', 'stroke-width': 1.5
+            });
+            // Stem
+            mk('text', {
+              x: stemCenterX, y: rowY + rowH / 2 + 5,
+              'font-family': FF, 'font-size': 14,
+              fill: '#2C2C2A', 'text-anchor': 'middle'
+            }, String(row.stem));
+            // Leaves
+            const leafText = row.leaves.join('   ');
+            mk('text', {
+              x: leafStartX, y: rowY + rowH / 2 + 5,
+              'font-family': FF, 'font-size': 13,
+              fill: '#2C2C2A', 'text-anchor': 'start'
+            }, leafText);
+          });
+
+          // Note
+          const noteY = tableTopY + tableH + 24;
+          mk('text', {
+            x: 340, y: noteY,
+            'font-family': FF, 'font-size': 12,
+            fill: '#444441', 'text-anchor': 'middle'
+          }, noteText);
+        }
+
+        const geo = computeGeometry();
+        render(geo);
+
+        svg.setAttribute('viewBox', `0 0 680 ${geo.totalH}`);
+      })();
+    </script>
+  </body>
+</html>

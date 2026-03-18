@@ -1,0 +1,39 @@
+<svg width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    화살촉 오목 사각형
+    A(340,60) B(560,380) C(340,260) D(120,380)
+    외적 부호: A→B→C:+ / B→C→D:− / C→D→A:+ / D→A→B:+
+    → C에서만 오목 (내각 > 180°) ✓
+  -->
+
+  <polygon points="340,60 560,380 340,260 120,380" fill="none" stroke="#185FA5" stroke-width="1.8" />
+
+  <!-- Reflex angle at C (> 180°) -->
+  <path d="M 318,252 A 28,28 0 1,0 362,252" fill="none" stroke="#A32D2D" stroke-width="1.1" />
+  <text x="340" y="230" text-anchor="middle" font-family="serif" font-size="13" fill="#A32D2D">&gt; 180°</text>
+
+  <!-- Ordinary angle arcs at A, B, D -->
+  <path d="M 322,88 A 30,30 0 0,1 358,88" fill="none" stroke="#5F5E5A" stroke-width="0.9" />
+  <path d="M 534,364 A 26,26 0 0,1 546,340" fill="none" stroke="#5F5E5A" stroke-width="0.9" />
+  <path d="M 134,354 A 26,26 0 0,1 146,330" fill="none" stroke="#5F5E5A" stroke-width="0.9" />
+
+  <!-- Vertices -->
+  <circle cx="340" cy="60" r="3.5" fill="#185FA5" />
+  <circle cx="560" cy="380" r="3.5" fill="#185FA5" />
+  <circle cx="340" cy="260" r="3.5" fill="#A32D2D" />
+  <circle cx="120" cy="380" r="3.5" fill="#185FA5" />
+
+  <!-- Vertex labels -->
+  <text x="340" y="42" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    A
+  </text>
+  <text x="584" y="390" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    B
+  </text>
+  <text x="340" y="302" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#A32D2D">
+    C
+  </text>
+  <text x="96" y="390" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    D
+  </text>
+</svg>

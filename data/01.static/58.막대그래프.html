@@ -1,0 +1,109 @@
+<svg width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="340" y="30" text-anchor="middle" font-family="serif" font-size="16" font-weight="bold" fill="#222">월별 강수량 (mm)</text>
+
+  <!-- Grid lines -->
+  <!-- y=50 → 300mm -->
+  <line x1="80" y1="320" x2="630" y2="320" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- 50mm -->
+  <line x1="80" y1="292" x2="630" y2="292" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- 100mm -->
+  <line x1="80" y1="264" x2="630" y2="264" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- 150mm -->
+  <line x1="80" y1="236" x2="630" y2="236" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- 200mm -->
+  <line x1="80" y1="208" x2="630" y2="208" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- 250mm -->
+  <line x1="80" y1="180" x2="630" y2="180" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+  <!-- 300mm -->
+  <line x1="80" y1="152" x2="630" y2="152" stroke="#D3D1C7" stroke-width="0.5" stroke-dasharray="4,3"/>
+
+  <!-- Y-axis labels (0 to 350, step 50) -->
+  <!-- scale: 320 (y=0) .. top. 350mm -> 320-(350*168/350)=152. pixel per mm = 168/350 = 0.48 -->
+  <!-- pixelHeight = val * 168 / 350 -->
+  <text x="72" y="324" text-anchor="end" font-family="serif" font-size="12" fill="#888780">0</text>
+  <text x="72" y="296" text-anchor="end" font-family="serif" font-size="12" fill="#888780">50</text>
+  <text x="72" y="268" text-anchor="end" font-family="serif" font-size="12" fill="#888780">100</text>
+  <text x="72" y="240" text-anchor="end" font-family="serif" font-size="12" fill="#888780">150</text>
+  <text x="72" y="212" text-anchor="end" font-family="serif" font-size="12" fill="#888780">200</text>
+  <text x="72" y="184" text-anchor="end" font-family="serif" font-size="12" fill="#888780">250</text>
+  <text x="72" y="156" text-anchor="end" font-family="serif" font-size="12" fill="#888780">300</text>
+  <text x="72" y="128" text-anchor="end" font-family="serif" font-size="12" fill="#888780">350</text>
+
+  <!-- Y-axis unit -->
+  <text x="80" y="55" text-anchor="middle" font-family="serif" font-size="11" fill="#888780">(mm)</text>
+
+  <!-- Bars: x origin=80, each bar group width = 550/12 ≈ 45.8
+       bar width = 28, center spacing = 45.8
+       barX = 80 + i*45.8 + (45.8-28)/2 = 80 + i*45.8 + 8.9
+       barHeight = val * 168/350
+       barY = 320 - barHeight
+       Data: 32,44,65,82,95,138,287,312,148,55,48,21 -->
+
+  <!-- Jan 32 -->
+  <rect x="97" y="304" width="28" height="15" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="111" y="301" text-anchor="middle" font-family="serif" font-size="10" fill="#333">32</text>
+  <!-- Feb 44 -->
+  <rect x="143" y="299" width="28" height="21" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="157" y="296" text-anchor="middle" font-family="serif" font-size="10" fill="#333">44</text>
+  <!-- Mar 65 -->
+  <rect x="189" y="289" width="28" height="31" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="203" y="286" text-anchor="middle" font-family="serif" font-size="10" fill="#333">65</text>
+  <!-- Apr 82 -->
+  <rect x="235" y="280" width="28" height="39" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="249" y="277" text-anchor="middle" font-family="serif" font-size="10" fill="#333">82</text>
+  <!-- May 95 -->
+  <rect x="281" y="274" width="28" height="46" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="295" y="271" text-anchor="middle" font-family="serif" font-size="10" fill="#333">95</text>
+  <!-- Jun 138 -->
+  <rect x="327" y="254" width="28" height="66" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="341" y="251" text-anchor="middle" font-family="serif" font-size="10" fill="#333">138</text>
+  <!-- Jul 287 -->
+  <rect x="373" y="182" width="28" height="138" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="387" y="179" text-anchor="middle" font-family="serif" font-size="10" fill="#333">287</text>
+  <!-- Aug 312 -->
+  <rect x="419" y="170" width="28" height="150" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="433" y="167" text-anchor="middle" font-family="serif" font-size="10" fill="#333">312</text>
+  <!-- Sep 148 -->
+  <rect x="465" y="249" width="28" height="71" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="479" y="246" text-anchor="middle" font-family="serif" font-size="10" fill="#333">148</text>
+  <!-- Oct 55 -->
+  <rect x="511" y="293" width="28" height="26" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="525" y="290" text-anchor="middle" font-family="serif" font-size="10" fill="#333">55</text>
+  <!-- Nov 48 -->
+  <rect x="557" y="297" width="28" height="23" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="571" y="294" text-anchor="middle" font-family="serif" font-size="10" fill="#333">48</text>
+  <!-- Dec 21 -->
+  <rect x="603" y="310" width="28" height="10" fill="#B5D4F4" stroke="#185FA5" stroke-width="1"/>
+  <text x="617" y="307" text-anchor="middle" font-family="serif" font-size="10" fill="#333">21</text>
+
+  <!-- X-axis tick labels -->
+  <text x="111" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">1월</text>
+  <text x="157" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">2월</text>
+  <text x="203" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">3월</text>
+  <text x="249" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">4월</text>
+  <text x="295" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">5월</text>
+  <text x="341" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">6월</text>
+  <text x="387" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">7월</text>
+  <text x="433" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">8월</text>
+  <text x="479" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">9월</text>
+  <text x="525" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">10월</text>
+  <text x="571" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">11월</text>
+  <text x="617" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">12월</text>
+
+  <!-- Y-axis -->
+  <line x1="80" y1="320" x2="80" y2="60" stroke="#444441" stroke-width="1.5"/>
+  <!-- Y arrowhead -->
+  <polyline points="74,68 80,56 86,68" fill="none" stroke="#444441" stroke-width="1.5"/>
+
+  <!-- X-axis -->
+  <line x1="80" y1="320" x2="638" y2="320" stroke="#444441" stroke-width="1.5"/>
+  <!-- X arrowhead -->
+  <polyline points="630,314 642,320 630,326" fill="none" stroke="#444441" stroke-width="1.5"/>
+
+  <!-- X-axis label -->
+  <text x="645" y="324" font-family="serif" font-size="12" fill="#888780">월</text>
+
+  <!-- Source note -->
+  <text x="340" y="390" text-anchor="middle" font-family="serif" font-size="11" fill="#aaa">단위: mm</text>
+</svg>

@@ -1,0 +1,105 @@
+<svg id="vis" width="100%" viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// AB=BC=210px, AC=240px
+// A=(220,280), C=(460,280), B=(340, 280-172.34)
+const hVal = Math.sqrt(210 * 210 - 120 * 120); // ≈ 172.34
+const A = { x: 220, y: 280 };
+const C = { x: 460, y: 280 };
+const B = { x: 340, y: 280 - hVal };
+
+// 삼각형 polygon
+svg.appendChild(el('polygon', {
+  points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`,
+  fill: '#3B82F6',
+  'fill-opacity': '0.12',
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5',
+  'stroke-linejoin': 'round'
+}));
+
+// 꼭짓점 원
+function addVertex(x, y) {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3.5', fill: '#1D4ED8' }));
+}
+addVertex(A.x, A.y);
+addVertex(B.x, B.y);
+addVertex(C.x, C.y);
+
+// 꼭짓점 레이블
+addText(A.x - 20, A.y + 14, 'A', { 'font-size': '15', 'font-weight': '600' });
+addText(B.x, B.y - 20, 'B', { 'font-size': '15', 'font-weight': '600' });
+addText(C.x + 20, C.y + 14, 'C', { 'font-size': '15', 'font-weight': '600' });
+
+// 무게중심
+const gcx = (A.x + B.x + C.x) / 3;
+const gcy = (A.y + B.y + C.y) / 3;
+
+// 변 중점 (바깥 오프셋 방향)
+function outerLabel(p1, p2, offset) {
+  const mx = (p1.x + p2.x) / 2;
+  const my = (p1.y + p2.y) / 2;
+  const nx = mx - gcx;
+  const ny = my - gcy;
+  const nl = Math.sqrt(nx * nx + ny * ny);
+  return { x: mx + (nx / nl) * offset, y: my + (ny / nl) * offset };
+}
+
+// 변 레이블
+const lAB = outerLabel(A, B, 20);
+const lBC = outerLabel(B, C, 20);
+const lAC = outerLabel(A, C, 18);
+
+addText(lAB.x, lAB.y, '7', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+addText(lBC.x, lBC.y, '7', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+addText(lAC.x, lAC.y, '8', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// tick mark 이중선 (등변 AB, BC)
+function drawDoubleTick(p1, p2, tickLen, gap) {
+  const mx = (p1.x + p2.x) / 2;
+  const my = (p1.y + p2.y) / 2;
+  const dx = p2.x - p1.x;
+  const dy = p2.y - p1.y;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  // 변 방향 단위벡터
+  const ux = dx / len;
+  const uy = dy / len;
+  // 수직 단위벡터
+  const px = -uy;
+  const py = ux;
+  const half = tickLen / 2;
+  const offsets = [-gap / 2, gap / 2];
+  for (const off of offsets) {
+    const cx = mx + ux * off;
+    const cy = my + uy * off;
+    svg.appendChild(el('line', {
+      x1: cx + px * half,
+      y1: cy + py * half,
+      x2: cx - px * half,
+      y2: cy - py * half,
+      stroke: '#1D4ED8',
+      'stroke-width': '1.8',
+      'stroke-linecap': 'round'
+    }));
+  }
+}
+
+drawDoubleTick(A, B, 12, 6);
+drawDoubleTick(B, C, 12, 6);
+</script>

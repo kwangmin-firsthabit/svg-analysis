@@ -1,0 +1,96 @@
+<svg width="100%" viewBox="0 0 680 450" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    scale: 50px = 1
+    AD(윗변)=200px=4,  BC(아랫변)=500px=10
+    A(190,80)  D(390,80)  B(40,330)  C(540,330)
+    AB=CD=√(150²+250²)≈291.5px (등변) ✓  ∠B=∠C ✓  AD∥BC ✓
+  -->
+
+  <!-- Symmetry axis -->
+  <line
+    x1="290"
+    y1="60"
+    x2="290"
+    y2="350"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="5 4"
+    stroke-linecap="round"
+  />
+
+  <!-- Parallel marks -->
+  <line x1="278" y1="68" x2="290" y2="68" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <polyline
+    points="286,64 292,68 286,72"
+    fill="none"
+    stroke="#5F5E5A"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <line x1="278" y1="342" x2="290" y2="342" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <polyline
+    points="286,338 292,342 286,346"
+    fill="none"
+    stroke="#5F5E5A"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Trapezoid -->
+  <polygon points="190,80 390,80 540,330 40,330" fill="none" stroke="#185FA5" stroke-width="1.8" />
+
+  <!-- Equal tick marks on AB and CD -->
+  <line x1="109" y1="201" x2="121" y2="209" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round" />
+  <line x1="459" y1="209" x2="471" y2="201" stroke="#185FA5" stroke-width="1.4" stroke-linecap="round" />
+
+  <!-- Equal base angle arcs at B and C -->
+  <path d="M 66,316 A 32,32 0 0,1 72,300" fill="none" stroke="#5F5E5A" stroke-width="0.9" />
+  <line x1="72" y1="306" x2="80" y2="313" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <path d="M 508,300 A 32,32 0 0,1 514,316" fill="none" stroke="#5F5E5A" stroke-width="0.9" />
+  <line x1="500" y1="313" x2="508" y2="306" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+
+  <!-- Vertices -->
+  <circle cx="190" cy="80" r="3" fill="#185FA5" />
+  <circle cx="390" cy="80" r="3" fill="#185FA5" />
+  <circle cx="40" cy="330" r="3" fill="#185FA5" />
+  <circle cx="540" cy="330" r="3" fill="#185FA5" />
+
+  <!-- Vertex labels -->
+  <text x="178" y="62" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    A
+  </text>
+  <text x="402" y="62" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    D
+  </text>
+  <text x="16" y="348" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    B
+  </text>
+  <text x="564" y="348" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    C
+  </text>
+
+  <!-- Labels -->
+  <text x="290" y="66" text-anchor="middle" font-family="serif" font-size="14" fill="#185FA5">4</text>
+  <text x="290" y="358" text-anchor="middle" font-family="serif" font-size="14" fill="#185FA5">10</text>
+  <text
+    text-anchor="middle"
+    font-family="serif"
+    font-size="14"
+    fill="#5F5E5A"
+    transform="translate(100,196) rotate(-59)"
+  >
+    AB
+  </text>
+  <text
+    text-anchor="middle"
+    font-family="serif"
+    font-size="14"
+    fill="#5F5E5A"
+    transform="translate(480,196) rotate(59)"
+  >
+    CD
+  </text>
+  <text x="290" y="224" text-anchor="middle" font-family="serif" font-size="12" fill="#B4B2A9">( AB = CD )</text>
+</svg>

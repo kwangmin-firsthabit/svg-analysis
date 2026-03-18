@@ -1,0 +1,122 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const W = 420;
+  const H = 280;
+
+  // 전체 집합 사각형
+  const rectX = 20, rectY = 20, rectW = 380, rectH = 240;
+
+  // 두 원
+  const cy = rectY + rectH / 2;  // 140
+  const r = 85;
+  const cx1 = 170;  // 수영 원 중심
+  const cx2 = 250;  // 농구 원 중심
+
+  // 데이터
+  const swimming = 22;
+  const basketball = 18;
+  const both = 7;
+  const swimOnly = swimming - both;   // 15
+  const bballOnly = basketball - both; // 11
+  const outside = 40 - swimming - basketball + both; // 7
+
+  // 텍스트 위치
+  const txSwimOnly  = { x: cx1 - 35, y: cy };
+  const txBoth      = { x: (cx1 + cx2) / 2, y: cy };
+  const txBballOnly = { x: cx2 + 35, y: cy };
+  const txOutside   = { x: rectX + 30, y: rectY + 30 };
+
+  return { W, H, rectX, rectY, rectW, rectH, cy, r, cx1, cx2,
+           swimOnly, both, bballOnly, outside,
+           txSwimOnly, txBoth, txBballOnly, txOutside };
+}
+
+function el(tag, attrs) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(content, attrs) {
+  const e = el('text', attrs);
+  e.textContent = String(content);
+  return e;
+}
+
+function render(geo) {
+  const { W, H, rectX, rectY, rectW, rectH, cy, r, cx1, cx2,
+          swimOnly, both, bballOnly, outside,
+          txSwimOnly, txBoth, txBballOnly, txOutside } = geo;
+
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+
+  // 전체 집합 사각형
+  svg.appendChild(el('rect', {
+    x: rectX, y: rectY, width: rectW, height: rectH,
+    fill: 'none', stroke: '#555', 'stroke-width': '2'
+  }));
+
+  // 수영 원
+  svg.appendChild(el('circle', {
+    cx: cx1, cy: cy, r: r,
+    fill: '#93c5fd', opacity: '0.45', stroke: '#2563eb', 'stroke-width': '2'
+  }));
+
+  // 농구 원
+  svg.appendChild(el('circle', {
+    cx: cx2, cy: cy, r: r,
+    fill: '#fca5a5', opacity: '0.45', stroke: '#ef4444', 'stroke-width': '2'
+  }));
+
+  // 원 레이블
+  svg.appendChild(txt('수영', {
+    x: cx1 - 30, y: cy - r + 28,
+    'text-anchor': 'middle', 'font-size': '15', fill: '#1d4ed8',
+    'font-weight': 'bold', 'font-family': 'sans-serif'
+  }));
+  svg.appendChild(txt('농구', {
+    x: cx2 + 30, y: cy - r + 28,
+    'text-anchor': 'middle', 'font-size': '15', fill: '#b91c1c',
+    'font-weight': 'bold', 'font-family': 'sans-serif'
+  }));
+
+  // 수영만 숫자
+  svg.appendChild(txt(swimOnly, {
+    x: txSwimOnly.x, y: txSwimOnly.y + 8,
+    'text-anchor': 'middle', 'font-size': '22', fill: '#1e3a8a',
+    'font-weight': 'bold', 'font-family': 'sans-serif'
+  }));
+
+  // 교집합 숫자
+  svg.appendChild(txt(both, {
+    x: txBoth.x, y: txBoth.y + 8,
+    'text-anchor': 'middle', 'font-size': '22', fill: '#374151',
+    'font-weight': 'bold', 'font-family': 'sans-serif'
+  }));
+
+  // 농구만 숫자
+  svg.appendChild(txt(bballOnly, {
+    x: txBballOnly.x, y: txBballOnly.y + 8,
+    'text-anchor': 'middle', 'font-size': '22', fill: '#7f1d1d',
+    'font-weight': 'bold', 'font-family': 'sans-serif'
+  }));
+
+  // 밖 숫자
+  svg.appendChild(txt(outside, {
+    x: txOutside.x, y: txOutside.y,
+    'text-anchor': 'middle', 'font-size': '18', fill: '#555',
+    'font-family': 'sans-serif'
+  }));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

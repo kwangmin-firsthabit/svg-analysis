@@ -1,0 +1,91 @@
+<svg width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    y = x⁴ − 2x²,  scale_x=140px, scale_y=50px, 원점 O(340,300)
+    극소(±1,−1)→(200/480,350) ✓  극대(0,0)→(340,300) ✓
+    x절편 (0,0)(±√2,0)→(142/340/538,300) ✓
+  -->
+
+  <!-- 격자 -->
+  <line x1="200" y1="60" x2="200" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="340" y1="60" x2="340" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="480" y1="60" x2="480" y2="420" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="80" y1="350" x2="600" y2="350" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="80" y1="100" x2="600" y2="100" stroke="#D3D1C7" stroke-width="0.5" />
+
+  <!-- 축 -->
+  <line x1="70" y1="300" x2="620" y2="300" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="614,295 621,300 614,305"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <line x1="340" y1="430" x2="340" y2="50" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="335,56 340,49 345,56"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <text x="630" y="305" font-family="serif" font-style="italic" font-size="16" fill="#888780">x</text>
+  <text x="332" y="42" font-family="serif" font-style="italic" font-size="16" fill="#888780">y</text>
+  <text x="322" y="318" font-family="serif" font-size="14" fill="#888780">O</text>
+
+  <!-- 눈금 -->
+  <line x1="200" y1="295" x2="200" y2="305" stroke="#888780" stroke-width="0.8" />
+  <text x="200" y="320" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−1</text>
+  <line x1="480" y1="295" x2="480" y2="305" stroke="#888780" stroke-width="0.8" />
+  <text x="480" y="320" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">1</text>
+  <line x1="142" y1="295" x2="142" y2="305" stroke="#888780" stroke-width="0.8" />
+  <text x="130" y="320" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−√2</text>
+  <line x1="538" y1="295" x2="538" y2="305" stroke="#888780" stroke-width="0.8" />
+  <text x="538" y="320" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">√2</text>
+  <line x1="335" y1="350" x2="345" y2="350" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="355" text-anchor="end" font-family="serif" font-size="13" fill="#888780">−1</text>
+  <line x1="335" y1="100" x2="345" y2="100" stroke="#888780" stroke-width="0.8" />
+  <text x="326" y="105" text-anchor="end" font-family="serif" font-size="13" fill="#888780">4</text>
+
+  <!-- 곡선 -->
+  <path
+    d="M 88,99
+    C 108,160 130,280 142,300
+    C 155,320 180,360 200,350
+    C 230,336 290,300 340,300
+    C 390,300 450,336 480,350
+    C 500,360 525,320 538,300
+    C 550,280 572,160 592,99"
+    fill="none"
+    stroke="#185FA5"
+    stroke-width="2.2"
+    stroke-linecap="round"
+  />
+
+  <!-- x절편 -->
+  <circle cx="142" cy="300" r="3.5" fill="#185FA5" />
+  <circle cx="340" cy="300" r="3.5" fill="#185FA5" />
+  <circle cx="538" cy="300" r="3.5" fill="#185FA5" />
+
+  <!-- 극값 -->
+  <circle cx="200" cy="350" r="4" fill="#993C1D" />
+  <line x1="90" y1="350" x2="194" y2="350" stroke="#B4B2A9" stroke-width="0.8" stroke-dasharray="4 3" />
+  <text x="200" y="376" text-anchor="middle" font-family="serif" font-size="12" fill="#993C1D">(−1, −1)</text>
+  <text x="200" y="390" text-anchor="middle" font-family="serif" font-size="11" fill="#993C1D">극소(최솟값)</text>
+
+  <circle cx="340" cy="300" r="4" fill="#0F6E56" />
+  <text x="358" y="290" font-family="serif" font-size="12" fill="#0F6E56">(0, 0) 극대</text>
+
+  <circle cx="480" cy="350" r="4" fill="#993C1D" />
+  <line x1="486" y1="350" x2="590" y2="350" stroke="#B4B2A9" stroke-width="0.8" stroke-dasharray="4 3" />
+  <text x="480" y="376" text-anchor="middle" font-family="serif" font-size="12" fill="#993C1D">(1, −1)</text>
+  <text x="480" y="390" text-anchor="middle" font-family="serif" font-size="11" fill="#993C1D">극소(최솟값)</text>
+
+  <!-- 함수식 -->
+  <text x="460" y="90" text-anchor="middle" font-family="serif" font-style="italic" font-size="15" fill="#185FA5">
+    y = x⁴ − 2x²
+  </text>
+</svg>

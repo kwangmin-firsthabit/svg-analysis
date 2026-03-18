@@ -1,0 +1,95 @@
+<!--
+  좌표 계산 검증
+  직각삼각형 변: a=6(세로), b=8(가로), c=10(빗변)
+  내접원 반지름: r = (a+b-c)/2 = (6+8-10)/2 = 2 ✓
+
+  1단위 = 40px
+
+  꼭짓점 배치 (직각=A, 가로끝=B, 세로끝=C):
+    A = (0,0) → 직각 꼭짓점
+    B = (8,0) → 가로 방향
+    C = (0,6) → 세로 방향
+
+  화면 좌표 (ox=60, oy=320):
+    A = (60, 320)
+    B = (60+8*40, 320) = (380, 320)
+    C = (60, 320-6*40) = (60, 80)
+
+  내접원 중심: (r, r) = (2, 2) 단위
+    화면: (60+2*40, 320-2*40) = (140, 240)
+  내접원 반지름: 2*40 = 80px
+
+  접점:
+    AB 위 (세로 변 아래): (60+0, 320-2*40) = (60, 240) → AC 변 위의 접점: x=A.x=60, y=center.y=240
+    AB 위 (가로 변): (60+2*40, 320) = (140, 320) → AB 변 위의 접점: x=center.x=140, y=A.y=320
+
+  BC 변 위의 접점:
+    BC 방향 벡터: (320,-240), 길이=400
+    단위벡터: (0.8, -0.6)
+    수직벡터 (내부방향): (0.6, 0.8)
+    center = B + t*(C-B), t 구하기
+    점 (140,240)과 직선 BC의 거리 = r=80px ✓
+    BC 직선: 3x+4y=3*60+4*80+...
+    직선 BC: x/8+y/6=1 (단위) → 3x+4y=24 (단위) → 픽셀: (x-60)/40/8 + (y-80)/(-40)/(-6) → 정규화
+
+    BC 직선 방정식 (픽셀):
+      점 B=(380,320), C=(60,80)
+      방향벡터: (-320, -240), 법선벡터: (-240, 320) → 정규화: (-3/5, 4/5)
+      내부방향 법선: (3/5, -4/5) 또는 반대
+
+    접점 = 중심에서 BC에 내린 수선의 발
+      BC 매개변수: P = B + t*(C-B) = (380-320t, 320-240t)
+      BP 벡터 수직 조건: (P-center)·(C-B) = 0
+      (380-320t-140, 320-240t-240)·(-320,-240) = 0
+      (240-320t, 80-240t)·(-320,-240) = 0
+      -320*(240-320t) - 240*(80-240t) = 0
+      -76800+102400t - 19200+57600t = 0
+      160000t = 96000
+      t = 0.6
+      접점: (380-192, 320-144) = (188, 176)
+
+  viewBox: "30 50 420 310"
+-->
+<svg width="450" height="330" viewBox="30 50 420 310" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- 직각삼각형 -->
+  <polygon points="60,320 380,320 60,80"
+    fill="#f0f9ff" stroke="#1e293b" stroke-width="2"/>
+
+  <!-- 직각 표시 -->
+  <path d="M 60,300 L 80,300 L 80,320" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+
+  <!-- 내접원 -->
+  <circle cx="140" cy="240" r="80"
+    fill="#fef3c7" fill-opacity="0.5" stroke="#d97706" stroke-width="1.8"/>
+
+  <!-- 접점 표시 -->
+  <!-- AC 변 위 접점: (60, 240) -->
+  <circle cx="60" cy="240" r="3" fill="#dc2626"/>
+  <!-- AB 변 위 접점: (140, 320) -->
+  <circle cx="140" cy="320" r="3" fill="#dc2626"/>
+  <!-- BC 변 위 접점: (188, 176) -->
+  <circle cx="188" cy="176" r="3" fill="#dc2626"/>
+
+  <!-- 내접원 중심 -->
+  <circle cx="140" cy="240" r="3" fill="#1e293b"/>
+  <text x="150" y="236" font-size="13" font-family="serif" fill="#1e293b">I</text>
+
+  <!-- 반지름선 (중심→접점) -->
+  <line x1="140" y1="240" x2="60" y2="240" stroke="#d97706" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="140" y1="240" x2="140" y2="320" stroke="#d97706" stroke-width="1" stroke-dasharray="4,3"/>
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="45" y="335" font-size="14" font-family="serif" fill="#111827">A</text>
+  <text x="387" y="328" font-size="14" font-family="serif" fill="#111827">B</text>
+  <text x="45" y="78" font-size="14" font-family="serif" fill="#111827">C</text>
+
+  <!-- 변 길이 라벨 -->
+  <text x="220" y="338" text-anchor="middle" font-size="13" font-family="serif" fill="#374151">8</text>
+  <text x="43" y="205" text-anchor="end" font-size="13" font-family="serif" fill="#374151">6</text>
+  <text x="238" y="195" text-anchor="middle" font-size="13" font-family="serif" fill="#374151">10</text>
+
+  <!-- 반지름 라벨 -->
+  <text x="96" y="233" text-anchor="middle" font-size="12" font-family="serif" fill="#d97706">r=2</text>
+
+</svg>

@@ -1,0 +1,166 @@
+<svg width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    y=2^x, y=log₂x, y=x (대칭축), y=−x+3 (직선, k=3)
+    scale=70px/unit, 원점 O(200,320)
+    P₁: y=2^x ∩ y=−x+3 → (296,206)
+    P₂: y=log₂x ∩ y=−x+3 → (314,224)
+    P₁·P₂는 y=x에 대해 대칭 ✓
+  -->
+
+  <!-- ── 격자 ── -->
+  <line x1="130" y1="40" x2="130" y2="380" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="270" y1="40" x2="270" y2="380" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="340" y1="40" x2="340" y2="380" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="410" y1="40" x2="410" y2="380" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="480" y1="40" x2="480" y2="380" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="80" y1="250" x2="540" y2="250" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="80" y1="180" x2="540" y2="180" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="80" y1="110" x2="540" y2="110" stroke="#D3D1C7" stroke-width="0.5" />
+
+  <!-- ── 대칭축 y=x (dashed) ── -->
+  <line
+    x1="130"
+    y1="390"
+    x2="480"
+    y2="40"
+    stroke="#B4B2A9"
+    stroke-width="1.2"
+    stroke-dasharray="6 4"
+    stroke-linecap="round"
+  />
+  <text x="490" y="36" font-family="serif" font-style="italic" font-size="13" fill="#888780">y=x</text>
+
+  <!-- ── x축 ── -->
+  <line x1="70" y1="320" x2="552" y2="320" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="546,315 553,320 546,325"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- ── y축 ── -->
+  <line x1="200" y1="400" x2="200" y2="36" stroke="#888780" stroke-width="1.2" stroke-linecap="round" />
+  <polyline
+    points="195,42 200,35 205,42"
+    fill="none"
+    stroke="#888780"
+    stroke-width="1.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- 축 레이블 -->
+  <text x="562" y="325" font-family="serif" font-style="italic" font-size="15" fill="#888780">x</text>
+  <text x="192" y="28" font-family="serif" font-style="italic" font-size="15" fill="#888780">y</text>
+  <text x="184" y="338" font-family="serif" font-size="13" fill="#888780">O</text>
+
+  <!-- x축 눈금 -->
+  <line x1="130" y1="315" x2="130" y2="325" stroke="#888780" stroke-width="0.8" />
+  <text x="130" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">−1</text>
+  <line x1="270" y1="315" x2="270" y2="325" stroke="#888780" stroke-width="0.8" />
+  <text x="270" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">1</text>
+  <line x1="340" y1="315" x2="340" y2="325" stroke="#888780" stroke-width="0.8" />
+  <text x="340" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">2</text>
+  <line x1="410" y1="315" x2="410" y2="325" stroke="#888780" stroke-width="0.8" />
+  <text x="410" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">3</text>
+  <line x1="480" y1="315" x2="480" y2="325" stroke="#888780" stroke-width="0.8" />
+  <text x="480" y="338" text-anchor="middle" font-family="serif" font-size="12" fill="#888780">4</text>
+
+  <!-- y축 눈금 -->
+  <line x1="195" y1="250" x2="205" y2="250" stroke="#888780" stroke-width="0.8" />
+  <text x="186" y="255" text-anchor="end" font-family="serif" font-size="12" fill="#888780">1</text>
+  <line x1="195" y1="180" x2="205" y2="180" stroke="#888780" stroke-width="0.8" />
+  <text x="186" y="185" text-anchor="end" font-family="serif" font-size="12" fill="#888780">2</text>
+  <line x1="195" y1="110" x2="205" y2="110" stroke="#888780" stroke-width="0.8" />
+  <text x="186" y="115" text-anchor="end" font-family="serif" font-size="12" fill="#888780">3</text>
+
+  <!-- ── 직선 y=−x+3 ── -->
+  <line x1="160" y1="60" x2="510" y2="390" stroke="#854F0B" stroke-width="2" stroke-linecap="round" />
+  <text x="522" y="388" font-family="serif" font-style="italic" font-size="13" fill="#854F0B">y=−x+k</text>
+
+  <!-- ── 곡선 y=2^x ── -->
+  <path
+    d="M 60,302
+    C 90,298 116,290 130,285
+    C 160,276 183,260 200,250
+    C 224,236 252,200 270,180
+    C 292,156 318,90  340,40"
+    fill="none"
+    stroke="#185FA5"
+    stroke-width="2"
+    stroke-linecap="round"
+  />
+  <text x="344" y="36" font-family="serif" font-style="italic" font-size="13" fill="#185FA5">y=2ˣ</text>
+
+  <!-- ── 곡선 y=log₂x ── -->
+  <path
+    d="M 214,390
+    C 224,370 248,338 270,320
+    C 294,300 318,270 340,250
+    C 366,228 390,202 410,180
+    C 434,156 460,128 480,110"
+    fill="none"
+    stroke="#0F6E56"
+    stroke-width="2"
+    stroke-linecap="round"
+  />
+  <text x="486" y="108" font-family="serif" font-style="italic" font-size="13" fill="#0F6E56">y=log₂x</text>
+
+  <!-- ── 교점 P₁, P₂ ── -->
+  <circle cx="296" cy="206" r="5.5" fill="#A32D2D" stroke="none" />
+  <circle cx="296" cy="206" r="3" fill="white" />
+  <text x="284" y="196" text-anchor="end" font-family="serif" font-size="12" fill="#A32D2D">P₁</text>
+
+  <circle cx="314" cy="224" r="5.5" fill="#A32D2D" stroke="none" />
+  <circle cx="314" cy="224" r="3" fill="white" />
+  <text x="326" y="236" text-anchor="start" font-family="serif" font-size="12" fill="#A32D2D">P₂</text>
+
+  <!-- ── P₁↔P₂ 연결선 ── -->
+  <line
+    x1="296"
+    y1="206"
+    x2="314"
+    y2="224"
+    stroke="#A32D2D"
+    stroke-width="0.9"
+    stroke-dasharray="4 3"
+    stroke-linecap="round"
+  />
+
+  <!-- 중점 -->
+  <circle cx="305" cy="215" r="3" fill="#A32D2D" />
+
+  <!-- ── P₁, P₂에서 y=x까지 수선 ── -->
+  <line
+    x1="296"
+    y1="206"
+    x2="256"
+    y2="246"
+    stroke="#B4B2A9"
+    stroke-width="0.7"
+    stroke-dasharray="3 3"
+    stroke-linecap="round"
+  />
+  <line
+    x1="314"
+    y1="224"
+    x2="274"
+    y2="264"
+    stroke="#B4B2A9"
+    stroke-width="0.7"
+    stroke-dasharray="3 3"
+    stroke-linecap="round"
+  />
+
+  <!-- ── 대칭 관계 레이블 ── -->
+  <text x="200" y="48" text-anchor="start" font-family="serif" font-size="12" fill="#A32D2D">
+    P₁, P₂는 y=x에 대해 대칭
+  </text>
+
+  <!-- ── 특수점 (0,1), (1,0) ── -->
+  <circle cx="200" cy="250" r="3" fill="#185FA5" />
+  <circle cx="270" cy="320" r="3" fill="#0F6E56" />
+</svg>

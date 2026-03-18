@@ -1,0 +1,144 @@
+<!--
+  정팔면체 (Regular Octahedron), 변의 길이 = 6
+  등각투영 좌표 계산
+
+  정팔면체 구조:
+    6개의 꼭짓점: 상단 T, 하단 Bo, 중간 정사각형 4개 A,B,C,D
+    T = (0, 0, h)  , Bo = (0, 0, -h)
+    A = (r, 0, 0)  , B = (0, r, 0)
+    C = (-r, 0, 0) , D = (0, -r, 0)
+
+    변 길이 = 6
+    |TA| = sqrt(r^2 + h^2) = 6
+    |AB| = sqrt(r^2 + r^2) = r*sqrt(2) = 6 → r = 6/sqrt(2) = 3*sqrt(2) ≈ 4.243
+    h = sqrt(36 - r^2) = sqrt(36 - 18) = sqrt(18) = 3*sqrt(2) ≈ 4.243
+    → r = h = 3√2 ≈ 4.243
+
+  등각투영 (e_x=(0.866,0.5), e_y=(-0.866,0.5), e_z=(0,-1)):
+    svgx = cx + x*0.866*s + y*(-0.866)*s
+    svgy = cy + x*0.5*s + y*0.5*s + z*(-1)*s
+
+  s=34, cx=200, cy=230:
+    T (0,0,4.243):
+      svgx = 200 + 0 + 0 = 200
+      svgy = 230 + 0 + 0 + 4.243*(-34) = 230 - 144.3 = 85.7 → (200, 86)
+
+    Bo (0,0,-4.243):
+      svgx = 200
+      svgy = 230 + 4.243*34 = 230 + 144.3 = 374.3 → (200, 374)
+
+    A (4.243, 0, 0):
+      svgx = 200 + 4.243*0.866*34 = 200 + 124.9 = 324.9 → (325, -)
+      svgy = 230 + 4.243*0.5*34 + 0 = 230 + 72.1 = 302.1 → (325, 302)
+
+    B (0, 4.243, 0):
+      svgx = 200 + 0 + 4.243*(-0.866)*34 = 200 - 124.9 = 75.1 → (75, -)
+      svgy = 230 + 0 + 4.243*0.5*34 = 230 + 72.1 = 302.1 → (75, 302)
+
+    C (-4.243, 0, 0):
+      svgx = 200 + (-4.243)*0.866*34 = 200 - 124.9 = 75.1 → (75, -)
+      svgy = 230 + (-4.243)*0.5*34 = 230 - 72.1 = 157.9 → (75, 158)
+
+    D (0, -4.243, 0):
+      svgx = 200 + 0 + (-4.243)*(-0.866)*34 = 200 + 124.9 = 324.9 → (325, -)
+      svgy = 230 + 0 + (-4.243)*0.5*34 = 230 - 72.1 = 157.9 → (325, 158)
+
+  최종 좌표:
+    T  = (200, 86)
+    Bo = (200, 374)
+    A  = (325, 302)
+    B  = (75, 302)
+    C  = (75, 158)
+    D  = (325, 158)
+
+  중간 정사각형: A-D-C-B (시계방향으로 등각투영)
+    A(325,302) - D(325,158) - C(75,158) - B(75,302)
+    → 직사각형 모양 (등각투영에서 정사각형이 직사각형으로)
+
+  픽셀 검증:
+    |AD|_px = sqrt(0 + (302-158)^2) = 144px
+    |DC|_px = sqrt((325-75)^2 + 0) = 250px → 직사각형 확인
+    (3D에서 |AD|=6 ✓, |DC|=6 ✓)
+
+  8개 면:
+    위쪽 4면 (T에 연결):
+      T-A-D: 오른쪽 위 (보임)
+      T-D-C: 앞-위 (보임)... 실제로 D는 오른쪽 앞
+      T-C-B: 왼쪽 위 (보임)
+      T-B-A: 뒤-위 (안 보임 or 점선)
+
+    아래쪽 4면 (Bo에 연결):
+      Bo-A-D: 오른쪽 아래 (보임)
+      Bo-D-C: 앞-아래 (보임)
+      Bo-C-B: 왼쪽 아래 (보임)
+      Bo-B-A: 뒤-아래 (안 보임 or 점선)
+
+  가시성 판단 (앞쪽에서 보는 경우):
+    T는 위, Bo는 아래, 중간 정사각형 A-D-C-B
+    A = 오른쪽 아래, B = 왼쪽 아래, C = 왼쪽 위, D = 오른쪽 위
+
+    보이는 면: T-A-D, T-C-D (위), T-B-C, Bo-A-D, Bo-C-D, Bo-B-C
+    숨겨진 면: T-A-B, Bo-A-B
+
+  숨겨진 모서리: T-B, Bo-B (B는 뒤쪽)
+    실제로 B(75,302)와 A(325,302)의 위치를 보면:
+    B가 왼쪽 아래에 있고 A가 오른쪽 아래에 있으므로
+    중간 정사각형에서 B-A가 뒤쪽 모서리 → 점선
+
+  숨겨진 모서리 목록:
+    T-B: (200,86)→(75,302) — 점선
+    Bo-B: (200,374)→(75,302) — 점선
+    A-B: (325,302)→(75,302) — 점선 (사각형 뒤쪽 가로)
+
+  변의 길이 표시: "6" — T에서 D 방향 모서리 중점
+    TD 중점: ((200+325)/2, (86+158)/2) = (262.5, 122)
+
+  viewBox: 0 0 420 460
+-->
+<svg width="420" height="460" viewBox="0 0 420 460" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- 숨겨진 모서리 (점선) -->
+  <line x1="200" y1="86" x2="75" y2="302" stroke="#888" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <line x1="200" y1="374" x2="75" y2="302" stroke="#888" stroke-width="1.5" stroke-dasharray="5,4"/>
+  <line x1="325" y1="302" x2="75" y2="302" stroke="#888" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+  <!-- 보이는 면 채우기 -->
+  <!-- T-D-C (위-앞-왼쪽) -->
+  <polygon points="200,86 325,158 75,158" fill="#dce8f5" fill-opacity="0.7" stroke="none"/>
+  <!-- T-A-D (위-오른쪽) -->
+  <polygon points="200,86 325,302 325,158" fill="#c8daf0" fill-opacity="0.7" stroke="none"/>
+  <!-- T-C-B (위-왼쪽, 뒤 포함) -->
+  <polygon points="200,86 75,158 75,302" fill="#d4e4f5" fill-opacity="0.5" stroke="none"/>
+  <!-- Bo-D-C (아래-앞-왼쪽) -->
+  <polygon points="200,374 325,158 75,158" fill="#e8f0f8" fill-opacity="0.7" stroke="none"/>
+  <!-- Bo-A-D (아래-오른쪽) -->
+  <polygon points="200,374 325,302 325,158" fill="#dde8f4" fill-opacity="0.7" stroke="none"/>
+  <!-- Bo-C-B (아래-왼쪽, 뒤 포함) -->
+  <polygon points="200,374 75,158 75,302" fill="#e4ecf8" fill-opacity="0.5" stroke="none"/>
+
+  <!-- 보이는 모서리 (실선) -->
+  <!-- 위쪽에서 T -->
+  <line x1="200" y1="86" x2="325" y2="158" stroke="#222" stroke-width="2"/>
+  <line x1="200" y1="86" x2="75" y2="158" stroke="#222" stroke-width="2"/>
+  <line x1="200" y1="86" x2="325" y2="302" stroke="#222" stroke-width="2"/>
+  <!-- Bo에서 -->
+  <line x1="200" y1="374" x2="325" y2="158" stroke="#222" stroke-width="2"/>
+  <line x1="200" y1="374" x2="75" y2="158" stroke="#222" stroke-width="2"/>
+  <line x1="200" y1="374" x2="325" y2="302" stroke="#222" stroke-width="2"/>
+  <!-- 중간 사각형 보이는 모서리 -->
+  <line x1="325" y1="158" x2="75" y2="158" stroke="#222" stroke-width="2"/>
+  <line x1="325" y1="158" x2="325" y2="302" stroke="#222" stroke-width="2"/>
+  <line x1="75" y1="158" x2="75" y2="302" stroke="#888" stroke-width="1.5" stroke-dasharray="5,4"/>
+
+  <!-- 변의 길이 6 표시 (T→D 모서리 옆) -->
+  <text x="278" y="118" text-anchor="start" font-size="15" font-family="serif" font-style="italic">6</text>
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="200" y="72" text-anchor="middle" font-size="16" font-family="serif" font-style="italic">T</text>
+  <text x="200" y="396" text-anchor="middle" font-size="16" font-family="serif" font-style="italic">B&#x2080;</text>
+  <text x="340" y="162" text-anchor="start" font-size="16" font-family="serif" font-style="italic">D</text>
+  <text x="60" y="162" text-anchor="end" font-size="16" font-family="serif" font-style="italic">C</text>
+  <text x="340" y="308" text-anchor="start" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="60" y="308" text-anchor="end" font-size="16" font-family="serif" font-style="italic">B</text>
+
+</svg>

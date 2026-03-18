@@ -1,0 +1,233 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 30;
+  const side = 5;
+  const s = side * unit; // 150px
+  const phi = (1 + Math.sqrt(5)) / 2; // 황금비
+
+  // 정이십면체 12개 꼭짓점 (황금 직사각형 3개 조합)
+  // 표준 꼭짓점: (0, ±1, ±phi) + cyclic permutations
+  // 한 변 길이 = 2 기준 → scale to s
+  const rawEdge = 2;
+  const scale = s / rawEdge;
+
+  const raw = [];
+  for (let sy = -1; sy <= 1; sy += 2)
+    for (let sz = -1; sz <= 1; sz += 2) {
+      raw.push([0, sy, sz * phi]);
+      raw.push([sy, sz * phi, 0]);
+      raw.push([sz * phi, 0, sy]);
+    }
+  const verts3d = raw.map(([x, y, z]) => [x * scale, y * scale, z * scale]);
+
+  // Isometric 투영
+  function iso(x, y, z) {
+    const ix = (x - z) * Math.cos(Math.PI / 6);
+    const iy = -y + (x + z) * Math.sin(Math.PI / 6);
+    return [ix, iy];
+  }
+
+  const projected = verts3d.map(([x, y, z]) => iso(x, y, z));
+
+  // 엣지: 한 변 길이 s에 가까운 점쌍 연결
+  const edges = [];
+  const tol = s * 0.05;
+  for (let i = 0; i < verts3d.length; i++) {
+    for (let j = i + 1; j < verts3d.length; j++) {
+      const dx = verts3d[i][0] - verts3d[j][0];
+      const dy = verts3d[i][1] - verts3d[j][1];
+      const dz = verts3d[i][2] - verts3d[j][2];
+      const d = Math.sqrt(dx*dx + dy*dy + dz*dz);
+      if (Math.abs(d - s) < tol) edges.push([i, j]);
+    }
+  }
+
+  // 중심 이동 및 패딩
+  const xs = projected.map(p => p[0]);
+  const ys = projected.map(p => p[1]);
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+  const maxX = Math.max(...xs);
+  const maxY2 = Math.max(...ys);
+
+  const pad = 50;
+  const ox = -minX + pad;
+  const oy = -minY + pad;
+  const pts = projected.map(([px, py]) => [px + ox, py + oy]);
+
+  const width = (maxX - minX) + pad * 2;
+  const height = (maxY2 - minY) + pad * 2;
+
+  // 3D y 좌표 중앙값으로 앞/뒤 판단
+  const yVals = verts3d.map(v => v[1]);
+  const midY = (Math.max(...yVals) + Math.min(...yVals)) / 2;
+
+  // 법선벡터로 면 가시성 계산 (카메라 방향: isometric 시점)
+  // 시야 방향 (isometric): 정규화된 벡터
+  const camDir = [1/Math.sqrt(3), 1/Math.sqrt(3), 1/Math.sqrt(3)];
+
+  // 삼각형 면 목록 생성
+  const faces = [];
+  // 엣지 인접리스트
+  const adj = Array.from({length: verts3d.length}, () => []);
+  for (const [i, j] of edges) {
+    adj[i].push(j);
+    adj[j].push(i);
+  }
+  // 공통 이웃을 가진 두 꼭짓점 쌍 → 삼각형 면
+  const faceSet = new Set();
+  for (const [i, j] of edges) {
+    for (const k of adj[i]) {
+      if (k !== j && adj[j].includes(k)) {
+        const tri = [i, j, k].sort((a, b) => a - b);
+        const key = tri.join(',');
+        if (!faceSet.has(key)) {
+          faceSet.add(key);
+          faces.push(tri);
+        }
+      }
+    }
+  }
+
+  // 각 면의 법선 계산 후 가시성 판단
+  function cross(a, b) {
+    return [
+      a[1]*b[2] - a[2]*b[1],
+      a[2]*b[0] - a[0]*b[2],
+      a[0]*b[1] - a[1]*b[0]
+    ];
+  }
+  function dot(a, b) { return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]; }
+  function sub(a, b) { return [a[0]-b[0], a[1]-b[1], a[2]-b[2]]; }
+
+  return { pts, verts3d, edges, faces, width, height, side, camDir, cross, dot, sub };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { pts, verts3d, edges, faces, width, height, side, camDir, cross, dot, sub } = geo;
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('width', width);
+  svg.setAttribute('height', height);
+
+  // 면 가시성 판단 (법선 · 카메라 방향 > 0 이면 보임)
+  const visibleFaces = new Set();
+  const faceByCentroid = [];
+  for (const [i, j, k] of faces) {
+    const v0 = verts3d[i], v1 = verts3d[j], v2 = verts3d[k];
+    const e1 = sub(v1, v0);
+    const e2 = sub(v2, v0);
+    const n = cross(e1, e2);
+    const d = dot(n, camDir);
+    faceByCentroid.push({ i, j, k, visible: d > 0 });
+  }
+
+  // 보이는 면 렌더링 (뒤에서 앞 순서)
+  // 면 중심 y 기준으로 정렬
+  faceByCentroid.sort((a, b) => {
+    const ya = (pts[a.i][1] + pts[a.j][1] + pts[a.k][1]) / 3;
+    const yb = (pts[b.i][1] + pts[b.j][1] + pts[b.k][1]) / 3;
+    return yb - ya;
+  });
+
+  for (const { i, j, k, visible } of faceByCentroid) {
+    if (visible) {
+      const p1 = pts[i], p2 = pts[j], p3 = pts[k];
+      svg.appendChild(el('polygon', {
+        points: `${p1[0]},${p1[1]} ${p2[0]},${p2[1]} ${p3[0]},${p3[1]}`,
+        fill: 'rgba(180,210,255,0.3)',
+        stroke: 'none'
+      }));
+    }
+  }
+
+  // 엣지 가시성: 엣지를 공유하는 두 면 중 하나라도 보이면 해당 엣지는 보임
+  // 면 인접: 각 엣지가 어떤 면에 속하는지 파악
+  const edgeFaces = new Map();
+  for (let fi = 0; fi < faces.length; fi++) {
+    const [ia, ib, ic] = faces[fi];
+    const fEdges = [
+      [Math.min(ia,ib), Math.max(ia,ib)],
+      [Math.min(ib,ic), Math.max(ib,ic)],
+      [Math.min(ia,ic), Math.max(ia,ic)]
+    ];
+    for (const [ea, eb] of fEdges) {
+      const key = `${ea}-${eb}`;
+      if (!edgeFaces.has(key)) edgeFaces.set(key, []);
+      edgeFaces.get(key).push(fi);
+    }
+  }
+
+  const faceVisible = faceByCentroid.map(f => f.visible);
+  // 재정렬된 faceByCentroid → 인덱스 매핑 필요하므로 faces 순서 기준 배열 사용
+  const faceVisArr = faces.map((_, fi) => faceByCentroid.find(f => f.i === faces[fi][0] && f.j === faces[fi][1] && f.k === faces[fi][2])?.visible ?? false);
+
+  for (const [i, j] of edges) {
+    const key = `${Math.min(i,j)}-${Math.max(i,j)}`;
+    const faceIdxs = edgeFaces.get(key) || [];
+    const anyVisible = faceIdxs.some(fi => faceVisArr[fi]);
+    const p = pts[i], q = pts[j];
+    if (anyVisible) {
+      svg.appendChild(el('line', {
+        x1: p[0], y1: p[1], x2: q[0], y2: q[1],
+        stroke: '#1a1a2e', 'stroke-width': '1.8',
+        'stroke-linecap': 'round'
+      }));
+    } else {
+      svg.appendChild(el('line', {
+        x1: p[0], y1: p[1], x2: q[0], y2: q[1],
+        stroke: '#aaa', 'stroke-width': '1',
+        'stroke-dasharray': '4,3'
+      }));
+    }
+  }
+
+  // 꼭짓점 점
+  for (const p of pts) {
+    svg.appendChild(el('circle', {
+      cx: p[0], cy: p[1], r: '2.5',
+      fill: '#1a1a2e'
+    }));
+  }
+
+  // 한 변 길이 표시: 가장 위쪽 엣지 근처
+  let topEdge = null;
+  let topY = Infinity;
+  for (const [i, j] of edges) {
+    const my = (pts[i][1] + pts[j][1]) / 2;
+    if (my < topY) {
+      topY = my;
+      topEdge = [i, j];
+    }
+  }
+  if (topEdge) {
+    const [i, j] = topEdge;
+    const p = pts[i], q = pts[j];
+    const mx = (p[0] + q[0]) / 2;
+    const my = (p[1] + q[1]) / 2;
+    svg.appendChild(el('text', {
+      x: mx + 14, y: my - 8,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '13',
+      'font-family': 'serif',
+      fill: '#c0392b'
+    }, `${side}`));
+  }
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

@@ -1,0 +1,354 @@
+<!doctype html>
+<html>
+  <body>
+    <svg width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+      <script>
+        const W = 680,
+          H = 480;
+        const ox = 340,
+          oy = 240,
+          unit = 66;
+
+        function toSVG(mx, my) {
+          return { x: ox + mx * unit, y: oy - my * unit };
+        }
+
+        const svg = document.querySelector('svg');
+        function el(tag, attrs, txt) {
+          const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+          for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+          if (txt !== undefined) e.textContent = txt;
+          svg.appendChild(e);
+          return e;
+        }
+
+        function dashedLine(x1, y1, x2, y2) {
+          el('line', { x1, y1, x2, y2, stroke: '#B4B2A9', 'stroke-width': 0.8, 'stroke-dasharray': '4 3' });
+        }
+
+        const xMin = -4.5,
+          xMax = 4.5,
+          yMin = -4.5,
+          yMax = 4.5;
+
+        // 격자
+        for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+          const p = toSVG(x, yMin),
+            q = toSVG(x, yMax);
+          el('line', { x1: p.x, y1: p.y, x2: q.x, y2: q.y, stroke: '#D3D1C7', 'stroke-width': 0.5 });
+        }
+        for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y++) {
+          const p = toSVG(xMin, y),
+            q = toSVG(xMax, y);
+          el('line', { x1: p.x, y1: p.y, x2: q.x, y2: q.y, stroke: '#D3D1C7', 'stroke-width': 0.5 });
+        }
+
+        // 점근선 x=0, y=0 — 빨강 점선 (축보다 먼저 그려 축이 위에 올라오게)
+        const axL = toSVG(xMin, 0),
+          axR = toSVG(xMax, 0);
+        const ayT = toSVG(0, yMax),
+          ayB = toSVG(0, yMin);
+        el('line', {
+          x1: axL.x,
+          y1: axL.y,
+          x2: axR.x,
+          y2: axR.y,
+          stroke: '#F3306A',
+          'stroke-width': 1.2,
+          'stroke-dasharray': '6 4',
+          'stroke-linecap': 'round',
+        });
+        el('line', {
+          x1: ayT.x,
+          y1: ayT.y,
+          x2: ayB.x,
+          y2: ayB.y,
+          stroke: '#F3306A',
+          'stroke-width': 1.2,
+          'stroke-dasharray': '6 4',
+          'stroke-linecap': 'round',
+        });
+
+        // 대칭축 y=x, y=−x — 초록 점선
+        const d = 4.2;
+        el('line', {
+          x1: toSVG(-d, -d).x,
+          y1: toSVG(-d, -d).y,
+          x2: toSVG(d, d).x,
+          y2: toSVG(d, d).y,
+          stroke: '#93DA6A',
+          'stroke-width': 1.0,
+          'stroke-dasharray': '5 4',
+          'stroke-linecap': 'round',
+        });
+        el('line', {
+          x1: toSVG(-d, d).x,
+          y1: toSVG(-d, d).y,
+          x2: toSVG(d, -d).x,
+          y2: toSVG(d, -d).y,
+          stroke: '#93DA6A',
+          'stroke-width': 1.0,
+          'stroke-dasharray': '5 4',
+          'stroke-linecap': 'round',
+        });
+
+        // 축
+        el('line', {
+          x1: axL.x,
+          y1: axL.y,
+          x2: axR.x,
+          y2: axR.y,
+          stroke: '#444441',
+          'stroke-width': 1.4,
+          'stroke-linecap': 'round',
+        });
+        el('line', {
+          x1: ayT.x,
+          y1: ayT.y,
+          x2: ayB.x,
+          y2: ayB.y,
+          stroke: '#444441',
+          'stroke-width': 1.4,
+          'stroke-linecap': 'round',
+        });
+
+        // 화살표
+        function arrowHead(x, y, dir) {
+          const s = 6;
+          let dd;
+          if (dir === 'right') dd = `M${x - s},${y - s / 2} L${x},${y} L${x - s},${y + s / 2}`;
+          if (dir === 'up') dd = `M${x - s / 2},${y + s} L${x},${y} L${x + s / 2},${y + s}`;
+          el('path', {
+            d: dd,
+            fill: 'none',
+            stroke: '#444441',
+            'stroke-width': 1.4,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+        }
+        arrowHead(axR.x + 6, axR.y, 'right');
+        arrowHead(ayT.x, ayT.y - 6, 'up');
+
+        // 축 레이블
+        el(
+          'text',
+          {
+            x: axR.x + 18,
+            y: axR.y + 5,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 14,
+            'font-style': 'italic',
+            fill: '#444441',
+          },
+          'x'
+        );
+        el(
+          'text',
+          {
+            x: ayT.x,
+            y: ayT.y - 14,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 14,
+            'font-style': 'italic',
+            fill: '#444441',
+          },
+          'y'
+        );
+
+        // 눈금
+        for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+          if (x === 0) continue;
+          const p = toSVG(x, 0);
+          el('line', { x1: p.x, y1: p.y - 4, x2: p.x, y2: p.y + 4, stroke: '#444441', 'stroke-width': 1 });
+          el(
+            'text',
+            {
+              x: p.x,
+              y: p.y + 18,
+              'text-anchor': 'middle',
+              'font-family': '"Anthropic Sans",sans-serif',
+              'font-size': 11,
+              fill: '#888780',
+            },
+            String(x)
+          );
+        }
+        for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y++) {
+          if (y === 0) continue;
+          const p = toSVG(0, y);
+          el('line', { x1: p.x - 4, y1: p.y, x2: p.x + 4, y2: p.y, stroke: '#444441', 'stroke-width': 1 });
+          el(
+            'text',
+            {
+              x: p.x - 18,
+              y: p.y + 4,
+              'text-anchor': 'middle',
+              'font-family': '"Anthropic Sans",sans-serif',
+              'font-size': 11,
+              fill: '#888780',
+            },
+            String(y)
+          );
+        }
+        el(
+          'text',
+          {
+            x: ox - 16,
+            y: oy + 16,
+            'text-anchor': 'middle',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 11,
+            fill: '#888780',
+          },
+          'O'
+        );
+
+        // y = 1/x 곡선 — x>0, x<0 두 가지 분리
+        const steps = 500,
+          eps = 0.04;
+        [
+          [eps, xMax],
+          [xMin, -eps],
+        ].forEach(([x0, x1]) => {
+          let pathD = '',
+            penDown = false;
+          for (let i = 0; i <= steps; i++) {
+            const mx = x0 + ((x1 - x0) * i) / steps;
+            const my = 1 / mx;
+            if (my < yMin - 0.1 || my > yMax + 0.1) {
+              penDown = false;
+              continue;
+            }
+            const p = toSVG(mx, my);
+            if (!penDown) {
+              pathD += `M${p.x},${p.y}`;
+              penDown = true;
+            } else {
+              pathD += ` L${p.x},${p.y}`;
+            }
+          }
+          el('path', {
+            d: pathD,
+            fill: 'none',
+            stroke: '#378ADD',
+            'stroke-width': 2.4,
+            'stroke-linecap': 'round',
+            'stroke-linejoin': 'round',
+          });
+        });
+
+        // 대표점 + 보조 점선
+        [
+          [1, 1],
+          [2, 0.5],
+          [0.5, 2],
+          [-1, -1],
+          [-2, -0.5],
+          [-0.5, -2],
+        ].forEach(([mx, my]) => {
+          const p = toSVG(mx, my);
+          dashedLine(p.x, p.y, p.x, oy);
+          dashedLine(p.x, p.y, ox, p.y);
+          el('circle', { cx: p.x, cy: p.y, r: 3.5, fill: '#B5D4F4', stroke: '#378ADD', 'stroke-width': 1.5 });
+        });
+
+        // 원점 대칭 강조: (1,1)↔(−1,−1) 노랑 점선
+        const ps = toSVG(1, 1),
+          pe = toSVG(-1, -1);
+        el('line', {
+          x1: ps.x,
+          y1: ps.y,
+          x2: pe.x,
+          y2: pe.y,
+          stroke: '#F3C230',
+          'stroke-width': 1.0,
+          'stroke-dasharray': '3 3',
+        });
+
+        // 대칭중심 (0,0)
+        el('circle', { cx: ox, cy: oy, r: 4.5, fill: '#F3C230', stroke: '#fff', 'stroke-width': 1.5 });
+
+        // 곡선 이름
+        el(
+          'text',
+          {
+            x: toSVG(2.8, 2.8).x,
+            y: toSVG(2.8, 2.8).y,
+            'text-anchor': 'start',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 15,
+            'font-style': 'italic',
+            'font-weight': 500,
+            fill: '#185FA5',
+          },
+          'y = 1/x'
+        );
+
+        // 레이블
+        el(
+          'text',
+          {
+            x: toSVG(0, yMax - 0.3).x + 8,
+            y: toSVG(0, yMax - 0.3).y,
+            'text-anchor': 'start',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 11,
+            fill: '#993356',
+          },
+          'x = 0'
+        );
+        el(
+          'text',
+          {
+            x: toSVG(xMax - 0.3, 0).x,
+            y: toSVG(xMax - 0.3, 0).y - 10,
+            'text-anchor': 'end',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 11,
+            fill: '#993356',
+          },
+          'y = 0'
+        );
+        el(
+          'text',
+          {
+            x: toSVG(3.8, 3.4).x,
+            y: toSVG(3.8, 3.4).y,
+            'text-anchor': 'start',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 11,
+            fill: '#3B6D11',
+          },
+          'y = x'
+        );
+        el(
+          'text',
+          {
+            x: toSVG(3.8, -3.4).x,
+            y: toSVG(3.8, -3.4).y,
+            'text-anchor': 'start',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 11,
+            fill: '#3B6D11',
+          },
+          'y = −x'
+        );
+        el(
+          'text',
+          {
+            x: ox + 10,
+            y: oy - 10,
+            'text-anchor': 'start',
+            'font-family': '"Anthropic Sans",sans-serif',
+            'font-size': 11,
+            fill: '#854F0B',
+          },
+          '대칭중심 (0, 0)'
+        );
+      </script>
+    </svg>
+  </body>
+</html>

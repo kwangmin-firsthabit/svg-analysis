@@ -1,0 +1,114 @@
+<!--
+  기본 산점도: 학생 12명 공부시간(x) vs 시험점수(y)
+  데이터: (1,45),(2,52),(2,58),(3,61),(3,70),(4,72),(4,78),(5,80),(5,85),(6,88),(7,91),(8,95)
+
+  좌표 변환:
+    viewBox: 0 0 400 360
+    플롯 영역: left=60, top=20, right=380, bottom=320
+    plotW = 320, plotH = 300
+
+    x축 범위: 0~9  → scaleX = 320/9 ≈ 35.56 px per unit
+    y축 범위: 40~100 → scaleY = 300/60 = 5 px per unit
+
+    변환식:
+      px = 60 + (x / 9) * 320
+      py = 320 - ((y - 40) / 60) * 300
+
+  각 데이터 포인트 변환:
+    (1,45)  → px=95.6,  py=295.0
+    (2,52)  → px=131.1, py=260.0
+    (2,58)  → px=131.1, py=230.0
+    (3,61)  → px=166.7, py=215.0
+    (3,70)  → px=166.7, py=170.0
+    (4,72)  → px=202.2, py=160.0
+    (4,78)  → px=202.2, py=130.0
+    (5,80)  → px=237.8, py=120.0
+    (5,85)  → px=237.8, py=95.0
+    (6,88)  → px=273.3, py=80.0
+    (7,91)  → px=308.9, py=65.0
+    (8,95)  → px=344.4, py=45.0
+-->
+<svg width="400" height="360" viewBox="0 0 400 360" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- 축 -->
+  <line x1="60" y1="320" x2="380" y2="320" stroke="#333" stroke-width="1.5"/>
+  <line x1="60" y1="320" x2="60" y2="20" stroke="#333" stroke-width="1.5"/>
+
+  <!-- x축 화살표 -->
+  <polygon points="380,320 373,316 373,324" fill="#333"/>
+  <!-- y축 화살표 -->
+  <polygon points="60,20 56,27 64,27" fill="#333"/>
+
+  <!-- x축 눈금 및 레이블 (1~8) -->
+  <line x1="95.6"  y1="320" x2="95.6"  y2="325" stroke="#333" stroke-width="1"/>
+  <text x="95.6"  y="337" text-anchor="middle" font-size="12" fill="#333">1</text>
+
+  <line x1="131.1" y1="320" x2="131.1" y2="325" stroke="#333" stroke-width="1"/>
+  <text x="131.1" y="337" text-anchor="middle" font-size="12" fill="#333">2</text>
+
+  <line x1="166.7" y1="320" x2="166.7" y2="325" stroke="#333" stroke-width="1"/>
+  <text x="166.7" y="337" text-anchor="middle" font-size="12" fill="#333">3</text>
+
+  <line x1="202.2" y1="320" x2="202.2" y2="325" stroke="#333" stroke-width="1"/>
+  <text x="202.2" y="337" text-anchor="middle" font-size="12" fill="#333">4</text>
+
+  <line x1="237.8" y1="320" x2="237.8" y2="325" stroke="#333" stroke-width="1"/>
+  <text x="237.8" y="337" text-anchor="middle" font-size="12" fill="#333">5</text>
+
+  <line x1="273.3" y1="320" x2="273.3" y2="325" stroke="#333" stroke-width="1"/>
+  <text x="273.3" y="337" text-anchor="middle" font-size="12" fill="#333">6</text>
+
+  <line x1="308.9" y1="320" x2="308.9" y2="325" stroke="#333" stroke-width="1"/>
+  <text x="308.9" y="337" text-anchor="middle" font-size="12" fill="#333">7</text>
+
+  <line x1="344.4" y1="320" x2="344.4" y2="325" stroke="#333" stroke-width="1"/>
+  <text x="344.4" y="337" text-anchor="middle" font-size="12" fill="#333">8</text>
+
+  <!-- y축 눈금 및 레이블 (40,50,...,100) -->
+  <line x1="55" y1="320" x2="60" y2="320" stroke="#333" stroke-width="1"/>
+  <text x="50" y="324" text-anchor="end" font-size="12" fill="#333">40</text>
+
+  <line x1="55" y1="270" x2="60" y2="270" stroke="#333" stroke-width="1"/>
+  <text x="50" y="274" text-anchor="end" font-size="12" fill="#333">50</text>
+
+  <line x1="55" y1="220" x2="60" y2="220" stroke="#333" stroke-width="1"/>
+  <text x="50" y="224" text-anchor="end" font-size="12" fill="#333">60</text>
+
+  <line x1="55" y1="170" x2="60" y2="170" stroke="#333" stroke-width="1"/>
+  <text x="50" y="174" text-anchor="end" font-size="12" fill="#333">70</text>
+
+  <line x1="55" y1="120" x2="60" y2="120" stroke="#333" stroke-width="1"/>
+  <text x="50" y="124" text-anchor="end" font-size="12" fill="#333">80</text>
+
+  <line x1="55" y1="70" x2="60" y2="70" stroke="#333" stroke-width="1"/>
+  <text x="50" y="74" text-anchor="end" font-size="12" fill="#333">90</text>
+
+  <line x1="55" y1="20" x2="60" y2="20" stroke="#333" stroke-width="1"/>
+  <text x="50" y="24" text-anchor="end" font-size="12" fill="#333">100</text>
+
+  <!-- 그리드 -->
+  <line x1="60" y1="270" x2="380" y2="270" stroke="#ddd" stroke-width="0.5"/>
+  <line x1="60" y1="220" x2="380" y2="220" stroke="#ddd" stroke-width="0.5"/>
+  <line x1="60" y1="170" x2="380" y2="170" stroke="#ddd" stroke-width="0.5"/>
+  <line x1="60" y1="120" x2="380" y2="120" stroke="#ddd" stroke-width="0.5"/>
+  <line x1="60" y1="70"  x2="380" y2="70"  stroke="#ddd" stroke-width="0.5"/>
+
+  <!-- 데이터 포인트 -->
+  <circle cx="95.6"  cy="295.0" r="5" fill="#2563eb" opacity="0.8"/>
+  <circle cx="131.1" cy="260.0" r="5" fill="#2563eb" opacity="0.8"/>
+  <circle cx="131.1" cy="230.0" r="5" fill="#2563eb" opacity="0.8"/>
+  <circle cx="166.7" cy="215.0" r="5" fill="#2563eb" opacity="0.8"/>
+  <circle cx="166.7" cy="170.0" r="5" fill="#2563eb" opacity="0.8"/>
+  <circle cx="202.2" cy="160.0" r="5" fill="#2563eb" opacity="0.8"/>
+  <circle cx="202.2" cy="130.0" r="5" fill="#2563eb" opacity="0.8"/>
+  <circle cx="237.8" cy="120.0" r="5" fill="#2563eb" opacity="0.8"/>
+  <circle cx="237.8" cy="95.0"  r="5" fill="#2563eb" opacity="0.8"/>
+  <circle cx="273.3" cy="80.0"  r="5" fill="#2563eb" opacity="0.8"/>
+  <circle cx="308.9" cy="65.0"  r="5" fill="#2563eb" opacity="0.8"/>
+  <circle cx="344.4" cy="45.0"  r="5" fill="#2563eb" opacity="0.8"/>
+
+  <!-- 축 레이블 -->
+  <text x="385" y="325" text-anchor="start" font-size="14" fill="#333" font-style="italic">x</text>
+  <text x="55"  y="16"  text-anchor="middle" font-size="14" fill="#333" font-style="italic">y</text>
+
+</svg>

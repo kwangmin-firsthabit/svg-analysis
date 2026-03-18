@@ -1,0 +1,147 @@
+<!--
+  코사인함수 y = cos x 좌표 계산 및 검증
+  축 범위: x: -2π~2π, y: -1.5~1.5
+  단위: x축 80px/π, y축 100px/1
+
+  좌표계 설정:
+    원점(O) = (180, 150)
+    SVG 너비 = 380, SVG 높이 = 320
+
+  SVG 변환:
+    svgX = 180 + x/π * 80
+    svgY = 150 - y * 100
+
+  주요 점:
+    (0, 1):     svgX=180, svgY=50
+    (-π, -1):   svgX=100, svgY=250
+    (π, -1):    svgX=260, svgY=250
+    (-2π, 1):   svgX=20,  svgY=50
+    (2π, 1):    svgX=340, svgY=50
+
+  샘플 (step π/16 → svgX step=5):
+  k=0:  x=-2π,     cos=1,        svgX=20,  svgY=50
+  k=8:  x=-3π/2,   cos=0,        svgX=60,  svgY=150
+  k=16: x=-π,      cos=-1,       svgX=100, svgY=250
+  k=24: x=-π/2,    cos=0,        svgX=140, svgY=150
+  k=32: x=0,       cos=1,        svgX=180, svgY=50
+  k=40: x=π/2,     cos=0,        svgX=220, svgY=150
+  k=48: x=π,       cos=-1,       svgX=260, svgY=250
+  k=56: x=3π/2,    cos=0,        svgX=300, svgY=150
+  k=64: x=2π,      cos=1,        svgX=340, svgY=50
+
+  중간 값:
+  k=4:  cos(-7π/4)=cos(π/4)=√2/2≈0.707,  svgX=40, svgY=150-70.7=79.3≈79
+  k=12: cos(-5π/4)=cos(5π/4)=-√2/2,       svgX=80, svgY=150+70.7=220.7≈221
+  k=20: cos(-3π/4)=-√2/2,                 svgX=120, svgY=221
+  k=28: cos(-π/4)=√2/2,                   svgX=160, svgY=79
+  k=36: cos(π/4)=√2/2,                    svgX=200, svgY=79
+  k=44: cos(3π/4)=-√2/2,                  svgX=240, svgY=221
+  k=52: cos(5π/4)=-√2/2,                  svgX=280, svgY=221
+  k=60: cos(7π/4)=√2/2,                   svgX=320, svgY=79
+-->
+<svg width="380" height="320" viewBox="0 0 380 320" xmlns="http://www.w3.org/2000/svg"
+     font-family="serif" font-size="14">
+
+  <!-- x축 -->
+  <line x1="10" y1="150" x2="360" y2="150" stroke="black" stroke-width="1.5"/>
+  <polygon points="360,150 352,146 352,154" fill="black"/>
+  <!-- y축 -->
+  <line x1="180" y1="305" x2="180" y2="20" stroke="black" stroke-width="1.5"/>
+  <polygon points="180,20 176,28 184,28" fill="black"/>
+
+  <!-- x축 눈금 -->
+  <line x1="20" y1="145" x2="20" y2="155" stroke="black" stroke-width="1"/>
+  <text x="20" y="170" text-anchor="middle" font-size="13">-2π</text>
+  <line x1="100" y1="145" x2="100" y2="155" stroke="black" stroke-width="1"/>
+  <text x="100" y="170" text-anchor="middle" font-size="13">-π</text>
+  <line x1="260" y1="145" x2="260" y2="155" stroke="black" stroke-width="1"/>
+  <text x="260" y="170" text-anchor="middle" font-size="13">π</text>
+  <line x1="340" y1="145" x2="340" y2="155" stroke="black" stroke-width="1"/>
+  <text x="340" y="170" text-anchor="middle" font-size="13">2π</text>
+
+  <!-- y축 눈금 -->
+  <line x1="175" y1="50" x2="185" y2="50" stroke="black" stroke-width="1"/>
+  <text x="170" y="54" text-anchor="end" font-size="12">1</text>
+  <line x1="175" y1="250" x2="185" y2="250" stroke="black" stroke-width="1"/>
+  <text x="170" y="254" text-anchor="end" font-size="12">-1</text>
+
+  <!-- 축 레이블 -->
+  <text x="364" y="154" text-anchor="start" font-size="14">x</text>
+  <text x="184" y="16" text-anchor="start" font-size="14">y</text>
+  <text x="170" y="168" text-anchor="end" font-size="12">O</text>
+
+  <!-- y = cos x 곡선 -->
+  <path fill="none" stroke="#16a34a" stroke-width="2.5"
+    d="M 20,50
+       L 25,51
+       L 30,55
+       L 35,62
+       L 40,79
+       L 45,97
+       L 50,116
+       L 55,134
+       L 60,150
+       L 65,166
+       L 70,183
+       L 75,201
+       L 80,221
+       L 85,237
+       L 90,245
+       L 95,249
+       L 100,250
+       L 105,249
+       L 110,245
+       L 115,237
+       L 120,221
+       L 125,201
+       L 130,183
+       L 135,166
+       L 140,150
+       L 145,134
+       L 150,116
+       L 155,97
+       L 160,79
+       L 165,62
+       L 170,55
+       L 175,51
+       L 180,50
+       L 185,51
+       L 190,55
+       L 195,62
+       L 200,79
+       L 205,97
+       L 210,116
+       L 215,134
+       L 220,150
+       L 225,166
+       L 230,183
+       L 235,201
+       L 240,221
+       L 245,237
+       L 250,245
+       L 255,249
+       L 260,250
+       L 265,249
+       L 270,245
+       L 275,237
+       L 280,221
+       L 285,201
+       L 290,183
+       L 295,166
+       L 300,150
+       L 305,134
+       L 310,116
+       L 315,97
+       L 320,79
+       L 325,62
+       L 330,55
+       L 335,51
+       L 340,50"/>
+
+  <!-- 점 (0, 1) -->
+  <circle cx="180" cy="50" r="4" fill="#16a34a"/>
+  <text x="188" y="46" text-anchor="start" font-size="12" fill="#16a34a">(0, 1)</text>
+
+  <!-- 함수식 레이블 -->
+  <text x="200" y="40" text-anchor="start" font-size="15" fill="#16a34a" font-style="italic">y = cos x</text>
+</svg>

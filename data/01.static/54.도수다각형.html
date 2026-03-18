@@ -1,0 +1,105 @@
+<svg width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    학생 40명의 통학 시간 도수다각형
+    중앙값: 5→5명, 15→12명, 25→14명, 35→7명, 45→2명
+    (-5,0)과 (55,0)으로 연장
+    origin: (100, 330), scaleX=100px/10min, scaleY=18px/명
+    SVG x = 100 + (분/10)*100, SVG y = 330 - 도수*18
+    midpoints SVG: (150,240), (250,114), (350,78), (450,204), (550,294)
+    extended: (-5분→x=50, 55분→x=650) → (50,330), (650,330)
+  -->
+
+  <!-- ── 격자 ── -->
+  <line x1="100" y1="330" x2="600" y2="330" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="294" x2="600" y2="294" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="258" x2="600" y2="258" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="222" x2="600" y2="222" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="186" x2="600" y2="186" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="150" x2="600" y2="150" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="114" x2="600" y2="114" stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="78"  x2="600" y2="78"  stroke="#D3D1C7" stroke-width="0.5" />
+  <line x1="100" y1="42"  x2="600" y2="42"  stroke="#D3D1C7" stroke-width="0.5" />
+
+  <!-- ── 도수다각형 선 ── -->
+  <!-- (-5,0)→(5,5)→(15,12)→(25,14)→(35,7)→(45,2)→(55,0) -->
+  <!-- SVG: (50,330)→(150,240)→(250,114)→(350,78)→(450,204)→(550,294)→(650,330) -->
+  <polyline
+    points="50,330 150,240 250,114 350,78 450,204 550,294 650,330"
+    fill="none"
+    stroke="#185FA5"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- ── 중앙값 점 ── -->
+  <circle cx="150" cy="240" r="5" fill="#185FA5" stroke="white" stroke-width="1.5" />
+  <circle cx="250" cy="114" r="5" fill="#185FA5" stroke="white" stroke-width="1.5" />
+  <circle cx="350" cy="78"  r="5" fill="#185FA5" stroke="white" stroke-width="1.5" />
+  <circle cx="450" cy="204" r="5" fill="#185FA5" stroke="white" stroke-width="1.5" />
+  <circle cx="550" cy="294" r="5" fill="#185FA5" stroke="white" stroke-width="1.5" />
+
+  <!-- 연장 끝점 (열린 원) -->
+  <circle cx="50"  cy="330" r="4" fill="white" stroke="#185FA5" stroke-width="1.5" />
+  <circle cx="650" cy="330" r="4" fill="white" stroke="#185FA5" stroke-width="1.5" />
+
+  <!-- ── x축 ── -->
+  <line x1="32" y1="330" x2="618" y2="330" stroke="#444441" stroke-width="1.5" stroke-linecap="round" />
+  <polyline points="612,324 619,330 612,336"
+            fill="none" stroke="#444441" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- ── y축 ── -->
+  <line x1="100" y1="338" x2="100" y2="32" stroke="#444441" stroke-width="1.5" stroke-linecap="round" />
+  <polyline points="94,38 100,31 106,38"
+            fill="none" stroke="#444441" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+
+  <!-- ── x축 눈금 ── -->
+  <line x1="50"  y1="326" x2="50"  y2="334" stroke="#444441" stroke-width="1" />
+  <text x="50"  y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">−5</text>
+  <line x1="100" y1="326" x2="100" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="100" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">0</text>
+  <line x1="150" y1="326" x2="150" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="150" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">5</text>
+  <line x1="200" y1="326" x2="200" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="200" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">10</text>
+  <line x1="250" y1="326" x2="250" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="250" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">15</text>
+  <line x1="300" y1="326" x2="300" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="300" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">20</text>
+  <line x1="350" y1="326" x2="350" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="350" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">25</text>
+  <line x1="400" y1="326" x2="400" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="400" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">30</text>
+  <line x1="450" y1="326" x2="450" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="450" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">35</text>
+  <line x1="500" y1="326" x2="500" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="500" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">40</text>
+  <line x1="550" y1="326" x2="550" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="550" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">45</text>
+  <line x1="600" y1="326" x2="600" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="600" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">50</text>
+  <line x1="650" y1="326" x2="650" y2="334" stroke="#444441" stroke-width="1" />
+  <text x="650" y="348" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">55</text>
+
+  <!-- ── y축 눈금 ── -->
+  <line x1="96" y1="294" x2="104" y2="294" stroke="#444441" stroke-width="1" />
+  <text x="88" y="298" text-anchor="end" font-family="serif" font-size="13" fill="#888780">2</text>
+  <line x1="96" y1="258" x2="104" y2="258" stroke="#444441" stroke-width="1" />
+  <text x="88" y="262" text-anchor="end" font-family="serif" font-size="13" fill="#888780">4</text>
+  <line x1="96" y1="222" x2="104" y2="222" stroke="#444441" stroke-width="1" />
+  <text x="88" y="226" text-anchor="end" font-family="serif" font-size="13" fill="#888780">6</text>
+  <line x1="96" y1="186" x2="104" y2="186" stroke="#444441" stroke-width="1" />
+  <text x="88" y="190" text-anchor="end" font-family="serif" font-size="13" fill="#888780">8</text>
+  <line x1="96" y1="150" x2="104" y2="150" stroke="#444441" stroke-width="1" />
+  <text x="88" y="154" text-anchor="end" font-family="serif" font-size="13" fill="#888780">10</text>
+  <line x1="96" y1="114" x2="104" y2="114" stroke="#444441" stroke-width="1" />
+  <text x="88" y="118" text-anchor="end" font-family="serif" font-size="13" fill="#888780">12</text>
+  <line x1="96" y1="78"  x2="104" y2="78"  stroke="#444441" stroke-width="1" />
+  <text x="88" y="82"  text-anchor="end" font-family="serif" font-size="13" fill="#888780">14</text>
+  <line x1="96" y1="42"  x2="104" y2="42"  stroke="#444441" stroke-width="1" />
+  <text x="88" y="46"  text-anchor="end" font-family="serif" font-size="13" fill="#888780">16</text>
+
+  <!-- ── 축 이름 레이블 ── -->
+  <text x="630" y="320" font-family="serif" font-size="13" fill="#888780">통학 시간(분)</text>
+  <text x="108" y="28" font-family="serif" font-size="13" fill="#888780">도수(명)</text>
+</svg>

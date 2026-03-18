@@ -1,0 +1,164 @@
+<svg id="vis" width="100%" viewBox="0 0 680 300" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 30-30-120 둔각삼각형
+// A=(240,260), B=(440,260), C=(340, 260-57.74)
+// height = 100 * tan(30°) ≈ 57.74 (AB=200, 밑면 절반=100)
+const hVal = 100 * Math.tan(30 * Math.PI / 180); // ≈ 57.74
+const A = { x: 240, y: 260 };
+const B = { x: 440, y: 260 };
+const C = { x: 340, y: 260 - hVal };
+
+// 삼각형 polygon
+svg.appendChild(el('polygon', {
+  points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`,
+  fill: '#3B82F6',
+  'fill-opacity': '0.12',
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5',
+  'stroke-linejoin': 'round'
+}));
+
+// 꼭짓점 원
+function addVertex(x, y) {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3.5', fill: '#1D4ED8' }));
+}
+addVertex(A.x, A.y);
+addVertex(B.x, B.y);
+addVertex(C.x, C.y);
+
+// 꼭짓점 레이블
+addText(A.x - 20, A.y + 14, 'A', { 'font-size': '15', 'font-weight': '600' });
+addText(B.x + 20, B.y + 14, 'B', { 'font-size': '15', 'font-weight': '600' });
+addText(C.x, C.y - 20, 'C', { 'font-size': '15', 'font-weight': '600' });
+
+// 각도 호 헬퍼
+// vertex: 꼭짓점, p1, p2: 양쪽 꼭짓점 (호의 방향 결정)
+// r: 호 반지름, angleDeg: 해당 꼭짓점의 내각
+function drawArc(vertex, p1, p2, r) {
+  // vertex에서 p1, p2 방향 각도
+  const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+  const a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+
+  // 내각 (항상 작은 쪽)
+  let start = a1;
+  let end = a2;
+
+  // 내부 호가 되도록 정렬
+  let diff = end - start;
+  while (diff < 0) diff += 2 * Math.PI;
+  while (diff > 2 * Math.PI) diff -= 2 * Math.PI;
+
+  // 항상 삼각형 내부를 향하는 짧은 호
+  const largeArc = diff > Math.PI ? 1 : 0;
+  // diff가 PI보다 크면 반대 방향이 내부
+  let useStart = start;
+  let useEnd = end;
+  let useLarge = 0;
+
+  if (diff <= Math.PI) {
+    useStart = a1;
+    useEnd = a2;
+    useLarge = 0;
+  } else {
+    useStart = a2;
+    useEnd = a1;
+    useLarge = 0;
+  }
+
+  const sx = vertex.x + r * Math.cos(useStart);
+  const sy = vertex.y + r * Math.sin(useStart);
+  const ex = vertex.x + r * Math.cos(useEnd);
+  const ey = vertex.y + r * Math.sin(useEnd);
+
+  svg.appendChild(el('path', {
+    d: `M ${sx},${sy} A ${r},${r} 0 ${useLarge},1 ${ex},${ey}`,
+    fill: 'none',
+    stroke: '#6366F1',
+    'stroke-width': '1',
+    'stroke-linecap': 'round'
+  }));
+}
+
+// 각도 호 그리기
+drawArc(A, C, B, 22); // A: 30°
+drawArc(B, A, C, 22); // B: 30°
+drawArc(C, A, B, 18); // C: 120° - 내부 호 반지름 작게
+
+// 120° 호: C에서 sweep 처리 (A, B 양쪽으로 120° 호이므로 large-arc=1)
+// C의 각도는 크므로 별도 처리
+const aC_A = Math.atan2(A.y - C.y, A.x - C.x);
+const aC_B = Math.atan2(B.y - C.y, B.x - C.x);
+// 기존 drawArc가 이미 그렸으므로 해당 path 제거 후 재그리기
+// C의 내각은 120° → large 필요 없음 (180° 미만), 하지만 방향 확인 필요
+// 이미 drawArc(C, A, B, 18)에서 diff 계산: aC_A에서 aC_B
+// 실제로 계산: aC_A ≈ atan2(260-202.26, 240-340) = atan2(57.74,-100) ≈ 150°
+//              aC_B ≈ atan2(260-202.26, 440-340) = atan2(57.74, 100) ≈ 30°
+// diff = 30 - 150 = -120 → +360 = 240° > 180 → 반대 방향, small arc = 120°
+// drawArc 함수가 diff>PI 시 swap하여 처리함 → 올바름
+
+// C 120° 호 재처리: 아래 방향(삼각형 내부)로 호 크기 18px
+// C에서 내각 120°이므로 drawArc의 swap 경로 확인 필요
+// 기존 drawArc 결과 확인을 위해 svg의 마지막 path를 제거하고 직접 그림
+const lastPath = svg.lastElementChild;
+if (lastPath && lastPath.tagName === 'path') svg.removeChild(lastPath);
+
+const r120 = 18;
+// aC_A ≈ 150°(rad), aC_B ≈ 30°(rad)
+const startA = Math.atan2(A.y - C.y, A.x - C.x);
+const startB = Math.atan2(B.y - C.y, B.x - C.x);
+// 삼각형 내부는 아래쪽 → sweep을 +방향(시계방향)으로 A→B
+// A는 왼쪽 아래, B는 오른쪽 아래 → C에서 봤을 때 A: 좌하, B: 우하
+// sweep-flag=1 (시계방향): A→B 로 그리면 아래쪽 120° 호 ✓
+const sx120 = C.x + r120 * Math.cos(startA);
+const sy120 = C.y + r120 * Math.sin(startA);
+const ex120 = C.x + r120 * Math.cos(startB);
+const ey120 = C.y + r120 * Math.sin(startB);
+svg.appendChild(el('path', {
+  d: `M ${sx120},${sy120} A ${r120},${r120} 0 0,1 ${ex120},${ey120}`,
+  fill: 'none',
+  stroke: '#6366F1',
+  'stroke-width': '1',
+  'stroke-linecap': 'round'
+}));
+
+// 각도 레이블 배치 (내부, 각도 이등분선 방향)
+function angleLabel(vertex, p1, p2, r, text) {
+  const a1 = Math.atan2(p1.y - vertex.y, p1.x - vertex.x);
+  const a2 = Math.atan2(p2.y - vertex.y, p2.x - vertex.x);
+  // 이등분 각도 (내부 방향)
+  let bisect = (a1 + a2) / 2;
+  // 양쪽 방향 중 삼각형 내부 쪽 선택
+  const gcx = (A.x + B.x + C.x) / 3;
+  const gcy = (A.y + B.y + C.y) / 3;
+  const bx1 = vertex.x + Math.cos(bisect) * r;
+  const by1 = vertex.y + Math.sin(bisect) * r;
+  const bx2 = vertex.x + Math.cos(bisect + Math.PI) * r;
+  const by2 = vertex.y + Math.sin(bisect + Math.PI) * r;
+  const d1 = (bx1 - gcx) ** 2 + (by1 - gcy) ** 2;
+  const d2 = (bx2 - gcx) ** 2 + (by2 - gcy) ** 2;
+  const bx = d1 < d2 ? bx1 : bx2;
+  const by = d1 < d2 ? by1 : by2;
+  addText(bx, by, text, { 'font-size': '11', 'font-weight': '400', fill: '#6366F1' });
+}
+
+angleLabel(A, C, B, 40, '30°');
+angleLabel(B, A, C, 40, '30°');
+angleLabel(C, A, B, 36, '120°');
+</script>

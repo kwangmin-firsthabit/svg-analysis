@@ -1,0 +1,20 @@
+<!--
+  반원, 지름 AB = 10 (1 unit = 30px → r = 150px, 지름 = 300px)
+  A = (80, 250), B = (380, 250), 반원은 위쪽
+  center = (230, 250)
+-->
+<svg width="460" height="320" viewBox="0 0 460 320" xmlns="http://www.w3.org/2000/svg">
+  <!-- 반원 호 -->
+  <path d="M 80,250 A 150,150 0 0 1 380,250" fill="none" stroke="#000" stroke-width="2"/>
+  <!-- 지름 -->
+  <line x1="80" y1="250" x2="380" y2="250" stroke="#000" stroke-width="2"/>
+
+  <!-- 꼭짓점 -->
+  <circle cx="80"  cy="250" r="3" fill="#000"/>
+  <circle cx="380" cy="250" r="3" fill="#000"/>
+
+  <!-- 레이블 -->
+  <text x="66"  y="268" text-anchor="end"   font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="394" y="268" text-anchor="start" font-size="16" font-family="serif" font-style="italic">B</text>
+  <text x="230" y="272" text-anchor="middle" font-size="14" font-family="serif">10</text>
+</svg>

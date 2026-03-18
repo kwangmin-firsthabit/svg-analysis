@@ -1,0 +1,76 @@
+<svg width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    scale: 60px = 1  →  높이=240px=4
+    AD(윗변)=240px=4,  BC(아랫변)=360px=6
+    A(220,80)  D(460,80)  B(160,320)  C(520,320)
+    AD ∥ BC ✓  높이=240px=4 ✓
+  -->
+
+  <!-- Height indicator (dashed) -->
+  <line
+    x1="340"
+    y1="80"
+    x2="340"
+    y2="320"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="5 4"
+    stroke-linecap="round"
+  />
+  <polyline
+    points="340,310 350,310 350,320"
+    fill="none"
+    stroke="#B4B2A9"
+    stroke-width="1.1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Parallel mark arrows on AD and BC -->
+  <line x1="316" y1="68" x2="332" y2="68" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <polyline
+    points="328,64 334,68 328,72"
+    fill="none"
+    stroke="#5F5E5A"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <line x1="316" y1="333" x2="332" y2="333" stroke="#5F5E5A" stroke-width="1" stroke-linecap="round" />
+  <polyline
+    points="328,329 334,333 328,337"
+    fill="none"
+    stroke="#5F5E5A"
+    stroke-width="1"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+
+  <!-- Trapezoid -->
+  <polygon points="220,80 460,80 520,320 160,320" fill="none" stroke="#185FA5" stroke-width="1.8" />
+
+  <!-- Vertices -->
+  <circle cx="220" cy="80" r="3" fill="#185FA5" />
+  <circle cx="460" cy="80" r="3" fill="#185FA5" />
+  <circle cx="160" cy="320" r="3" fill="#185FA5" />
+  <circle cx="520" cy="320" r="3" fill="#185FA5" />
+
+  <!-- Vertex labels -->
+  <text x="208" y="62" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    A
+  </text>
+  <text x="472" y="62" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    D
+  </text>
+  <text x="136" y="338" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    B
+  </text>
+  <text x="544" y="338" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    C
+  </text>
+
+  <!-- Labels -->
+  <text x="340" y="66" text-anchor="middle" font-family="serif" font-size="14" fill="#185FA5">4</text>
+  <text x="340" y="352" text-anchor="middle" font-family="serif" font-size="14" fill="#185FA5">6</text>
+  <text x="360" y="206" text-anchor="start" font-family="serif" font-size="13" fill="#888780">h = 4</text>
+</svg>

@@ -1,0 +1,52 @@
+<!--
+  줄기-잎그림(비교): 남학생 vs 여학생 키(cm)
+  남: 152,158,161,163,165,167,168,170,172,175
+  여: 148,151,153,155,157,159,162,164,165,168
+
+  줄기별 잎 (남=왼쪽 역순, 여=오른쪽 정순):
+    줄기 14 | 남: 없음       | 여: 8
+    줄기 15 | 남: 8 2       | 여: 1 3 5 7 9
+    줄기 16 | 남: 8 7 5 3 1 | 여: 2 4 5 8
+    줄기 17 | 남: 5 2 0     | 여: 없음
+
+  레이아웃:
+    viewBox: 0 0 420 220
+    중앙 구분선: x=210
+    줄기 위치: 중앙
+    왼쪽 잎: right-align → x=196
+    오른쪽 잎: left-align → x=226
+    헤더 y=38, 첫 줄기 y=75, 간격 38px
+-->
+<svg width="420" height="220" viewBox="0 0 420 220" xmlns="http://www.w3.org/2000/svg">
+  <!-- 구분선 -->
+  <line x1="210" y1="20" x2="210" y2="210" stroke="#333" stroke-width="1.5"/>
+
+  <!-- 헤더 -->
+  <text x="100" y="36" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#1a6bb5">남학생</text>
+  <text x="210" y="36" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#444">줄기</text>
+  <text x="320" y="36" text-anchor="middle" font-family="sans-serif" font-size="13" font-weight="bold" fill="#c0392b">여학생</text>
+  <line x1="30" y1="42" x2="390" y2="42" stroke="#555" stroke-width="1"/>
+
+  <!-- 줄기 14 -->
+  <text x="210" y="78" text-anchor="middle" font-family="monospace" font-size="14" fill="#222">14</text>
+  <!-- 남: 없음 -->
+  <text x="228" y="78" text-anchor="start" font-family="monospace" font-size="14" fill="#c0392b">8</text>
+
+  <!-- 줄기 15 -->
+  <text x="210" y="116" text-anchor="middle" font-family="monospace" font-size="14" fill="#222">15</text>
+  <!-- 남: 8 2 (역순) → "8  2" 오른쪽 정렬 -->
+  <text x="196" y="116" text-anchor="end" font-family="monospace" font-size="14" fill="#1a6bb5">8  2</text>
+  <text x="228" y="116" text-anchor="start" font-family="monospace" font-size="14" fill="#c0392b">1  3  5  7  9</text>
+
+  <!-- 줄기 16 -->
+  <text x="210" y="154" text-anchor="middle" font-family="monospace" font-size="14" fill="#222">16</text>
+  <!-- 남: 8 7 5 3 1 (역순) -->
+  <text x="196" y="154" text-anchor="end" font-family="monospace" font-size="14" fill="#1a6bb5">8  7  5  3  1</text>
+  <text x="228" y="154" text-anchor="start" font-family="monospace" font-size="14" fill="#c0392b">2  4  5  8</text>
+
+  <!-- 줄기 17 -->
+  <text x="210" y="192" text-anchor="middle" font-family="monospace" font-size="14" fill="#222">17</text>
+  <!-- 남: 5 2 0 (역순) -->
+  <text x="196" y="192" text-anchor="end" font-family="monospace" font-size="14" fill="#1a6bb5">5  2  0</text>
+  <!-- 여: 없음 -->
+</svg>

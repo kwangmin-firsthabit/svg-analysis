@@ -1,0 +1,110 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const W = 480;
+  const UNIT = 50;
+  const OX = 180;   // 원점 SVG x
+  const OY = 380;   // 원점 SVG y
+
+  // x: -3~5, y: -7~7
+  const xMin = -3, xMax = 5;
+  const yMin = -7, yMax = 7;
+
+  const toSvgX = x => OX + x * UNIT;
+  const toSvgY = y => OY - y * UNIT;
+
+  const H = OY + (-yMin) * UNIT + 30;
+
+  // 함수 y = 2x - 3
+  const f = x => 2 * x - 3;
+
+  // 그래프 끝점: y 범위 내 x 계산
+  // yMin=-7: x=(-7+3)/2=-2, yMax=7: x=(7+3)/2=5
+  const x1 = -2, x2 = 5;
+
+  // 특수점
+  const xIntercept = { x: 1.5, y: 0 };
+  const yIntercept = { x: 0,   y: -3 };
+
+  return { W, H, UNIT, OX, OY, xMin, xMax, yMin, yMax, toSvgX, toSvgY, f, x1, x2, xIntercept, yIntercept };
+}
+
+function render(geo) {
+  const { W, H, UNIT, OX, OY, xMin, xMax, yMin, yMax, toSvgX, toSvgY, f, x1, x2, xIntercept, yIntercept } = geo;
+
+  svg.setAttribute('width', W);
+  svg.setAttribute('height', H);
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('font-family', 'serif');
+  svg.setAttribute('font-size', '14');
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(NS, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  // x축
+  svg.appendChild(el('line', { x1: 20, y1: OY, x2: W - 30, y2: OY, stroke: 'black', 'stroke-width': 1.5 }));
+  svg.appendChild(el('polygon', { points: `${W-30},${OY} ${W-38},${OY-4} ${W-38},${OY+4}`, fill: 'black' }));
+
+  // y축
+  svg.appendChild(el('line', { x1: OX, y1: H - 20, x2: OX, y2: 20, stroke: 'black', 'stroke-width': 1.5 }));
+  svg.appendChild(el('polygon', { points: `${OX},20 ${OX-4},28 ${OX+4},28`, fill: 'black' }));
+
+  // x축 눈금 및 레이블
+  for (let x = xMin; x <= xMax; x++) {
+    if (x === 0) continue;
+    const sx = toSvgX(x);
+    svg.appendChild(el('line', { x1: sx, y1: OY - 5, x2: sx, y2: OY + 5, stroke: 'black', 'stroke-width': 1 }));
+    const t = el('text', { x: sx, y: OY + 18, 'text-anchor': 'middle', 'font-size': 12 });
+    t.textContent = x;
+    svg.appendChild(t);
+  }
+
+  // y축 눈금 및 레이블
+  for (let y = yMin; y <= yMax; y++) {
+    if (y === 0) continue;
+    const sy = toSvgY(y);
+    svg.appendChild(el('line', { x1: OX - 5, y1: sy, x2: OX + 5, y2: sy, stroke: 'black', 'stroke-width': 1 }));
+    const t = el('text', { x: OX - 8, y: sy + 4, 'text-anchor': 'end', 'font-size': 12 });
+    t.textContent = y;
+    svg.appendChild(t);
+  }
+
+  // 축 레이블
+  const tx = el('text', { x: W - 24, y: OY + 4, 'text-anchor': 'start', 'font-size': 14 });
+  tx.textContent = 'x'; svg.appendChild(tx);
+  const ty = el('text', { x: OX + 4, y: 16, 'text-anchor': 'start', 'font-size': 14 });
+  ty.textContent = 'y'; svg.appendChild(ty);
+  const to = el('text', { x: OX - 8, y: OY + 18, 'text-anchor': 'end', 'font-size': 12 });
+  to.textContent = 'O'; svg.appendChild(to);
+
+  // y = 2x - 3 그래프
+  const lx1 = toSvgX(x1), ly1 = toSvgY(f(x1));
+  const lx2 = toSvgX(x2), ly2 = toSvgY(f(x2));
+  svg.appendChild(el('line', { x1: lx1, y1: ly1, x2: lx2, y2: ly2, stroke: '#2563eb', 'stroke-width': 2 }));
+
+  // x절편
+  svg.appendChild(el('circle', { cx: toSvgX(xIntercept.x), cy: toSvgY(xIntercept.y), r: 4, fill: '#2563eb' }));
+  const txi = el('text', { x: toSvgX(xIntercept.x), y: toSvgY(xIntercept.y) - 7, 'text-anchor': 'middle', 'font-size': 12, fill: '#2563eb' });
+  txi.textContent = '(3/2, 0)'; svg.appendChild(txi);
+
+  // y절편
+  svg.appendChild(el('circle', { cx: toSvgX(yIntercept.x), cy: toSvgY(yIntercept.y), r: 4, fill: '#2563eb' }));
+  const tyi = el('text', { x: toSvgX(yIntercept.x) + 10, y: toSvgY(yIntercept.y) + 4, 'text-anchor': 'start', 'font-size': 12, fill: '#2563eb' });
+  tyi.textContent = '(0, -3)'; svg.appendChild(tyi);
+
+  // 함수식 레이블
+  const tlabel = el('text', { x: toSvgX(3.5), y: toSvgY(5.5), 'text-anchor': 'start', 'font-size': 15, fill: '#2563eb', 'font-style': 'italic' });
+  tlabel.textContent = 'y = 2x − 3'; svg.appendChild(tlabel);
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

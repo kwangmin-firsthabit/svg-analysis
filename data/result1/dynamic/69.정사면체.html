@@ -1,0 +1,167 @@
+<svg id="svg" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+  <script>
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('svg');
+
+function computeGeometry() {
+  const unit = 30;
+  const side = 6;
+  const s = side * unit; // 180px
+
+  // 정사면체 꼭짓점 3D 좌표 (한 변 = s)
+  // 밑면 정삼각형: 중심을 원점으로
+  // 밑면 꼭짓점 반지름 r = s / sqrt(3)
+  const r = s / Math.sqrt(3);
+  // 정사면체 높이 h = s * sqrt(2/3)
+  const h3d = s * Math.sqrt(2 / 3);
+
+  // 3D 꼭짓점 (x, y, z): y축이 위
+  // 밑면 정삼각형 꼭짓점 (y=0 평면)
+  // B: 앞쪽, C: 오른쪽 뒤, D: 왼쪽 뒤
+  const pts3d = {
+    A: [0,          h3d,       0],           // 상단 꼭짓점
+    B: [0,          0,         r],           // 밑면 앞
+    C: [ r * Math.sin(Math.PI * 2/3), 0, r * Math.cos(Math.PI * 2/3)], // 밑면 오른쪽 뒤
+    D: [ r * Math.sin(Math.PI * 4/3), 0, r * Math.cos(Math.PI * 4/3)], // 밑면 왼쪽 뒤
+  };
+
+  // Isometric 투영: x_iso = (x - z) * cos30, y_iso = y - (x + z) * sin30
+  // 표준 isometric: X축 오른쪽 30도, Z축 왼쪽 30도, Y축 위
+  function iso(x, y, z) {
+    const ix = (x - z) * Math.cos(Math.PI / 6);
+    const iy = -y + (x + z) * Math.sin(Math.PI / 6);
+    return [ix, iy];
+  }
+
+  const projected = {};
+  for (const [k, [x, y, z]] of Object.entries(pts3d)) {
+    projected[k] = iso(x, y, z);
+  }
+
+  // SVG 오프셋: 좌측 여백 및 상단 여백 적용
+  // 모든 점의 min/max 계산
+  const xs = Object.values(projected).map(p => p[0]);
+  const ys = Object.values(projected).map(p => p[1]);
+  const minX = Math.min(...xs);
+  const minY = Math.min(...ys);
+  const maxX = Math.max(...xs);
+  const maxY2 = Math.max(...ys);
+
+  const pad = 60;
+  const ox = -minX + pad;
+  const oy = -minY + pad;
+
+  const pts = {};
+  for (const [k, [px, py]] of Object.entries(projected)) {
+    pts[k] = [px + ox, py + oy];
+  }
+
+  const width = (maxX - minX) + pad * 2;
+  const height = (maxY2 - minY) + pad * 2;
+
+  return { pts, width, height, s, unit, side };
+}
+
+function el(tag, attrs, text) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render(geo) {
+  const { pts, width, height, s, side } = geo;
+  svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+  svg.setAttribute('width', width);
+  svg.setAttribute('height', height);
+
+  const A = pts.A, B = pts.B, C = pts.C, D = pts.D;
+
+  // 보이는 면: ABD (왼쪽 앞면), ABC (오른쪽 앞면), ABD, ACD는 isometric에서 판단
+  // 정사면체 등각투영: A=상단, B=앞, C=오른쪽뒤, D=왼쪽뒤
+  // 보이는 면: A-B-C, A-B-D, A-C-D의 앞쪽 2면
+  // 실선 엣지: A-B, A-C, A-D, B-C, B-D (앞쪽)
+  // 점선 엣지: C-D (밑면 뒷선)
+
+  // 면 채우기
+  const faceABC = el('polygon', {
+    points: `${A[0]},${A[1]} ${B[0]},${B[1]} ${C[0]},${C[1]}`,
+    fill: 'rgba(180,210,255,0.35)',
+    stroke: 'none'
+  });
+  const faceABD = el('polygon', {
+    points: `${A[0]},${A[1]} ${B[0]},${B[1]} ${D[0]},${D[1]}`,
+    fill: 'rgba(150,190,240,0.35)',
+    stroke: 'none'
+  });
+  const faceACD = el('polygon', {
+    points: `${A[0]},${A[1]} ${C[0]},${C[1]} ${D[0]},${D[1]}`,
+    fill: 'rgba(120,170,230,0.35)',
+    stroke: 'none'
+  });
+  svg.appendChild(faceABC);
+  svg.appendChild(faceABD);
+  svg.appendChild(faceACD);
+
+  // 점선: C-D (밑면 뒷변, 숨겨진 선)
+  svg.appendChild(el('line', {
+    x1: C[0], y1: C[1], x2: D[0], y2: D[1],
+    stroke: '#666', 'stroke-width': '1.5',
+    'stroke-dasharray': '5,4'
+  }));
+
+  // 실선 엣지
+  const solidEdges = [
+    [A, B], [A, C], [A, D], [B, C], [B, D]
+  ];
+  for (const [p, q] of solidEdges) {
+    svg.appendChild(el('line', {
+      x1: p[0], y1: p[1], x2: q[0], y2: q[1],
+      stroke: '#1a1a2e', 'stroke-width': '2',
+      'stroke-linecap': 'round'
+    }));
+  }
+
+  // 꼭짓점 점
+  const verts = { A, B, C, D };
+  const labelOffset = { A: [0, -14], B: [0, 14], C: [14, 4], D: [-14, 4] };
+  for (const [k, p] of Object.entries(verts)) {
+    svg.appendChild(el('circle', {
+      cx: p[0], cy: p[1], r: '3',
+      fill: '#1a1a2e'
+    }));
+    const [lx, ly] = labelOffset[k];
+    svg.appendChild(el('text', {
+      x: p[0] + lx, y: p[1] + ly,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-family': 'serif',
+      'font-style': 'italic',
+      fill: '#1a1a2e'
+    }, k));
+  }
+
+  // 한 변 길이 표시: B-C 변 중점
+  const mx = (B[0] + C[0]) / 2;
+  const my = (B[1] + C[1]) / 2;
+  const dx = C[0] - B[0];
+  const dy = C[1] - B[1];
+  const len = Math.sqrt(dx*dx + dy*dy);
+  const nx = -dy / len * 14;
+  const ny = dx / len * 14;
+  svg.appendChild(el('text', {
+    x: mx + nx, y: my + ny,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'central',
+    'font-size': '13',
+    'font-family': 'serif',
+    fill: '#c0392b'
+  }, `${side}`));
+}
+
+const geo = computeGeometry();
+render(geo);
+  </script>
+</svg>

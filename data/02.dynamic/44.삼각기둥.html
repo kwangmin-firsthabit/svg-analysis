@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+  <body>
+    <svg width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg" id="main-svg"></svg>
+    <script>
+      (function () {
+        const svg = document.getElementById('main-svg');
+        const NS = 'http://www.w3.org/2000/svg';
+        function mk(tag, attrs, txt) {
+          const e = document.createElementNS(NS, tag);
+          for (const k in attrs) e.setAttribute(k, attrs[k]);
+          if (txt != null) e.textContent = txt;
+          svg.appendChild(e);
+          return e;
+        }
+        const FF = '"Anthropic Sans",sans-serif';
+
+        function computeGeometry() {
+          const scale = 50;
+          const side = 4;
+          const height = 6;
+          // dx, dy for oblique projection (45°, factor 0.5)
+          const dx = Math.cos(Math.PI / 4) * 0.5 * scale; // ≈ 17.7
+          const dy = -Math.sin(Math.PI / 4) * 0.5 * scale; // ≈ -17.7
+
+          // Equilateral triangle: base=side*scale, triangle height = sqrt(3)/2*side*scale
+          const baseW = side * scale;
+          const triH = (Math.sqrt(3) / 2) * side * scale;
+
+          // Front face ABC: A=bottom-left, B=bottom-right, C=top-center
+          const ox = 155, oy = 375;
+          const A = { x: ox, y: oy };
+          const B = { x: ox + baseW, y: oy };
+          const C = { x: ox + baseW / 2, y: oy - triH };
+
+          // Back face DEF = front + oblique offset
+          const D = { x: A.x + dx, y: A.y + dy };
+          const E = { x: B.x + dx, y: B.y + dy };
+          const F = { x: C.x + dx, y: C.y + dy };
+
+          return { A, B, C, D, E, F, side, height, triH };
+        }
+
+        function render(geo) {
+          const { A, B, C, D, E, F, side, height, triH } = geo;
+
+          function pts(arr) {
+            return arr.map(p => p.x + ',' + p.y).join(' ');
+          }
+
+          // Hidden edges (dashed)
+          function hiddenLine(p1, p2) {
+            mk('line', {
+              x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
+              stroke: '#888780', 'stroke-width': 1,
+              'stroke-dasharray': '5 4', 'stroke-linecap': 'round'
+            });
+          }
+          hiddenLine(A, D);
+          hiddenLine(D, E);
+          hiddenLine(D, F);
+
+          // Face fills
+          mk('polygon', { points: pts([D, E, F]), fill: '#85B7EB', stroke: 'none', opacity: 0.5 });
+          mk('polygon', { points: pts([B, E, F, C]), fill: '#B5D4F4', stroke: 'none', opacity: 0.5 });
+          mk('polygon', { points: pts([A, D, F, C]), fill: '#E6F1FB', stroke: 'none', opacity: 0.5 });
+          mk('polygon', { points: pts([A, B, E, D]), fill: '#B5D4F4', stroke: 'none', opacity: 0.4 });
+          mk('polygon', { points: pts([A, B, C]), fill: '#E6F1FB', stroke: 'none', opacity: 0.3 });
+
+          // Visible edges
+          function visLine(p1, p2) {
+            mk('line', {
+              x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
+              stroke: '#2C2C2A', 'stroke-width': 1.6, 'stroke-linecap': 'round'
+            });
+          }
+          visLine(A, B);
+          visLine(B, C);
+          visLine(C, A);
+          visLine(B, E);
+          visLine(C, F);
+          visLine(E, F);
+
+          // Vertices
+          const verts = { A, B, C, D, E, F };
+          const visVerts = ['A', 'B', 'C', 'E', 'F'];
+          visVerts.forEach(name => {
+            const p = verts[name];
+            mk('circle', { cx: p.x, cy: p.y, r: 3, fill: '#2C2C2A' });
+          });
+          mk('circle', { cx: D.x, cy: D.y, r: 3, fill: '#888780' });
+
+          // Vertex labels
+          const labelOffsets = {
+            A: [-16, 18], B: [14, 18], C: [0, -12],
+            D: [-16, 8], E: [16, 8], F: [14, -8]
+          };
+          Object.entries(labelOffsets).forEach(([name, [ox, oy]]) => {
+            const p = verts[name];
+            const isDashed = name === 'D';
+            mk('text', {
+              x: p.x + ox, y: p.y + oy,
+              'text-anchor': 'middle',
+              'font-family': 'serif', 'font-style': 'italic',
+              'font-size': 16,
+              fill: isDashed ? '#888780' : '#2C2C2A'
+            }, name);
+          });
+
+          // Dimension: side=4 (below A-B)
+          const dimY = A.y + 28;
+          mk('line', { x1: A.x, y1: dimY, x2: B.x, y2: dimY, stroke: '#5F5E5A', 'stroke-width': 0.8, 'stroke-linecap': 'round' });
+          mk('line', { x1: A.x, y1: dimY - 6, x2: A.x, y2: dimY + 6, stroke: '#5F5E5A', 'stroke-width': 0.8 });
+          mk('line', { x1: B.x, y1: dimY - 6, x2: B.x, y2: dimY + 6, stroke: '#5F5E5A', 'stroke-width': 0.8 });
+          mk('text', {
+            x: (A.x + B.x) / 2, y: dimY + 18,
+            'text-anchor': 'middle', 'font-family': FF, 'font-size': 13, fill: '#5F5E5A'
+          }, String(side));
+
+          // Dimension: height=6 (left side, A to C vertically)
+          const dimX = A.x - 28;
+          mk('line', { x1: dimX, y1: A.y, x2: dimX, y2: C.y, stroke: '#5F5E5A', 'stroke-width': 0.8, 'stroke-linecap': 'round' });
+          mk('line', { x1: dimX - 6, y1: A.y, x2: dimX + 6, y2: A.y, stroke: '#5F5E5A', 'stroke-width': 0.8 });
+          mk('line', { x1: dimX - 6, y1: C.y, x2: dimX + 6, y2: C.y, stroke: '#5F5E5A', 'stroke-width': 0.8 });
+          mk('text', {
+            x: dimX - 10, y: (A.y + C.y) / 2 + 5,
+            'text-anchor': 'end', 'font-family': FF, 'font-size': 13, fill: '#5F5E5A'
+          }, String(height));
+        }
+
+        const geo = computeGeometry();
+        render(geo);
+
+        const maxY = Math.max(geo.A.y, geo.B.y) + 60;
+        svg.setAttribute('viewBox', `0 0 680 ${maxY}`);
+      })();
+    </script>
+  </body>
+</html>

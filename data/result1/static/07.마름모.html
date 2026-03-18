@@ -1,0 +1,33 @@
+<!--
+  마름모 ABCD, 네 변의 길이 = 6 (1 unit = 25px)
+  각도 120°/60° 선택
+  대각선: d_AC = 2*6*sin(60°)*25 = 259.8px (수직), d_BD = 2*6*sin(30°)*25 = 150px (수평)
+  center = (200, 190)
+  A = (200, 190 - 129.9) = (200, 60.1)
+  B = (200 + 75, 190) = (275, 190)
+  C = (200, 190 + 129.9) = (200, 319.9)
+  D = (200 - 75, 190) = (125, 190)
+  검증: |AB| = sqrt(75^2 + 129.9^2) = sqrt(5625 + 16874) = sqrt(22499) ≈ 150px = 6 ✓
+-->
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="200,60 275,190 200,320 125,190" fill="none" stroke="#000" stroke-width="2"/>
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="200" y="48" text-anchor="middle" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="290" y="194" text-anchor="start" font-size="16" font-family="serif" font-style="italic">B</text>
+  <text x="200" y="340" text-anchor="middle" font-size="16" font-family="serif" font-style="italic">C</text>
+  <text x="110" y="194" text-anchor="end" font-size="16" font-family="serif" font-style="italic">D</text>
+
+  <!-- 변의 길이 레이블 (AB, BC에만 — 나머지는 틱으로) -->
+  <!-- 등변 틱 마크 (4개 변) -->
+  <g transform="translate(237,125) rotate(60)"><line x1="-6" y1="0" x2="6" y2="0" stroke="#000" stroke-width="1.5"/></g>
+  <g transform="translate(237,255) rotate(-60)"><line x1="-6" y1="0" x2="6" y2="0" stroke="#000" stroke-width="1.5"/></g>
+  <g transform="translate(163,255) rotate(60)"><line x1="-6" y1="0" x2="6" y2="0" stroke="#000" stroke-width="1.5"/></g>
+  <g transform="translate(163,125) rotate(-60)"><line x1="-6" y1="0" x2="6" y2="0" stroke="#000" stroke-width="1.5"/></g>
+
+  <!-- 변의 길이 레이블 -->
+  <text x="248" y="121" text-anchor="start" font-size="14" font-family="serif">6</text>
+  <text x="248" y="267" text-anchor="start" font-size="14" font-family="serif">6</text>
+  <text x="152" y="267" text-anchor="end" font-size="14" font-family="serif">6</text>
+  <text x="152" y="121" text-anchor="end" font-size="14" font-family="serif">6</text>
+</svg>

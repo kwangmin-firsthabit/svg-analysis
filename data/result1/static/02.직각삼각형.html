@@ -1,0 +1,37 @@
+<!--
+  직각삼각형 ABC, CA=3cm, CB=4cm, AB=5cm (빗변)
+  1 unit = 40px → CA=120px, CB=160px, AB=200px
+  직각은 C에 위치
+  C = (100, 280), A = (100, 160), B = (260, 280)
+  검증: |CA| = |280-160| = 120px = 3 ✓
+  검증: |CB| = |260-100| = 160px = 4 ✓
+  검증: |AB| = sqrt((260-100)^2 + (280-160)^2) = sqrt(160^2 + 120^2) = sqrt(25600+14400) = sqrt(40000) = 200px = 5 ✓
+
+  직각 표시: C = (100, 280), 내부 방향으로 작은 정사각형
+  → 위쪽(A 방향): (100, 260), 오른쪽(B 방향): (120, 280)
+  → 꺾인점: (120, 260)
+
+  변 레이블 위치:
+  CA (수직): 중점 (100, 220), 왼쪽
+  CB (수평): 중점 (180, 280), 아래쪽
+  AB (빗변): 중점 (180, 220), 오른쪽 위
+-->
+<svg width="360" height="360" viewBox="0 0 360 360" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="100,160 260,280 100,280" fill="none" stroke="#000" stroke-width="2" />
+
+  <!-- 직각 표시 (C = 100,280 기준, 변의 안쪽 방향) -->
+  <polyline points="100,260 120,260 120,280" fill="none" stroke="#000" stroke-width="1.5" />
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="100" y="148" text-anchor="middle" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="274" y="296" text-anchor="start" font-size="16" font-family="serif" font-style="italic">B</text>
+  <text x="86" y="296" text-anchor="end" font-size="16" font-family="serif" font-style="italic">C</text>
+
+  <!-- 변 길이 레이블 -->
+  <!-- CA 왼쪽 -->
+  <text x="86" y="224" text-anchor="end" font-size="14" font-family="serif">3</text>
+  <!-- CB 아래 -->
+  <text x="180" y="298" text-anchor="middle" font-size="14" font-family="serif">4</text>
+  <!-- AB 빗변 오른쪽 -->
+  <text x="192" y="214" text-anchor="start" font-size="14" font-family="serif">5</text>
+</svg>

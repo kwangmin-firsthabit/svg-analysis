@@ -1,0 +1,41 @@
+<svg width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    동심원, O(340,220), scale=36px/1
+    R₁=3→108px  R₂=5→180px
+  -->
+
+  <!-- Outer circle (R=5) -->
+  <circle cx="340" cy="220" r="180" fill="none" stroke="#185FA5" stroke-width="1.8" />
+
+  <!-- Inner circle (R=3) -->
+  <circle cx="340" cy="220" r="108" fill="none" stroke="#185FA5" stroke-width="1.8" />
+
+  <!-- Radius to inner circle -->
+  <line x1="340" y1="220" x2="448" y2="220" stroke="#185FA5" stroke-width="1.2" stroke-linecap="round" />
+
+  <!-- Radius extension to outer circle (dashed) -->
+  <line
+    x1="448"
+    y1="220"
+    x2="520"
+    y2="220"
+    stroke="#B4B2A9"
+    stroke-width="1"
+    stroke-dasharray="5 4"
+    stroke-linecap="round"
+  />
+
+  <!-- Points -->
+  <circle cx="448" cy="220" r="3" fill="#185FA5" />
+  <circle cx="520" cy="220" r="3" fill="#185FA5" />
+  <circle cx="340" cy="220" r="3.5" fill="#185FA5" />
+
+  <!-- Labels -->
+  <text x="340" y="248" text-anchor="middle" font-family="serif" font-style="italic" font-size="20" fill="#185FA5">
+    O
+  </text>
+  <text x="394" y="208" text-anchor="middle" font-family="serif" font-size="14" fill="#185FA5">3</text>
+  <text x="484" y="208" text-anchor="middle" font-family="serif" font-size="14" fill="#888780">5</text>
+  <text x="340" y="32" text-anchor="middle" font-family="serif" font-size="13" fill="#888780">r = 5</text>
+  <text x="340" y="104" text-anchor="middle" font-family="serif" font-size="13" fill="#185FA5">r = 3</text>
+</svg>

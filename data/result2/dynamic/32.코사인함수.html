@@ -1,0 +1,82 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const ox = 340, oy = 220, scaleX = 60, scaleY = 100, H = 440;
+
+// 축
+svg.appendChild(el('line', { x1: 40, y1: oy, x2: 640, y2: oy, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('line', { x1: ox, y1: H - 20, x2: ox, y2: 20, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' }));
+addText(650, oy, 'x', { fill: '#374151', 'font-weight': '600' });
+addText(ox, 12, 'y', { fill: '#374151', 'font-weight': '600' });
+
+// 눈금 x축
+const PI = Math.PI;
+const ticksX = [
+  { v: -2, label: '−2π' },
+  { v: -1, label: '−π' },
+  { v: 1, label: 'π' },
+  { v: 2, label: '2π' }
+];
+for (const { v, label } of ticksX) {
+  const px = Math.round(ox + v * PI * scaleX);
+  svg.appendChild(el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: '#374151', 'stroke-width': '1' }));
+  addText(px, oy + 16, label);
+}
+
+// 눈금 y축
+for (const v of [-1, 1]) {
+  const py = Math.round(oy - v * scaleY);
+  svg.appendChild(el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: '#374151', 'stroke-width': '1' }));
+  addText(ox - 18, py, v === 1 ? '1' : '−1');
+}
+
+// cos 곡선 polyline
+const pts = [];
+for (let px = 60; px <= 620; px += 2) {
+  const mx = (px - ox) / scaleX;
+  const my = Math.cos(mx);
+  const py = Math.round(oy - my * scaleY);
+  pts.push(`${px},${py}`);
+}
+svg.appendChild(el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#2563EB', 'stroke-width': '2' }));
+
+// 특수점
+const specialPts = [
+  { mx: 0, my: 1 },
+  { mx: PI / 2, my: 0 },
+  { mx: PI, my: -1 },
+  { mx: 3 * PI / 2, my: 0 },
+  { mx: 2 * PI, my: 1 },
+  { mx: -PI / 2, my: 0 },
+  { mx: -PI, my: -1 },
+  { mx: -3 * PI / 2, my: 0 },
+  { mx: -2 * PI, my: 1 }
+];
+for (const { mx, my } of specialPts) {
+  const px = Math.round(ox + mx * scaleX);
+  const py = Math.round(oy - my * scaleY);
+  svg.appendChild(el('circle', { cx: px, cy: py, r: '3', fill: '#2563EB', stroke: '#fff', 'stroke-width': '1' }));
+}
+
+// 레이블
+addText(580, 60, 'y = cos x', { fill: '#1E293B', 'font-size': '14', 'font-weight': '600', 'text-anchor': 'end' });
+
+// 원점 레이블
+addText(ox + 10, oy + 16, 'O', { 'text-anchor': 'start' });
+</script>

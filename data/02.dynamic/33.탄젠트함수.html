@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+  <body>
+    <svg width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+      <script>
+        const W = 680,
+          H = 480;
+        const ox = 340,
+          oy = 240,
+          unitX = 84,
+          unitY = 52;
+
+        function toSVG(mx, my) {
+          return { x: ox + mx * unitX, y: oy - my * unitY };
+        }
+
+        const svg = document.querySelector('svg');
+        function el(tag, attrs, txt) {
+          const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+          for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+          if (txt !== undefined) e.textContent = txt;
+          svg.appendChild(e);
+          return e;
+        }
+
+        const PI = Math.PI;
+        const xMin = -PI * 1.25,
+          xMax = PI * 1.75,
+          yMin = -4.2,
+          yMax = 4.2;
+
+        // 격자 (π/2 단위), 축, 화살표, 눈금 ...
+
+        // 점근선: x = ±π/2, ±3π/2
+        [-PI / 2, PI / 2, (-3 * PI) / 2, (3 * PI) / 2].forEach(ax => {
+          if (ax < xMin || ax > xMax) return;
+          const p = toSVG(ax, yMin),
+            q = toSVG(ax, yMax);
+          el('line', {
+            x1: p.x,
+            y1: p.y,
+            x2: q.x,
+            y2: q.y,
+            stroke: '#F3306A',
+            'stroke-width': 1.2,
+            'stroke-dasharray': '6 4',
+            'stroke-linecap': 'round',
+          });
+        });
+
+        // y = tan(x) — 점근선 사이 구간마다 독립적으로 그림
+        // eps: 점근선 근방 ε 여백으로 연결선 방지
+        const eps = 0.015,
+          steps = 400;
+        [
+          [-PI * 1.25, -PI / 2],
+          [-PI / 2, PI / 2],
+          [PI / 2, (3 * PI) / 2],
+        ].forEach(([x0, x1]) => {
+          const lo = x0 + eps,
+            hi = x1 - eps;
+          let pathD = '',
+            penDown = false;
+          for (let i = 0; i <= steps; i++) {
+            const mx = lo + ((hi - lo) * i) / steps;
+            const my = Math.tan(mx);
+            if (my < yMin - 0.1 || my > yMax + 0.1) {
+              penDown = false;
+              continue;
+            }
+            const p = toSVG(mx, my);
+            if (!penDown) {
+              pathD += `M${p.x},${p.y}`;
+              penDown = true;
+            } else {
+              pathD += ` L${p.x},${p.y}`;
+            }
+          }
+          if (pathD)
+            el('path', {
+              d: pathD,
+              fill: 'none',
+              stroke: '#378ADD',
+              'stroke-width': 2.4,
+              'stroke-linecap': 'round',
+              'stroke-linejoin': 'round',
+            });
+        });
+
+        // 원점 (0,0)
+        const p00 = toSVG(0, 0);
+        el('circle', { cx: p00.x, cy: p00.y, r: 5.5, fill: '#F3306A', stroke: '#fff', 'stroke-width': 1.5 });
+
+        // 대표점: (±π/4, ±1)
+        [
+          [PI / 4, 1],
+          [-PI / 4, -1],
+          [PI / 4 + PI, 1],
+          [-PI / 4 - PI, -1],
+        ].forEach(([mx, my]) => {
+          if (mx < xMin || mx > xMax) return;
+          const p = toSVG(mx, my);
+          dashedLine(p.x, p.y, p.x, oy);
+          dashedLine(p.x, p.y, ox, p.y);
+          el('circle', { cx: p.x, cy: p.y, r: 3.5, fill: '#B5D4F4', stroke: '#378ADD', 'stroke-width': 1.5 });
+        });
+
+        // 주기 표시 (−π/2 → π/2)
+        // ... 양방향 화살표 + "주기 π" 레이블
+      </script>
+    </svg>
+  </body>
+</html>

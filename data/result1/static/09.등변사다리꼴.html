@@ -1,0 +1,41 @@
+<!--
+  등변사다리꼴 ABCD, 윗변 AD=4, 아랫변 BC=10, 두 밑각 같음 (1 unit = 40px)
+  (10-4)/2 = 3 → 각 변 수평 오프셋 = 3
+  높이 = 4 → leg = sqrt(3^2 + 4^2) = 5
+  A = (200, 120), B = (80, 280), C = (480, 280), D = (360, 120)
+  검증:
+    |BC| = 400px = 10 ✓
+    |AD| = 160px = 4 ✓
+    |AB| = sqrt(120^2 + 160^2) = sqrt(14400+25600) = sqrt(40000) = 200px = 5 ✓
+    |DC| = sqrt(120^2 + 160^2) = 200px = 5 ✓
+    밑각 ∠B = ∠C (대칭) ✓
+-->
+<svg width="560" height="360" viewBox="0 0 560 360" xmlns="http://www.w3.org/2000/svg">
+  <polygon points="200,120 360,120 480,280 80,280" fill="none" stroke="#000" stroke-width="2"/>
+
+  <!-- 등변 틱 마크 (AB, DC) -->
+  <g transform="translate(140,200) rotate(53)"><line x1="-6" y1="0" x2="6" y2="0" stroke="#000" stroke-width="1.5"/></g>
+  <g transform="translate(420,200) rotate(-53)"><line x1="-6" y1="0" x2="6" y2="0" stroke="#000" stroke-width="1.5"/></g>
+
+  <!-- 평행 표시 -->
+  <g transform="translate(280,120) rotate(0)">
+    <line x1="-8" y1="-5" x2="0" y2="0" stroke="#000" stroke-width="1.5"/>
+    <line x1="-8" y1="5" x2="0" y2="0" stroke="#000" stroke-width="1.5"/>
+  </g>
+  <g transform="translate(280,280) rotate(0)">
+    <line x1="-8" y1="-5" x2="0" y2="0" stroke="#000" stroke-width="1.5"/>
+    <line x1="-8" y1="5" x2="0" y2="0" stroke="#000" stroke-width="1.5"/>
+  </g>
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="186" y="112" text-anchor="end" font-size="16" font-family="serif" font-style="italic">A</text>
+  <text x="374" y="112" text-anchor="start" font-size="16" font-family="serif" font-style="italic">D</text>
+  <text x="66" y="296" text-anchor="end" font-size="16" font-family="serif" font-style="italic">B</text>
+  <text x="494" y="296" text-anchor="start" font-size="16" font-family="serif" font-style="italic">C</text>
+
+  <!-- 변의 길이 레이블 -->
+  <text x="280" y="110" text-anchor="middle" font-size="14" font-family="serif">4</text>
+  <text x="280" y="304" text-anchor="middle" font-size="14" font-family="serif">10</text>
+  <text x="120" y="202" text-anchor="end" font-size="14" font-family="serif">5</text>
+  <text x="440" y="202" text-anchor="start" font-size="14" font-family="serif">5</text>
+</svg>
