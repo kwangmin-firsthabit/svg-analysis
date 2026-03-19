@@ -1,0 +1,76 @@
+<svg id="vis" width="100%" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  svg.appendChild(e);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = document.createElementNS(ns, 'text');
+  Object.entries({ x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#334155', ...attrs }).forEach(([k, v]) => t.setAttribute(k, v));
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 3-4-5 직각삼각형, scale=55px per unit
+const s = 55;
+// C: 직각 꼭짓점, A: 가로(오른쪽), B: 세로(위쪽)
+const Cx = 290, Cy = 390;
+const Ax = Cx + 3 * s, Ay = Cy;       // CA = 3 (가로)
+const Bx = Cx, By = Cy - 4 * s;       // CB = 4 (세로)
+
+// 정사각형 꼭짓점 계산
+// S1: 변 CA(=3) 아래쪽 정사각형
+const S1 = [[Cx, Cy], [Ax, Ay], [Ax, Ay + 3 * s], [Cx, Cy + 3 * s]];
+// S2: 변 CB(=4) 왼쪽 정사각형
+const S2 = [[Bx, By], [Cx, Cy], [Cx - 4 * s, Cy], [Bx - 4 * s, By]];
+// S3: 변 AB(=5) 빗변 바깥쪽 정사각형
+// AB 방향: (Bx-Ax, By-Ay) = (-3s, -4s)
+// 외부 법선(오른쪽 바깥): (4s, -3s) / 5s * 5s = (4s, -3s)
+const dx = 4 * s, dy = -3 * s;
+const S3 = [[Ax, Ay], [Bx, By], [Bx + dx, By + dy], [Ax + dx, Ay + dy]];
+
+function pts(arr) { return arr.map(p => p[0] + ',' + p[1]).join(' '); }
+function center(arr) { return [arr.reduce((a, p) => a + p[0], 0) / arr.length, arr.reduce((a, p) => a + p[1], 0) / arr.length]; }
+
+// 정사각형 채우기
+el('polygon', { points: pts(S1), fill: '#DBEAFE', stroke: '#3B82F6', 'stroke-width': '1.5', 'stroke-linejoin': 'round' });
+el('polygon', { points: pts(S2), fill: '#D1FAE5', stroke: '#10B981', 'stroke-width': '1.5', 'stroke-linejoin': 'round' });
+el('polygon', { points: pts(S3), fill: '#FEF3C7', stroke: '#D97706', 'stroke-width': '1.5', 'stroke-linejoin': 'round' });
+
+// 직각삼각형
+el('polygon', { points: `${Cx},${Cy} ${Ax},${Ay} ${Bx},${By}`, fill: '#F1F5F9', stroke: '#475569', 'stroke-width': '2', 'stroke-linejoin': 'round' });
+
+// 직각 기호
+const r = 14;
+el('path', { d: `M${Cx + r},${Cy} L${Cx + r},${Cy - r} L${Cx},${Cy - r}`, fill: 'none', stroke: '#475569', 'stroke-width': '1.4' });
+
+// 정사각형 넓이 라벨
+const c1 = center(S1);
+addText(c1[0], c1[1] - 8, '3² = 9', { 'font-size': '14', 'font-weight': '600', fill: '#1E40AF' });
+const c2 = center(S2);
+addText(c2[0], c2[1] - 8, '4² = 16', { 'font-size': '14', 'font-weight': '600', fill: '#065F46' });
+const c3 = center(S3);
+addText(c3[0], c3[1] - 8, '5² = 25', { 'font-size': '14', 'font-weight': '600', fill: '#92400E' });
+
+// 변 길이 라벨
+addText((Cx + Ax) / 2, Cy - 14, '3', { fill: '#1E40AF' });
+addText(Cx + 14, (Cy + By) / 2, '4', { fill: '#065F46', 'text-anchor': 'start' });
+// 빗변: AB 중점에서 약간 오프셋
+const mx = (Ax + Bx) / 2, my = (Ay + By) / 2;
+addText(mx + 14, my + 8, '5', { fill: '#92400E' });
+
+// 꼭짓점 표시
+[[Cx, Cy, 'C', -14, 16], [Ax, Ay, 'A', 14, 16], [Bx, By, 'B', -14, -12]].forEach(([x, y, label, ox, oy]) => {
+  el('circle', { cx: x, cy: y, r: '3', fill: '#475569' });
+  addText(x + ox, y + oy, label, { 'font-size': '14', 'font-weight': '600', fill: '#475569' });
+});
+
+// 피타고라스 정리 공식
+addText(340, 598, '3² + 4² = 5²  →  9 + 16 = 25', { 'font-size': '13', 'font-weight': '500', fill: '#64748B' });
+</script>

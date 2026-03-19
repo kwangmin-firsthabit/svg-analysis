@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>학생 과목별 점수 표</title>
+</head>
+<body>
+<svg id="vis" width="100%" viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function txt(x, y, s, attrs={}) {
+  const t = el('text', {x, y, 'font-size':'13', 'font-weight':'400', 'text-anchor':'middle', 'dominant-baseline':'central', fill:'#1E293B', ...attrs});
+  t.textContent = s;
+  svg.appendChild(t);
+}
+function line(x1, y1, x2, y2, attrs={}) {
+  svg.appendChild(el('line', {x1, y1, x2, y2, stroke:'#CBD5E1', 'stroke-width':'1', ...attrs}));
+}
+function rect(x, y, w, h, attrs={}) {
+  svg.appendChild(el('rect', {x, y, width:w, height:h, fill:'#F8FAFC', stroke:'#CBD5E1', 'stroke-width':'1.5', ...attrs}));
+}
+
+const students = ['A','B','C','D','E'];
+const subjects = ['국어','수학','영어','과학'];
+const scores = [
+  [85, 90, 88, 76],
+  [92, 76, 95, 80],
+  [78, 84, 70, 92],
+  [88, 91, 83, 74],
+  [95, 82, 79, 86]
+];
+
+const ox = 20, oy = 20;
+const colW = [136, 128, 128, 128, 128];
+const rowH = 44;
+const rows = 7;
+const totalW = 640;
+const totalH = rowH * rows - rowH;
+
+rect(ox, oy, totalW, rowH * (students.length + 2), {rx:'6'});
+
+svg.appendChild(el('rect', {x:ox, y:oy, width:totalW, height:rowH, fill:'#E2E8F0', rx:'6', stroke:'none'}));
+svg.appendChild(el('rect', {x:ox, y:oy+10, width:totalW, height:rowH-10, fill:'#E2E8F0', stroke:'none'}));
+
+let cx = ox;
+const colXMids = [];
+for (let i = 0; i < colW.length; i++) {
+  colXMids.push(cx + colW[i] / 2);
+  cx += colW[i];
+}
+
+const headers = ['학생', ...subjects];
+headers.forEach((h, i) => {
+  txt(colXMids[i], oy + rowH / 2, h, {'font-size':'14','font-weight':'600','fill':'#1E293B'});
+});
+
+let cumX = ox;
+for (let i = 1; i < colW.length; i++) {
+  cumX += colW[i-1];
+  line(cumX, oy, cumX, oy + rowH * (students.length + 1), {'stroke-width':'1'});
+}
+
+for (let r = 0; r <= students.length; r++) {
+  const y = oy + rowH + r * rowH;
+  line(ox, y, ox + totalW, y, {'stroke-width': r === 0 ? '1.5' : '1'});
+}
+
+students.forEach((s, r) => {
+  const y = oy + rowH + rowH / 2 + r * rowH;
+  txt(colXMids[0], y, s, {'font-weight':'500'});
+  scores[r].forEach((sc, c) => {
+    txt(colXMids[c+1], y, String(sc), {'fill':'#475569'});
+  });
+});
+
+txt(340, 24, '학생별 과목 점수표', {'font-size':'14','font-weight':'600','fill':'#1E293B','dominant-baseline':'auto'});
+</script>
+</body>
+</html>

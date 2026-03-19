@@ -1,0 +1,101 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#111',
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  // side length scale
+  const s = 60;
+
+  // center triangle (equilateral)
+  const h = (s * Math.sqrt(3)) / 2;
+
+  const A = { x: 340, y: 120 };
+  const B = { x: 340 - s / 2, y: 120 + h };
+  const C = { x: 340 + s / 2, y: 120 + h };
+
+  // function to reflect triangle across edge
+  function reflect(P, Q, R) {
+    const midx = (P.x + Q.x) / 2;
+    const midy = (P.y + Q.y) / 2;
+    const dx = Q.y - P.y;
+    const dy = -(Q.x - P.x);
+    const len = Math.sqrt(dx * dx + dy * dy);
+    const ux = dx / len,
+      uy = dy / len;
+    return {
+      x: midx + ux * h,
+      y: midy + uy * h,
+    };
+  }
+
+  // three attached triangles
+  const D = reflect(B, C, A);
+  const E = reflect(A, C, B);
+  const F = reflect(A, B, C);
+
+  // draw triangles
+  function drawTri(p1, p2, p3, colorStroke, colorFill) {
+    svg.appendChild(
+      el('polygon', {
+        points: `${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`,
+        fill: colorFill,
+        'fill-opacity': '0.15',
+        stroke: colorStroke,
+        'stroke-width': '1.5',
+        'stroke-linejoin': 'round',
+      })
+    );
+  }
+
+  // central
+  drawTri(A, B, C, '#2563eb', '#3b82f6');
+
+  // attached
+  drawTri(B, C, D, '#059669', '#10b981');
+  drawTri(A, C, E, '#d97706', '#f59e0b');
+  drawTri(A, B, F, '#dc2626', '#ef4444');
+
+  // vertices
+  [A, B, C, D, E, F].forEach(p => {
+    svg.appendChild(el('circle', { cx: p.x, cy: p.y, r: 3.5, fill: '#111' }));
+  });
+
+  // labels (central)
+  svg.appendChild(text(A.x, A.y - 15, 'A'));
+  svg.appendChild(text(B.x - 15, B.y + 15, 'B'));
+  svg.appendChild(text(C.x + 15, C.y + 15, 'C'));
+
+  // side length label
+  function mid(p, q) {
+    return { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 };
+  }
+
+  const mAB = mid(A, B);
+  const mBC = mid(B, C);
+  const mCA = mid(C, A);
+
+  svg.appendChild(text(mAB.x - 10, mAB.y, '6', { 'font-size': '12', 'font-weight': '400' }));
+  svg.appendChild(text(mBC.x, mBC.y + 18, '6', { 'font-size': '12', 'font-weight': '400' }));
+  svg.appendChild(text(mCA.x + 10, mCA.y, '6', { 'font-size': '12', 'font-weight': '400' }));
+</script>

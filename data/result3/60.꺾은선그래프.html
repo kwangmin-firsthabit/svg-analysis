@@ -1,0 +1,148 @@
+<div style="display: flex; gap: 20px; margin-bottom: 8px; font-size: 12px; color: #475569; padding: 0 16px;">
+  <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 24px; height: 3px; background: #3B82F6; display:inline-block;"></span>서울</span>
+  <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 24px; height: 3px; background: #F59E0B; display:inline-block;"></span>부산</span>
+  <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 24px; height: 3px; background: #10B981; display:inline-block;"></span>대구</span>
+</div>
+<div style="position: relative; width: 100%; height: 380px;">
+  <canvas id="tempChart"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const years = ['2019', '2020', '2021', '2022', '2023'];
+const seoul = [12.4, 12.8, 13.1, 12.9, 13.5];
+const busan = [14.9, 15.2, 15.4, 15.1, 15.8];
+const daegu = [14.1, 14.5, 14.8, 14.6, 15.2];
+
+const intersectionPlugin = {
+  id: 'intersections',
+  afterDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    const xScale = chart.scales.x;
+    const yScale = chart.scales.y;
+
+    const datasets = [
+      { data: seoul, color: '#3B82F6' },
+      { data: busan, color: '#F59E0B' },
+      { data: daegu, color: '#10B981' }
+    ];
+
+    const cityNames = ['서울', '부산', '대구'];
+    const colors = ['#3B82F6', '#F59E0B', '#10B981'];
+
+    datasets.forEach((ds, di) => {
+      const lastVal = ds.data[ds.data.length - 1];
+      const lastX = xScale.getPixelForValue(ds.data.length - 1);
+      const lastY = yScale.getPixelForValue(lastVal);
+
+      ctx.save();
+      ctx.font = '500 12px sans-serif';
+      ctx.fillStyle = ds.color;
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(cityNames[di] + ' ' + lastVal.toFixed(1) + '°C', lastX + 8, lastY);
+      ctx.restore();
+    });
+
+    for (let i = 0; i < years.length - 1; i++) {
+      for (let a = 0; a < datasets.length; a++) {
+        for (let b = a + 1; b < datasets.length; b++) {
+          const y1a = datasets[a].data[i], y2a = datasets[a].data[i + 1];
+          const y1b = datasets[b].data[i], y2b = datasets[b].data[i + 1];
+          const da = y2a - y1a, db = y2b - y1b;
+          if ((y1a - y1b) * (y2a - y2b) < 0) {
+            const t = (y1b - y1a) / (da - db);
+            const ix = xScale.getPixelForValue(i + t);
+            const iy = yScale.getPixelForValue(y1a + da * t);
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(ix, iy, 5, 0, Math.PI * 2);
+            ctx.fillStyle = '#fff';
+            ctx.fill();
+            ctx.strokeStyle = '#94A3B8';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.restore();
+          }
+        }
+      }
+    }
+  }
+};
+
+new Chart(document.getElementById('tempChart'), {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [
+      {
+        label: '서울',
+        data: seoul,
+        borderColor: '#3B82F6',
+        backgroundColor: '#3B82F6',
+        borderWidth: 2,
+        pointRadius: 5,
+        pointBackgroundColor: '#fff',
+        pointBorderColor: '#3B82F6',
+        pointBorderWidth: 2,
+        tension: 0.3
+      },
+      {
+        label: '부산',
+        data: busan,
+        borderColor: '#F59E0B',
+        backgroundColor: '#F59E0B',
+        borderWidth: 2,
+        pointRadius: 5,
+        pointBackgroundColor: '#fff',
+        pointBorderColor: '#F59E0B',
+        pointBorderWidth: 2,
+        tension: 0.3
+      },
+      {
+        label: '대구',
+        data: daegu,
+        borderColor: '#10B981',
+        backgroundColor: '#10B981',
+        borderWidth: 2,
+        pointRadius: 5,
+        pointBackgroundColor: '#fff',
+        pointBorderColor: '#10B981',
+        pointBorderWidth: 2,
+        tension: 0.3
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { right: 80 } },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ctx.dataset.label + ': ' + ctx.parsed.y.toFixed(1) + '°C'
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { font: { size: 13 }, color: '#475569' },
+        grid: { color: '#E2E8F0' }
+      },
+      y: {
+        min: 11,
+        max: 17,
+        title: { display: true, text: '연평균 기온 (°C)', font: { size: 12 }, color: '#475569' },
+        ticks: {
+          stepSize: 1,
+          font: { size: 11 },
+          color: '#475569',
+          callback: v => v.toFixed(0) + '°C'
+        },
+        grid: { color: '#E2E8F0' }
+      }
+    }
+  },
+  plugins: [intersectionPlugin]
+});
+</script>

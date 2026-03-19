@@ -1,1 +1,10 @@
 @import 'tailwindcss';
+
+/* result7: 헤더 스크롤바 숨김 (JS로 컨텐츠 스크롤과 동기화) */
+.result7-header-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.result7-header-scroll::-webkit-scrollbar {
+  display: none;
+}

@@ -1,0 +1,38 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// r=8, chord=8 => half-angle=30deg => chord endpoints 60deg apart
+const cx = 340, cy = 204, r = 120;
+const halfAngle = Math.PI / 6; // 30 degrees
+const ax = Math.round(cx - r * Math.sin(halfAngle));
+const ay = Math.round(cy + r * Math.cos(halfAngle));
+const bx = Math.round(cx + r * Math.sin(halfAngle));
+const by = ay;
+
+const seg = el('path', {
+  d: `M ${ax} ${ay} A ${r} ${r} 0 0 1 ${bx} ${by} Z`,
+  fill: '#3B82F6', 'fill-opacity': '0.12', stroke: '#1D4ED8', 'stroke-width': '1.5'
+});
+svg.appendChild(seg);
+
+svg.appendChild(el('line', { x1: ax, y1: ay, x2: bx, y2: by, stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+
+addText(ax - 10, ay, 'A', { 'font-size': '14', 'font-weight': '500', 'text-anchor': 'end', fill: '#1E293B' });
+addText(bx + 10, by, 'B', { 'font-size': '14', 'font-weight': '500', 'text-anchor': 'start', fill: '#1E293B' });
+addText(cx, cy + 10, 'r = 8', {});
+addText(cx, ay + 16, '현 = 8', {});
+</script>

@@ -1,0 +1,76 @@
+<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+svg.appendChild(el('rect', { width: '680', height: '520', fill: '#F8FAFC' }));
+addText(340, 36, '원기둥 전개도 (r = 3, h = 8)', { 'font-size': '18', 'font-weight': '600', fill: '#1E293B' });
+
+const r = 3;
+const h = 8;
+const scale = 20;
+const sr = Math.round(r * scale);
+const sh = Math.round(h * scale);
+const circumference = 2 * Math.PI * r;
+const sw = Math.round(circumference * scale);
+
+const cx = 340;
+const topCircleY = 90 + sr;
+const rectY = topCircleY + sr + 20;
+const botCircleY = rectY + sh + sr + 20;
+
+const rectX = Math.round(cx - sw / 2);
+
+svg.appendChild(el('ellipse', {
+  cx, cy: topCircleY, rx: sr, ry: sr,
+  fill: '#3B82F6', 'fill-opacity': '0.12',
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+addText(cx, topCircleY - 8, '윗면', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+addText(cx, topCircleY + 10, `r = ${r}`, { 'font-size': '11', fill: '#475569' });
+
+svg.appendChild(el('rect', {
+  x: rectX, y: rectY, width: sw, height: sh,
+  fill: '#3B82F6', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+addText(cx, Math.round(rectY + sh / 2) - 12, '옆면', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+addText(cx, Math.round(rectY + sh / 2) + 8, `2πr × h = ${circumference.toFixed(2)} × ${h}`, { 'font-size': '11', fill: '#475569' });
+
+svg.appendChild(el('line', {
+  x1: rectX, y1: rectY - 12, x2: rectX + sw, y2: rectY - 12,
+  stroke: '#1D4ED8', 'stroke-width': '1', 'stroke-dasharray': '4 3'
+}));
+svg.appendChild(el('line', {
+  x1: rectX, y1: rectY + sh + 12, x2: rectX + sw, y2: rectY + sh + 12,
+  stroke: '#1D4ED8', 'stroke-width': '1', 'stroke-dasharray': '4 3'
+}));
+
+addText(rectX - 20, Math.round(rectY + sh / 2), `h=${h}`, { 'font-size': '11', fill: '#94A3B8' });
+addText(cx, rectY + sh + 26, `2πr = 2π×${r} = ${circumference.toFixed(2)}`, { 'font-size': '11', fill: '#94A3B8' });
+
+svg.appendChild(el('ellipse', {
+  cx, cy: botCircleY, rx: sr, ry: sr,
+  fill: '#3B82F6', 'fill-opacity': '0.12',
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+addText(cx, botCircleY - 8, '아랫면', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+addText(cx, botCircleY + 10, `r = ${r}`, { 'font-size': '11', fill: '#475569' });
+
+const sideArea = (2 * Math.PI * r * h).toFixed(1);
+const totalArea = (2 * Math.PI * r * r + 2 * Math.PI * r * h).toFixed(1);
+addText(340, botCircleY + sr + 25, `옆면 넓이: 2πrh = 2π×${r}×${h} = ${2*r*h}π ≈ ${sideArea}`, { 'font-size': '13', fill: '#475569' });
+addText(340, botCircleY + sr + 50, `겉넓이: 2πr² + 2πrh = ${2*r*r}π + ${2*r*h}π = ${2*r*r+2*r*h}π ≈ ${totalArea}`, { 'font-size': '13', fill: '#475569' });
+</script>

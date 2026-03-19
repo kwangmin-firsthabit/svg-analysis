@@ -1,0 +1,103 @@
+<svg id="vis" width="100%" viewBox="0 0 680 360" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', {
+    x, y,
+    'font-size': '12', 'font-weight': '400',
+    'text-anchor': 'middle', 'dominant-baseline': 'central',
+    fill: '#1E293B', ...attrs
+  });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const grades = ['1학년', '2학년', '3학년'];
+const jobs = ['의사/과학자', '교사', '예술가', '엔지니어', '기타'];
+const colors = ['#1D4ED8', '#3B82F6', '#F59E0B', '#10B981', '#94A3B8'];
+const data = [
+  [35, 25, 20, 12, 8],
+  [28, 30, 18, 15, 9],
+  [22, 20, 25, 22, 11]
+];
+
+const barH = 54;
+const barGap = 24;
+const startX = 100;
+const barW = 500;
+const startY = 70;
+
+addText(340, 28, '학년별 장래 희망 직업 분포', {
+  'font-size': '14', 'font-weight': '500', fill: '#1E293B'
+});
+
+grades.forEach((grade, gi) => {
+  const y = startY + gi * (barH + barGap);
+  addText(70, y + barH / 2, grade, {
+    'font-size': '13', 'font-weight': '500', fill: '#1E293B', 'text-anchor': 'middle'
+  });
+
+  const total = data[gi].reduce((a, b) => a + b, 0);
+  let cumX = startX;
+  const maxIdx = data[gi].indexOf(Math.max(...data[gi]));
+
+  data[gi].forEach((val, ji) => {
+    const w = (val / total) * barW;
+    const isMax = ji === maxIdx;
+
+    svg.appendChild(el('rect', {
+      x: cumX, y,
+      width: w, height: barH,
+      fill: colors[ji],
+      opacity: isMax ? '1' : '0.72',
+      stroke: '#fff', 'stroke-width': '1'
+    }));
+
+    if (w > 38) {
+      addText(cumX + w / 2, y + barH / 2, val + '%', {
+        'font-size': '11', 'font-weight': isMax ? '500' : '400',
+        fill: ji < 2 ? '#fff' : (ji === 4 ? '#fff' : '#1E293B'),
+        'text-anchor': 'middle'
+      });
+    }
+
+    if (isMax) {
+      svg.appendChild(el('rect', {
+        x: cumX, y,
+        width: w, height: barH,
+        fill: 'none',
+        stroke: '#1E293B', 'stroke-width': '2'
+      }));
+    }
+
+    cumX += w;
+  });
+});
+
+const legendY = startY + 3 * (barH + barGap) + 10;
+const legendStartX = 100;
+const legendW = 500 / jobs.length;
+jobs.forEach((job, i) => {
+  const lx = legendStartX + i * legendW + legendW / 2;
+  svg.appendChild(el('rect', {
+    x: lx - legendW / 2 + 8, y: legendY,
+    width: 12, height: 12,
+    fill: colors[i], rx: '2'
+  }));
+  addText(lx + 8, legendY + 6, job, {
+    'font-size': '11', 'font-weight': '400', fill: '#475569', 'text-anchor': 'start'
+  });
+});
+
+addText(340, legendY + 28, '※ 굵은 테두리: 학년별 최고 비율 직업', {
+  'font-size': '11', 'font-weight': '400', fill: '#94A3B8'
+});
+</script>

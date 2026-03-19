@@ -1,0 +1,72 @@
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+const ox = 340, oy = 280, scale = 50;
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 좌표축
+svg.appendChild(el('line', { x1: 60, y1: oy, x2: 630, y2: oy, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('line', { x1: ox, y1: 430, x2: ox, y2: 40, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+addText(622, oy - 14, 'x', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(ox + 14, 52, 'y', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(ox - 14, oy + 14, 'O', { 'font-size': '12', fill: '#475569' });
+
+// 눈금
+for (let i = -5; i <= 5; i++) {
+  if (i === 0) continue;
+  const px = ox + i * scale;
+  svg.appendChild(el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: '#64748B', 'stroke-width': '0.8' }));
+  addText(px, oy + 16, String(i));
+}
+for (let j = 1; j <= 4; j++) {
+  const py = oy - j * scale;
+  svg.appendChild(el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: '#64748B', 'stroke-width': '0.8' }));
+  addText(ox - 16, py, String(j), { 'text-anchor': 'end' });
+}
+
+// y = |x| 그래프 (두 반직선)
+// 오른쪽: x >= 0, y = x
+svg.appendChild(el('line', { x1: ox, y1: oy, x2: ox + 4 * scale, y2: oy - 4 * scale, stroke: '#3B82F6', 'stroke-width': '2', 'stroke-linecap': 'round' }));
+// 왼쪽: x < 0, y = -x
+svg.appendChild(el('line', { x1: ox, y1: oy, x2: ox - 4 * scale, y2: oy - 4 * scale, stroke: '#3B82F6', 'stroke-width': '2', 'stroke-linecap': 'round' }));
+
+// 꼭짓점 (0, 0)
+svg.appendChild(el('circle', { cx: ox, cy: oy, r: '4', fill: '#3B82F6' }));
+addText(ox - 22, oy + 18, '(0, 0)', { 'font-size': '12', fill: '#1E293B', 'font-weight': '500' });
+
+// 함수 라벨
+addText(ox + 3 * scale + 30, oy - 3 * scale - 10, 'y = |x|', { 'font-size': '14', 'font-weight': '500', fill: '#3B82F6' });
+
+// 오른쪽 기울기 삼각형 (기울기 1)
+const rtx = ox + 2 * scale; // x=2 점
+const rty = oy - 2 * scale; // y=2 점
+// 삼각형: (rtx, oy), (rtx + scale, oy), (rtx + scale, oy - scale)
+svg.appendChild(el('line', { x1: rtx, y1: rty, x2: rtx + scale, y2: rty, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+svg.appendChild(el('line', { x1: rtx + scale, y1: rty, x2: rtx + scale, y2: oy - 3 * scale, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+addText(rtx + scale / 2, rty + 12, '1', { 'font-size': '12', fill: '#475569' });
+addText(rtx + scale + 14, rty - scale / 2, '1', { 'font-size': '12', fill: '#475569' });
+
+// 왼쪽 기울기 삼각형 (기울기 -1)
+const ltx = ox - 2 * scale; // x=-2 점
+const lty = oy - 2 * scale; // y=2 점
+svg.appendChild(el('line', { x1: ltx, y1: lty, x2: ltx - scale, y2: lty, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+svg.appendChild(el('line', { x1: ltx - scale, y1: lty, x2: ltx - scale, y2: oy - 3 * scale, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+addText(ltx - scale / 2, lty + 12, '1', { 'font-size': '12', fill: '#475569' });
+addText(ltx - scale - 14, lty - scale / 2, '1', { 'font-size': '12', fill: '#475569' });
+addText(ltx - scale - 30, lty - scale / 2 - 14, '기울기 -1', { 'font-size': '11', fill: '#94A3B8', 'text-anchor': 'middle' });
+addText(rtx + scale + 50, rty - scale / 2 - 14, '기울기 1', { 'font-size': '11', fill: '#94A3B8', 'text-anchor': 'middle' });
+</script>

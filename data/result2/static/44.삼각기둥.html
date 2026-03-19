@@ -1,0 +1,41 @@
+<svg width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+  <!-- 삼각기둥 ABC-DEF: 변의 길이 4, 높이 6 (scale=50px) -->
+  <!-- A=(200,420), B=(400,420), C=(375,377) -->
+  <!-- D=(200,120), E=(400,120), F=(375,77) -->
+  <!-- C의 정확한 좌표: x=200+100+43=343 → 재계산 필요 -->
+  <!-- C: 3D (100, 0, 173.2) → px=200+100+173.2*0.866*0.5=200+100+75=375, py=420-0-173.2*0.5*0.5=420-43.3=377 ✓ -->
+
+  <!-- 가려진 모서리 (점선) -->
+  <!-- AC (하단 밑면 왼쪽-뒤) -->
+  <line x1="200" y1="420" x2="375" y2="377" stroke="#94A3B8" stroke-width="1" stroke-dasharray="5 4"/>
+  <!-- CF (오른쪽 뒤 수직) -->
+  <line x1="375" y1="377" x2="375" y2="77" stroke="#94A3B8" stroke-width="1" stroke-dasharray="5 4"/>
+
+  <!-- 보이는 면들 -->
+  <!-- 하단 삼각형 ABC -->
+  <polygon points="200,420 400,420 375,377" fill="#3B82F6" fill-opacity="0.12" stroke="#1D4ED8" stroke-width="1.5"/>
+
+  <!-- 앞 면 ABDE (사각형) -->
+  <polygon points="200,420 400,420 400,120 200,120" fill="#3B82F6" fill-opacity="0.12" stroke="#1D4ED8" stroke-width="1.5"/>
+
+  <!-- 오른쪽 면 BCEF (사각형) -->
+  <polygon points="400,420 375,377 375,77 400,120" fill="#3B82F6" fill-opacity="0.12" stroke="#1D4ED8" stroke-width="1.5"/>
+
+  <!-- 상단 삼각형 DEF -->
+  <polygon points="200,120 400,120 375,77" fill="#3B82F6" fill-opacity="0.12" stroke="#1D4ED8" stroke-width="1.5"/>
+
+  <!-- 왼쪽 뒷면 ACFD (점선 아님: 부분적으로 보임 - AD는 보임) -->
+  <!-- AD는 이미 앞면에 포함 -->
+
+  <!-- 꼭짓점 라벨 -->
+  <text x="185" y="430" text-anchor="end" dominant-baseline="central" font-size="14" font-weight="500" fill="#1E293B">A</text>
+  <text x="410" y="430" text-anchor="start" dominant-baseline="central" font-size="14" font-weight="500" fill="#1E293B">B</text>
+  <text x="385" y="382" text-anchor="start" dominant-baseline="central" font-size="14" font-weight="500" fill="#1E293B">C</text>
+  <text x="185" y="115" text-anchor="end" dominant-baseline="central" font-size="14" font-weight="500" fill="#1E293B">D</text>
+  <text x="410" y="115" text-anchor="start" dominant-baseline="central" font-size="14" font-weight="500" fill="#1E293B">E</text>
+  <text x="385" y="72" text-anchor="start" dominant-baseline="central" font-size="14" font-weight="500" fill="#1E293B">F</text>
+
+  <!-- 치수 라벨 -->
+  <text x="300" y="440" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="400" fill="#475569">4</text>
+  <text x="188" y="270" text-anchor="end" dominant-baseline="central" font-size="12" font-weight="400" fill="#475569">6</text>
+</svg>

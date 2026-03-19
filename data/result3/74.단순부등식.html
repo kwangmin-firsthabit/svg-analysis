@@ -1,0 +1,60 @@
+<svg id="vis" width="100%" viewBox="0 0 680 260" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 제목
+txt(340, 36, 'x > 2 의 해를 수직선 위에 나타내기', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+
+// 수직선 설정
+const axY = 130;
+const ox = 340;       // 원점 x (수직선의 0 위치)
+const sc = 60;        // 1 단위 = 60px
+
+const xMin = -3, xMax = 6;
+const lineL = ox + xMin * sc;
+const lineR = ox + xMax * sc;
+
+// 수직선
+svg.appendChild(el('line', { x1: lineL - 20, y1: axY, x2: lineR + 20, y2: axY, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)', 'marker-start': 'url(#arrow)' }));
+
+// 눈금 및 라벨
+for (let i = xMin; i <= xMax; i++) {
+  const px = ox + i * sc;
+  svg.appendChild(el('line', { x1: px, y1: axY - 5, x2: px, y2: axY + 5, stroke: '#64748B', 'stroke-width': '0.8' }));
+  txt(px, axY + 22, String(i), { 'font-size': '13', 'font-weight': '400', fill: '#475569' });
+}
+
+// 해 영역 색상 (x > 2: x=2 오른쪽)
+const x2px = ox + 2 * sc;
+// 해 영역 배경 (x=2 ~ 수직선 오른쪽 끝)
+svg.appendChild(el('rect', { x: x2px, y: axY - 12, width: lineR + 20 - x2px, height: 24, fill: '#EFF6FF', 'fill-opacity': '0.6' }));
+
+// 해 방향 화살표 (굵은 선)
+svg.appendChild(el('line', { x1: x2px, y1: axY, x2: lineR + 10, y2: axY, stroke: '#1D4ED8', 'stroke-width': '3', 'marker-end': 'url(#arrow)', 'stroke-linecap': 'round' }));
+
+// 열린 점 (x=2에서 열린 원 ○)
+svg.appendChild(el('circle', { cx: x2px, cy: axY, r: '7', fill: 'white', stroke: '#1D4ED8', 'stroke-width': '2' }));
+
+// x=2 강조 라벨
+txt(x2px, axY - 28, 'x = 2', { 'font-size': '13', 'font-weight': '500', fill: '#1D4ED8' });
+txt(x2px, axY + 44, '열린 점 ○', { 'font-size': '12', 'font-weight': '400', fill: '#1D4ED8' });
+
+// 부등식 레이블
+txt(340, 195, 'x > 2', { 'font-size': '16', 'font-weight': '500', fill: '#1D4ED8' });
+txt(340, 220, '(x = 2 는 포함되지 않음)', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

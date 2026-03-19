@@ -1,0 +1,201 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+<div id="table-title" style="margin-bottom: 10px; display: flex; justify-content: center"></div>
+
+<svg id="vis" width="100%" viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg"></svg>
+
+<script>
+  (function () {
+    const svg = document.getElementById('vis');
+    const ns = 'http://www.w3.org/2000/svg';
+
+    // 1. 데이터 설정 (총합 30명)
+    const data = [
+      { label: '봄', count: 8 },
+      { label: '여름', count: 7 },
+      { label: '가을', count: 9 },
+      { label: '겨울', count: 6 },
+    ];
+    const total = data.reduce((acc, cur) => acc + cur.count, 0);
+
+    // 2. 제목 렌더링 (KaTeX)
+    katex.render('\\text{좋아하는 계절별 학생 수 도수분포표 (} N=30 \\text{)}', document.getElementById('table-title'));
+
+    function el(tag, attrs) {
+      const e = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      return e;
+    }
+
+    function addText(x, y, content, attrs = {}) {
+      const t = el('text', {
+        x,
+        y,
+        'text-anchor': 'middle',
+        'dominant-baseline': 'central',
+        'font-size': '14',
+        'font-weight': '500',
+        fill: '[label-primary]',
+        ...attrs,
+      });
+      t.textContent = content;
+      svg.appendChild(t);
+    }
+
+    // '正'자 그리기 함수 (전형적인 획순 기준)
+    function drawJeong(startX, startY, count) {
+      const size = 18;
+      const spacing = 32;
+      const strokeWidth = 1.8;
+      const color = '[shape-stroke]';
+
+      for (let i = 0; i < Math.ceil(count / 5); i++) {
+        const x = startX + i * spacing;
+        const y = startY - size / 2;
+        const strokes = Math.min(5, count - i * 5);
+
+        // 1획: 윗변 가로
+        if (strokes >= 1)
+          svg.appendChild(
+            el('line', {
+              x1: x,
+              y1: y,
+              x2: x + size,
+              y2: y,
+              stroke: color,
+              'stroke-width': strokeWidth,
+              'stroke-linecap': 'round',
+            })
+          );
+        // 2획: 가운데 세로
+        if (strokes >= 2)
+          svg.appendChild(
+            el('line', {
+              x1: x + size / 2,
+              y1: y,
+              x2: x + size / 2,
+              y2: y + size / 2,
+              stroke: color,
+              'stroke-width': strokeWidth,
+              'stroke-linecap': 'round',
+            })
+          );
+        // 3획: 가운데 가로
+        if (strokes >= 3)
+          svg.appendChild(
+            el('line', {
+              x1: x + size / 2,
+              y1: y + size / 2,
+              x2: x + size,
+              y2: y + size / 2,
+              stroke: color,
+              'stroke-width': strokeWidth,
+              'stroke-linecap': 'round',
+            })
+          );
+        // 4획: 왼쪽 세로
+        if (strokes >= 4)
+          svg.appendChild(
+            el('line', {
+              x1: x,
+              y1: y,
+              x2: x,
+              y2: y + size,
+              stroke: color,
+              'stroke-width': strokeWidth,
+              'stroke-linecap': 'round',
+            })
+          );
+        // 5획: 밑변 가로
+        if (strokes >= 5)
+          svg.appendChild(
+            el('line', {
+              x1: x,
+              y1: y + size,
+              x2: x + size,
+              y2: y + size,
+              stroke: color,
+              'stroke-width': strokeWidth,
+              'stroke-linecap': 'round',
+            })
+          );
+      }
+    }
+
+    // 3. 표 레이아웃 설정
+    const startX = 100,
+      startY = 40;
+    const colWidths = [120, 260, 100];
+    const rowHeight = 45;
+    const tableWidth = colWidths.reduce((a, b) => a + b, 0);
+
+    // 헤더 배경
+    svg.appendChild(
+      el('rect', {
+        x: startX,
+        y: startY,
+        width: tableWidth,
+        height: rowHeight,
+        fill: '[shape-fill]',
+        'fill-opacity': '0.1',
+      })
+    );
+
+    // 표 가로선
+    for (let i = 0; i <= data.length + 2; i++) {
+      const y = startY + i * rowHeight;
+      svg.appendChild(
+        el('line', {
+          x1: startX,
+          y1: y,
+          x2: startX + tableWidth,
+          y2: y,
+          stroke: '[shape-stroke]',
+          'stroke-width': '0.5',
+        })
+      );
+    }
+
+    // 표 세로선
+    let currentX = startX;
+    for (let i = 0; i <= colWidths.length; i++) {
+      svg.appendChild(
+        el('line', {
+          x1: currentX,
+          y1: startY,
+          x2: currentX,
+          y2: startY + (data.length + 2) * rowHeight,
+          stroke: '[shape-stroke]',
+          'stroke-width': '0.5',
+        })
+      );
+      if (i < colWidths.length) currentX += colWidths[i];
+    }
+
+    // 4. 내용 기입
+    const headers = ['계절', '기록 (정자 표시)', '학생 수(명)'];
+    let headerX = startX;
+    headers.forEach((h, i) => {
+      addText(headerX + colWidths[i] / 2, startY + rowHeight / 2, h);
+      headerX += colWidths[i];
+    });
+
+    data.forEach((item, i) => {
+      const rowY = startY + (i + 1) * rowHeight;
+      // 계절명
+      addText(startX + colWidths[0] / 2, rowY + rowHeight / 2, item.label);
+      // 정자 표시
+      drawJeong(startX + colWidths[0] + 30, rowY + rowHeight / 2, item.count);
+      // 도수
+      addText(startX + colWidths[0] + colWidths[1] + colWidths[2] / 2, rowY + rowHeight / 2, item.count);
+    });
+
+    // 합계 행
+    const lastRowY = startY + (data.length + 1) * rowHeight;
+    addText(startX + colWidths[0] / 2, lastRowY + rowHeight / 2, '합계');
+    addText(startX + colWidths[0] + colWidths[1] + colWidths[2] / 2, lastRowY + rowHeight / 2, total, {
+      'font-weight': '600',
+    });
+  })();
+</script>

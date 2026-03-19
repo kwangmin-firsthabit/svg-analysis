@@ -1,0 +1,117 @@
+<svg id="vis" width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 삼각기둥 ABC-DEF: 밑면 정삼각형 한 변 a=4, 높이 h=6
+// 등각투영(isometric-like) 사영
+const a = 4, h = 6;
+const sc = 40;
+
+// 2D 투영: isometric projection
+// x축: 오른쪽 아래, y축: 오른쪽 위, z축: 위
+function iso(x, y, z) {
+  // 등각 투영
+  const px = (x - y) * Math.cos(Math.PI / 6) * sc;
+  const py = -(x + y) * Math.sin(Math.PI / 6) * sc - z * sc;
+  return [340 + px, 280 + py];
+}
+
+// 정삼각형 꼭짓점 (바닥 기준)
+// A=(0,0,0), B=(a,0,0), C=(a/2, a*√3/2, 0)
+const sqr3 = Math.sqrt(3);
+const A3d = [0, 0, 0];
+const B3d = [a, 0, 0];
+const C3d = [a / 2, a * sqr3 / 2, 0];
+// 윗면: D=A+h*z, E=B+h*z, F=C+h*z
+const D3d = [0, 0, h];
+const E3d = [a, 0, h];
+const F3d = [a / 2, a * sqr3 / 2, h];
+
+const [Ax, Ay] = iso(...A3d);
+const [Bx, By] = iso(...B3d);
+const [Cx, Cy] = iso(...C3d);
+const [Dx, Dy] = iso(...D3d);
+const [Ex, Ey] = iso(...E3d);
+const [Fx, Fy] = iso(...F3d);
+
+function pt(p) { return `${Math.round(p[0])},${Math.round(p[1])}`; }
+
+// 뒤쪽 면 (은선): A-C-F-D (왼쪽 측면)
+svg.appendChild(el('polygon', {
+  points: [pt([Ax,Ay]), pt([Cx,Cy]), pt([Fx,Fy]), pt([Dx,Dy])].join(' '),
+  fill: '#E0E7FF', 'fill-opacity': '0.4', stroke: '#94A3B8', 'stroke-width': '1.2', 'stroke-dasharray': '5 3'
+}));
+
+// 밑면 ABC (아래)
+svg.appendChild(el('polygon', {
+  points: [pt([Ax,Ay]), pt([Bx,By]), pt([Cx,Cy])].join(' '),
+  fill: '#DBEAFE', 'fill-opacity': '0.5', stroke: '#2563EB', 'stroke-width': '1.8'
+}));
+
+// 앞쪽 측면 A-B-E-D (앞면)
+svg.appendChild(el('polygon', {
+  points: [pt([Ax,Ay]), pt([Bx,By]), pt([Ex,Ey]), pt([Dx,Dy])].join(' '),
+  fill: '#FEF9C3', 'fill-opacity': '0.6', stroke: '#CA8A04', 'stroke-width': '1.8'
+}));
+
+// 오른쪽 측면 B-C-F-E
+svg.appendChild(el('polygon', {
+  points: [pt([Bx,By]), pt([Cx,Cy]), pt([Fx,Fy]), pt([Ex,Ey])].join(' '),
+  fill: '#D1FAE5', 'fill-opacity': '0.5', stroke: '#16A34A', 'stroke-width': '1.8'
+}));
+
+// 윗면 DEF
+svg.appendChild(el('polygon', {
+  points: [pt([Dx,Dy]), pt([Ex,Ey]), pt([Fx,Fy])].join(' '),
+  fill: '#E0E7FF', 'fill-opacity': '0.6', stroke: '#6366F1', 'stroke-width': '1.8'
+}));
+
+// 은선: A-C
+svg.appendChild(el('line', {
+  x1: Math.round(Ax), y1: Math.round(Ay), x2: Math.round(Cx), y2: Math.round(Cy),
+  stroke: '#94A3B8', 'stroke-width': '1.2', 'stroke-dasharray': '5 3'
+}));
+// C-F 은선
+svg.appendChild(el('line', {
+  x1: Math.round(Cx), y1: Math.round(Cy), x2: Math.round(Fx), y2: Math.round(Fy),
+  stroke: '#94A3B8', 'stroke-width': '1.2', 'stroke-dasharray': '5 3'
+}));
+
+// 꼭짓점 레이블
+const labelOffset = 14;
+addText(Ax - labelOffset, Ay, 'A', { 'font-size': '14', 'font-weight': '700', fill: '#1E3A5F' });
+addText(Bx + labelOffset, By + 4, 'B', { 'font-size': '14', 'font-weight': '700', fill: '#1E3A5F' });
+addText(Cx + labelOffset, Cy, 'C', { 'font-size': '14', 'font-weight': '700', fill: '#1E3A5F' });
+addText(Dx - labelOffset, Dy, 'D', { 'font-size': '14', 'font-weight': '700', fill: '#1E3A5F' });
+addText(Ex + labelOffset, Ey, 'E', { 'font-size': '14', 'font-weight': '700', fill: '#1E3A5F' });
+addText(Fx + labelOffset, Fy, 'F', { 'font-size': '14', 'font-weight': '700', fill: '#1E3A5F' });
+
+// 변 길이 라벨: AB = 4
+const abMx = (Ax + Bx) / 2, abMy = (Ay + By) / 2;
+addText(abMx, abMy + 16, '4', { fill: '#1D4ED8', 'font-size': '13', 'font-weight': '600' });
+
+// 높이 라벨: AE = h = 6 (높이 표시선)
+const hLabelX = Math.round((Ax + Dx) / 2) - 18;
+const hLabelY = Math.round((Ay + Dy) / 2);
+svg.appendChild(el('line', {
+  x1: Math.round(Ax) - 8, y1: Math.round(Ay),
+  x2: Math.round(Dx) - 8, y2: Math.round(Dy),
+  stroke: '#DC2626', 'stroke-width': '1.2', 'stroke-dasharray': '3 2'
+}));
+addText(Math.round(Ax) - 22, (Math.round(Ay) + Math.round(Dy)) / 2, 'h=6', { fill: '#DC2626', 'font-size': '12' });
+
+addText(340, 440, '삼각기둥 ABC-DEF (밑면 한 변=4, 높이=6)', { 'font-size': '13', fill: '#1E293B', 'font-weight': '600' });
+</script>

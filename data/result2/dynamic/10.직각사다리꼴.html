@@ -1,0 +1,47 @@
+<svg id="vis" width="100%" viewBox="0 0 680 370" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const scale = 40;
+const ox = 160, oy = 300;
+
+const W_top = 3, W_bot = 6, H = 5;
+const ax = ox, ay = oy - H * scale;
+const bx = ox + W_top * scale, by = ay;
+const cx = ox + W_bot * scale, cy = oy;
+const dx = ox, dy = oy;
+
+const pts = `${Math.round(ax)},${Math.round(ay)} ${Math.round(bx)},${Math.round(by)} ${Math.round(cx)},${Math.round(cy)} ${Math.round(dx)},${Math.round(dy)}`;
+svg.appendChild(el('polygon', { points: pts, fill: '#3B82F6', 'fill-opacity': '0.12', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+
+const sq = 8;
+svg.appendChild(el('polyline', { points: `${dx},${dy - sq} ${dx + sq},${dy - sq} ${dx + sq},${dy}`, fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+
+const verts = [
+  { x: ax, y: ay, label: 'A', tx: ax - 14, ty: ay },
+  { x: bx, y: by, label: 'B', tx: bx + 14, ty: by },
+  { x: cx, y: cy, label: 'C', tx: cx + 14, ty: cy },
+  { x: dx, y: dy, label: 'D', tx: dx - 14, ty: dy },
+];
+for (const v of verts) {
+  svg.appendChild(el('circle', { cx: Math.round(v.x), cy: Math.round(v.y), r: '3.5', fill: '#1D4ED8' }));
+  addText(Math.round(v.tx), Math.round(v.ty), v.label, { 'font-size': '14', 'font-weight': '500', fill: '#1E293B', 'text-anchor': v.label === 'A' || v.label === 'D' ? 'end' : 'start' });
+}
+
+addText(Math.round((ax + bx) / 2), Math.round(ay - 14), '3');
+addText(Math.round((dx + cx) / 2), Math.round(dy + 14), '6');
+addText(Math.round(ax - 16), Math.round((ay + dy) / 2), '5');
+</script>

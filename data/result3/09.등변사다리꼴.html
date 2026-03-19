@@ -1,140 +1,98 @@
-<svg id="vis" width="100%" viewBox="0 0 680 332" xmlns="http://www.w3.org/2000/svg">
-<defs></defs>
-</svg>
+<svg id="vis" width="100%" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg"></svg>
 <script>
 const svg = document.getElementById('vis');
 const ns = 'http://www.w3.org/2000/svg';
+
 function el(tag, attrs) {
   const e = document.createElementNS(ns, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
   return e;
 }
 
-// 등변사다리꼴: 윗변 AD=4, 아랫변 BC=10, 높이=6
-// 각 옆 돌출 = (10-4)/2 = 3
-// 수학 좌표 (중심 원점): B=(-5,0), C=(5,0), D=(2,6), A=(-2,6)
-// SVG 좌표: 중앙 cx=340, 아랫변 y=312, 윗변 y=60
-// scale = 42px/unit
-
-const scale = 42;
-const cx = 340;
-const top = 60;
-
-const Ax = Math.round(cx - 2*scale), Ay = top;
-const Dx = Math.round(cx + 2*scale), Dy = top;
-const Bx = Math.round(cx - 5*scale), By = Math.round(top + 6*scale);
-const Cx = Math.round(cx + 5*scale), Cy = By;
-
-// 사다리꼴 채우기
-svg.appendChild(el('polygon', {
-  points: `${Ax},${Ay} ${Dx},${Dy} ${Cx},${Cy} ${Bx},${By}`,
-  fill: '#3B82F6',
-  'fill-opacity': '0.12',
-  stroke: '#1D4ED8',
-  'stroke-width': '1.5'
-}));
-
-// 대각선 AC, BD
-svg.appendChild(el('line', {
-  x1: Ax, y1: Ay, x2: Cx, y2: Cy,
-  stroke: '#1D4ED8',
-  'stroke-width': '1.2',
-  'stroke-dasharray': '5 3'
-}));
-svg.appendChild(el('line', {
-  x1: Bx, y1: By, x2: Dx, y2: Dy,
-  stroke: '#1D4ED8',
-  'stroke-width': '1.2',
-  'stroke-dasharray': '5 3'
-}));
-
-// 교점 O 계산
-// A + t*(C-A) = B + s*(D-B)
-// 수학 좌표: A=(-2,6), C=(5,0), B=(-5,0), D=(2,6)
-// t = 2/7
-const t = 2 / 7;
-const Ox = Math.round(Ax + t * (Cx - Ax));
-const Oy = Math.round(Ay + t * (Cy - Ay));
-
-// 교점 O 점
-svg.appendChild(el('circle', {
-  cx: Ox, cy: Oy, r: '3.5',
-  fill: '#1D4ED8'
-}));
-
-// 등변 표시 (다리 AB, CD 중점에 틱)
-function tickMark(x1, y1, x2, y2) {
-  const mx = (x1 + x2) / 2;
-  const my = (y1 + y2) / 2;
-  const len = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
-  const dx = (x2 - x1) / len;
-  const dy = (y2 - y1) / len;
-  const nx = -dy, ny = dx;
-  const tk = 6;
-  svg.appendChild(el('line', {
-    x1: Math.round(mx - nx*tk), y1: Math.round(my - ny*tk),
-    x2: Math.round(mx + nx*tk), y2: Math.round(my + ny*tk),
-    stroke: '#1D4ED8', 'stroke-width': '1.5'
-  }));
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
 }
-tickMark(Ax, Ay, Bx, By);
-tickMark(Dx, Dy, Cx, Cy);
+
+// 등변사다리꼴: 윗변 4, 아랫변 10, 비평행 변 AB=CD (등변)
+// 배율: 1단위 = 28px
+const scale = 28;
+const topLen = 4 * scale;  // 112px
+const botLen = 10 * scale; // 280px
+
+const cx = 340;
+const botY = 310, topY = 310 - 5*scale; // 높이 계산
+// 가로 차이 = (botLen - topLen)/2 = (280-112)/2 = 84
+const dx = (botLen - topLen) / 2;
+// 등변 길이: sqrt(dx^2 + h^2), h = 5*scale = 140
+const legH = 5 * scale;
+
+const A = [cx - topLen/2, topY];  // 왼위 A
+const B = [cx - botLen/2, botY];  // 왼아래 B
+const C = [cx + botLen/2, botY];  // 오른아래 C
+const D = [cx + topLen/2, topY];  // 오른위 D
+
+// 도형
+svg.appendChild(el('polygon', {
+  points: A[0]+','+A[1]+' '+D[0]+','+D[1]+' '+C[0]+','+C[1]+' '+B[0]+','+B[1],
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 꼭짓점 점
+[A, B, C, D].forEach(([x, y]) => {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3.5', fill: '#1D4ED8' }));
+});
 
 // 꼭짓점 라벨
-const off = 16;
-const vLabels = [
-  { text: 'A', x: Ax - off, y: Ay, anchor: 'middle' },
-  { text: 'D', x: Dx + off, y: Dy, anchor: 'middle' },
-  { text: 'B', x: Bx - off, y: By, anchor: 'middle' },
-  { text: 'C', x: Cx + off, y: Cy, anchor: 'middle' },
-  { text: 'O', x: Ox + 16, y: Oy, anchor: 'middle' }
-];
-for (const lb of vLabels) {
-  svg.appendChild(el('text', {
-    x: lb.x, y: lb.y,
-    'dominant-baseline': 'central',
-    'text-anchor': lb.anchor,
-    'font-size': '14px',
-    'font-weight': '500',
-    fill: '#1E293B'
-  })).textContent = lb.text;
+addText(A[0] - 16, A[1] - 14, 'A');
+addText(D[0] + 16, D[1] - 14, 'D');
+addText(B[0] - 16, B[1] + 14, 'B');
+addText(C[0] + 16, C[1] + 14, 'C');
+
+// 이선(||) 표시: 비평행 두 변 AB, CD
+function drawDoubleTick(p1, p2) {
+  const mx = (p1[0]+p2[0])/2;
+  const my = (p1[1]+p2[1])/2;
+  const dx2 = p2[0]-p1[0], dy2 = p2[1]-p1[1];
+  const len = Math.sqrt(dx2*dx2+dy2*dy2);
+  const nx = -dy2/len * 8, ny = dx2/len * 8;
+  const tx = dx2/len * 4, ty = dy2/len * 4;
+  svg.appendChild(el('line', {
+    x1: mx+nx-tx, y1: my+ny-ty, x2: mx-nx-tx, y2: my-ny-ty,
+    stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linecap': 'round'
+  }));
+  svg.appendChild(el('line', {
+    x1: mx+nx+tx, y1: my+ny+ty, x2: mx-nx+tx, y2: my-ny+ty,
+    stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linecap': 'round'
+  }));
+}
+drawDoubleTick(A, B);
+drawDoubleTick(D, C);
+
+// 밑각 B, C에 동일 크기 호 표시
+function drawArc(vx, vy, p1, p2, r) {
+  const a1 = Math.atan2(p1[1] - vy, p1[0] - vx);
+  const a2 = Math.atan2(p2[1] - vy, p2[0] - vx);
+  let start = a1, end = a2;
+  let diff = end - start;
+  if (diff < 0) diff += 2 * Math.PI;
+  if (diff > Math.PI) { const tmp = start; start = end; end = tmp; }
+  const sx = vx + r * Math.cos(start);
+  const sy = vy + r * Math.sin(start);
+  const ex = vx + r * Math.cos(end);
+  const ey = vy + r * Math.sin(end);
+  svg.appendChild(el('path', {
+    d: 'M '+sx+' '+sy+' A '+r+' '+r+' 0 0 1 '+ex+' '+ey,
+    fill: 'none', stroke: '#60A5FA', 'stroke-width': '1'
+  }));
 }
 
-// 변 길이 라벨
-// 윗변 AD=4
-svg.appendChild(el('text', {
-  x: Math.round((Ax + Dx) / 2), y: Ay - 14,
-  'dominant-baseline': 'central',
-  'text-anchor': 'middle',
-  'font-size': '12px',
-  'font-weight': '400',
-  fill: '#475569'
-})).textContent = '4';
+drawArc(B[0], B[1], C, A, 28);
+drawArc(C[0], C[1], B, D, 28);
 
-// 아랫변 BC=10
-svg.appendChild(el('text', {
-  x: Math.round((Bx + Cx) / 2), y: By + 16,
-  'dominant-baseline': 'central',
-  'text-anchor': 'middle',
-  'font-size': '12px',
-  'font-weight': '400',
-  fill: '#475569'
-})).textContent = '10';
-
-// 높이 보조선 + 라벨
-const hx = Math.round(cx + 5*scale + 30);
-svg.appendChild(el('line', {
-  x1: hx, y1: Ay, x2: hx, y2: By,
-  stroke: '#94A3B8',
-  'stroke-width': '0.8',
-  'stroke-dasharray': '4 3'
-}));
-svg.appendChild(el('text', {
-  x: hx + 14, y: Math.round((Ay + By) / 2),
-  'dominant-baseline': 'central',
-  'text-anchor': 'middle',
-  'font-size': '12px',
-  'font-weight': '400',
-  fill: '#475569'
-})).textContent = '6';
+// 윗변, 아랫변 길이 라벨
+addText((A[0]+D[0])/2, A[1] - 16, '4', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+addText((B[0]+C[0])/2, B[1] + 16, '10', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
 </script>

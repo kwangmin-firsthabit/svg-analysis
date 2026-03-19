@@ -1,0 +1,153 @@
+<svg id="vis" viewBox="0 0 680 600" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '[label-primary]',
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  // 좌표 계산 상수
+  const sideLength = 6;
+  const scale = 45; // 1단위 = 45px
+  const l = sideLength * scale; // 스케일링된 한 변 길이 270
+  const h = Math.round((l * Math.sqrt(3)) / 2); // 정삼각형 높이 233.8 -> 234
+
+  // 중앙 배치 고려 좌표 설정
+  const centerY = 100;
+  const cx = 340,
+    cy = centerY; // C (340, 100)
+  const ax = cx - l / 2,
+    ay = centerY + h; // A (205, 334)
+  const bx = cx + l / 2,
+    by = centerY + h; // B (475, 334)
+  const dx = cx,
+    dy = centerY + 2 * h; // D (340, 568)
+  const ex = cx - l,
+    ey = centerY; // E (70, 100)
+  const fx = cx + l,
+    fy = centerY; // F (610, 100)
+
+  // 1. 전개도 외곽선 (polygon)
+  // E-C-F-B-D-A 순서로 연결
+  const exVal = 70,
+    eyVal = 100,
+    cxVal = 340,
+    cyVal = 100,
+    fxVal = 610,
+    fyVal = 100,
+    bxVal = 475,
+    byVal = 334,
+    dxVal = 340,
+    dyVal = 568,
+    axVal = 205,
+    ayVal = 334;
+  svg.appendChild(
+    el('polygon', {
+      points:
+        exVal +
+        ',' +
+        eyVal +
+        ' ' +
+        cxVal +
+        ',' +
+        cyVal +
+        ' ' +
+        fxVal +
+        ',' +
+        fyVal +
+        ' ' +
+        bxVal +
+        ',' +
+        byVal +
+        ' ' +
+        dxVal +
+        ',' +
+        dyVal +
+        ' ' +
+        axVal +
+        ',' +
+        ayVal,
+      fill: '[shape-fill]',
+      'fill-opacity': '0.15',
+      stroke: '[shape-stroke]',
+      'stroke-width': '1.5',
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // 2. 접히는 선 (보조선, dashed)
+  // 중앙 삼각형의 세 변 AC, BC, AB
+  svg.appendChild(
+    el('line', {
+      x1: axVal,
+      y1: ayVal,
+      x2: cxVal,
+      y2: cyVal,
+      stroke: '[auxiliary-line]',
+      'stroke-width': '0.8',
+      'stroke-dasharray': '4 3',
+    })
+  );
+  svg.appendChild(
+    el('line', {
+      x1: bxVal,
+      y1: byVal,
+      x2: cxVal,
+      y2: cyVal,
+      stroke: '[auxiliary-line]',
+      'stroke-width': '0.8',
+      'stroke-dasharray': '4 3',
+    })
+  );
+  svg.appendChild(
+    el('line', {
+      x1: axVal,
+      y1: ayVal,
+      x2: bxVal,
+      y2: byVal,
+      stroke: '[auxiliary-line]',
+      'stroke-width': '0.8',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  // 3. 꼭짓점 라벨 (text)
+  // weight 500, size 14px, color [label-primary]
+  svg.appendChild(text(cxVal, eyVal - 10, 'C', { 'dominant-baseline': 'central', 'text-anchor': 'middle' }));
+  svg.appendChild(text(exVal - 10, eyVal, 'E', { 'dominant-baseline': 'central', 'text-anchor': 'end' }));
+  svg.appendChild(text(fxVal + 10, fyVal, 'F', { 'dominant-baseline': 'central', 'text-anchor': 'start' }));
+  svg.appendChild(text(axVal - 10, ayVal, 'A', { 'dominant-baseline': 'central', 'text-anchor': 'end' }));
+  svg.appendChild(text(bxVal + 10, byVal, 'B', { 'dominant-baseline': 'central', 'text-anchor': 'start' }));
+  svg.appendChild(text(dxVal, dyVal + 15, 'D', { 'dominant-baseline': 'central', 'text-anchor': 'middle' }));
+
+  // 4. 변 길이 라벨 (text)
+  // '6', size 12px, weight 400, color [label-secondary]
+  // 중앙 삼각형 변 AB 아래 배치
+  svg.appendChild(
+    text(cxVal, ayVal + 15, '6', {
+      'font-size': '12',
+      'font-weight': '400',
+      fill: '[label-secondary]',
+      'dominant-baseline': 'central',
+      'text-anchor': 'middle',
+    })
+  );
+</script>

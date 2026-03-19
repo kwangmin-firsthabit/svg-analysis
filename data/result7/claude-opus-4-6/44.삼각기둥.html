@@ -1,0 +1,127 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 삼각기둥 ABC-DEF
+// 밑면: 한 변 a=4인 정삼각형, 높이 h=6
+const a = 4, h = 6;
+const sc = 42;
+
+// oblique projection: (x,y,z) -> (px, py)
+// x: 오른쪽, z: 위, y: 깊이(왼쪽 위로 비스듬히)
+const angle = Math.PI / 6;
+const depthScale = 0.5;
+function proj(x, y, z) {
+  const px = x * sc + y * sc * depthScale * Math.cos(angle);
+  const py = -z * sc - y * sc * depthScale * Math.sin(angle);
+  return [340 + px - 80, 380 + py];
+}
+
+// 정삼각형 밑면 꼭짓점 (xz 평면 기준, y=0이 앞면)
+// B: 앞 왼쪽, C: 앞 오른쪽, A: 뒤쪽 중앙
+const sqr3 = Math.sqrt(3);
+const triH = a * sqr3 / 2;
+
+// 밑면 삼각형을 중심 기준으로 배치
+const cx = 0, cy = 0;
+const B3 = [-a / 2, 0, 0];
+const C3 = [a / 2, 0, 0];
+const A3 = [0, triH, 0];
+
+// 윗면: z = h
+const E3 = [-a / 2, 0, h];
+const F3 = [a / 2, 0, h];
+const D3 = [0, triH, h];
+
+const [Ax, Ay] = proj(...A3);
+const [Bx, By] = proj(...B3);
+const [Cx, Cy] = proj(...C3);
+const [Dx, Dy] = proj(...D3);
+const [Ex, Ey] = proj(...E3);
+const [Fx, Fy] = proj(...F3);
+
+// 은선(hidden edges): A-B, A-C, A-D (뒤쪽 모서리)
+svg.appendChild(el('line', {
+  x1: Ax, y1: Ay, x2: Bx, y2: By,
+  stroke: '#94A3B8', 'stroke-width': '1.2', 'stroke-dasharray': '6 4'
+}));
+svg.appendChild(el('line', {
+  x1: Ax, y1: Ay, x2: Cx, y2: Cy,
+  stroke: '#94A3B8', 'stroke-width': '1.2', 'stroke-dasharray': '6 4'
+}));
+svg.appendChild(el('line', {
+  x1: Ax, y1: Ay, x2: Dx, y2: Dy,
+  stroke: '#94A3B8', 'stroke-width': '1.2', 'stroke-dasharray': '6 4'
+}));
+
+// 앞면 (사각형 B-C-F-E)
+svg.appendChild(el('polygon', {
+  points: `${Bx},${By} ${Cx},${Cy} ${Fx},${Fy} ${Ex},${Ey}`,
+  fill: '#DBEAFE', 'fill-opacity': '0.5', stroke: '#2563EB', 'stroke-width': '1.8'
+}));
+
+// 오른쪽 측면 (C-A-D-F) — A,D는 뒤쪽이므로 반투명
+svg.appendChild(el('polygon', {
+  points: `${Cx},${Cy} ${Ax},${Ay} ${Dx},${Dy} ${Fx},${Fy}`,
+  fill: '#D1FAE5', 'fill-opacity': '0.35', stroke: 'none'
+}));
+
+// 왼쪽 측면 (B-A-D-E) — 반투명
+svg.appendChild(el('polygon', {
+  points: `${Bx},${By} ${Ax},${Ay} ${Dx},${Dy} ${Ex},${Ey}`,
+  fill: '#FEF3C7', 'fill-opacity': '0.3', stroke: 'none'
+}));
+
+// 윗면 (삼각형 D-E-F)
+svg.appendChild(el('polygon', {
+  points: `${Dx},${Dy} ${Ex},${Ey} ${Fx},${Fy}`,
+  fill: '#EDE9FE', 'fill-opacity': '0.7', stroke: '#6366F1', 'stroke-width': '1.8'
+}));
+
+// 보이는 모서리 실선: B-E, C-F, D-E, D-F, B-C, E-F
+const visibleEdges = [[Bx,By,Ex,Ey],[Cx,Cy,Fx,Fy],[Dx,Dy,Ex,Ey],[Dx,Dy,Fx,Fy],[Bx,By,Cx,Cy],[Ex,Ey,Fx,Fy]];
+for (const [x1,y1,x2,y2] of visibleEdges) {
+  svg.appendChild(el('line', { x1, y1, x2, y2, stroke: '#334155', 'stroke-width': '1.8' }));
+}
+
+// 꼭짓점 점
+const verts = [[Ax,Ay],[Bx,By],[Cx,Cy],[Dx,Dy],[Ex,Ey],[Fx,Fy]];
+for (const [vx, vy] of verts) {
+  svg.appendChild(el('circle', { cx: vx, cy: vy, r: '2.5', fill: '#1E293B' }));
+}
+
+// 꼭짓점 레이블
+addText(Ax + 12, Ay + 12, 'A', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(Bx - 14, By + 6, 'B', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(Cx + 14, Cy + 6, 'C', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(Dx + 12, Dy - 10, 'D', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(Ex - 14, Ey - 6, 'E', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(Fx + 14, Fy - 6, 'F', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+
+// 밑변 길이 라벨 (BC = 4)
+addText((Bx + Cx) / 2, By + 20, '4', { 'font-size': '12', 'font-weight': '400', fill: '#2563EB' });
+
+// 높이 라벨 (BE = 6)
+// 높이 표시 보조선
+const hx = Bx - 14;
+svg.appendChild(el('line', {
+  x1: hx, y1: By, x2: hx, y2: Ey,
+  stroke: '#DC2626', 'stroke-width': '1', 'stroke-dasharray': '3 2'
+}));
+svg.appendChild(el('line', { x1: hx - 4, y1: By, x2: hx + 4, y2: By, stroke: '#DC2626', 'stroke-width': '1' }));
+svg.appendChild(el('line', { x1: hx - 4, y1: Ey, x2: hx + 4, y2: Ey, stroke: '#DC2626', 'stroke-width': '1' }));
+addText(hx - 14, (By + Ey) / 2, '6', { 'font-size': '12', 'font-weight': '400', fill: '#DC2626' });
+</script>

@@ -1,86 +1,91 @@
-<div style="font-family: sans-serif; padding: 16px;">
-  <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-    <div>
-      <p style="text-align: center; font-size: 14px; font-weight: 500; margin-bottom: 8px;">2022년</p>
-      <div style="position: relative; width: 260px; height: 260px;">
-        <canvas id="chart1"></canvas>
-      </div>
-    </div>
-    <div>
-      <p style="text-align: center; font-size: 14px; font-weight: 500; margin-bottom: 8px;">2023년</p>
-      <div style="position: relative; width: 260px; height: 260px;">
-        <canvas id="chart2"></canvas>
-      </div>
-    </div>
-  </div>
-  <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-top: 16px;">
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <div style="width: 14px; height: 14px; background: #3B82F6; border-radius: 2px;"></div>
-      <span style="font-size: 13px;">식비</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <div style="width: 14px; height: 14px; background: #10B981; border-radius: 2px;"></div>
-      <span style="font-size: 13px;">주거</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <div style="width: 14px; height: 14px; background: #F59E0B; border-radius: 2px;"></div>
-      <span style="font-size: 13px;">교육</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <div style="width: 14px; height: 14px; background: #EF4444; border-radius: 2px;"></div>
-      <span style="font-size: 13px;">교통</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <div style="width: 14px; height: 14px; background: #8B5CF6; border-radius: 2px;"></div>
-      <span style="font-size: 13px;">기타</span>
-    </div>
-  </div>
+<div style="position: relative; width: 100%; height: 420px;">
+  <canvas id="pieChart"></canvas>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-  var colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6'];
-  var labels = ['식비', '주거', '교육', '교통', '기타'];
+const categories = ['식비', '주거', '교육', '교통', '기타'];
+const percents = [32, 28, 18, 12, 10];
+const colors = ['#1D4ED8', '#93C5FD', '#FCD34D', '#6EE7B7', '#CBD5E1'];
+const borderColors = ['#1E40AF', '#3B82F6', '#F59E0B', '#10B981', '#94A3B8'];
 
-  var commonOptions = {
+const datalabelPlugin = {
+  id: 'pieDatalabels',
+  afterDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    const meta = chart.getDatasetMeta(0);
+    const cx = chart.chartArea.left + (chart.chartArea.right - chart.chartArea.left) / 2;
+    const cy = chart.chartArea.top + (chart.chartArea.bottom - chart.chartArea.top) / 2;
+    const outerR = meta.data[0] ? meta.data[0].outerRadius : 150;
+
+    meta.data.forEach((arc, i) => {
+      const midAngle = (arc.startAngle + arc.endAngle) / 2;
+      const labelR = outerR * 0.65;
+      const lx = cx + labelR * Math.cos(midAngle);
+      const ly = cy + labelR * Math.sin(midAngle);
+
+      ctx.save();
+      ctx.font = '500 13px sans-serif';
+      ctx.fillStyle = i === 0 ? '#fff' : '#1E293B';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(percents[i] + '%', lx, ly);
+      ctx.restore();
+
+      const lineR = outerR + 10;
+      const tipR = outerR + 30;
+      const lx1 = cx + lineR * Math.cos(midAngle);
+      const ly1 = cy + lineR * Math.sin(midAngle);
+      const lx2 = cx + tipR * Math.cos(midAngle);
+      const ly2 = cy + tipR * Math.sin(midAngle);
+      const textX = lx2 + (Math.cos(midAngle) > 0 ? 6 : -6);
+      const anchor = Math.cos(midAngle) > 0 ? 'left' : 'right';
+
+      ctx.save();
+      ctx.strokeStyle = borderColors[i];
+      ctx.lineWidth = 0.8;
+      ctx.setLineDash([3, 2]);
+      ctx.beginPath();
+      ctx.moveTo(lx1, ly1);
+      ctx.lineTo(lx2, ly2);
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.font = '500 12px sans-serif';
+      ctx.fillStyle = borderColors[i];
+      ctx.textAlign = anchor;
+      ctx.textBaseline = 'middle';
+      ctx.fillText(categories[i], textX, ly2);
+      ctx.restore();
+    });
+  }
+};
+
+new Chart(document.getElementById('pieChart'), {
+  type: 'pie',
+  data: {
+    labels: categories,
+    datasets: [{
+      data: percents,
+      backgroundColor: colors,
+      borderColor: borderColors,
+      borderWidth: 1.5,
+      hoverOffset: 8
+    }]
+  },
+  options: {
     responsive: true,
     maintainAspectRatio: false,
+    layout: { padding: 60 },
     plugins: {
       legend: { display: false },
       tooltip: {
         callbacks: {
-          label: function(ctx) {
-            return ctx.label + ': ' + ctx.parsed.toFixed(0) + '%';
-          }
+          label: ctx => ctx.label + ': ' + ctx.parsed + '%'
         }
       }
     }
-  };
-
-  new Chart(document.getElementById('chart1'), {
-    type: 'pie',
-    data: {
-      labels: labels,
-      datasets: [{
-        data: [32, 28, 18, 12, 10],
-        backgroundColor: colors,
-        borderColor: '#ffffff',
-        borderWidth: 2
-      }]
-    },
-    options: commonOptions
-  });
-
-  new Chart(document.getElementById('chart2'), {
-    type: 'pie',
-    data: {
-      labels: labels,
-      datasets: [{
-        data: [28, 30, 20, 10, 12],
-        backgroundColor: colors,
-        borderColor: '#ffffff',
-        borderWidth: 2
-      }]
-    },
-    options: commonOptions
-  });
+  },
+  plugins: [datalabelPlugin]
+});
 </script>

@@ -1,0 +1,109 @@
+<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+svg.appendChild(el('rect', { width: '680', height: '520', fill: '#F8FAFC' }));
+addText(340, 40, '정팔면체 (한 변의 길이: 6)', { 'font-size': '18', 'font-weight': '600', fill: '#1E293B' });
+
+const side = 6;
+const scale = 140;
+const cx = 340;
+const cy = 255;
+
+function iso(x, y, z) {
+  return {
+    px: Math.round(cx + (x - z) * Math.cos(Math.PI / 6) * scale),
+    py: Math.round(cy - y * scale + (x + z) * Math.sin(Math.PI / 6) * scale)
+  };
+}
+
+const a = side / Math.sqrt(2);
+
+const T = iso(0, a, 0);
+const B = iso(0, -a, 0);
+const F = iso(0, 0, a);
+const Bk = iso(0, 0, -a);
+const L = iso(-a, 0, 0);
+const R = iso(a, 0, 0);
+
+const verts = { T, B, F, Bk, L, R };
+
+function face(pts, opacity) {
+  const points = pts.map(p => `${p.px},${p.py}`).join(' ');
+  return el('polygon', {
+    points,
+    fill: '#3B82F6', 'fill-opacity': String(opacity),
+    stroke: '#1D4ED8', 'stroke-width': '1.5'
+  });
+}
+
+function hiddenLine(a, b) {
+  svg.appendChild(el('line', {
+    x1: a.px, y1: a.py, x2: b.px, y2: b.py,
+    stroke: '#94A3B8', 'stroke-width': '1.5', 'stroke-dasharray': '5 4'
+  }));
+}
+
+hiddenLine(T, Bk);
+hiddenLine(B, Bk);
+hiddenLine(L, Bk);
+hiddenLine(R, Bk);
+
+svg.appendChild(face([T, R, F], 0.15));
+svg.appendChild(face([T, F, L], 0.12));
+svg.appendChild(face([B, F, R], 0.10));
+svg.appendChild(face([B, L, F], 0.08));
+
+function edge(a, b) {
+  svg.appendChild(el('line', {
+    x1: a.px, y1: a.py, x2: b.px, y2: b.py,
+    stroke: '#1D4ED8', 'stroke-width': '1.5'
+  }));
+}
+
+edge(T, R); edge(T, L); edge(T, F);
+edge(B, R); edge(B, L); edge(B, F);
+edge(L, F); edge(R, F);
+
+Object.values(verts).forEach(v => {
+  svg.appendChild(el('circle', { cx: v.px, cy: v.py, r: '4', fill: '#1D4ED8' }));
+});
+
+function midLabel(a, b, text, dx = 0, dy = -10) {
+  addText(
+    Math.round((a.px + b.px) / 2) + dx,
+    Math.round((a.py + b.py) / 2) + dy,
+    text, { 'font-size': '13', fill: '#475569' }
+  );
+}
+
+midLabel(T, R, `${side}`, 12, 0);
+midLabel(T, F, `${side}`, -12, 0);
+midLabel(T, L, `${side}`, -12, 0);
+midLabel(B, R, `${side}`, 12, 0);
+midLabel(B, F, `${side}`, 0, 10);
+midLabel(B, L, `${side}`, -12, 0);
+
+addText(T.px + 10, T.py - 8, '꼭대기', { 'font-size': '12', 'text-anchor': 'start', fill: '#1E293B', 'font-weight': '500' });
+addText(B.px + 10, B.py + 8, '아래', { 'font-size': '12', 'text-anchor': 'start', fill: '#1E293B', 'font-weight': '500' });
+addText(F.px + 10, F.py, '앞', { 'font-size': '12', 'text-anchor': 'start', fill: '#1E293B', 'font-weight': '500' });
+addText(L.px - 8, L.py, '왼쪽', { 'font-size': '12', 'text-anchor': 'end', fill: '#1E293B', 'font-weight': '500' });
+addText(R.px + 8, R.py, '오른쪽', { 'font-size': '12', 'text-anchor': 'start', fill: '#1E293B', 'font-weight': '500' });
+
+const sa = (2 * Math.sqrt(3) * side * side).toFixed(1);
+addText(340, 455, '꼭짓점 6개, 모서리 12개, 면 8개 (정삼각형)', { 'font-size': '13', fill: '#475569' });
+addText(340, 478, `겉넓이: 2√3 × ${side}² ≈ ${sa}`, { 'font-size': '13', fill: '#475569' });
+</script>

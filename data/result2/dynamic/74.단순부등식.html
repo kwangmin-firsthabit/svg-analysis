@@ -1,0 +1,61 @@
+<svg id="vis" width="100%" viewBox="0 0 680 240" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L8,3 z" fill="#475569"/>
+  </marker>
+  <marker id="arrowL" markerWidth="8" markerHeight="8" refX="2" refY="3" orient="auto">
+    <path d="M8,0 L8,6 L0,3 z" fill="#475569"/>
+  </marker>
+</defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+svg.appendChild(el('rect', { width: '680', height: '240', fill: '#F8FAFC' }));
+addText(340, 40, '단순 부등식: x > 2', { 'font-size': '18', 'font-weight': '600', fill: '#1E293B' });
+
+const originX = 340;
+const axisY = 120;
+const unit = 80;
+const minX = -3;
+const maxX = 5;
+
+const axisStart = Math.round(originX + minX * unit);
+const axisEnd = Math.round(originX + maxX * unit);
+
+svg.appendChild(el('line', {
+  x1: axisStart, y1: axisY, x2: axisEnd, y2: axisY,
+  stroke: '#475569', 'stroke-width': '1.5',
+  'marker-start': 'url(#arrowL)', 'marker-end': 'url(#arrow)'
+}));
+
+for (let n = -3; n <= 5; n++) {
+  const px = Math.round(originX + n * unit);
+  svg.appendChild(el('line', { x1: px, y1: axisY - 8, x2: px, y2: axisY + 8, stroke: '#475569', 'stroke-width': '1.5' }));
+  addText(px, axisY + 22, String(n), { 'font-size': '13', fill: '#475569' });
+}
+
+const boundVal = 2;
+const boundPx = Math.round(originX + boundVal * unit);
+
+svg.appendChild(el('line', {
+  x1: boundPx, y1: axisY, x2: axisEnd - 10, y2: axisY,
+  stroke: '#1D4ED8', 'stroke-width': '3'
+}));
+
+svg.appendChild(el('circle', { cx: boundPx, cy: axisY, r: '6', fill: 'white', stroke: '#1D4ED8', 'stroke-width': '2.5' }));
+
+addText(340, 190, 'x > 2의 해: 2에서 열린 점(빈 원), 오른쪽으로 무한히 연장', { 'font-size': '13', fill: '#475569' });
+addText(340, 213, '수직선 위에 x > 2인 범위를 파란색으로 표시', { 'font-size': '13', fill: '#475569' });
+</script>

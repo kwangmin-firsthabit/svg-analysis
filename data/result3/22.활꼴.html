@@ -1,0 +1,119 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 활꼴: 반지름 r=8, 현의 길이 AB=8
+// 실제 조건 확인: r=8, 현=8이면 이등변삼각형 OAB (OA=OB=8, AB=8) → 정삼각형
+// 중심각 = 60°
+// 시각적: r = 170px
+
+const cx = 340, cy = 260, r = 170;
+const centralAngle = 60; // 도
+
+// 현 AB가 수평이 되도록: A 왼쪽, B 오른쪽
+// 중심 O는 현 아래
+// 호는 현 위쪽에 그려짐
+const halfAngle = centralAngle / 2 * Math.PI / 180;
+
+// A: 왼쪽 위, B: 오른쪽 위 (중심각 60°)
+const angA = -Math.PI / 2 - halfAngle; // = -120° from right = 210°
+const angB = -Math.PI / 2 + halfAngle; // = -60° from right = -60°
+
+// 실제로 현이 위에, 호가 위에 오도록 배치
+// O 아래에 현 AB가 있고 호는 위쪽으로 휘어지도록
+const Ax = cx - r * Math.sin(halfAngle);
+const Ay = cy - r * Math.cos(halfAngle);
+const Bx = cx + r * Math.sin(halfAngle);
+const By = cy - r * Math.cos(halfAngle);
+
+// Ax = cx - r*sin(30°) = cx - r*0.5 = cx - 85
+// Ay = cy - r*cos(30°) = cy - r*√3/2 ≈ cy - 147
+
+// 활꼴 (호 + 현으로 둘러싸인 영역)
+// 호: A에서 B까지 위쪽 (small arc, sweep=1)
+svg.appendChild(el('path', {
+  d: `M ${Ax.toFixed(1)} ${Ay.toFixed(1)} A ${r} ${r} 0 0 1 ${Bx.toFixed(1)} ${By.toFixed(1)} Z`,
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 부채꼴의 나머지 부분 (참고용 점선 - 현 아래)
+svg.appendChild(el('path', {
+  d: `M ${Ax.toFixed(1)} ${Ay.toFixed(1)} A ${r} ${r} 0 1 0 ${Bx.toFixed(1)} ${By.toFixed(1)}`,
+  fill: 'none',
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '5 4'
+}));
+
+// 중심 O
+svg.appendChild(el('circle', { cx, cy, r: '3.5', fill: '#94A3B8' }));
+addText(cx, cy + 20, 'O', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' });
+
+// OA, OB 점선
+svg.appendChild(el('line', {
+  x1: cx, y1: cy, x2: Ax.toFixed(1), y2: Ay.toFixed(1),
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+svg.appendChild(el('line', {
+  x1: cx, y1: cy, x2: Bx.toFixed(1), y2: By.toFixed(1),
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+
+// 점 A, B
+svg.appendChild(el('circle', { cx: Ax.toFixed(1), cy: Ay.toFixed(1), r: '3.5', fill: '#1D4ED8' }));
+svg.appendChild(el('circle', { cx: Bx.toFixed(1), cy: By.toFixed(1), r: '3.5', fill: '#1D4ED8' }));
+
+// A, B 라벨
+addText((Ax - 18).toFixed(1), (Ay).toFixed(1), 'A');
+addText((Bx + 18).toFixed(1), (By).toFixed(1), 'B');
+
+// 현 AB 라벨
+const midAB_x = (Ax + Bx) / 2, midAB_y = (Ay + By) / 2;
+addText(midAB_x, midAB_y + 20, 'AB = 8', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 수선 (O에서 AB까지): 현 이등분
+const midABx = (Ax + Bx) / 2;
+const midABy = (Ay + By) / 2;
+
+svg.appendChild(el('line', {
+  x1: cx, y1: cy, x2: midABx.toFixed(1), y2: midABy.toFixed(1),
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '5 4'
+}));
+
+// 수선 발 점
+svg.appendChild(el('circle', { cx: midABx.toFixed(1), cy: midABy.toFixed(1), r: '2.5', fill: '#94A3B8' }));
+
+// 수선 중점 M 라벨
+addText(midABx + 18, midABy, 'M', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' });
+
+// 직각 표시 (수선과 현이 만나는 점)
+const s = 10;
+svg.appendChild(el('path', {
+  d: `M ${(midABx - s).toFixed(1)},${midABy.toFixed(1)} L ${(midABx - s).toFixed(1)},${(midABy - s).toFixed(1)} L ${midABx.toFixed(1)},${(midABy - s).toFixed(1)}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.8'
+}));
+
+// AM = MB = 4 라벨
+addText((Ax + midABx) / 2, midABy - 16, '4', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
+addText((Bx + midABx) / 2, midABy - 16, '4', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
+
+// 반지름 라벨 (OA)
+const midOA_x = (cx + Ax) / 2, midOA_y = (cy + Ay) / 2;
+addText((midOA_x - 24).toFixed(1), midOA_y.toFixed(1), 'r = 8', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
+
+// 안내 텍스트
+addText(340, 410, '활꼴: 반지름 8, 현 AB = 8 (중심각 60°)', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

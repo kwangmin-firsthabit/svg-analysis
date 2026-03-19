@@ -1,108 +1,140 @@
-<div style="font-family: sans-serif; padding: 16px;">
-  <div style="text-align: center; font-size: 13px; font-weight: 600; margin-bottom: 4px;">공부 시간과 시험 점수의 관계 (r ≈ 0.98)</div>
-  <div style="display: flex; gap: 16px; justify-content: center; align-items: center; margin-bottom: 12px;">
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <div style="width: 14px; height: 14px; background: #3B82F6; border-radius: 50%;"></div>
-      <span style="font-size: 13px;">관측값</span>
-    </div>
-    <div style="display: flex; align-items: center; gap: 6px;">
-      <div style="width: 24px; height: 3px; background: #EF4444;"></div>
-      <span style="font-size: 13px;">회귀 직선 (y = 6.13x + 45.65)</span>
-    </div>
-  </div>
-  <div style="position: relative; width: 100%; height: 320px;">
-    <canvas id="chart"></canvas>
-  </div>
+<div style="position: relative; width: 100%; height: 420px;">
+  <canvas id="regrChart"></canvas>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-  var scatterData = [
-    {x: 1, y: 45}, {x: 2, y: 52}, {x: 2, y: 58}, {x: 3, y: 61}, {x: 3, y: 70},
-    {x: 4, y: 72}, {x: 4, y: 78}, {x: 5, y: 80}, {x: 5, y: 85}, {x: 6, y: 88},
-    {x: 7, y: 91}, {x: 8, y: 95}, {x: 8, y: 88}, {x: 6, y: 75}, {x: 7, y: 82}
-  ];
+const students = [
+  {x:150,y:45},{x:155,y:50},{x:158,y:52},{x:160,y:55},{x:162,y:58},
+  {x:163,y:60},{x:165,y:62},{x:167,y:65},{x:168,y:68},{x:170,y:70},
+  {x:172,y:72},{x:175,y:76},{x:178,y:80},{x:180,y:83},{x:183,y:88}
+];
 
-  var a = 6.13;
-  var b = 45.65;
-  var regressionLine = [
-    {x: 0, y: parseFloat((a * 0 + b).toFixed(2))},
-    {x: 9, y: parseFloat((a * 9 + b).toFixed(2))}
-  ];
+const n = students.length;
+const sumX = students.reduce((s, d) => s + d.x, 0);
+const sumY = students.reduce((s, d) => s + d.y, 0);
+const sumXY = students.reduce((s, d) => s + d.x * d.y, 0);
+const sumX2 = students.reduce((s, d) => s + d.x * d.x, 0);
+const a = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+const b = (sumY - a * sumX) / n;
 
-  new Chart(document.getElementById('chart'), {
-    data: {
-      datasets: [
-        {
-          type: 'scatter',
-          label: '관측값',
-          data: scatterData,
-          backgroundColor: '#3B82F6',
-          borderColor: '#3B82F6',
-          pointRadius: 6,
-          pointHoverRadius: 8,
-          order: 1
-        },
-        {
-          type: 'line',
-          label: '회귀 직선',
-          data: regressionLine,
-          borderColor: '#EF4444',
-          backgroundColor: 'transparent',
-          borderWidth: 2,
-          pointRadius: 0,
-          tension: 0,
-          fill: false,
-          order: 0
-        }
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: function(ctx) {
-              if (ctx.dataset.type === 'scatter') {
-                return '공부 시간: ' + ctx.parsed.x + '시간, 점수: ' + Math.round(ctx.parsed.y) + '점';
-              }
-              return '회귀 직선: y = 6.13x + 45.65';
-            }
+const xMin = 148, xMax = 185;
+const regrLine = [
+  { x: xMin, y: a * xMin + b },
+  { x: xMax, y: a * xMax + b }
+];
+
+const eqLabel = 'y = ' + a.toFixed(2) + 'x + (' + b.toFixed(1) + ')';
+
+const annotPlugin = {
+  id: 'annotPlugin',
+  afterDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    const xScale = chart.scales.x;
+    const yScale = chart.scales.y;
+
+    const extremes = [
+      { d: students[0], label: '(' + students[0].x + ', ' + students[0].y + ')' },
+      { d: students[students.length - 1], label: '(' + students[students.length - 1].x + ', ' + students[students.length - 1].y + ')' }
+    ];
+
+    extremes.forEach((e, i) => {
+      const px = xScale.getPixelForValue(e.d.x);
+      const py = yScale.getPixelForValue(e.d.y);
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(px, py, 8, 0, Math.PI * 2);
+      ctx.fillStyle = '#1D4ED8';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.font = '500 12px sans-serif';
+      ctx.fillStyle = '#1E293B';
+      ctx.textAlign = i === 0 ? 'left' : 'right';
+      ctx.textBaseline = 'middle';
+      const offX = i === 0 ? 12 : -12;
+      ctx.fillText(e.label, px + offX, py - 10);
+      ctx.restore();
+    });
+
+    ctx.save();
+    ctx.font = '500 12px sans-serif';
+    ctx.fillStyle = '#F59E0B';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText(eqLabel, chart.chartArea.left + 10, chart.chartArea.top + 10);
+    ctx.restore();
+  }
+};
+
+new Chart(document.getElementById('regrChart'), {
+  type: 'scatter',
+  data: {
+    datasets: [
+      {
+        label: '학생 키·몸무게',
+        data: students,
+        backgroundColor: '#93C5FD',
+        borderColor: '#3B82F6',
+        borderWidth: 1.5,
+        pointRadius: 5,
+        pointHoverRadius: 7
+      },
+      {
+        label: '회귀직선',
+        data: regrLine,
+        type: 'line',
+        borderColor: '#F59E0B',
+        borderWidth: 2,
+        borderDash: [],
+        pointRadius: 0,
+        fill: false,
+        tension: 0
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => {
+            if (ctx.datasetIndex === 1) return null;
+            return '키 ' + ctx.parsed.x + 'cm, 몸무게 ' + ctx.parsed.y + 'kg';
           }
         }
-      },
-      scales: {
-        x: {
-          type: 'linear',
-          min: 0,
-          max: 9,
-          title: {
-            display: true,
-            text: '공부 시간(시간)',
-            font: { size: 12 }
-          },
-          ticks: {
-            stepSize: 1,
-            callback: function(value) { return Math.round(value) + '시간'; }
-          },
-          grid: { color: '#e5e7eb' }
+      }
+    },
+    scales: {
+      x: {
+        min: 147,
+        max: 186,
+        title: { display: true, text: '키 (cm)', font: { size: 12 }, color: '#475569' },
+        ticks: {
+          stepSize: 5,
+          font: { size: 11 },
+          color: '#475569'
         },
-        y: {
-          min: 30,
-          max: 105,
-          title: {
-            display: true,
-            text: '시험 점수',
-            font: { size: 12 }
-          },
-          ticks: {
-            stepSize: 10,
-            callback: function(value) { return Math.round(value) + '점'; }
-          },
-          grid: { color: '#e5e7eb' }
-        }
+        grid: { color: '#E2E8F0' }
+      },
+      y: {
+        min: 38,
+        max: 96,
+        title: { display: true, text: '몸무게 (kg)', font: { size: 12 }, color: '#475569' },
+        ticks: {
+          stepSize: 10,
+          font: { size: 11 },
+          color: '#475569'
+        },
+        grid: { color: '#E2E8F0' }
       }
     }
-  });
+  },
+  plugins: [annotPlugin]
+});
 </script>

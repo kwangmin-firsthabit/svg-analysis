@@ -1,0 +1,109 @@
+<svg id="vis" width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 정팔각형: 반지름 10 (시각적으로 r=160px)
+const cx = 340, cy = 225, r = 160;
+const n = 8;
+
+// 꼭짓점 계산 (위쪽 꼭짓점 기준)
+const verts = [];
+for (let i = 0; i < n; i++) {
+  const angle = (2 * Math.PI * i / n) - Math.PI / 2;
+  verts.push({
+    x: cx + r * Math.cos(angle),
+    y: cy + r * Math.sin(angle)
+  });
+}
+
+// 외접원 (점선)
+svg.appendChild(el('circle', {
+  cx, cy, r,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+
+// 도형
+const pts_str = verts.map(v => v.x.toFixed(1) + ',' + v.y.toFixed(1)).join(' ');
+svg.appendChild(el('polygon', {
+  points: pts_str,
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 변 중점에 단선(|) 표시
+for (let i = 0; i < n; i++) {
+  const v1 = verts[i], v2 = verts[(i + 1) % n];
+  const mx = (v1.x + v2.x) / 2, my = (v1.y + v2.y) / 2;
+  const dx = v2.x - v1.x, dy = v2.y - v1.y;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  const nx = -dy / len * 7, ny = dx / len * 7;
+  svg.appendChild(el('line', {
+    x1: (mx + nx).toFixed(1), y1: (my + ny).toFixed(1),
+    x2: (mx - nx).toFixed(1), y2: (my - ny).toFixed(1),
+    stroke: '#1D4ED8', 'stroke-width': '1.5'
+  }));
+}
+
+// 꼭짓점 점
+verts.forEach(v => {
+  svg.appendChild(el('circle', { cx: v.x.toFixed(1), cy: v.y.toFixed(1), r: '3.5', fill: '#1D4ED8' }));
+});
+
+// 꼭짓점 번호 (선택적, 라벨 생략하고 꼭짓점만 표시)
+// 첫 꼭짓점(위)에 내각 135° 표시
+const A = verts[0];
+const prev = verts[n - 1], next = verts[1];
+const arcR = 30;
+
+const ang1 = Math.atan2(prev.y - A.y, prev.x - A.x);
+const ang2 = Math.atan2(next.y - A.y, next.x - A.x);
+
+// 내각이 135° - sweep 방향 계산
+// 정팔각형에서 A는 위쪽, prev는 좌상, next는 우상
+// 내각은 시계방향으로 그려야 함
+const sx = A.x + arcR * Math.cos(ang1);
+const sy = A.y + arcR * Math.sin(ang1);
+const ex = A.x + arcR * Math.cos(ang2);
+const ey = A.y + arcR * Math.sin(ang2);
+
+// 내각(135°)이므로 large-arc=0, sweep=0 (반시계 방향 내부)
+svg.appendChild(el('path', {
+  d: `M ${sx.toFixed(1)} ${sy.toFixed(1)} A ${arcR} ${arcR} 0 0 0 ${ex.toFixed(1)} ${ey.toFixed(1)}`,
+  fill: 'none', stroke: '#60A5FA', 'stroke-width': '1.2'
+}));
+
+// 135° 라벨
+const midAng = (ang1 + ang2) / 2 + Math.PI;  // 호 내부 방향
+const labelDist = 52;
+addText(
+  (A.x + labelDist * Math.cos(midAng)).toFixed(1),
+  (A.y + labelDist * Math.sin(midAng)).toFixed(1),
+  '135°',
+  { 'font-size': '12', 'font-weight': '400', fill: '#475569' }
+);
+
+// 중심 O 표시
+svg.appendChild(el('circle', { cx, cy, r: '3', fill: '#94A3B8' }));
+addText(cx + 14, cy + 14, 'O', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 반지름 r=10 라벨 (중심에서 첫 번째 꼭짓점까지)
+svg.appendChild(el('line', {
+  x1: cx, y1: cy, x2: A.x.toFixed(1), y2: A.y.toFixed(1),
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+addText(cx + 15, cy - 50, 'r = 10', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5년간 세 도시 연평균 기온 변화</title>
+</head>
+<body>
+<div style="position:relative;width:100%;height:360px;">
+  <canvas id="chart1"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+new Chart(document.getElementById('chart1'), {
+  type: 'line',
+  data: {
+    labels: ['2019', '2020', '2021', '2022', '2023'],
+    datasets: [
+      {
+        label: '서울',
+        data: [12.3, 13.1, 12.8, 13.5, 14.2],
+        borderColor: '#16A34A',
+        backgroundColor: '#16A34A22',
+        borderWidth: 2.5,
+        pointRadius: 5,
+        pointBackgroundColor: '#16A34A',
+        pointBorderColor: '#FFFFFF',
+        pointBorderWidth: 2,
+        tension: 0.2
+      },
+      {
+        label: '부산',
+        data: [15.1, 15.8, 15.4, 16.0, 16.5],
+        borderColor: '#EF4444',
+        backgroundColor: '#EF444422',
+        borderWidth: 2.5,
+        pointRadius: 5,
+        pointBackgroundColor: '#EF4444',
+        pointBorderColor: '#FFFFFF',
+        pointBorderWidth: 2,
+        tension: 0.2
+      },
+      {
+        label: '대구',
+        data: [14.2, 15.0, 14.7, 15.3, 16.1],
+        borderColor: '#F59E0B',
+        backgroundColor: '#F59E0B22',
+        borderWidth: 2.5,
+        pointRadius: 5,
+        pointBackgroundColor: '#F59E0B',
+        pointBorderColor: '#FFFFFF',
+        pointBorderWidth: 2,
+        tension: 0.2
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+        labels: { color: '#1E293B', font: { size: 12 } }
+      },
+      title: {
+        display: true,
+        text: '5년간 세 도시 연평균 기온 변화 (°C)',
+        font: { size: 16, weight: 'bold' },
+        color: '#1E293B',
+        padding: { bottom: 8 }
+      }
+    },
+    scales: {
+      x: {
+        grid: { color: '#E2E8F0' },
+        ticks: { color: '#475569', font: { size: 12 } }
+      },
+      y: {
+        min: 10,
+        max: 20,
+        title: {
+          display: true,
+          text: '기온 (°C)',
+          color: '#475569',
+          font: { size: 12 }
+        },
+        ticks: { color: '#64748B', font: { size: 11 }, stepSize: 2 },
+        grid: { color: '#E2E8F0' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

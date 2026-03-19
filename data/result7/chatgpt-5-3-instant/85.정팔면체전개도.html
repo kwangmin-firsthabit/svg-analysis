@@ -1,0 +1,98 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#111',
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  // side length
+  const s = 60;
+  const h = (s * Math.sqrt(3)) / 2;
+
+  // helper to draw triangle
+  function tri(p1, p2, p3, stroke, fill) {
+    svg.appendChild(
+      el('polygon', {
+        points: `${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`,
+        fill: fill,
+        'fill-opacity': '0.15',
+        stroke: stroke,
+        'stroke-width': '1.5',
+        'stroke-linejoin': 'round',
+      })
+    );
+  }
+
+  // base point
+  const cx = 340;
+  const cy = 250;
+
+  // central diamond (4 triangles)
+  const A = { x: cx, y: cy - h };
+  const B = { x: cx - s / 2, y: cy };
+  const C = { x: cx + s / 2, y: cy };
+  const D = { x: cx, y: cy + h };
+
+  // central 4
+  tri(A, B, C, '#2563eb', '#3b82f6');
+  tri(D, B, C, '#2563eb', '#3b82f6');
+
+  // attach left
+  const E = { x: B.x - s / 2, y: B.y - h };
+  const F = { x: B.x - s / 2, y: B.y + h };
+
+  tri(B, E, A, '#059669', '#10b981');
+  tri(B, D, F, '#059669', '#10b981');
+
+  // attach right
+  const G = { x: C.x + s / 2, y: C.y - h };
+  const H = { x: C.x + s / 2, y: C.y + h };
+
+  tri(C, A, G, '#dc2626', '#ef4444');
+  tri(C, H, D, '#dc2626', '#ef4444');
+
+  // vertices
+  [A, B, C, D, E, F, G, H].forEach(p => {
+    svg.appendChild(el('circle', { cx: p.x, cy: p.y, r: 3.5, fill: '#111' }));
+  });
+
+  // side labels
+  function mid(p, q) {
+    return { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 };
+  }
+
+  const edges = [
+    [A, B],
+    [A, C],
+    [B, C],
+    [D, B],
+    [D, C],
+  ];
+
+  edges.forEach(([p, q]) => {
+    const m = mid(p, q);
+    svg.appendChild(text(m.x, m.y + 14, '6', { 'font-size': '12', 'font-weight': '400' }));
+  });
+
+  // title-like label
+  svg.appendChild(text(340, 40, '정팔면체 전개도 (한 변 6)', { 'font-size': '14', 'font-weight': '500' }));
+</script>

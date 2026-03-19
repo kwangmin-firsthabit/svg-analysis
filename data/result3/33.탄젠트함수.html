@@ -1,10 +1,5 @@
-<svg id="vis" width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
-<clipPath id="plot-area">
-<rect x="60" y="40" width="560" height="400"/>
-</clipPath>
-</defs>
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
 </svg>
 <script>
 const svg = document.getElementById('vis');
@@ -16,222 +11,97 @@ function el(tag, attrs) {
   return e;
 }
 
-const ox = 340;
-const oy = 240;
-const scale = 50;
-const xMin = 60;
-const xMax = 620;
-const yMin = 40;
-const yMax = 440;
-
-function tx(x) { return Math.round(ox + x * scale); }
-function ty(y) { return Math.round(oy - y * scale); }
-
-// x축
-svg.appendChild(el('line', {
-  x1: xMin, y1: oy, x2: xMax, y2: oy,
-  stroke: '#64748B', 'stroke-width': '1.5',
-  'marker-end': 'url(#arrow)'
-}));
-// y축
-svg.appendChild(el('line', {
-  x1: ox, y1: yMax, x2: ox, y2: yMin,
-  stroke: '#64748B', 'stroke-width': '1.5',
-  'marker-end': 'url(#arrow)'
-}));
-
-// 원점 라벨
-const originLabel = el('text', {
-  x: ox - 12, y: oy + 16,
-  fill: '#1E293B', 'font-size': '13', 'font-family': 'serif',
-  'dominant-baseline': 'central', 'text-anchor': 'middle'
-});
-originLabel.textContent = 'O';
-svg.appendChild(originLabel);
-
-// x축 라벨
-const xLabel = el('text', {
-  x: xMax + 12, y: oy,
-  fill: '#1E293B', 'font-size': '13', 'font-family': 'serif',
-  'dominant-baseline': 'central', 'text-anchor': 'start'
-});
-xLabel.textContent = 'x';
-svg.appendChild(xLabel);
-
-// y축 라벨
-const yLabel = el('text', {
-  x: ox, y: yMin - 12,
-  fill: '#1E293B', 'font-size': '13', 'font-family': 'serif',
-  'dominant-baseline': 'central', 'text-anchor': 'middle'
-});
-yLabel.textContent = 'y';
-svg.appendChild(yLabel);
-
-// y축 눈금 (정수, -4 ~ 4, 0 제외)
-for (let i = -4; i <= 4; i++) {
-  if (i === 0) continue;
-  const py = ty(i);
-  svg.appendChild(el('line', {
-    x1: ox - 4, y1: py, x2: ox + 4, y2: py,
-    stroke: '#64748B', 'stroke-width': '1'
-  }));
-  const t = el('text', {
-    x: ox - 10, y: py,
-    fill: '#475569', 'font-size': '11', 'font-family': 'serif',
-    'dominant-baseline': 'central', 'text-anchor': 'end'
-  });
-  t.textContent = i;
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
   svg.appendChild(t);
 }
 
-// x축 눈금 및 라벨 데이터
-const pi = Math.PI;
+// y = tanx, 주기 π, 범위: -π/2 ~ 3π/2 (두 주기 표시)
+// 점근선: x = -π/2, π/2, 3π/2
+// ox: 원점을 중앙쪽에 배치
+const ox = 340, oy = 230, scaleX = 100, scaleY = 55;
+// x 범위: -π ~ π (약 -3.14 ~ 3.14, 픽셀: -314 ~ 314 → 40 ~ 654 → 너무 넓으므로 scaleX 조정)
+// scaleX=100, 표시 범위: (-π ~ π) = -314px ~ +314px → 26 ~ 654 ok
+
+// 좌표축
+svg.appendChild(el('line', { x1: 60, y1: oy, x2: 630, y2: oy, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('line', { x1: ox, y1: 440, x2: ox, y2: 40, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+addText(620, oy - 16, 'x', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(ox + 14, 52, 'y', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(ox - 14, oy + 16, 'O', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// x눈금
 const xTicks = [
-  { val: -3 * pi / 2, label: '-3π/2' },
-  { val: -pi,         label: '-π' },
-  { val: -pi / 2,     label: '-π/2' },
-  { val: pi / 2,      label: 'π/2' },
-  { val: pi,          label: 'π' },
-  { val: 3 * pi / 2,  label: '3π/2' }
+  { v: -Math.PI, label: '-π' },
+  { v: -Math.PI / 2, label: '-π/2' },
+  { v: Math.PI / 2, label: 'π/2' },
+  { v: Math.PI, label: 'π' }
 ];
-
-// 분수 표현 helper
-function piTickLabel(label, px, py_pos) {
-  // 분수 형태를 SVG text로 렌더링
-  const parts = {
-    '-3π/2': { num: '-3π', den: '2' },
-    '-π/2':  { num: '-π',  den: '2' },
-    'π/2':   { num: 'π',   den: '2' },
-    '3π/2':  { num: '3π',  den: '2' }
-  };
-  if (parts[label]) {
-    const g = el('g', {});
-    const numT = el('text', {
-      x: px, y: py_pos - 7,
-      fill: '#475569', 'font-size': '11', 'font-family': 'serif',
-      'dominant-baseline': 'central', 'text-anchor': 'middle'
-    });
-    numT.textContent = parts[label].num;
-    const line = el('line', {
-      x1: px - 8, y1: py_pos, x2: px + 8, y2: py_pos,
-      stroke: '#475569', 'stroke-width': '0.8'
-    });
-    const denT = el('text', {
-      x: px, y: py_pos + 7,
-      fill: '#475569', 'font-size': '11', 'font-family': 'serif',
-      'dominant-baseline': 'central', 'text-anchor': 'middle'
-    });
-    denT.textContent = parts[label].den;
-    g.appendChild(numT);
-    g.appendChild(line);
-    g.appendChild(denT);
-    return g;
-  } else {
-    // -π, π
-    const t = el('text', {
-      x: px, y: py_pos,
-      fill: '#475569', 'font-size': '11', 'font-family': 'serif',
-      'dominant-baseline': 'central', 'text-anchor': 'middle'
-    });
-    t.textContent = label;
-    return t;
-  }
-}
-
-for (const tick of xTicks) {
-  const px = tx(tick.val);
-  svg.appendChild(el('line', {
-    x1: px, y1: oy - 4, x2: px, y2: oy + 4,
-    stroke: '#64748B', 'stroke-width': '1'
-  }));
-  svg.appendChild(piTickLabel(tick.label, px, oy + 20));
-}
-
-// 점근선: x = -π/2, π/2 (내부), x = -3π/2, 3π/2 (경계)
-const asymptotes = [-3 * pi / 2, -pi / 2, pi / 2, 3 * pi / 2];
-for (const a of asymptotes) {
-  const px = tx(a);
-  svg.appendChild(el('line', {
-    x1: px, y1: yMin, x2: px, y2: yMax,
-    stroke: '#94A3B8', 'stroke-width': '1.2',
-    'stroke-dasharray': '5,4',
-    'clip-path': 'url(#plot-area)'
-  }));
-}
-
-// tan 곡선 그리기 (클립 영역 내, y 범위 제한)
-const yClipMin = -4;
-const yClipMax = 4;
-
-// 각 주기 구간
-const intervals = [
-  { start: -3 * pi / 2 + 0.01, end: -pi / 2 - 0.01 },
-  { start: -pi / 2 + 0.01,     end:  pi / 2 - 0.01 },
-  { start:  pi / 2 + 0.01,     end:  3 * pi / 2 - 0.01 }
-];
-
-for (const interval of intervals) {
-  const points = [];
-  const steps = 400;
-  const step = (interval.end - interval.start) / steps;
-  for (let i = 0; i <= steps; i++) {
-    const x = interval.start + i * step;
-    const y = Math.tan(x);
-    if (y < yClipMin || y > yClipMax) continue;
-    const px = tx(x);
-    const py = ty(y);
-    points.push(`${px},${py}`);
-  }
-  if (points.length < 2) continue;
-
-  // 연속 세그먼트로 분리하여 폴리라인 그리기
-  const allPts = [];
-  const stepsTotal = 400;
-  const stepSize = (interval.end - interval.start) / stepsTotal;
-  let currentSeg = [];
-  let prevY = null;
-
-  for (let i = 0; i <= stepsTotal; i++) {
-    const x = interval.start + i * stepSize;
-    const y = Math.tan(x);
-    if (y < yClipMin || y > yClipMax) {
-      if (currentSeg.length > 1) {
-        allPts.push([...currentSeg]);
-      }
-      currentSeg = [];
-      prevY = null;
-      continue;
-    }
-    if (prevY !== null && Math.abs(y - prevY) > 2) {
-      if (currentSeg.length > 1) {
-        allPts.push([...currentSeg]);
-      }
-      currentSeg = [];
-    }
-    currentSeg.push(`${tx(x)},${ty(y)}`);
-    prevY = y;
-  }
-  if (currentSeg.length > 1) allPts.push(currentSeg);
-
-  for (const seg of allPts) {
-    const poly = el('polyline', {
-      points: seg.join(' '),
-      fill: 'none',
-      stroke: '#3B82F6',
-      'stroke-width': '2',
-      'clip-path': 'url(#plot-area)'
-    });
-    svg.appendChild(poly);
-  }
-}
-
-// 수식 라벨
-const formulaLabel = el('text', {
-  x: 590, y: 80,
-  fill: '#1E293B', 'font-size': '15', 'font-family': 'serif',
-  'dominant-baseline': 'central', 'text-anchor': 'end',
-  'font-style': 'italic'
+xTicks.forEach(({ v, label }) => {
+  const px = ox + v * scaleX;
+  if (px < 65 || px > 625) return;
+  svg.appendChild(el('line', { x1: px.toFixed(1), y1: oy - 4, x2: px.toFixed(1), y2: oy + 4, stroke: '#64748B', 'stroke-width': '0.8' }));
+  addText(px, oy + 18, label, { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
 });
-formulaLabel.textContent = 'y = tan x';
-svg.appendChild(formulaLabel);
+
+// y눈금
+for (let j = -3; j <= 3; j++) {
+  if (j === 0) continue;
+  const py = oy - j * scaleY;
+  if (py < 50 || py > 430) continue;
+  svg.appendChild(el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: '#64748B', 'stroke-width': '0.8' }));
+  addText(ox - 20, py, String(j), { 'font-size': '12', 'font-weight': '400', fill: '#475569', 'text-anchor': 'end' });
+}
+
+// 점근선 x = -π/2, π/2 (점선)
+const asymptotes = [-Math.PI / 2, Math.PI / 2];
+asymptotes.forEach(v => {
+  const px = ox + v * scaleX;
+  svg.appendChild(el('line', { x1: px.toFixed(1), y1: 50, x2: px.toFixed(1), y2: 430, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '6 3' }));
+});
+addText(ox + (-Math.PI / 2) * scaleX - 36, 68, 'x=-π/2', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
+addText(ox + (Math.PI / 2) * scaleX + 36, 68, 'x=π/2', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
+
+// 곡선 y = tanx — 각 구간(-π~-π/2, -π/2~π/2, π/2~π)별로 별도 폴리라인
+const eps = 0.05;
+const segments = [
+  { from: -Math.PI + eps, to: -Math.PI / 2 - eps },
+  { from: -Math.PI / 2 + eps, to: Math.PI / 2 - eps },
+  { from: Math.PI / 2 + eps, to: Math.PI - eps }
+];
+segments.forEach(({ from, to }) => {
+  let pts = '';
+  const steps = 80;
+  for (let i = 0; i <= steps; i++) {
+    const mx = from + (to - from) * (i / steps);
+    const my = Math.tan(mx);
+    if (Math.abs(my) > 8) continue; // 화면 밖 극값 제외
+    const px = ox + mx * scaleX;
+    const py = oy - my * scaleY;
+    if (px < 62 || px > 628 || py < 50 || py > 430) continue;
+    pts += `${Math.round(px * 10) / 10},${Math.round(py * 10) / 10} `;
+  }
+  if (pts.trim()) {
+    svg.appendChild(el('polyline', { points: pts.trim(), fill: 'none', stroke: '#3B82F6', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+  }
+});
+
+// 원점 점
+svg.appendChild(el('circle', { cx: ox, cy: oy, r: '3.5', fill: '#3B82F6' }));
+
+// 주기 π 화살표 표시 (y=2 높이에서 0 → π 구간)
+const arrowY = oy - 2 * scaleY;
+const arrX1 = ox + 0.1 * scaleX;
+const arrX2 = ox + Math.PI * scaleX - 0.1 * scaleX;
+svg.appendChild(el('line', {
+  x1: arrX1.toFixed(1), y1: arrowY.toFixed(1),
+  x2: arrX2.toFixed(1), y2: arrowY.toFixed(1),
+  stroke: '#F59E0B', 'stroke-width': '1.2',
+  'marker-end': 'url(#arrow)', 'marker-start': 'url(#arrow)'
+}));
+addText((arrX1 + arrX2) / 2, arrowY - 16, '주기 π', { 'font-size': '12', 'font-weight': '400', fill: '#F59E0B' });
+
+// 함수식 라벨
+addText(560, 100, 'y = tanx', { 'font-size': '14', 'font-weight': '500', fill: '#3B82F6' });
 </script>

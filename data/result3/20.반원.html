@@ -1,0 +1,91 @@
+<svg id="vis" width="100%" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 반원: 지름 AB = 10, 시각적 r = 170
+const cx = 340, cy = 260, r = 170;
+
+const Ax = cx - r, Ay = cy;
+const Bx = cx + r, By = cy;
+
+// 반원 호 (위쪽)
+svg.appendChild(el('path', {
+  d: `M ${Ax} ${Ay} A ${r} ${r} 0 0 1 ${Bx} ${By}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// 지름 AB
+svg.appendChild(el('line', {
+  x1: Ax, y1: Ay, x2: Bx, y2: By,
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// 점 A, B
+svg.appendChild(el('circle', { cx: Ax, cy: Ay, r: '3.5', fill: '#1D4ED8' }));
+svg.appendChild(el('circle', { cx: Bx, cy: By, r: '3.5', fill: '#1D4ED8' }));
+
+// 지름 라벨
+addText(cx, cy + 22, 'AB = 10', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// A, B 라벨
+addText(Ax - 18, Ay, 'A');
+addText(Bx + 18, By, 'B');
+
+// 호 위의 임의 점 P (75° 위치)
+const angP = -Math.PI * 0.55; // 약 100° from right
+const Px = cx + r * Math.cos(angP);
+const Py = cy + r * Math.sin(angP);
+
+svg.appendChild(el('circle', { cx: Px.toFixed(1), cy: Py.toFixed(1), r: '3.5', fill: '#1D4ED8' }));
+addText((Px - 20).toFixed(1), (Py - 18).toFixed(1), 'P');
+
+// PA, PB 선분
+svg.appendChild(el('line', {
+  x1: Px.toFixed(1), y1: Py.toFixed(1), x2: Ax, y2: Ay,
+  stroke: '#1D4ED8', 'stroke-width': '1.2'
+}));
+svg.appendChild(el('line', {
+  x1: Px.toFixed(1), y1: Py.toFixed(1), x2: Bx, y2: By,
+  stroke: '#1D4ED8', 'stroke-width': '1.2'
+}));
+
+// ∠APB = 90° 직각 표시 (P에서)
+// PA 방향, PB 방향
+const angPA = Math.atan2(Ay - Py, Ax - Px);
+const angPB = Math.atan2(By - Py, Bx - Px);
+
+const s = 14; // 직각 표시 크기
+const p1x = Px + s * Math.cos(angPA), p1y = Py + s * Math.sin(angPA);
+const p2x = Px + s * Math.cos(angPB), p2y = Py + s * Math.sin(angPB);
+const p3x = p1x + s * Math.cos(angPB), p3y = p1y + s * Math.sin(angPB);
+
+svg.appendChild(el('path', {
+  d: `M ${p1x.toFixed(1)},${p1y.toFixed(1)} L ${p3x.toFixed(1)},${p3y.toFixed(1)} L ${p2x.toFixed(1)},${p2y.toFixed(1)}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1'
+}));
+
+// ∠APB = 90° 라벨
+addText((Px + 46).toFixed(1), (Py + 30).toFixed(1), '∠APB = 90°', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 중심 O
+svg.appendChild(el('circle', { cx, cy, r: '3', fill: '#94A3B8' }));
+addText(cx, cy + 18, 'O', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' });
+
+// 정리 라벨
+addText(340, 345, '반원에 대한 원주각 ∠APB = 90°', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

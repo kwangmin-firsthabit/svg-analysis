@@ -1,0 +1,83 @@
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 데이터: 계급 0~10, 10~20, 20~30, 30~40, 40~50 / 도수 5, 12, 14, 7, 2
+const data = [5, 12, 14, 7, 2];
+const classes = ['0', '10', '20', '30', '40', '50'];
+const maxFreq = 16;
+
+const left = 80, bottom = 380, right = 620, top = 60;
+const chartW = right - left, chartH = bottom - top;
+const barW = chartW / data.length;
+const scaleY = chartH / maxFreq;
+
+// 축
+svg.appendChild(el('line', { x1: left, y1: bottom, x2: right + 20, y2: bottom, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('line', { x1: left, y1: bottom, x2: left, y2: top - 20, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' }));
+
+// 축 레이블
+addText(right + 36, bottom, '(분)', { 'font-size': '11', fill: '#374151' });
+addText(left, top - 30, '(명)', { 'font-size': '11', fill: '#374151' });
+
+// y 눈금: 2, 4, 6, 8, 10, 12, 14
+for (let f = 2; f <= 14; f += 2) {
+  const py = bottom - f * scaleY;
+  svg.appendChild(el('line', { x1: left - 5, y1: py, x2: left, y2: py, stroke: '#374151', 'stroke-width': '1' }));
+  addText(left - 16, py, String(f));
+}
+
+// 히스토그램 막대
+data.forEach((freq, i) => {
+  const x = left + i * barW;
+  const h = freq * scaleY;
+  const y = bottom - h;
+  svg.appendChild(el('rect', { x: x + 1, y, width: barW - 2, height: h, fill: '#93C5FD', 'fill-opacity': '0.7', stroke: '#2563EB', 'stroke-width': '1.2' }));
+  addText(x + barW / 2, y - 12, String(freq), { fill: '#1D4ED8', 'font-weight': '600' });
+});
+
+// x축 눈금 및 레이블
+classes.forEach((label, i) => {
+  const px = left + i * barW;
+  svg.appendChild(el('line', { x1: px, y1: bottom, x2: px, y2: bottom + 5, stroke: '#374151', 'stroke-width': '1' }));
+  addText(px, bottom + 16, label);
+});
+
+// 도수다각형: 각 계급 중앙값 연결
+// 양 끝은 (−5, 0), (55, 0)에 해당하는 px 좌표
+const polyPts = [];
+// 왼쪽 가상점
+polyPts.push(`${left},${bottom}`);
+data.forEach((freq, i) => {
+  const cx = left + (i + 0.5) * barW;
+  const cy = bottom - freq * scaleY;
+  polyPts.push(`${cx},${cy}`);
+});
+// 오른쪽 가상점
+polyPts.push(`${right},${bottom}`);
+
+svg.appendChild(el('polyline', { points: polyPts.join(' '), fill: 'none', stroke: '#DC2626', 'stroke-width': '2', 'stroke-linejoin': 'round' }));
+
+// 도수다각형 점
+data.forEach((freq, i) => {
+  const cx = left + (i + 0.5) * barW;
+  const cy = bottom - freq * scaleY;
+  svg.appendChild(el('circle', { cx, cy, r: '4', fill: '#DC2626' }));
+});
+
+// 제목
+addText(340, 30, '통학 시간 히스토그램 + 도수다각형', { 'font-size': '14', fill: '#1E293B', 'font-weight': '600' });
+</script>

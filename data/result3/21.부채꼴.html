@@ -1,256 +1,86 @@
-<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
-<defs>
-  <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-    <path d="M0,0 L0,6 L8,3 z" fill="#64748B"/>
-  </marker>
-</defs>
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
 </svg>
 <script>
 const svg = document.getElementById('vis');
 const ns = 'http://www.w3.org/2000/svg';
+
 function el(tag, attrs) {
   const e = document.createElementNS(ns, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
   return e;
 }
 
-const cx = 270;
-const cy = 230;
-const r = 240;
-const startDeg = -30;
-const endDeg = -150;
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
 
-function toRad(deg) { return deg * Math.PI / 180; }
+// 부채꼴 AOB: 반지름 6, 중심각 60°
+// 시각적: r = 200px
+const cx = 340, cy = 290, r = 200;
+const centralAngle = 60; // 도
 
-const ax = Math.round(cx + r * Math.cos(toRad(startDeg)));
-const ay = Math.round(cy + r * Math.sin(toRad(startDeg)));
-const bx = Math.round(cx + r * Math.cos(toRad(endDeg)));
-const by = Math.round(cy + r * Math.sin(toRad(endDeg)));
+// OA: 위쪽 방향 -90° - 30° = -120° (왼쪽 위)
+// OB: 위쪽 방향 -90° + 30° = -60° (오른쪽 위)
+// 대칭으로 배치
+const angA = (-90 - 30) * Math.PI / 180; // -120°
+const angB = (-90 + 30) * Math.PI / 180; // -60°
 
-// 부채꼴 채우기 (path)
-const sectorPath = el('path', {
-  d: `M ${cx} ${cy} L ${ax} ${ay} A ${r} ${r} 0 0 0 ${bx} ${by} Z`,
-  fill: '#3B82F6',
-  'fill-opacity': '0.12',
-  stroke: '#1D4ED8',
-  'stroke-width': '1.5'
-});
-svg.appendChild(sectorPath);
+const Ax = cx + r * Math.cos(angA);
+const Ay = cy + r * Math.sin(angA);
+const Bx = cx + r * Math.cos(angB);
+const By = cy + r * Math.sin(angB);
 
-// 반지름 OA
-svg.appendChild(el('line', {
-  x1: cx, y1: cy, x2: ax, y2: ay,
-  stroke: '#1D4ED8', 'stroke-width': '1.5'
+// 부채꼴 (채우기 + 호)
+svg.appendChild(el('path', {
+  d: `M ${cx} ${cy} L ${Ax.toFixed(1)} ${Ay.toFixed(1)} A ${r} ${r} 0 0 1 ${Bx.toFixed(1)} ${By.toFixed(1)} Z`,
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
 }));
 
-// 반지름 OB
-svg.appendChild(el('line', {
-  x1: cx, y1: cy, x2: bx, y2: by,
-  stroke: '#1D4ED8', 'stroke-width': '1.5'
+// 중심 O
+svg.appendChild(el('circle', { cx, cy, r: '3.5', fill: '#1D4ED8' }));
+addText(cx, cy + 22, 'O');
+
+// 점 A, B
+svg.appendChild(el('circle', { cx: Ax.toFixed(1), cy: Ay.toFixed(1), r: '3.5', fill: '#1D4ED8' }));
+svg.appendChild(el('circle', { cx: Bx.toFixed(1), cy: By.toFixed(1), r: '3.5', fill: '#1D4ED8' }));
+
+// A, B 라벨
+addText((Ax - 18).toFixed(1), (Ay - 12).toFixed(1), 'A');
+addText((Bx + 18).toFixed(1), (By - 12).toFixed(1), 'B');
+
+// OA 반지름 라벨 (6)
+const midOA_x = (cx + Ax) / 2, midOA_y = (cy + Ay) / 2;
+addText((midOA_x - 20).toFixed(1), (midOA_y).toFixed(1), '6', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// OB 반지름 라벨 (6)
+const midOB_x = (cx + Bx) / 2, midOB_y = (cy + By) / 2;
+addText((midOB_x + 20).toFixed(1), (midOB_y).toFixed(1), '6', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 중심각 60° 호 (작은 호)
+const arcR2 = 36;
+const sax = cx + arcR2 * Math.cos(angA);
+const say = cy + arcR2 * Math.sin(angA);
+const eax = cx + arcR2 * Math.cos(angB);
+const eay = cy + arcR2 * Math.sin(angB);
+
+svg.appendChild(el('path', {
+  d: `M ${sax.toFixed(1)} ${say.toFixed(1)} A ${arcR2} ${arcR2} 0 0 1 ${eax.toFixed(1)} ${eay.toFixed(1)}`,
+  fill: 'none', stroke: '#60A5FA', 'stroke-width': '1.2'
 }));
 
-// 각도 호 (arc) for angle marker
-const arcR = 50;
-const arcPath = el('path', {
-  d: `M ${Math.round(cx + arcR * Math.cos(toRad(startDeg)))} ${Math.round(cy + arcR * Math.sin(toRad(startDeg)))} A ${arcR} ${arcR} 0 0 0 ${Math.round(cx + arcR * Math.cos(toRad(endDeg)))} ${Math.round(cy + arcR * Math.sin(toRad(endDeg)))}`,
-  fill: 'none',
-  stroke: '#F59E0B',
-  'stroke-width': '1.5'
-});
-svg.appendChild(arcPath);
+// 60° 라벨
+addText(cx, cy - 52, '60°', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
 
-// 각도 라벨 120°
-const angleLabelX = Math.round(cx + (arcR + 22) * Math.cos(toRad(-90)));
-const angleLabelY = Math.round(cy + (arcR + 22) * Math.sin(toRad(-90)));
-const angleLabel = el('text', {
-  x: angleLabelX, y: angleLabelY,
-  'font-size': '14', 'font-weight': '500',
-  fill: '#F59E0B',
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central'
-});
-angleLabel.textContent = '120°';
-svg.appendChild(angleLabel);
+// 호의 길이 라벨: 2π
+// 호 중간 위치 (angA + angB)/2 = -90°, 즉 바로 위
+const midAng = (angA + angB) / 2;
+const arcLabelX = cx + (r + 28) * Math.cos(midAng);
+const arcLabelY = cy + (r + 28) * Math.sin(midAng);
+addText(arcLabelX.toFixed(1), arcLabelY.toFixed(1), 'l = 2π', { 'font-size': '12', 'font-weight': '400', fill: '#3B82F6' });
 
-// 점 O
-const dotO = el('circle', { cx: cx, cy: cy, r: '4', fill: '#1E293B' });
-svg.appendChild(dotO);
-
-// 점 A
-const dotA = el('circle', { cx: ax, cy: ay, r: '4', fill: '#1E293B' });
-svg.appendChild(dotA);
-
-// 점 B
-const dotB = el('circle', { cx: bx, cy: by, r: '4', fill: '#1E293B' });
-svg.appendChild(dotB);
-
-// 라벨 O
-const labelO = el('text', {
-  x: cx + 16, y: cy + 4,
-  'font-size': '14', 'font-weight': '500',
-  fill: '#1E293B',
-  'text-anchor': 'start',
-  'dominant-baseline': 'central'
-});
-labelO.textContent = 'O';
-svg.appendChild(labelO);
-
-// 라벨 A
-const labelA = el('text', {
-  x: ax + 10, y: ay,
-  'font-size': '14', 'font-weight': '500',
-  fill: '#1E293B',
-  'text-anchor': 'start',
-  'dominant-baseline': 'central'
-});
-labelA.textContent = 'A';
-svg.appendChild(labelA);
-
-// 라벨 B
-const labelB = el('text', {
-  x: bx - 20, y: by,
-  'font-size': '14', 'font-weight': '500',
-  fill: '#1E293B',
-  'text-anchor': 'end',
-  'dominant-baseline': 'central'
-});
-labelB.textContent = 'B';
-svg.appendChild(labelB);
-
-// 반지름 라벨 "8" (OA 선분 중간)
-const rLabelX = Math.round((cx + ax) / 2 + 12);
-const rLabelY = Math.round((cy + ay) / 2 + 10);
-const rLabel = el('text', {
-  x: rLabelX, y: rLabelY,
-  'font-size': '14', 'font-weight': '500',
-  fill: '#1D4ED8',
-  'text-anchor': 'start',
-  'dominant-baseline': 'central'
-});
-rLabel.textContent = '8';
-svg.appendChild(rLabel);
-
-// 정보 박스 (오른쪽)
-const infoX = 530;
-const infoY = 130;
-
-// 배경 박스
-const box = el('rect', {
-  x: infoX - 10, y: infoY - 20,
-  width: '150', height: '150',
-  rx: '8',
-  fill: '#F8FAFC',
-  stroke: '#CBD5E1',
-  'stroke-width': '1'
-});
-svg.appendChild(box);
-
-// 제목
-const title = el('text', {
-  x: infoX + 65, y: infoY,
-  'font-size': '14', 'font-weight': '500',
-  fill: '#1E293B',
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central'
-});
-title.textContent = '부채꼴 AOB';
-svg.appendChild(title);
-
-// 반지름 정보
-const t1 = el('text', {
-  x: infoX, y: infoY + 30,
-  'font-size': '12', 'font-weight': '400',
-  fill: '#475569',
-  'text-anchor': 'start',
-  'dominant-baseline': 'central'
-});
-t1.textContent = '반지름  r = 8';
-svg.appendChild(t1);
-
-// 중심각 정보
-const t2 = el('text', {
-  x: infoX, y: infoY + 54,
-  'font-size': '12', 'font-weight': '400',
-  fill: '#475569',
-  'text-anchor': 'start',
-  'dominant-baseline': 'central'
-});
-t2.textContent = '중심각  θ = 120°';
-svg.appendChild(t2);
-
-// 구분선
-const sep = el('line', {
-  x1: infoX - 5, y1: infoY + 70,
-  x2: infoX + 130, y2: infoY + 70,
-  stroke: '#CBD5E1', 'stroke-width': '1'
-});
-svg.appendChild(sep);
-
-// 호의 길이
-const t3 = el('text', {
-  x: infoX, y: infoY + 90,
-  'font-size': '12', 'font-weight': '400',
-  fill: '#475569',
-  'text-anchor': 'start',
-  'dominant-baseline': 'central'
-});
-t3.textContent = '호의 길이';
-svg.appendChild(t3);
-
-const t3v = el('text', {
-  x: infoX, y: infoY + 108,
-  'font-size': '14', 'font-weight': '500',
-  fill: '#1E293B',
-  'text-anchor': 'start',
-  'dominant-baseline': 'central'
-});
-t3v.textContent = 'l = 16π/3';
-svg.appendChild(t3v);
-
-// 넓이
-const t4 = el('text', {
-  x: infoX, y: infoY + 130,
-  'font-size': '12', 'font-weight': '400',
-  fill: '#475569',
-  'text-anchor': 'start',
-  'dominant-baseline': 'central'
-});
-t4.textContent = '넓이';
-svg.appendChild(t4);
-
-const t4v = el('text', {
-  x: infoX, y: infoY + 148,
-  'font-size': '14', 'font-weight': '500',
-  fill: '#1E293B',
-  'text-anchor': 'start',
-  'dominant-baseline': 'central'
-});
-t4v.textContent = 'S = 64π/3';
-svg.appendChild(t4v);
-
-// 호 위에 호의 길이 라벨 화살표 (호 중간 지점)
-const midDeg = -90;
-const arcMidX = Math.round(cx + r * Math.cos(toRad(midDeg)));
-const arcMidY = Math.round(cy + r * Math.sin(toRad(midDeg)));
-
-const dotArcMid = el('circle', { cx: arcMidX, cy: arcMidY, r: '3', fill: '#3B82F6' });
-svg.appendChild(dotArcMid);
-
-// 호 라벨 보조선
-const auxLine = el('line', {
-  x1: arcMidX, y1: arcMidY,
-  x2: arcMidX, y2: arcMidY - 30,
-  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
-});
-svg.appendChild(auxLine);
-
-const arcLabel = el('text', {
-  x: arcMidX, y: arcMidY - 44,
-  'font-size': '12', 'font-weight': '400',
-  fill: '#3B82F6',
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central'
-});
-arcLabel.textContent = '호 AB';
-svg.appendChild(arcLabel);
+// 호 길이 유도 안내
+addText(340, 425, '호의 길이: l = 2π × 6 × (60/360) = 2π', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
 </script>

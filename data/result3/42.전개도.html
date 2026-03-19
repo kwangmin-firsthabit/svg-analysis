@@ -1,206 +1,74 @@
-<svg id="vis" width="100%" viewBox="0 0 680 560" xmlns="http://www.w3.org/2000/svg">
-<defs>
-  <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-    <path d="M0,0 L0,6 L6,3 Z" fill="#94A3B8"/>
-  </marker>
-</defs>
+<svg id="vis" width="100%" viewBox="0 0 680 580" xmlns="http://www.w3.org/2000/svg">
 </svg>
 <script>
 const svg = document.getElementById('vis');
 const ns = 'http://www.w3.org/2000/svg';
+
 function el(tag, attrs) {
   const e = document.createElementNS(ns, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
   return e;
 }
 
-// scale: 30px per unit
-// rectangles: 3x10(90x300), 4x10(120x300), 5x10(150x300)
-// total rect width = 90+120+150 = 360
-// layout center around x=340
-// rect starts: x0=160, so rects at 160,250,370, end at 520
-// triangle height: 3-4-5 right triangle, place base along bottom of rect
-// top triangles sit above rect row, bottom below
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
 
-const scale = 30;
-const rectH = 300; // 10 * scale
-const w3 = 90, w4 = 120, w5 = 150; // side lengths * scale
-
-// x positions of rectangles (left edges)
-const rx1 = 160;
-const rx2 = rx1 + w3; // 250
-const rx3 = rx2 + w4; // 370
-const rectTop = 130;
-const rectBot = rectTop + rectH; // 430
-
-// Draw rectangles
-const rects = [
-  { x: rx1, w: w3, area: '30' },
-  { x: rx2, w: w4, area: '40' },
-  { x: rx3, w: w5, area: '50' },
-];
-
-rects.forEach(r => {
+function rect(x, y, w, h, label, sublabel) {
   svg.appendChild(el('rect', {
-    x: r.x, y: rectTop, width: r.w, height: rectH,
-    fill: '#3B82F6', 'fill-opacity': '0.12',
-    stroke: '#1D4ED8', 'stroke-width': '1.5'
+    x, y, width: w, height: h,
+    fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5'
   }));
-  // area label
-  const cx = Math.round(r.x + r.w / 2);
-  const cy = Math.round(rectTop + rectH / 2);
-  svg.appendChild(el('text', {
-    x: cx, y: cy,
-    'text-anchor': 'middle', 'dominant-baseline': 'central',
-    fill: '#1E293B', 'font-size': '15', 'font-weight': '500'
-  })).textContent = r.area;
-});
+  addText(x + w / 2, y + h / 2 - (sublabel ? 8 : 0), label, { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+  if (sublabel) {
+    addText(x + w / 2, y + h / 2 + 10, sublabel, { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+  }
+}
 
-// 3-4-5 right triangle: vertices relative to hypotenuse base
-// The triangle's sides are 3,4,5. We use side 3 for rect1 top, side 4 for rect2, side 5 for rect3.
-// For top triangles: base = bottom of rect, apex points upward
-// For bottom triangles: base = bottom of rect, apex points downward
+// 직육면체: 가로 5, 세로 3, 높이 4
+// 전개도 레이아웃 (십자형):
+//            [위(5×3)]
+//  [좌(4×3)] [앞(5×4)] [우(4×3)] [뒤(5×4)]
+//            [아래(5×3)]
 
-// Triangle on top of rect1 (base = w3=90, side3 of triangle)
-// The 3-4-5 triangle: side3 is opposite the right angle vertex from side4
-// We need the triangle height from side-3 base
-// Place triangle: base along top of rect1 (length 90=3 units)
-// Height from base-3: area=6, so h = 2*6/3 = 4 units = 120px
-// But that's too tall; let's use the actual triangle geometry
-// Triangle vertices: right angle at origin, legs 3 and 4
-// When base = side of length 3 (bottom edge):
-//   A=(0,0), B=(90,0), C=?
-//   AC=150(5units*30), BC=120(4units*30), AB=90(3units*30)
-//   Cx = (90^2 + 150^2 - 120^2) / (2*90) = (8100+22500-14400)/180 = 16200/180 = 90
-//   Wait, let me recalc: cos(A) = (AB^2+AC^2-BC^2)/(2*AB*AC)
-//   With AB=3, AC=5, BC=4: cos(A)=(9+25-16)/(2*3*5)=18/30=0.6, sin(A)=0.8
-//   So C = A + AC*(cos(A), sin(A)) = (0,0) + 5*(0.6, 0.8) = (3, 4) in units
-//   In pixels: A=(0,0), B=(90,0), C=(90,120) -- that is the right angle at B!
-// Actually 3-4-5: legs are 3 and 4, hypotenuse 5
-// Right angle between sides 3 and 4
-// Let's fix orientation for each face:
+const sc = 46; // 1단위 = 46px
+const W = 5 * sc; // 230px
+const D = 3 * sc; // 138px
+const H = 4 * sc; // 184px
 
-// Top triangle above rect1 (base = side-3 = 90px wide)
-// Place with base at top of rect1: from (rx1, rectTop) to (rx1+90, rectTop)
-// Apex: needs to form triangle with sides 3,4,5 with base=3
-// Right angle vertex: from base endpoints A=(rx1,rectTop), B=(rx1+90,rectTop)
-// C such that AC=5*30=150, BC=4*30=120
-// Cx = (AB^2 + AC^2 - BC^2)/(2*AB) = (8100+22500-14400)/180 = 16200/180 = 90
-// Cy = -sqrt(AC^2 - Cx^2) = -sqrt(22500-8100) = -sqrt(14400) = -120 (upward)
-// So C = (rx1+90, rectTop-120)
+// 앞면 기준 (5×4) 위치
+const frontX = 200, frontY = 210;
 
-const triTopApex = { x: rx1 + 90, y: rectTop - 120 };
-const triTopPts = `${rx1},${rectTop} ${rx1 + 90},${rectTop} ${triTopApex.x},${triTopApex.y}`;
-svg.appendChild(el('polygon', {
-  points: triTopPts,
-  fill: '#3B82F6', 'fill-opacity': '0.12',
-  stroke: '#1D4ED8', 'stroke-width': '1.5'
-}));
-// area label
-svg.appendChild(el('text', {
-  x: Math.round(rx1 + 90 / 3),
-  y: Math.round(rectTop - 40),
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#1E293B', 'font-size': '15', 'font-weight': '500'
-})).textContent = '6';
+// 위면 (5×3): 앞면 위
+rect(frontX, frontY - D, W, D, '15', '(5 × 3)');
+// 앞면 (5×4)
+rect(frontX, frontY, W, H, '20', '(5 × 4)');
+// 아래면 (5×3): 앞면 아래
+rect(frontX, frontY + H, W, D, '15', '(5 × 3)');
+// 좌면 (4×3): 앞면 왼쪽, 가로=4, 세로=3
+rect(frontX - D, frontY, D, H, '12', '(3 × 4)');
+// 우면 (4×3): 앞면 오른쪽
+rect(frontX + W, frontY, D, H, '12', '(3 × 4)');
+// 뒤면 (5×4): 우면 오른쪽
+rect(frontX + W + D, frontY, W, H, '20', '(5 × 4)');
 
-// Bottom triangle below rect3 (base = side-5 = 150px wide, hypotenuse)
-// Place with base at bottom of rect3: from (rx3, rectBot) to (rx3+150, rectBot)
-// For hypotenuse as base: height = 2*area/hyp = 12/5 = 2.4 units = 72px
-// Right angle at C, legs CA=3*30=90, CB=4*30=120
-// A=(rx3,rectBot), B=(rx3+150,rectBot)
-// Cx = (AB^2 + CA^2 - CB^2)/(2*AB) -- wait use cosine rule from A
-// cos(angle at A) = (AB^2 + CA^2 - CB^2)/(2*AB*CA) -- no, law of cosines
-// CA=90, CB=120, AB=150 (right angle at C)
-// Cx = CA^2/AB = 8100/150 = 54
-// Cy = sqrt(CA^2 - Cx^2) = sqrt(8100-2916) = sqrt(5184) = 72 (downward)
-const triBot5Apex = { x: rx3 + 54, y: rectBot + 72 };
-const triBotPts = `${rx3},${rectBot} ${rx3 + 150},${rectBot} ${triBot5Apex.x},${triBot5Apex.y}`;
-svg.appendChild(el('polygon', {
-  points: triBotPts,
-  fill: '#3B82F6', 'fill-opacity': '0.12',
-  stroke: '#1D4ED8', 'stroke-width': '1.5'
-}));
-svg.appendChild(el('text', {
-  x: Math.round(rx3 + 68),
-  y: Math.round(rectBot + 30),
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#1E293B', 'font-size': '15', 'font-weight': '500'
-})).textContent = '6';
+// 치수 라벨 (전개도 외부)
+// 가로 5 (앞면 아래)
+addText(frontX + W / 2, frontY + H + D + 22, '← 5 →', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' });
+// 세로 3 (위면 왼쪽)
+addText(frontX - D - 28, frontY - D + D / 2, '3', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' });
+// 높이 4 (앞면 왼쪽)
+addText(frontX - D - 28, frontY + H / 2, '4', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' });
+// 뒤면 오른쪽 (가로 5)
+addText(frontX + W + D + W / 2, frontY + H + 22, '← 5 →', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' });
 
-// Dimension labels for rectangles
-// Side labels along bottom edge of rectangles
-const dimY = rectBot + 18;
-const dimData = [
-  { x: Math.round(rx1 + w3/2), label: '3' },
-  { x: Math.round(rx2 + w4/2), label: '4' },
-  { x: Math.round(rx3 + w5/2), label: '5' },
-];
-dimData.forEach(d => {
-  svg.appendChild(el('text', {
-    x: d.x, y: dimY,
-    'text-anchor': 'middle', 'dominant-baseline': 'central',
-    fill: '#475569', 'font-size': '12', 'font-weight': '400'
-  })).textContent = d.label;
-});
+// 각 면 이름 (작은 글자)
+addText(frontX + W / 2, frontY - D - 14, '위', { 'font-size': '11', fill: '#94A3B8', 'font-weight': '400' });
+addText(frontX + W / 2, frontY - 14, '앞', { 'font-size': '11', fill: '#94A3B8', 'font-weight': '400' });
 
-// Height label on left side of first rectangle
-svg.appendChild(el('text', {
-  x: rx1 - 16, y: Math.round(rectTop + rectH/2),
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#475569', 'font-size': '12', 'font-weight': '400'
-})).textContent = '10';
-
-// Title
-svg.appendChild(el('text', {
-  x: 340, y: 28,
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#1E293B', 'font-size': '16', 'font-weight': '500'
-})).textContent = '삼각기둥의 전개도';
-
-// Subtitle: area summary
-const summaryLines = [
-  '밑면(직각삼각형): 넓이 = 6',
-  '옆면 3개: 넓이 = 30, 40, 50',
-  '전체 겉넓이 = 6×2 + 30 + 40 + 50 = 132',
-];
-summaryLines.forEach((line, i) => {
-  svg.appendChild(el('text', {
-    x: 340, y: 500 + i * 22,
-    'text-anchor': 'middle', 'dominant-baseline': 'central',
-    fill: '#475569', 'font-size': '13', 'font-weight': '400'
-  })).textContent = line;
-});
-
-// Right angle mark on bottom triangle
-const raSize = 8;
-const raX = triBot5Apex.x;
-const raY = triBot5Apex.y;
-// vectors from apex to A and to B
-const dAx = rx3 - raX, dAy = rectBot - raY;
-const dBx = rx3+150 - raX, dBy = rectBot - raY;
-const lenA = Math.sqrt(dAx*dAx+dAy*dAy);
-const lenB = Math.sqrt(dBx*dBx+dBy*dBy);
-const uAx = dAx/lenA*raSize, uAy = dAy/lenA*raSize;
-const uBx = dBx/lenB*raSize, uBy = dBy/lenB*raSize;
-const raPts = `${Math.round(raX+uAx)},${Math.round(raY+uAy)} ${Math.round(raX+uAx+uBx)},${Math.round(raY+uAy+uBy)} ${Math.round(raX+uBx)},${Math.round(raY+uBy)}`;
-svg.appendChild(el('polyline', {
-  points: raPts,
-  fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.2'
-}));
-
-// Right angle mark on top triangle (at vertex B = rx1+90, rectTop)
-const tRaX = rx1 + 90, tRaY = rectTop;
-// vectors to A and to apex
-const tdAx = rx1 - tRaX, tdAy = rectTop - tRaY; // to A = (-90, 0)
-const tdCx = triTopApex.x - tRaX, tdCy = triTopApex.y - tRaY; // to apex
-const tlenA = Math.sqrt(tdAx*tdAx+tdAy*tdAy);
-const tlenC = Math.sqrt(tdCx*tdCx+tdCy*tdCy);
-const tuAx = tdAx/tlenA*raSize, tuAy = tdAy/tlenA*raSize;
-const tuCx = tdCx/tlenC*raSize, tuCy = tdCy/tlenC*raSize;
-const traPts = `${Math.round(tRaX+tuAx)},${Math.round(tRaY+tuAy)} ${Math.round(tRaX+tuAx+tuCx)},${Math.round(tRaY+tuAy+tuCy)} ${Math.round(tRaX+tuCx)},${Math.round(tRaY+tuCy)}`;
-svg.appendChild(el('polyline', {
-  points: traPts,
-  fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.2'
-}));
+// 전체 제목
+addText(340, 38, '직육면체 전개도  (가로 5, 세로 3, 높이 4)', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(340, 56, '각 면의 넓이', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
 </script>

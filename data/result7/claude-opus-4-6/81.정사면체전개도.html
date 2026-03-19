@@ -1,0 +1,151 @@
+<svg id="vis" width="100%" viewBox="0 0 680 580" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  svg.appendChild(e);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = document.createElementNS(ns, 'text');
+  Object.entries({ x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs }).forEach(([k, v]) => t.setAttribute(k, v));
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 정사면체 전개도: 한 변 a=6, 스케일 sc
+const a = 6;
+const sc = 46;
+const side = a * sc; // 276px
+const h = side * Math.sqrt(3) / 2; // 정삼각형 높이 ≈ 239
+
+// 중앙 삼각형 배치 (꼭짓점이 위를 향함)
+const cx = 340;
+const baseY = 310;
+
+// T0: 중앙 삼각형 (꼭짓점 위)
+const T0 = [
+  [cx, baseY - h],
+  [cx - side / 2, baseY],
+  [cx + side / 2, baseY]
+];
+
+// T1: 아래쪽 (밑변 공유, 꼭짓점 아래) - 밑변을 기준으로 뒤집힘
+const T1 = [
+  [cx - side / 2, baseY],
+  [cx + side / 2, baseY],
+  [cx, baseY + h]
+];
+
+// T2: 왼쪽 (T0 왼쪽 변 공유)
+// T0 왼쪽 변: T0[0]~T0[1], 반대편 꼭짓점 T0[2]를 왼쪽 변 기준으로 반사
+const lx1 = T0[0][0], ly1 = T0[0][1];
+const lx2 = T0[1][0], ly2 = T0[1][1];
+const ldx = lx2 - lx1, ldy = ly2 - ly1;
+const llen2 = ldx * ldx + ldy * ldy;
+const lt = ((T0[2][0] - lx1) * ldx + (T0[2][1] - ly1) * ldy) / llen2;
+const lpx = lx1 + lt * ldx, lpy = ly1 + lt * ldy;
+const T2 = [
+  [T0[0][0], T0[0][1]],
+  [T0[1][0], T0[1][1]],
+  [2 * lpx - T0[2][0], 2 * lpy - T0[2][1]]
+];
+
+// T3: 오른쪽 (T0 오른쪽 변 공유)
+// T0 오른쪽 변: T0[0]~T0[2], 반대편 꼭짓점 T0[1]을 오른쪽 변 기준으로 반사
+const rx1 = T0[0][0], ry1 = T0[0][1];
+const rx2 = T0[2][0], ry2 = T0[2][1];
+const rdx = rx2 - rx1, rdy = ry2 - ry1;
+const rlen2 = rdx * rdx + rdy * rdy;
+const rt = ((T0[1][0] - rx1) * rdx + (T0[1][1] - ry1) * rdy) / rlen2;
+const rpx = rx1 + rt * rdx, rpy = ry1 + rt * rdy;
+const T3 = [
+  [T0[0][0], T0[0][1]],
+  [T0[2][0], T0[2][1]],
+  [2 * rpx - T0[1][0], 2 * rpy - T0[1][1]]
+];
+
+// 면 색상
+const fills = ['#DBEAFE', '#D1FAE5', '#FEF3C7', '#FEE2E2'];
+const strokes = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
+
+// 삼각형 채우기
+[T0, T1, T2, T3].forEach((tri, i) => {
+  el('polygon', {
+    points: tri.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' '),
+    fill: fills[i],
+    stroke: strokes[i],
+    'stroke-width': '1.8',
+    'stroke-linejoin': 'round'
+  });
+});
+
+// 접는 선 (점선) - 중앙 삼각형의 3변 위에 겹쳐서 표시
+[[T0[0], T0[1]], [T0[0], T0[2]], [T0[1], T0[2]]].forEach(([p1, p2]) => {
+  el('line', {
+    x1: p1[0].toFixed(1), y1: p1[1].toFixed(1),
+    x2: p2[0].toFixed(1), y2: p2[1].toFixed(1),
+    stroke: '#64748B',
+    'stroke-width': '1.2',
+    'stroke-dasharray': '6 3'
+  });
+});
+
+// 면 번호 라벨
+const faceLabels = ['1', '2', '3', '4'];
+[T0, T1, T2, T3].forEach((tri, i) => {
+  const mx = (tri[0][0] + tri[1][0] + tri[2][0]) / 3;
+  const my = (tri[0][1] + tri[1][1] + tri[2][1]) / 3;
+  addText(mx.toFixed(1), my.toFixed(1), faceLabels[i], {
+    'font-size': '18',
+    'font-weight': '700',
+    fill: '#1E293B'
+  });
+});
+
+// 변 길이 라벨 "6" - 외곽 변에 표시
+const dimOff = 16;
+function labelEdge(p1, p2, triCenter) {
+  const mx = (p1[0] + p2[0]) / 2;
+  const my = (p1[1] + p2[1]) / 2;
+  // 법선 벡터
+  const dx = p2[1] - p1[1], dy = -(p2[0] - p1[0]);
+  const len = Math.sqrt(dx * dx + dy * dy);
+  const nx = dx / len, ny = dy / len;
+  // 법선 방향이 삼각형 중심 반대쪽을 향하도록
+  const toC = (triCenter[0] - mx) * nx + (triCenter[1] - my) * ny;
+  const sign = toC < 0 ? 1 : -1;
+  addText((mx + sign * nx * dimOff).toFixed(1), (my + sign * ny * dimOff).toFixed(1), '6', {
+    'font-size': '14',
+    'font-weight': '500',
+    fill: '#334155'
+  });
+}
+
+function triCenter(tri) {
+  return [(tri[0][0] + tri[1][0] + tri[2][0]) / 3, (tri[0][1] + tri[1][1] + tri[2][1]) / 3];
+}
+
+// T1 외곽 변 (밑변은 공유 → 왼쪽 변, 오른쪽 변만)
+labelEdge(T1[0], T1[2], triCenter(T1)); // 왼쪽
+labelEdge(T1[1], T1[2], triCenter(T1)); // 오른쪽
+
+// T2 외곽 변 (두 꼭짓점~반사점)
+labelEdge(T2[0], T2[2], triCenter(T2));
+labelEdge(T2[1], T2[2], triCenter(T2));
+
+// T3 외곽 변 (두 꼭짓점~반사점)
+labelEdge(T3[0], T3[2], triCenter(T3));
+labelEdge(T3[1], T3[2], triCenter(T3));
+
+// 제목
+addText(340, 558, '한 변의 길이가 6인 정사면체 전개도', {
+  'font-size': '14',
+  'font-weight': '500',
+  fill: '#1E293B'
+});
+</script>

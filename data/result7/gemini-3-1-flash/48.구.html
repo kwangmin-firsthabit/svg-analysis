@@ -1,0 +1,122 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="sphereGrad" x1="30%" y1="30%" x2="70%" y2="70%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.3" />
+      <stop offset="100%" stop-color="#2563eb" stop-opacity="0.1" />
+    </linearGradient>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // 설정: 반지름 5단위, 1단위당 30px 스케일링 (R=150px)
+  const r = 5;
+  const scale = 30;
+  const rPx = r * scale;
+  const cx = 340,
+    cy = 220;
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': '14',
+      'font-weight': '500',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: '#1e293b',
+      ...attrs,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 구의 외곽선 (Great Circle - 가로)
+  svg.appendChild(
+    el('circle', {
+      cx,
+      cy,
+      r: rPx,
+      fill: 'url(#sphereGrad)',
+      stroke: '#2563eb',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // 2. 적도(Equator) 타원 - 앞면 (실선)
+  svg.appendChild(
+    el('path', {
+      d: `M ${cx - rPx} ${cy} A ${rPx} ${rPx / 3} 0 0 0 ${cx + rPx} ${cy}`,
+      fill: 'none',
+      stroke: '#2563eb',
+      'stroke-width': '1',
+      'stroke-opacity': '0.6',
+    })
+  );
+
+  // 3. 적도(Equator) 타원 - 뒷면 (점선)
+  svg.appendChild(
+    el('path', {
+      d: `M ${cx - rPx} ${cy} A ${rPx} ${rPx / 3} 0 0 1 ${cx + rPx} ${cy}`,
+      fill: 'none',
+      stroke: '#94a3b8',
+      'stroke-width': '1',
+      'stroke-dasharray': '4 3',
+      'stroke-opacity': '0.5',
+    })
+  );
+
+  // 4. 자오선(Meridian) 타원 - 앞면 (실선)
+  svg.appendChild(
+    el('path', {
+      d: `M ${cx} ${cy - rPx} A ${rPx / 4} ${rPx} 0 0 1 ${cx} ${cy + rPx}`,
+      fill: 'none',
+      stroke: '#2563eb',
+      'stroke-width': '0.8',
+      'stroke-opacity': '0.4',
+    })
+  );
+
+  // 5. 중심 O 및 반지름 표시
+  svg.appendChild(el('circle', { cx, cy, r: '3', fill: '#1e293b' }));
+  addText(cx - 15, cy - 15, 'O');
+
+  // 반지름 선 (입체감을 위해 약간 비스듬히)
+  const angle = (-30 * Math.PI) / 180;
+  const rx = cx + rPx * Math.cos(angle);
+  const ry = cy + rPx * Math.sin(angle);
+  svg.appendChild(
+    el('line', {
+      x1: cx,
+      y1: cy,
+      x2: rx,
+      y2: ry,
+      stroke: '#dc2626',
+      'stroke-width': '1.5',
+    })
+  );
+  addText((cx + rx) / 2, (cy + ry) / 2 - 15, 'r = 5', { fill: '#dc2626' });
+
+  // 6. 좌표축 (선택적 입체감)
+  const axisLen = rPx + 40;
+  // z축 (수직)
+  svg.appendChild(
+    el('line', {
+      x1: cx,
+      y1: cy - axisLen,
+      x2: cx,
+      y2: cy + axisLen,
+      stroke: '#94a3b8',
+      'stroke-width': '0.5',
+      'stroke-dasharray': '2 2',
+    })
+  );
+</script>

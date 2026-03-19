@@ -1,0 +1,145 @@
+<svg id="vis" width="100%" viewBox="0 0 680 180" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#111',
+      ...attrs,
+    });
+    t.textContent = str;
+    return t;
+  }
+
+  // axis setup
+  const y = 90;
+  const xStart = 80;
+  const xEnd = 600;
+
+  // mapping (-5 ~ 5)
+  function map(x) {
+    return xStart + ((x + 5) * (xEnd - xStart)) / 10;
+  }
+
+  // axis line
+  svg.appendChild(
+    el('line', {
+      x1: xStart,
+      y1: y,
+      x2: xEnd,
+      y2: y,
+      stroke: '#000',
+      'stroke-width': '1.2',
+    })
+  );
+
+  // ticks
+  for (let i = -5; i <= 5; i++) {
+    const px = map(i);
+    svg.appendChild(
+      el('line', {
+        x1: px,
+        y1: y - 5,
+        x2: px,
+        y2: y + 5,
+        stroke: '#000',
+        'stroke-width': '0.8',
+      })
+    );
+    if (i % 1 === 0) {
+      svg.appendChild(text(px, y + 18, String(i), { 'font-size': '12', 'font-weight': '400' }));
+    }
+  }
+
+  // left region x ≤ -2
+  const leftPoint = map(-2);
+
+  svg.appendChild(
+    el('line', {
+      x1: leftPoint,
+      y1: y,
+      x2: xStart,
+      y2: y,
+      stroke: '#2563eb',
+      'stroke-width': '4',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+
+  // closed dot at -2
+  svg.appendChild(
+    el('circle', {
+      cx: leftPoint,
+      cy: y,
+      r: 5,
+      fill: '#2563eb',
+    })
+  );
+
+  // right region x > 1
+  const rightPoint = map(1);
+
+  svg.appendChild(
+    el('line', {
+      x1: rightPoint,
+      y1: y,
+      x2: xEnd,
+      y2: y,
+      stroke: '#2563eb',
+      'stroke-width': '4',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+
+  // open dot at 1
+  svg.appendChild(
+    el('circle', {
+      cx: rightPoint,
+      cy: y,
+      r: 5,
+      fill: '#fff',
+      stroke: '#2563eb',
+      'stroke-width': '2',
+    })
+  );
+
+  // labels
+  svg.appendChild(text(leftPoint, y - 20, '-2', { 'font-size': '12' }));
+  svg.appendChild(text(rightPoint, y - 20, '1', { 'font-size': '12' }));
+
+  svg.appendChild(text(340, 30, 'x ≤ -2 또는 x > 1', { 'font-size': '14', 'font-weight': '500' }));
+</script>

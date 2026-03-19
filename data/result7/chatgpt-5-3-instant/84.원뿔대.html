@@ -1,0 +1,133 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#111',
+      ...attrs,
+    });
+    t.textContent = str;
+    return t;
+  }
+
+  // parameters
+  const R = 5; // bottom radius
+  const r = 2; // top radius
+  const h = 6; // height
+  const scale = 30;
+
+  // center
+  const cx = 340;
+  const cy = 220;
+
+  // pixel radii
+  const Rpx = R * scale;
+  const rpx = r * scale;
+  const hpx = h * scale;
+
+  // top ellipse center
+  const topY = cy - hpx / 2;
+  const botY = cy + hpx / 2;
+
+  // draw bottom ellipse
+  svg.appendChild(
+    el('ellipse', {
+      cx: cx,
+      cy: botY,
+      rx: Rpx,
+      ry: Rpx * 0.35,
+      fill: '#3b82f6',
+      'fill-opacity': '0.15',
+      stroke: '#2563eb',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // draw top ellipse
+  svg.appendChild(
+    el('ellipse', {
+      cx: cx,
+      cy: topY,
+      rx: rpx,
+      ry: rpx * 0.35,
+      fill: '#10b981',
+      'fill-opacity': '0.15',
+      stroke: '#059669',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // side edges
+  svg.appendChild(
+    el('line', {
+      x1: cx - Rpx,
+      y1: botY,
+      x2: cx - rpx,
+      y2: topY,
+      stroke: '#111',
+      'stroke-width': '1.5',
+    })
+  );
+
+  svg.appendChild(
+    el('line', {
+      x1: cx + Rpx,
+      y1: botY,
+      x2: cx + rpx,
+      y2: topY,
+      stroke: '#111',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // hidden back edge (dashed)
+  svg.appendChild(
+    el('ellipse', {
+      cx: cx,
+      cy: botY,
+      rx: Rpx,
+      ry: Rpx * 0.35,
+      fill: 'none',
+      stroke: '#2563eb',
+      'stroke-width': '1',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  // height line
+  svg.appendChild(
+    el('line', {
+      x1: cx + Rpx + 40,
+      y1: topY,
+      x2: cx + Rpx + 40,
+      y2: botY,
+      stroke: '#dc2626',
+      'stroke-width': '1',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  // height label
+  svg.appendChild(text(cx + Rpx + 60, (topY + botY) / 2, '6', { 'font-size': '12', 'font-weight': '400' }));
+
+  // radius labels
+  svg.appendChild(text(cx + rpx + 20, topY, '2', { 'font-size': '12', 'font-weight': '400' }));
+  svg.appendChild(text(cx + Rpx + 20, botY, '5', { 'font-size': '12', 'font-weight': '400' }));
+
+  // title
+  svg.appendChild(text(340, 40, '원뿔대 (밑면 5, 윗면 2, 높이 6)', { 'font-size': '14', 'font-weight': '500' }));
+</script>

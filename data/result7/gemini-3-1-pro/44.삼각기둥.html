@@ -1,0 +1,147 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+<div
+  id="math-display"
+  style="display: flex; flex-direction: column; align-items: center; gap: 8px; margin-bottom: 12px"
+>
+  <div id="volume-eq"></div>
+  <div id="surface-eq"></div>
+</div>
+
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  (function () {
+    const svg = document.getElementById('vis');
+    const ns = 'http://www.w3.org/2000/svg';
+
+    // 1. 수학적 계산 및 KaTeX 렌더링
+    const side = 4;
+    const height = 6;
+    const baseArea = (Math.sqrt(3) / 4) * Math.pow(side, 2); // 4 * sqrt(3)
+    const volume = baseArea * height; // 24 * sqrt(3)
+    const surfaceArea = 2 * baseArea + 3 * side * height; // 8 * sqrt(3) + 72
+
+    katex.render('V = 4\\sqrt{3} \\times 6 = 24\\sqrt{3} \\approx 41.57', document.getElementById('volume-eq'));
+    katex.render(
+      'S = 2(4\\sqrt{3}) + 3(4 \\times 6) = 8\\sqrt{3} + 72 \\approx 85.86',
+      document.getElementById('surface-eq')
+    );
+
+    // 2. 3D 투영 설정
+    const ox = 220,
+      oy = 440,
+      scale = 60;
+    function project(x, y, z) {
+      return {
+        px: Math.round(ox + x * scale + z * scale * Math.cos(Math.PI / 4) * 0.5),
+        py: Math.round(oy - y * scale - z * scale * Math.sin(Math.PI / 4) * 0.5),
+      };
+    }
+
+    // 꼭짓점 정의 (A, B, C는 상단 / D, E, F는 하단)
+    const h_tri = (side * Math.sqrt(3)) / 2;
+    const pts = {
+      D: project(0, 0, 0),
+      E: project(4, 0, 0),
+      F: project(2, 0, h_tri),
+      A: project(0, 6, 0),
+      B: project(4, 6, 0),
+      C: project(2, 6, h_tri),
+    };
+
+    function el(tag, attrs) {
+      const e = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      return e;
+    }
+
+    function drawLine(p1, p2, isHidden = false) {
+      const attrs = {
+        x1: p1.px,
+        y1: p1.py,
+        x2: p2.px,
+        y2: p2.py,
+        stroke: isHidden ? '[auxiliary-line]' : '[shape-stroke]',
+        'stroke-width': isHidden ? '1' : '1.5',
+      };
+      if (isHidden) attrs['stroke-dasharray'] = '5 4';
+      svg.appendChild(el('line', attrs));
+    }
+
+    function addLabel(p, content, dx = 0, dy = 0) {
+      const t = el('text', {
+        x: p.px + dx,
+        y: p.py + dy,
+        'font-size': '14',
+        'font-weight': '500',
+        'text-anchor': 'middle',
+        'dominant-baseline': 'central',
+        fill: '[label-primary]',
+      });
+      t.textContent = content;
+      svg.appendChild(t);
+    }
+
+    // 3. 면 채우기 (가독성을 위해 배경색 살짝 추가)
+    const faces = [
+      [pts.A, pts.B, pts.E, pts.D], // 앞면
+      [pts.A, pts.B, pts.C], // 상단면
+    ];
+    faces.forEach(f => {
+      const poly = el('polygon', {
+        points: f.map(p => p.px + ',' + p.py).join(' '),
+        fill: '[shape-fill]',
+        'fill-opacity': '0.1',
+      });
+      svg.appendChild(poly);
+    });
+
+    // 4. 모서리 그리기
+    // 보이는 선
+    drawLine(pts.A, pts.B);
+    drawLine(pts.B, pts.C);
+    drawLine(pts.C, pts.A); // 상단
+    drawLine(pts.A, pts.D);
+    drawLine(pts.B, pts.E); // 수직
+    drawLine(pts.D, pts.E); // 하단 앞
+    // 숨겨진 선 (점선)
+    drawLine(pts.C, pts.F, true); // 뒷 수직
+    drawLine(pts.D, pts.F, true);
+    drawLine(pts.E, pts.F, true); // 하단 뒤
+
+    // 5. 라벨링
+    addLabel(pts.A, 'A', -15, -15);
+    addLabel(pts.B, 'B', 15, -15);
+    addLabel(pts.C, 'C', 0, -20);
+    addLabel(pts.D, 'D', -15, 15);
+    addLabel(pts.E, 'E', 15, 15);
+    addLabel(pts.F, 'F', 0, 20);
+
+    // 치수 표시
+    addLabel({ px: (pts.D.px + pts.E.px) / 2, py: pts.D.py }, '4', 0, 20);
+    addLabel({ px: pts.D.px, py: (pts.A.py + pts.D.py) / 2 }, '6', -20, 0);
+  })();
+</script>

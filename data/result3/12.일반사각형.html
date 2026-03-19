@@ -1,0 +1,103 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 사각형 ABCD: 불규칙 사각형
+// 변의 길이: AB=3, BC=5, CD=4, DA=6
+// 적당한 픽셀 배율로 배치
+const scale = 60;
+
+// 꼭짓점 좌표 설정 (비정형 사각형)
+// A -> B -> C -> D -> A
+// AB = 3 (아래쪽 변), BC = 5 (오른쪽 변), CD = 4 (위쪽 변), DA = 6 (왼쪽 변)
+const ax = 200, ay = 100;
+const bx = 200 + 3 * scale, by = 100;    // AB=3, 수평
+const cx = 200 + 3 * scale + 60, cy = 100 + 5 * scale; // BC=5, 오른쪽 아래
+const dx = 200 + 60 - 40, dy = 100 + 5 * scale;  // CD=4
+
+// 더 자연스러운 불규칙 사각형
+// A(좌상단), B(우상단), C(우하단), D(좌하단)
+const A = { x: 190, y: 80 };
+const B = { x: 470, y: 110 };  // AB = ~3단위
+const C = { x: 490, y: 340 };  // BC = ~5단위
+const D = { x: 170, y: 330 };  // CD = ~4단위, DA = ~6단위
+
+const pts = [A, B, C, D];
+const pts_str = pts.map(p => p.x + ',' + p.y).join(' ');
+
+// 도형
+svg.appendChild(el('polygon', {
+  points: pts_str,
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 꼭짓점 점
+pts.forEach(p => {
+  svg.appendChild(el('circle', { cx: p.x, cy: p.y, r: '3.5', fill: '#1D4ED8' }));
+});
+
+// 꼭짓점 라벨
+addText(A.x - 18, A.y - 10, 'A');
+addText(B.x + 18, B.y - 10, 'B');
+addText(C.x + 18, C.y + 10, 'C');
+addText(D.x - 18, D.y + 10, 'D');
+
+// 변 중점에 길이 라벨
+function midpoint(p1, p2) {
+  return { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 };
+}
+
+function perpOffset(p1, p2, dist) {
+  const dx = p2.x - p1.x, dy = p2.y - p1.y;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  return { dx: -dy / len * dist, dy: dx / len * dist };
+}
+
+// AB 변 (위쪽) - 길이 3
+const mAB = midpoint(A, B);
+const offAB = perpOffset(A, B, 18);
+addText(mAB.x + offAB.dx, mAB.y + offAB.dy - 8, '3', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// BC 변 (오른쪽) - 길이 5
+const mBC = midpoint(B, C);
+const offBC = perpOffset(B, C, 18);
+addText(mBC.x + offBC.dx, mBC.y + offBC.dy, '5', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// CD 변 (아래쪽) - 길이 4
+const mCD = midpoint(C, D);
+const offCD = perpOffset(C, D, 18);
+addText(mCD.x + offCD.dx, mCD.y + offCD.dy + 8, '4', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// DA 변 (왼쪽) - 길이 6
+const mDA = midpoint(D, A);
+const offDA = perpOffset(D, A, 18);
+addText(mDA.x + offDA.dx - 8, mDA.y + offDA.dy, '6', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 대각선 AC (점선)
+svg.appendChild(el('line', {
+  x1: A.x, y1: A.y, x2: C.x, y2: C.y,
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '5 4'
+}));
+
+// 대각선 BD (점선)
+svg.appendChild(el('line', {
+  x1: B.x, y1: B.y, x2: D.x, y2: D.y,
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '5 4'
+}));
+</script>

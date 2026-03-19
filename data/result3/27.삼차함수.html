@@ -1,0 +1,89 @@
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// y = x(x-2)(x+2) = x³ - 4x
+// x절편: -2, 0, 2
+// 극대: x = -2/√3 ≈ -1.155, y ≈ 3.08
+// 극소: x = 2/√3 ≈ 1.155, y ≈ -3.08
+const ox = 340, oy = 230, scale = 60;
+
+// 좌표축
+svg.appendChild(el('line', { x1: 60, y1: oy, x2: 630, y2: oy, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('line', { x1: ox, y1: 440, x2: ox, y2: 40, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+addText(620, oy - 16, 'x', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(ox + 16, 52, 'y', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(ox - 16, oy + 16, 'O', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 눈금
+for (let i = -4; i <= 4; i++) {
+  if (i === 0) continue;
+  const px = ox + i * scale;
+  if (px < 70 || px > 620) continue;
+  svg.appendChild(el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: '#64748B', 'stroke-width': '0.8' }));
+  addText(px, oy + 16, String(i), { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+}
+for (let j = -3; j <= 3; j++) {
+  if (j === 0) continue;
+  const py = oy - j * scale;
+  if (py < 50 || py > 430) continue;
+  svg.appendChild(el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: '#64748B', 'stroke-width': '0.8' }));
+  addText(ox - 20, py, String(j), { 'font-size': '12', 'font-weight': '400', fill: '#475569', 'text-anchor': 'end' });
+}
+
+// 곡선 y = x³ - 4x
+let points = '';
+for (let px = 60; px <= 620; px += 2) {
+  const mx = (px - ox) / scale;
+  const my = mx * mx * mx - 4 * mx;
+  const py = oy - my * scale;
+  if (py >= 50 && py <= 430) {
+    points += `${px},${Math.round(py * 10) / 10} `;
+  }
+}
+svg.appendChild(el('polyline', { points: points.trim(), fill: 'none', stroke: '#3B82F6', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+
+// x절편 표시
+const xInts = [-2, 0, 2];
+const xLabels = ['(-2, 0)', '(0, 0)', '(2, 0)'];
+const xOffsets = [[-36, 20], [0, 20], [32, 20]];
+xInts.forEach((xi, idx) => {
+  const px = ox + xi * scale;
+  svg.appendChild(el('circle', { cx: px, cy: oy, r: '4', fill: '#3B82F6' }));
+  addText(px + xOffsets[idx][0], oy + xOffsets[idx][1], xLabels[idx], { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+});
+
+// 극대점: x = -2/√3, y = 16/(3√3) ≈ 3.079
+const xMax = -2 / Math.sqrt(3);
+const yMax = xMax * xMax * xMax - 4 * xMax;
+const pxMax = ox + xMax * scale;
+const pyMax = oy - yMax * scale;
+svg.appendChild(el('circle', { cx: pxMax.toFixed(1), cy: pyMax.toFixed(1), r: '4.5', fill: '#F59E0B' }));
+addText(pxMax - 40, pyMax - 16, '극대', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 극소점: x = 2/√3, y = -16/(3√3) ≈ -3.079
+const xMin = 2 / Math.sqrt(3);
+const yMin = xMin * xMin * xMin - 4 * xMin;
+const pxMin = ox + xMin * scale;
+const pyMin = oy - yMin * scale;
+svg.appendChild(el('circle', { cx: pxMin.toFixed(1), cy: pyMin.toFixed(1), r: '4.5', fill: '#F59E0B' }));
+addText(pxMin + 40, pyMin + 16, '극소', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 함수식 라벨
+addText(520, 100, 'y = x(x−2)(x+2)', { 'font-size': '14', 'font-weight': '500', fill: '#3B82F6' });
+</script>

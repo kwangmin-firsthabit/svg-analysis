@@ -1,0 +1,257 @@
+<svg id="vis" width="100%" viewBox="0 0 760 520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const C = {
+    circle: '#2563eb',
+    chord: '#dc2626',
+    radius: '#16a34a',
+    fill: '#dbeafe',
+    text: '#0f172a',
+    sub: '#64748b',
+    center: '#7c3aed',
+    guide: '#94a3b8',
+  };
+
+  function el(tag, attrs = {}) {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    return node;
+  }
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      fill: C.text,
+      'font-size': 14,
+      'font-weight': 500,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      ...attrs,
+    });
+    t.textContent = str;
+    return add(t);
+  }
+
+  // Geometry
+  const O = { x: 230, y: 290 };
+  const R = 140; // scaled radius for display
+  const halfChord = R / 2; // because chord length 8, radius 8 -> half chord = 4
+  const d = Math.sqrt(R * R - halfChord * halfChord); // distance from center to chord
+  const A = { x: O.x - halfChord, y: O.y + d };
+  const B = { x: O.x + halfChord, y: O.y + d };
+  const M = { x: O.x, y: O.y + d };
+
+  // helper background
+  add(el('rect', { x: 0, y: 0, width: 760, height: 520, fill: 'white' }));
+
+  // fill the circular segment (minor segment)
+  const segmentPath = [`M ${A.x} ${A.y}`, `A ${R} ${R} 0 0 1 ${B.x} ${B.y}`, `L ${A.x} ${A.y}`, 'Z'].join(' ');
+  add(
+    el('path', {
+      d: segmentPath,
+      fill: C.fill,
+      stroke: 'none',
+      opacity: 0.95,
+    })
+  );
+
+  // circle outline (faint for context)
+  add(
+    el('circle', {
+      cx: O.x,
+      cy: O.y,
+      r: R,
+      fill: 'none',
+      stroke: C.guide,
+      'stroke-width': 1.4,
+      'stroke-dasharray': '6 5',
+    })
+  );
+
+  // highlighted minor arc
+  add(
+    el('path', {
+      d: `M ${A.x} ${A.y} A ${R} ${R} 0 0 1 ${B.x} ${B.y}`,
+      fill: 'none',
+      stroke: C.circle,
+      'stroke-width': 3,
+      'stroke-linecap': 'round',
+    })
+  );
+
+  // chord
+  add(
+    el('line', {
+      x1: A.x,
+      y1: A.y,
+      x2: B.x,
+      y2: B.y,
+      stroke: C.chord,
+      'stroke-width': 3,
+    })
+  );
+
+  // radii
+  add(
+    el('line', {
+      x1: O.x,
+      y1: O.y,
+      x2: A.x,
+      y2: A.y,
+      stroke: C.radius,
+      'stroke-width': 2.4,
+    })
+  );
+  add(
+    el('line', {
+      x1: O.x,
+      y1: O.y,
+      x2: B.x,
+      y2: B.y,
+      stroke: C.radius,
+      'stroke-width': 2.4,
+    })
+  );
+
+  // perpendicular from center to chord
+  add(
+    el('line', {
+      x1: O.x,
+      y1: O.y,
+      x2: M.x,
+      y2: M.y,
+      stroke: C.guide,
+      'stroke-width': 1.6,
+      'stroke-dasharray': '5 4',
+    })
+  );
+
+  // right angle mark at M
+  add(
+    el('path', {
+      d: `M ${M.x} ${M.y} l 12 0 l 0 -12 l -12 0`,
+      fill: 'none',
+      stroke: C.center,
+      'stroke-width': 1.8,
+    })
+  );
+
+  // points
+  for (const P of [A, B]) {
+    add(el('circle', { cx: P.x, cy: P.y, r: 4.5, fill: C.chord }));
+  }
+  add(el('circle', { cx: O.x, cy: O.y, r: 4.8, fill: C.center }));
+  add(el('circle', { cx: M.x, cy: M.y, r: 3.8, fill: C.guide }));
+
+  // labels
+  text(O.x - 14, O.y - 14, 'O', { fill: C.center, 'font-size': 13 });
+  text(A.x - 14, A.y + 16, 'A', { fill: C.chord, 'font-size': 13 });
+  text(B.x + 14, B.y + 16, 'B', { fill: C.chord, 'font-size': 13 });
+  text(M.x + 16, M.y - 10, 'M', { fill: C.sub, 'font-size': 12, 'text-anchor': 'start' });
+
+  text((A.x + B.x) / 2, A.y + 22, '현 AB = 8', {
+    fill: C.chord,
+    'font-size': 15,
+  });
+
+  text((O.x + A.x) / 2 - 18, (O.y + A.y) / 2, '8', {
+    fill: C.radius,
+    'font-size': 15,
+  });
+  text((O.x + B.x) / 2 + 18, (O.y + B.y) / 2, '8', {
+    fill: C.radius,
+    'font-size': 15,
+  });
+
+  // center angle (60 degrees because 2R sin(theta/2)=8 with R=8)
+  const arcR = 42;
+  const ang1 = Math.atan2(A.y - O.y, A.x - O.x);
+  const ang2 = Math.atan2(B.y - O.y, B.x - O.x);
+  add(
+    el('path', {
+      d: `M ${O.x + arcR * Math.cos(ang1)} ${O.y + arcR * Math.sin(ang1)}
+      A ${arcR} ${arcR} 0 0 1 ${O.x + arcR * Math.cos(ang2)} ${O.y + arcR * Math.sin(ang2)}`,
+      fill: 'none',
+      stroke: C.center,
+      'stroke-width': 2,
+    })
+  );
+  text(O.x, O.y + 56, '∠AOB = 60°', {
+    fill: C.center,
+    'font-size': 13,
+  });
+
+  // sagitta label
+  const sagitta = R - d;
+  text(O.x + 205, 104, '반지름 8, 현의 길이 8인 활꼴', {
+    'font-size': 20,
+    'font-weight': 700,
+  });
+  text(O.x + 205, 136, '중심각은 60°', {
+    fill: C.sub,
+    'font-size': 13,
+    'font-weight': 400,
+  });
+  text(O.x + 205, 162, '현의 중점 M에서 OM ⟂ AB', {
+    fill: C.sub,
+    'font-size': 13,
+    'font-weight': 400,
+  });
+  text(O.x + 205, 188, '활의 높이 = 8 - 4√3', {
+    fill: C.sub,
+    'font-size': 13,
+    'font-weight': 400,
+  });
+
+  // pointer lines
+  add(
+    el('line', {
+      x1: O.x + 170,
+      y1: 200,
+      x2: O.x + 62,
+      y2: O.y + 74,
+      stroke: C.sub,
+      'stroke-width': 1.4,
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  add(
+    el('line', {
+      x1: O.x + 165,
+      y1: 150,
+      x2: B.x - 8,
+      y2: B.y - 24,
+      stroke: C.sub,
+      'stroke-width': 1.4,
+      'marker-end': 'url(#arrow)',
+    })
+  );
+</script>

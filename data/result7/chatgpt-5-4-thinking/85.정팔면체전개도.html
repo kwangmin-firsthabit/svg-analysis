@@ -1,0 +1,277 @@
+<svg id="vis" width="100%" viewBox="0 0 860 620" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const C = {
+    f1: '#dbeafe',
+    f2: '#dcfce7',
+    f3: '#fef3c7',
+    f4: '#fee2e2',
+    f5: '#ede9fe',
+    f6: '#fce7f3',
+    f7: '#cffafe',
+    f8: '#e2e8f0',
+    edge: '#0f172a',
+    fold: '#64748b',
+    text: '#0f172a',
+    sub: '#64748b',
+    vertex: '#2563eb',
+  };
+
+  function el(tag, attrs = {}) {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    return node;
+  }
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      fill: C.text,
+      'font-size': 14,
+      'font-weight': 500,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      ...attrs,
+    });
+    t.textContent = str;
+    return add(t);
+  }
+  function polygon(points, fill, stroke = C.edge, width = 2.2) {
+    return add(
+      el('polygon', {
+        points: points.map(p => `${p.x},${p.y}`).join(' '),
+        fill,
+        stroke,
+        'stroke-width': width,
+        'stroke-linejoin': 'round',
+      })
+    );
+  }
+  function line(P, Q, attrs = {}) {
+    return add(
+      el('line', {
+        x1: P.x,
+        y1: P.y,
+        x2: Q.x,
+        y2: Q.y,
+        ...attrs,
+      })
+    );
+  }
+  function mid(P, Q) {
+    return { x: (P.x + Q.x) / 2, y: (P.y + Q.y) / 2 };
+  }
+
+  // Regular octahedron net: 8 equilateral triangles, each side length 6
+  const s = 120; // display scale for side 6
+  const h = (s * Math.sqrt(3)) / 2; // equilateral triangle height
+
+  // Central strip of 4 triangles
+  const A = { x: 180, y: 320 };
+  const B = { x: 300, y: 320 };
+  const Cc = { x: 420, y: 320 };
+  const D = { x: 540, y: 320 };
+
+  const U1 = { x: 240, y: 320 - h };
+  const U2 = { x: 360, y: 320 - h };
+  const U3 = { x: 480, y: 320 - h };
+
+  const L1 = { x: 240, y: 320 + h };
+  const L2 = { x: 360, y: 320 + h };
+  const L3 = { x: 480, y: 320 + h };
+
+  // Extra caps
+  const T = { x: 360, y: 320 - 2 * h };
+  const Btm = { x: 360, y: 320 + 2 * h };
+
+  // background
+  add(el('rect', { x: 0, y: 0, width: 860, height: 620, fill: 'white' }));
+
+  // 8 triangular faces
+  polygon([A, B, U1], C.f1); // upper left
+  polygon([B, Cc, U2], C.f2); // upper middle
+  polygon([Cc, D, U3], C.f3); // upper right
+  polygon([A, B, L1], C.f4); // lower left
+  polygon([B, Cc, L2], C.f5); // lower middle
+  polygon([Cc, D, L3], C.f6); // lower right
+  polygon([U1, U2, T], C.f7); // top cap
+  polygon([L1, L2, Btm], C.f8); // bottom cap
+
+  // fold lines
+  const foldEdges = [
+    [A, B],
+    [B, Cc],
+    [Cc, D],
+    [B, U1],
+    [B, L1],
+    [Cc, U2],
+    [Cc, L2],
+    [U1, U2],
+    [L1, L2],
+  ];
+  for (const [P, Q] of foldEdges) {
+    line(P, Q, {
+      stroke: C.fold,
+      'stroke-width': 1.8,
+      'stroke-dasharray': '7 5',
+    });
+  }
+
+  // emphasize outer boundary
+  const boundary = [
+    [A, U1],
+    [U1, T],
+    [T, U2],
+    [U2, U3],
+    [U3, D],
+    [D, L3],
+    [L3, Cc],
+    [Cc, Btm],
+    [Btm, L2],
+    [L2, L1],
+    [L1, A],
+  ];
+  for (const [P, Q] of boundary) {
+    line(P, Q, {
+      stroke: C.edge,
+      'stroke-width': 2.8,
+      'stroke-linecap': 'round',
+    });
+  }
+
+  // vertices
+  for (const P of [A, B, Cc, D, U1, U2, U3, L1, L2, L3, T, Btm]) {
+    add(el('circle', { cx: P.x, cy: P.y, r: 3.8, fill: C.vertex }));
+  }
+
+  // labels for a few key vertices
+  text(A.x - 14, A.y + 18, 'A', { 'font-size': 13 });
+  text(B.x, B.y + 18, 'B', { 'font-size': 13 });
+  text(Cc.x, Cc.y + 18, 'C', { 'font-size': 13 });
+  text(D.x + 14, D.y + 18, 'D', { 'font-size': 13 });
+  text(T.x, T.y - 18, 'T', { 'font-size': 13 });
+  text(Btm.x, Btm.y + 18, 'S', { 'font-size': 13 });
+
+  // edge length labels: all edges are 6
+  const edgesToLabel = [
+    [A, B, 0, 18],
+    [B, Cc, 0, 18],
+    [Cc, D, 0, 18],
+    [A, U1, -18, -2],
+    [B, U1, 18, -2],
+    [B, U2, -18, -2],
+    [Cc, U2, 18, -2],
+    [Cc, U3, -18, -2],
+    [D, U3, 18, -2],
+    [A, L1, -18, 2],
+    [B, L1, 18, 2],
+    [B, L2, -18, 2],
+    [Cc, L2, 18, 2],
+    [Cc, L3, -18, 2],
+    [D, L3, 18, 2],
+    [U1, T, -14, -2],
+    [U2, T, 14, -2],
+    [L1, Btm, -14, 2],
+    [L2, Btm, 14, 2],
+  ];
+  for (const [P, Q, dx, dy] of edgesToLabel) {
+    const M = mid(P, Q);
+    text(M.x + dx, M.y + dy, '6', {
+      'font-size': 13,
+      fill: C.sub,
+    });
+  }
+
+  // face labels
+  text(240, 258, '면 1', { fill: '#1d4ed8', 'font-size': 12 });
+  text(360, 258, '면 2', { fill: '#15803d', 'font-size': 12 });
+  text(480, 258, '면 3', { fill: '#b45309', 'font-size': 12 });
+  text(240, 382, '면 4', { fill: '#b91c1c', 'font-size': 12 });
+  text(360, 382, '면 5', { fill: '#6d28d9', 'font-size': 12 });
+  text(480, 382, '면 6', { fill: '#be185d', 'font-size': 12 });
+  text(360, 130, '면 7', { fill: '#0f766e', 'font-size': 12 });
+  text(360, 510, '면 8', { fill: '#475569', 'font-size': 12 });
+
+  // title and notes
+  text(680, 88, '정팔면체의 전개도', {
+    'font-size': 24,
+    'font-weight': 700,
+  });
+  text(680, 122, '모든 면은 한 변의 길이가 6인 정삼각형', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(680, 150, '정삼각형 8개로 이루어진 입체', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(680, 178, '가운데 띠 모양 6개와 위·아래 1개씩 붙은 형태', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(680, 206, '점선은 접는 모서리', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+
+  // guide arrows
+  line(
+    { x: 610, y: 212 },
+    { x: 420, y: 258 },
+    {
+      stroke: C.sub,
+      'stroke-width': 1.4,
+      'marker-end': 'url(#arrow)',
+    }
+  );
+  line(
+    { x: 610, y: 168 },
+    { x: 360, y: 132 },
+    {
+      stroke: C.sub,
+      'stroke-width': 1.4,
+      'marker-end': 'url(#arrow)',
+    }
+  );
+  line(
+    { x: 610, y: 236 },
+    { x: 360, y: 492 },
+    {
+      stroke: C.sub,
+      'stroke-width': 1.4,
+      'marker-end': 'url(#arrow)',
+    }
+  );
+</script>

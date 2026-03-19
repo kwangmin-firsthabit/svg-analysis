@@ -1,0 +1,64 @@
+<svg id="vis" width="100%" viewBox="0 0 680 540" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '13', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#374151', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+function poly(points, fill, stroke, sw = '1.5') {
+  svg.appendChild(el('polygon', { points: points.map(([x, y]) => `${x},${y}`).join(' '), fill, stroke, 'stroke-width': sw }));
+}
+
+const Cx = 290, Cy = 380;
+const s = 40;
+const Ax = Cx, Ay = Cy - 3 * s;
+const Bx = Cx + 4 * s, By = Cy;
+
+const dx = Bx - Ax, dy = By - Ay;
+const len = Math.hypot(dx, dy);
+const ux = dx / len, uy = dy / len;
+const nx = uy, ny = -ux;
+const sd = 5 * s;
+
+const Dx = Ax + nx * sd, Dy = Ay + ny * sd;
+const Ex = Bx + nx * sd, Ey = By + ny * sd;
+
+poly([[Cx, Cy - 3*s], [Cx - 3*s, Cy - 3*s], [Cx - 3*s, Cy], [Cx, Cy]], '#DBEAFE', '#2563EB');
+poly([[Cx, Cy], [Bx, By], [Bx, Cy + s], [Cx, Cy + s]], '#DCFCE7', '#16A34A');
+poly([[Ax, Ay], [Dx, Dy], [Ex, Ey], [Bx, By]], '#FEF9C3', '#CA8A04');
+poly([[Ax, Ay], [Bx, By], [Cx, Cy]], '#F0F9FF', '#374151', '2');
+
+svg.appendChild(el('rect', { x: Cx - 16, y: Cy - 16, width: 16, height: 16, fill: 'none', stroke: '#374151', 'stroke-width': '1.5' }));
+
+const t9 = el('text', { x: Cx - 3*s/2, y: (Cy + Ay) / 2, 'font-size': '14', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E40AF', 'font-weight': '600' });
+t9.textContent = '9';
+svg.appendChild(t9);
+
+const t16 = el('text', { x: (Cx + Bx) / 2, y: Cy + s / 2, 'font-size': '14', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#15803D', 'font-weight': '600' });
+t16.textContent = '16';
+svg.appendChild(t16);
+
+const midHypX = (Ax + Bx + Dx + Ex) / 4, midHypY = (Ay + By + Dy + Ey) / 4;
+const t25 = el('text', { x: midHypX, y: midHypY, 'font-size': '14', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#92400E', 'font-weight': '600' });
+t25.textContent = '25';
+svg.appendChild(t25);
+
+addText(Ax - 12, Ay, 'A', { 'text-anchor': 'end', fill: '#374151', 'font-weight': '500' });
+addText(Bx + 14, By + 4, 'B', { 'text-anchor': 'start', fill: '#374151', 'font-weight': '500' });
+addText(Cx - 14, Cy + 4, 'C', { 'text-anchor': 'end', fill: '#374151', 'font-weight': '500' });
+
+addText((Cx + Ax) / 2 - 16, (Cy + Ay) / 2, '3', { fill: '#2563EB', 'font-size': '12' });
+addText((Cx + Bx) / 2, Cy + 14, '4', { fill: '#16A34A', 'font-size': '12' });
+addText((Ax + Bx) / 2 + 18, (Ay + By) / 2 - 8, '5', { fill: '#CA8A04', 'font-size': '12' });
+
+addText(340, 30, '피타고라스 정리: 3² + 4² = 5²', { 'font-size': '16', fill: '#374151', 'font-weight': '700' });
+addText(340, 56, '9 + 16 = 25', { 'font-size': '13', fill: '#475569' });
+</script>

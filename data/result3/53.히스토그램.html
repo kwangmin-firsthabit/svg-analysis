@@ -1,0 +1,98 @@
+<svg id="vis" width="100%" viewBox="0 0 680 60" xmlns="http://www.w3.org/2000/svg">
+<text x="340" y="36" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#1E293B">통학 시간 도수분포 히스토그램 (학생 40명)</text>
+</svg>
+<div style="position: relative; width: 100%; height: 340px; padding: 0 20px; box-sizing: border-box;">
+  <canvas id="chart53"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const labels = ['0~10', '10~20', '20~30', '30~40', '40~50'];
+const frequencies = [5, 12, 14, 7, 2];
+const total = frequencies.reduce((a, b) => a + b, 0);
+const mean = frequencies.reduce((sum, f, i) => sum + f * (i * 10 + 5), 0) / total;
+
+const ctx = document.getElementById('chart53').getContext('2d');
+
+const avgLinePlugin = {
+  id: 'avgLine',
+  afterDraw(chart) {
+    const { ctx: c, chartArea, scales } = chart;
+    const xPos = scales.x.getPixelForValue(mean / 10 - 0.5);
+    c.save();
+    c.strokeStyle = '#F59E0B';
+    c.lineWidth = 1.5;
+    c.setLineDash([6, 4]);
+    c.beginPath();
+    c.moveTo(xPos, chartArea.top);
+    c.lineTo(xPos, chartArea.bottom);
+    c.stroke();
+    c.setLineDash([]);
+    c.fillStyle = '#F59E0B';
+    c.font = '12px sans-serif';
+    c.textAlign = 'left';
+    c.fillText('평균≈' + mean.toFixed(0) + '분', xPos + 4, chartArea.top + 16);
+    c.restore();
+  }
+};
+
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [{
+      label: '도수',
+      data: frequencies,
+      backgroundColor: '#EFF6FF',
+      borderColor: '#1D4ED8',
+      borderWidth: 1.5,
+      borderRadius: 0,
+      barPercentage: 1.0,
+      categoryPercentage: 1.0,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { top: 30, right: 20, bottom: 10, left: 10 } },
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false },
+      datalabels: { display: false }
+    },
+    scales: {
+      x: {
+        title: { display: true, text: '통학 시간 (분)', color: '#475569', font: { size: 12 } },
+        grid: { display: false },
+        ticks: { color: '#475569', font: { size: 12 } }
+      },
+      y: {
+        title: { display: true, text: '도수 (명)', color: '#475569', font: { size: 12 } },
+        min: 0, max: 18,
+        ticks: { stepSize: 2, color: '#475569', font: { size: 12 } },
+        grid: { color: '#F1F5F9' }
+      }
+    },
+    animation: { duration: 0 }
+  },
+  plugins: [
+    avgLinePlugin,
+    {
+      id: 'dataLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx: c, data } = chart;
+        const dataset = chart.getDatasetMeta(0);
+        dataset.data.forEach((bar, i) => {
+          const value = data.datasets[0].data[i];
+          c.save();
+          c.fillStyle = '#1D4ED8';
+          c.font = '500 12px sans-serif';
+          c.textAlign = 'center';
+          c.textBaseline = 'bottom';
+          c.fillText(String(value), bar.x, bar.y - 4);
+          c.restore();
+        });
+      }
+    }
+  ]
+});
+</script>

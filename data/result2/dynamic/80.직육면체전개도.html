@@ -1,0 +1,58 @@
+<svg id="vis" width="100%" viewBox="0 0 680 560" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+function drawFace(x, y, w, h, label, dim, opacity = 0.12) {
+  svg.appendChild(el('rect', {
+    x, y, width: w, height: h,
+    fill: '#3B82F6', 'fill-opacity': String(opacity),
+    stroke: '#1D4ED8', 'stroke-width': '1.5'
+  }));
+  addText(x + w / 2, y + h / 2 - 8, label, { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+  addText(x + w / 2, y + h / 2 + 10, dim, { 'font-size': '11', fill: '#475569' });
+}
+
+svg.appendChild(el('rect', { width: '680', height: '560', fill: '#F8FAFC' }));
+addText(340, 38, '직육면체 전개도 (가로 5, 세로 3, 높이 4)', { 'font-size': '18', 'font-weight': '600', fill: '#1E293B' });
+
+const W = 5, D = 3, H = 4;
+const scale = 24;
+const sw = Math.round(W * scale);
+const sd = Math.round(D * scale);
+const sh = Math.round(H * scale);
+
+const startX = Math.round((680 - (sd + sw + sd)) / 2);
+const topY = 70;
+
+drawFace(startX + sd, topY, sw, sd, '위면', `${W} × ${D}`, 0.12);
+drawFace(startX + sd, topY + sd, sw, sh, '앞면', `${W} × ${H}`, 0.18);
+drawFace(startX + sd, topY + sd + sh, sw, sd, '아래면', `${W} × ${D}`, 0.12);
+drawFace(startX + sd, topY + sd + sh + sd, sw, sh, '뒷면', `${W} × ${H}`, 0.15);
+drawFace(startX, topY + sd, sd, sh, '왼면', `${D} × ${H}`, 0.12);
+drawFace(startX + sd + sw, topY + sd, sd, sh, '오른면', `${D} × ${H}`, 0.12);
+
+const totalH = sd + sh + sd + sh;
+[startX, startX + sd + sw + sd].forEach(lx => {
+  svg.appendChild(el('line', {
+    x1: lx, y1: topY + sd, x2: lx, y2: topY + sd + sh,
+    stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '4 3'
+  }));
+});
+
+const sa = 2 * (W * D + W * H + D * H);
+const vol = W * D * H;
+addText(340, 460, `겉넓이 = 2(${W}×${D} + ${W}×${H} + ${D}×${H}) = 2(${W*D} + ${W*H} + ${D*H}) = ${sa}`, { 'font-size': '13', fill: '#475569' });
+addText(340, 485, `부피 = ${W} × ${D} × ${H} = ${vol}`, { 'font-size': '13', fill: '#475569' });
+</script>

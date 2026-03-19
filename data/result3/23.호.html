@@ -1,0 +1,109 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const cx = 340, cy = 220, r = 150;
+
+// 원
+svg.appendChild(el('circle', { cx, cy, r, fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+
+// 중심 O
+svg.appendChild(el('circle', { cx, cy, r: '3.5', fill: '#1D4ED8' }));
+addText(cx - 15, cy + 2, 'O', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+
+// 호의 호길이가 10, 원둘레=2πr=2π×150≈942, 호의 중심각=10/150 rad
+// 중심각 θ = 10/150 rad ≈ 3.82°
+// 호를 위쪽 중앙에 배치: 약 240° ~ 300° 범위 (SVG 각도)
+// A는 -120° (240°), B는 -60° (300°)에서 시작 — 호가 위쪽에 위치
+// 실제 수학 각도: A = 120°, B = 60° (y축 반전이므로)
+// SVG에서 y는 아래로 → A: 240deg (svg), B: 300deg (svg)
+// 중심각 θ = 10/150 rad = 약 0.0667 rad = 약 3.82°
+// 시각적으로 충분히 보이도록 중심각을 60°로 설정 (교육적 표현)
+
+const thetaDeg = 60; // 시각적 중심각
+const startAngle = 210 * Math.PI / 180; // A 점 (좌하)
+const endAngle = 330 * Math.PI / 180;   // B 점 (우하)
+// 호가 위쪽에 표시되도록 각도 재배치
+const aAngle = -120 * Math.PI / 180; // A: 좌상
+const bAngle = -60 * Math.PI / 180;  // B: 우상
+
+const ax = cx + r * Math.cos(aAngle);
+const ay = cy + r * Math.sin(aAngle);
+const bx = cx + r * Math.cos(bAngle);
+const by = cy + r * Math.sin(bAngle);
+
+// 호 AB (위쪽, 짧은 호)
+const arcStartX = ax, arcStartY = ay;
+const arcEndX = bx, arcEndY = by;
+svg.appendChild(el('path', {
+  d: `M ${arcStartX.toFixed(2)} ${arcStartY.toFixed(2)} A ${r} ${r} 0 0 1 ${arcEndX.toFixed(2)} ${arcEndY.toFixed(2)}`,
+  fill: 'none', stroke: '#1D4ED8', 'stroke-width': '2.5', 'stroke-linecap': 'round'
+}));
+
+// 반지름 OA (점선)
+svg.appendChild(el('line', {
+  x1: cx, y1: cy, x2: ax.toFixed(2), y2: ay.toFixed(2),
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+
+// 반지름 OB (점선)
+svg.appendChild(el('line', {
+  x1: cx, y1: cy, x2: bx.toFixed(2), y2: by.toFixed(2),
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+
+// 점 A, B
+svg.appendChild(el('circle', { cx: ax.toFixed(2), cy: ay.toFixed(2), r: '3.5', fill: '#1D4ED8' }));
+svg.appendChild(el('circle', { cx: bx.toFixed(2), cy: by.toFixed(2), r: '3.5', fill: '#1D4ED8' }));
+
+// 라벨 A, B
+addText(ax - 18, ay - 10, 'A');
+addText(bx + 18, by - 10, 'B');
+
+// 중심각 표시 (호)
+const arcR = 38;
+const arcMidAngle = (aAngle + bAngle) / 2; // -90도 방향 (위쪽)
+const arcSX = cx + arcR * Math.cos(aAngle);
+const arcSY = cy + arcR * Math.sin(aAngle);
+const arcEX = cx + arcR * Math.cos(bAngle);
+const arcEY = cy + arcR * Math.sin(bAngle);
+svg.appendChild(el('path', {
+  d: `M ${arcSX.toFixed(2)} ${arcSY.toFixed(2)} A ${arcR} ${arcR} 0 0 1 ${arcEX.toFixed(2)} ${arcEY.toFixed(2)}`,
+  fill: 'none', stroke: '#60A5FA', 'stroke-width': '1'
+}));
+
+// 중심각 라벨
+const labelR = 52;
+const midX = cx + labelR * Math.cos(arcMidAngle);
+const midY = cy + labelR * Math.sin(arcMidAngle);
+addText(midX, midY, '60°', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 호의 길이 라벨 (호 위)
+const arcMidX = cx + (r + 20) * Math.cos(arcMidAngle);
+const arcMidY = cy + (r + 20) * Math.sin(arcMidAngle);
+addText(arcMidX, arcMidY, '10', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 라벨 r=OA, r=OB
+const oaLabelX = (cx + ax) / 2 - 15;
+const oaLabelY = (cy + ay) / 2;
+addText(oaLabelX, oaLabelY, 'r', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+const obLabelX = (cx + bx) / 2 + 15;
+const obLabelY = (cy + by) / 2;
+addText(obLabelX, obLabelY, 'r', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

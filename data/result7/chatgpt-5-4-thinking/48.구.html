@@ -1,0 +1,221 @@
+<svg id="vis" width="100%" viewBox="0 0 760 520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="sphereGrad" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="45%" stop-color="#bfdbfe" />
+      <stop offset="100%" stop-color="#60a5fa" />
+    </radialGradient>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const C = {
+    sphere: '#2563eb',
+    outline: '#1d4ed8',
+    hidden: '#93c5fd',
+    radius: '#dc2626',
+    center: '#7c3aed',
+    text: '#0f172a',
+    sub: '#64748b',
+    guide: '#94a3b8',
+  };
+
+  function el(tag, attrs = {}) {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    return node;
+  }
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      fill: C.text,
+      'font-size': 14,
+      'font-weight': 500,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      ...attrs,
+    });
+    t.textContent = str;
+    return add(t);
+  }
+
+  const O = { x: 280, y: 270 };
+  const R = 150;
+
+  // background
+  add(el('rect', { x: 0, y: 0, width: 760, height: 520, fill: 'white' }));
+
+  // sphere body
+  add(
+    el('circle', {
+      cx: O.x,
+      cy: O.y,
+      r: R,
+      fill: 'url(#sphereGrad)',
+      stroke: C.outline,
+      'stroke-width': 3,
+    })
+  );
+
+  // equator
+  add(
+    el('ellipse', {
+      cx: O.x,
+      cy: O.y,
+      rx: R,
+      ry: R * 0.34,
+      fill: 'none',
+      stroke: C.hidden,
+      'stroke-width': 2,
+      opacity: 0.9,
+    })
+  );
+
+  // hidden meridian
+  add(
+    el('ellipse', {
+      cx: O.x,
+      cy: O.y,
+      rx: R * 0.34,
+      ry: R,
+      fill: 'none',
+      stroke: C.hidden,
+      'stroke-width': 1.8,
+      'stroke-dasharray': '6 5',
+      opacity: 0.85,
+    })
+  );
+
+  // visible front arc of meridian
+  add(
+    el('path', {
+      d: `
+    M ${O.x} ${O.y - R}
+    A ${R * 0.34} ${R} 0 0 1 ${O.x} ${O.y + R}
+  `,
+      fill: 'none',
+      stroke: C.outline,
+      'stroke-width': 2.2,
+    })
+  );
+
+  // center point
+  add(
+    el('circle', {
+      cx: O.x,
+      cy: O.y,
+      r: 5,
+      fill: C.center,
+    })
+  );
+
+  // radius
+  const P = { x: O.x + R * Math.cos((-35 * Math.PI) / 180), y: O.y + R * Math.sin((-35 * Math.PI) / 180) };
+  add(
+    el('line', {
+      x1: O.x,
+      y1: O.y,
+      x2: P.x,
+      y2: P.y,
+      stroke: C.radius,
+      'stroke-width': 3,
+    })
+  );
+  add(
+    el('circle', {
+      cx: P.x,
+      cy: P.y,
+      r: 4.5,
+      fill: C.radius,
+    })
+  );
+
+  // labels
+  text(O.x - 18, O.y - 18, 'O', {
+    fill: C.center,
+    'font-size': 16,
+    'font-weight': 700,
+  });
+  text((O.x + P.x) / 2 + 14, (O.y + P.y) / 2 - 12, '5', {
+    fill: C.radius,
+    'font-size': 18,
+    'font-weight': 700,
+  });
+  text(P.x + 18, P.y - 10, '반지름', {
+    fill: C.radius,
+    'font-size': 12,
+    'text-anchor': 'start',
+  });
+
+  // highlight rim
+  add(
+    el('circle', {
+      cx: O.x,
+      cy: O.y,
+      r: R,
+      fill: 'none',
+      stroke: '#ffffff',
+      'stroke-width': 1.2,
+      opacity: 0.8,
+    })
+  );
+
+  // title and note
+  text(590, 110, '중심 O인 구', {
+    'font-size': 24,
+    'font-weight': 700,
+  });
+  text(590, 146, '반지름 = 5', {
+    'font-size': 16,
+    fill: C.sub,
+  });
+  text(590, 178, '모든 표면의 점이 중심 O에서', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(590, 202, '같은 거리 5에 있음', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+
+  // pointer arrow
+  add(
+    el('line', {
+      x1: 520,
+      y1: 190,
+      x2: P.x + 8,
+      y2: P.y + 6,
+      stroke: C.sub,
+      'stroke-width': 1.4,
+      'marker-end': 'url(#arrow)',
+    })
+  );
+</script>

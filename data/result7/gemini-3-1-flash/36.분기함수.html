@@ -1,0 +1,121 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+  const ox = 340,
+    oy = 360,
+    scale = 30;
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': '12',
+      'font-weight': '400',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: '[label-secondary]',
+      ...attrs,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 좌표축 그리기
+  svg.appendChild(
+    el('line', {
+      x1: 60,
+      y1: oy,
+      x2: 620,
+      y2: oy,
+      stroke: '[axis]',
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: 400,
+      x2: ox,
+      y2: 40,
+      stroke: '[axis]',
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  addText(615, oy - 14, 'x', { 'font-size': '14', 'font-weight': '500', fill: '[label-primary]' });
+  addText(ox + 14, 50, 'y', { 'font-size': '14', 'font-weight': '500', fill: '[label-primary]' });
+  addText(ox - 12, oy + 12, 'O');
+
+  // 2. 함수 곡선 그리기
+  // y = -x (x < 0)
+  let points1 = '';
+  for (let x = -8; x <= 0; x += 0.1) {
+    const y = -x;
+    const px = ox + x * scale;
+    const py = oy - y * scale;
+    if (px >= 60 && py >= 40) points1 += Math.round(px * 10) / 10 + ',' + Math.round(py * 10) / 10 + ' ';
+  }
+  svg.appendChild(
+    el('polyline', {
+      points: points1.trim(),
+      fill: 'none',
+      stroke: '[curve-primary]',
+      'stroke-width': '2',
+      'stroke-linecap': 'round',
+    })
+  );
+
+  // y = x^2 (x >= 0)
+  let points2 = '';
+  for (let x = 0; x <= 4; x += 0.1) {
+    const y = x * x;
+    const px = ox + x * scale;
+    const py = oy - y * scale;
+    if (px <= 620 && py >= 40) points2 += Math.round(px * 10) / 10 + ',' + Math.round(py * 10) / 10 + ' ';
+  }
+  svg.appendChild(
+    el('polyline', {
+      points: points2.trim(),
+      fill: 'none',
+      stroke: '[curve-secondary]',
+      'stroke-width': '2',
+      'stroke-linecap': 'round',
+    })
+  );
+
+  // 3. 주요 지점 및 라벨
+  svg.appendChild(el('circle', { cx: ox, cy: oy, r: '3.5', fill: '[label-primary]' }));
+
+  // 함수식 라벨 (KaTeX 대신 텍스트로 표현)
+  addText(ox - 60, oy - 100, 'y = -x', { fill: '[curve-primary]', 'font-weight': '500' });
+  addText(ox + 80, oy - 100, 'y = x²', { fill: '[curve-secondary]', 'font-weight': '500' });
+</script>

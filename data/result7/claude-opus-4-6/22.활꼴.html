@@ -1,0 +1,139 @@
+<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+  return t;
+}
+
+// r = 8, chord = 8
+// sin(θ/2) = (chord/2)/r = 4/8 = 0.5 → θ/2 = 30° → θ = 60°
+// 중심에서 현까지 거리 d = r·cos(30°) = 8·(√3/2) = 4√3 ≈ 6.928
+// 활꼴 높이 h = r - d = 8 - 4√3 ≈ 1.072
+const r = 8;
+const chord = 8;
+const centralAngle = Math.PI / 3; // 60°
+const halfAngle = Math.PI / 6; // 30°
+const d = r * Math.cos(halfAngle); // 4√3
+const h = r - d;
+
+const scale = 30;
+const cx = 340, cy = 240;
+const R = r * scale; // 240px
+
+// 원 전체 (점선 보조선)
+svg.appendChild(el('circle', { cx, cy, r: R, fill: 'none', stroke: '#CBD5E1', 'stroke-width': '1', 'stroke-dasharray': '6 4' }));
+
+// 현의 양 끝점 A, B (원 위쪽, 중심각 60° 대칭)
+const Ax = cx - (chord / 2) * scale;
+const Ay = cy - d * scale;
+const Bx = cx + (chord / 2) * scale;
+const By = Ay;
+
+// 활꼴 영역: 현 AB + 위쪽 호 (작은 호)
+const segPath = `M ${Ax},${Ay} A ${R},${R} 0 0 0 ${Bx},${By} Z`;
+svg.appendChild(el('path', { d: segPath, fill: '#DBEAFE', 'fill-opacity': '0.6', stroke: 'none' }));
+
+// 호 (활꼴의 곡선 부분)
+const arcPath = `M ${Ax},${Ay} A ${R},${R} 0 0 0 ${Bx},${By}`;
+svg.appendChild(el('path', { d: arcPath, fill: 'none', stroke: '#2563EB', 'stroke-width': '2.5' }));
+
+// 현 AB
+svg.appendChild(el('line', { x1: Ax, y1: Ay, x2: Bx, y2: By, stroke: '#2563EB', 'stroke-width': '2' }));
+
+// 반지름 OA, OB (점선)
+svg.appendChild(el('line', { x1: cx, y1: cy, x2: Ax, y2: Ay, stroke: '#64748B', 'stroke-width': '1.3', 'stroke-dasharray': '6 3' }));
+svg.appendChild(el('line', { x1: cx, y1: cy, x2: Bx, y2: By, stroke: '#64748B', 'stroke-width': '1.3', 'stroke-dasharray': '6 3' }));
+
+// 중심에서 현까지 수직선 (점선)
+const Mx = (Ax + Bx) / 2;
+const My = Ay;
+svg.appendChild(el('line', { x1: cx, y1: cy, x2: Mx, y2: My, stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '4 3' }));
+
+// 직각 표시 (중심→현 수직)
+const sqSize = 8;
+const sqPath = `M ${Mx - sqSize},${My} L ${Mx - sqSize},${My + sqSize} L ${Mx},${My + sqSize}`;
+svg.appendChild(el('path', { d: sqPath, fill: 'none', stroke: '#94A3B8', 'stroke-width': '1' }));
+
+// 중심각 60° 호 표시
+const angR = 36;
+const angStartX = cx + angR * Math.cos(-Math.PI / 2 - halfAngle);
+const angStartY = cy + angR * Math.sin(-Math.PI / 2 - halfAngle);
+const angEndX = cx + angR * Math.cos(-Math.PI / 2 + halfAngle);
+const angEndY = cy + angR * Math.sin(-Math.PI / 2 + halfAngle);
+const angArc = `M ${angStartX},${angStartY} A ${angR},${angR} 0 0 1 ${angEndX},${angEndY}`;
+svg.appendChild(el('path', { d: angArc, fill: 'none', stroke: '#F59E0B', 'stroke-width': '1.8' }));
+
+// 중심각 라벨
+addText(cx, cy - angR - 14, '60°', { fill: '#B45309', 'font-size': '13', 'font-weight': '600' });
+
+// 점: O (중심)
+svg.appendChild(el('circle', { cx, cy, r: '3.5', fill: '#334155' }));
+addText(cx + 14, cy + 14, 'O', { fill: '#334155', 'font-size': '14', 'font-weight': '600' });
+
+// 점: A
+svg.appendChild(el('circle', { cx: Ax, cy: Ay, r: '4', fill: '#2563EB' }));
+addText(Ax - 16, Ay + 2, 'A', { fill: '#1E293B', 'font-size': '14', 'font-weight': '600' });
+
+// 점: B
+svg.appendChild(el('circle', { cx: Bx, cy: By, r: '4', fill: '#2563EB' }));
+addText(Bx + 16, By + 2, 'B', { fill: '#1E293B', 'font-size': '14', 'font-weight': '600' });
+
+// 호의 꼭대기 점
+const topX = cx;
+const topY = cy - R;
+svg.appendChild(el('circle', { cx: topX, cy: topY, r: '3', fill: '#2563EB' }));
+
+// 반지름 라벨 (OA 중점 부근)
+const rLabelX = (cx + Ax) / 2 - 18;
+const rLabelY = (cy + Ay) / 2;
+addText(rLabelX, rLabelY, 'r = 8', { fill: '#64748B', 'font-size': '12', 'font-weight': '400' });
+
+// 현 라벨
+addText(Mx, Ay + 22, '현 = 8', { fill: '#1E40AF', 'font-size': '13', 'font-weight': '500' });
+
+// 활꼴 높이 h 표시 (수직 양쪽 화살표)
+const hLineX = Bx + 40;
+const hTop = topY;
+const hBot = Ay;
+
+// 높이 화살표 선
+svg.appendChild(el('line', { x1: hLineX, y1: hTop, x2: hLineX, y2: hBot, stroke: '#DC2626', 'stroke-width': '1.2' }));
+
+// 화살표 머리 (위)
+svg.appendChild(el('path', { d: `M ${hLineX},${hTop} l -4,8 l 8,0 Z`, fill: '#DC2626' }));
+// 화살표 머리 (아래)
+svg.appendChild(el('path', { d: `M ${hLineX},${hBot} l -4,-8 l 8,0 Z`, fill: '#DC2626' }));
+
+// 수평 틱 (위, 아래)
+svg.appendChild(el('line', { x1: hLineX - 6, y1: hTop, x2: hLineX + 6, y2: hTop, stroke: '#DC2626', 'stroke-width': '1' }));
+svg.appendChild(el('line', { x1: hLineX - 6, y1: hBot, x2: hLineX + 6, y2: hBot, stroke: '#DC2626', 'stroke-width': '1' }));
+
+// h 라벨
+addText(hLineX + 38, (hTop + hBot) / 2, `h ≈ ${h.toFixed(2)}`, { fill: '#DC2626', 'font-size': '12', 'font-weight': '400' });
+
+// d 라벨 (중심→현 거리)
+addText(cx + 16, (cy + My) / 2, 'd = 4√3', { fill: '#64748B', 'font-size': '12', 'font-weight': '400', 'text-anchor': 'start' });
+
+// 활꼴 면적 계산
+// S = (r²/2)(θ - sinθ) = (64/2)(π/3 - sin60°) = 32(π/3 - √3/2) ≈ 5.80
+const area = (r * r / 2) * (centralAngle - Math.sin(centralAngle));
+
+// 활꼴 영역 내부 라벨
+addText(cx, topY + (My - topY) * 0.45, '활꼴', { fill: '#1E40AF', 'font-size': '13', 'font-weight': '500' });
+
+// 하단 정보
+addText(340, 440, '반지름 r = 8, 현의 길이 = 8인 활꼴', { 'font-size': '14', fill: '#334155', 'font-weight': '500' });
+addText(340, 462, `중심각 θ = 60°,  활꼴의 높이 h = r − d ≈ ${h.toFixed(3)}`, { 'font-size': '12', fill: '#64748B', 'font-weight': '400' });
+addText(340, 482, `활꼴의 넓이 S = ½r²(θ − sinθ) ≈ ${area.toFixed(2)}`, { 'font-size': '12', fill: '#64748B', 'font-weight': '400' });
+</script>

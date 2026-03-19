@@ -1,0 +1,245 @@
+<svg id="vis" width="100%" viewBox="0 0 860 560" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const C = {
+    lateralFill: '#dbeafe',
+    lateralStroke: '#2563eb',
+    baseFill: '#dcfce7',
+    baseStroke: '#16a34a',
+    fold: '#64748b',
+    text: '#0f172a',
+    sub: '#64748b',
+    guide: '#94a3b8',
+    accent: '#dc2626',
+  };
+
+  function el(tag, attrs = {}) {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    return node;
+  }
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      fill: C.text,
+      'font-size': 14,
+      'font-weight': 500,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      ...attrs,
+    });
+    t.textContent = str;
+    return add(t);
+  }
+  function line(x1, y1, x2, y2, attrs = {}) {
+    return add(el('line', { x1, y1, x2, y2, ...attrs }));
+  }
+
+  // scale: radius 3 -> 72px, height 8 -> 192px
+  const scale = 24;
+  const r = 3 * scale; // 72
+  const h = 8 * scale; // 192
+  const w = 6 * Math.PI * scale; // 6π * scale ≈ 452.4
+
+  const rectX = 190;
+  const rectY = 180;
+
+  const topC = { x: rectX + 110, y: 90 };
+  const botC = { x: rectX + w - 110, y: 468 };
+
+  // background
+  add(el('rect', { x: 0, y: 0, width: 860, height: 560, fill: 'white' }));
+
+  // lateral surface rectangle
+  add(
+    el('rect', {
+      x: rectX,
+      y: rectY,
+      width: w,
+      height: h,
+      rx: 4,
+      fill: C.lateralFill,
+      stroke: C.lateralStroke,
+      'stroke-width': 2.8,
+    })
+  );
+
+  // fold lines to top and bottom bases
+  line(topC.x - r, rectY, topC.x + r, rectY, {
+    stroke: C.fold,
+    'stroke-width': 2,
+    'stroke-dasharray': '7 5',
+  });
+  line(botC.x - r, rectY + h, botC.x + r, rectY + h, {
+    stroke: C.fold,
+    'stroke-width': 2,
+    'stroke-dasharray': '7 5',
+  });
+
+  // top base circle
+  add(
+    el('circle', {
+      cx: topC.x,
+      cy: topC.y,
+      r,
+      fill: C.baseFill,
+      stroke: C.baseStroke,
+      'stroke-width': 2.8,
+    })
+  );
+
+  // bottom base circle
+  add(
+    el('circle', {
+      cx: botC.x,
+      cy: botC.y,
+      r,
+      fill: C.baseFill,
+      stroke: C.baseStroke,
+      'stroke-width': 2.8,
+    })
+  );
+
+  // connector tabs / attachment guides
+  line(topC.x, topC.y + r, topC.x, rectY, {
+    stroke: C.guide,
+    'stroke-width': 1.5,
+    'stroke-dasharray': '5 4',
+  });
+  line(botC.x, rectY + h, botC.x, botC.y - r, {
+    stroke: C.guide,
+    'stroke-width': 1.5,
+    'stroke-dasharray': '5 4',
+  });
+
+  // radii
+  line(topC.x, topC.y, topC.x + r, topC.y, {
+    stroke: C.accent,
+    'stroke-width': 2.2,
+  });
+  line(botC.x, botC.y, botC.x + r, botC.y, {
+    stroke: C.accent,
+    'stroke-width': 2.2,
+  });
+
+  // center points
+  add(el('circle', { cx: topC.x, cy: topC.y, r: 4.2, fill: C.baseStroke }));
+  add(el('circle', { cx: botC.x, cy: botC.y, r: 4.2, fill: C.baseStroke }));
+
+  // labels
+  text(rectX + w / 2, rectY + h / 2, '옆면', {
+    fill: C.lateralStroke,
+    'font-size': 18,
+    'font-weight': 700,
+  });
+  text(topC.x, topC.y, '윗면', {
+    fill: C.baseStroke,
+    'font-size': 16,
+    'font-weight': 700,
+  });
+  text(botC.x, botC.y, '아랫면', {
+    fill: C.baseStroke,
+    'font-size': 16,
+    'font-weight': 700,
+  });
+
+  // radius labels
+  text(topC.x + r / 2, topC.y - 16, '반지름 3', {
+    fill: C.accent,
+    'font-size': 13,
+  });
+  text(botC.x + r / 2, botC.y - 16, '반지름 3', {
+    fill: C.accent,
+    'font-size': 13,
+  });
+
+  // rectangle dimensions
+  text(rectX + w / 2, rectY - 22, '가로 = 밑면의 둘레 = 2πr = 6π', {
+    fill: C.lateralStroke,
+    'font-size': 15,
+  });
+  text(rectX - 28, rectY + h / 2, '높이 8', {
+    fill: C.lateralStroke,
+    'font-size': 15,
+    'text-anchor': 'middle',
+    transform: `rotate(-90 ${rectX - 28} ${rectY + h / 2})`,
+  });
+
+  // boundary accents
+  line(rectX, rectY, rectX + w, rectY, { stroke: C.lateralStroke, 'stroke-width': 2.8 });
+  line(rectX + w, rectY, rectX + w, rectY + h, { stroke: C.lateralStroke, 'stroke-width': 2.8 });
+  line(rectX + w, rectY + h, rectX, rectY + h, { stroke: C.lateralStroke, 'stroke-width': 2.8 });
+  line(rectX, rectY + h, rectX, rectY, { stroke: C.lateralStroke, 'stroke-width': 2.8 });
+
+  // title and notes
+  text(680, 72, '원기둥의 전개도', {
+    'font-size': 24,
+    'font-weight': 700,
+  });
+  text(680, 106, '밑면의 반지름이 3, 높이가 8', {
+    'font-size': 14,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(680, 134, '전개도는 직사각형 1개와 원 2개로 이루어짐', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(680, 162, '직사각형의 가로 길이는 밑면의 둘레 6π', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(680, 190, '점선은 접어서 붙는 부분', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+
+  // guide arrows
+  line(610, 196, topC.x + 38, topC.y + 38, {
+    stroke: C.sub,
+    'stroke-width': 1.4,
+    'marker-end': 'url(#arrow)',
+  });
+  line(620, 168, rectX + w / 2 + 40, rectY + 38, {
+    stroke: C.sub,
+    'stroke-width': 1.4,
+    'marker-end': 'url(#arrow)',
+  });
+  line(620, 224, botC.x - 18, botC.y - 34, {
+    stroke: C.sub,
+    'stroke-width': 1.4,
+    'marker-end': 'url(#arrow)',
+  });
+</script>

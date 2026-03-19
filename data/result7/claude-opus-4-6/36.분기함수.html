@@ -1,0 +1,198 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+// Piecewise function: y = -x (x < 0), y = x² (x >= 0)
+const svg = document.getElementById('vis');
+const NS = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  (parent || svg).appendChild(e);
+  return e;
+}
+
+function addText(x, y, text, attrs) {
+  const t = el('text', { x, y, 'dominant-baseline': 'central', ...attrs });
+  t.textContent = text;
+  return t;
+}
+
+const ox = 280, oy = 380;
+const sx = 65, sy = 65;
+const xMin = -4, xMax = 5;
+const yMin = -1, yMax = 5.5;
+
+function px(x) { return ox + x * sx; }
+function py(y) { return oy - y * sy; }
+
+// defs for arrow marker
+const defs = el('defs', {});
+const marker = el('marker', {
+  id: 'arrow', viewBox: '0 0 10 10', refX: '10', refY: '5',
+  markerWidth: '8', markerHeight: '8', orient: 'auto-start-reverse'
+}, defs);
+el('path', { d: 'M0,0 L10,5 L0,10 Z', fill: '#333' }, marker);
+
+// grid lines
+for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+  if (x === 0) continue;
+  el('line', {
+    x1: px(x), y1: py(yMin), x2: px(x), y2: py(yMax),
+    stroke: '#e5e7eb', 'stroke-width': '1'
+  });
+}
+for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y++) {
+  if (y === 0) continue;
+  el('line', {
+    x1: px(xMin), y1: py(y), x2: px(xMax), y2: py(y),
+    stroke: '#e5e7eb', 'stroke-width': '1'
+  });
+}
+
+// x-axis
+el('line', {
+  x1: px(xMin) - 10, y1: py(0), x2: px(xMax) + 10, y2: py(0),
+  stroke: '#333', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)'
+});
+
+// y-axis
+el('line', {
+  x1: px(0), y1: py(yMin) + 10, x2: px(0), y2: py(yMax) - 10,
+  stroke: '#333', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)'
+});
+
+// x-axis ticks and labels
+for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+  if (x === 0) continue;
+  el('line', {
+    x1: px(x), y1: py(0) - 4, x2: px(x), y2: py(0) + 4,
+    stroke: '#333', 'stroke-width': '1.5'
+  });
+  addText(px(x), py(0) + 20, x, {
+    'text-anchor': 'middle', 'font-size': '12', 'font-weight': '400', fill: '#333'
+  });
+}
+
+// y-axis ticks and labels
+for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y++) {
+  if (y === 0) continue;
+  el('line', {
+    x1: px(0) - 4, y1: py(y), x2: px(0) + 4, y2: py(y),
+    stroke: '#333', 'stroke-width': '1.5'
+  });
+  addText(px(0) - 14, py(y), y, {
+    'text-anchor': 'middle', 'font-size': '12', 'font-weight': '400', fill: '#333'
+  });
+}
+
+// axis labels
+addText(px(xMax) + 20, py(0), 'x', {
+  'text-anchor': 'middle', 'font-size': '14', 'font-weight': '500', fill: '#333'
+});
+addText(px(0), py(yMax) - 20, 'y', {
+  'text-anchor': 'middle', 'font-size': '14', 'font-weight': '500', fill: '#333'
+});
+
+// origin label
+addText(px(0) - 14, py(0) + 16, 'O', {
+  'text-anchor': 'middle', 'font-size': '12', 'font-weight': '400', fill: '#333'
+});
+
+// piece 1: y = -x for x < 0 (line from xMin to 0)
+const linePts = [];
+const lineSteps = 100;
+for (let i = 0; i <= lineSteps; i++) {
+  const x = xMin + (0 - xMin) * i / lineSteps;
+  if (x >= 0) break;
+  const y = -x;
+  if (y > yMax + 0.5 || y < yMin - 0.5) continue;
+  linePts.push(`${Math.round(px(x) * 10) / 10},${Math.round(py(y) * 10) / 10}`);
+}
+
+el('polyline', {
+  points: linePts.join(' '),
+  fill: 'none', stroke: '#e11d48', 'stroke-width': '2.5',
+  'stroke-linecap': 'round', 'stroke-linejoin': 'round'
+});
+
+// open circle at (0, 0) for y = -x branch (x < 0, not including 0)
+el('circle', {
+  cx: px(0), cy: py(0), r: '5',
+  fill: '#fff', stroke: '#e11d48', 'stroke-width': '2'
+});
+
+// piece 2: y = x² for x >= 0
+const paraPts = [];
+const paraSteps = 200;
+const paraXMax = Math.min(xMax, Math.sqrt(yMax) + 0.1);
+for (let i = 0; i <= paraSteps; i++) {
+  const x = 0 + paraXMax * i / paraSteps;
+  const y = x * x;
+  if (y > yMax + 0.5) continue;
+  paraPts.push(`${Math.round(px(x) * 10) / 10},${Math.round(py(y) * 10) / 10}`);
+}
+
+el('polyline', {
+  points: paraPts.join(' '),
+  fill: 'none', stroke: '#2563eb', 'stroke-width': '2.5',
+  'stroke-linecap': 'round', 'stroke-linejoin': 'round'
+});
+
+// closed circle at (0, 0) for y = x² branch (x >= 0, includes 0)
+el('circle', {
+  cx: px(0), cy: py(0), r: '5',
+  fill: '#2563eb', stroke: '#fff', 'stroke-width': '2'
+});
+
+// key points on y = -x: (-1, 1), (-2, 2), (-3, 3)
+[[-1, 1], [-2, 2], [-3, 3]].forEach(([mx, my]) => {
+  el('circle', {
+    cx: px(mx), cy: py(my), r: '4',
+    fill: '#e11d48', stroke: '#fff', 'stroke-width': '1.5'
+  });
+});
+
+// key points on y = x²: (1, 1), (2, 4)
+[[1, 1], [2, 4]].forEach(([mx, my]) => {
+  el('circle', {
+    cx: px(mx), cy: py(my), r: '4',
+    fill: '#2563eb', stroke: '#fff', 'stroke-width': '1.5'
+  });
+});
+
+// point labels
+addText(px(-1) - 10, py(1) - 14, '(\u22121, 1)', {
+  'text-anchor': 'end', 'font-size': '12', 'font-weight': '400', fill: '#e11d48'
+});
+addText(px(-2) - 10, py(2) - 14, '(\u22122, 2)', {
+  'text-anchor': 'end', 'font-size': '12', 'font-weight': '400', fill: '#e11d48'
+});
+addText(px(1) + 10, py(1) - 14, '(1, 1)', {
+  'text-anchor': 'start', 'font-size': '12', 'font-weight': '400', fill: '#2563eb'
+});
+addText(px(2) + 10, py(4) - 14, '(2, 4)', {
+  'text-anchor': 'start', 'font-size': '12', 'font-weight': '400', fill: '#2563eb'
+});
+
+// origin point label
+addText(px(0) + 14, py(0) - 14, '(0, 0)', {
+  'text-anchor': 'start', 'font-size': '12', 'font-weight': '400', fill: '#2563eb'
+});
+
+// function labels
+addText(px(-3.2), py(4.8), 'y = \u2212x', {
+  'text-anchor': 'start', 'font-size': '14', 'font-weight': '500', fill: '#e11d48',
+  'font-style': 'italic'
+});
+addText(px(-3.2), py(4.8) + 18, '(x < 0)', {
+  'text-anchor': 'start', 'font-size': '12', 'font-weight': '400', fill: '#e11d48'
+});
+
+addText(px(2.5), py(4.8), 'y = x\u00B2', {
+  'text-anchor': 'start', 'font-size': '14', 'font-weight': '500', fill: '#2563eb',
+  'font-style': 'italic'
+});
+addText(px(2.5), py(4.8) + 18, '(x \u2265 0)', {
+  'text-anchor': 'start', 'font-size': '12', 'font-weight': '400', fill: '#2563eb'
+});
+</script>

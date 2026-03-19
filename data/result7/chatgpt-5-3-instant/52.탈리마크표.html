@@ -1,0 +1,147 @@
+<svg id="vis" width="100%" viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#111',
+      ...attrs,
+    });
+    t.textContent = str;
+    return t;
+  }
+
+  // data (합계 30명)
+  const data = [
+    { name: '봄', count: 8 },
+    { name: '여름', count: 7 },
+    { name: '가을', count: 9 },
+    { name: '겨울', count: 6 },
+  ];
+
+  // table layout
+  const startX = 120;
+  const startY = 60;
+  const colW = [120, 260, 80];
+  const rowH = 50;
+
+  // header
+  const headers = ['계절', '정자', '도수'];
+
+  headers.forEach((h, i) => {
+    svg.appendChild(
+      el('rect', {
+        x: startX + colW.slice(0, i).reduce((a, b) => a + b, 0),
+        y: startY,
+        width: colW[i],
+        height: rowH,
+        fill: '#e5e7eb',
+        stroke: '#9ca3af',
+        'stroke-width': '1',
+      })
+    );
+    svg.appendChild(text(startX + colW.slice(0, i).reduce((a, b) => a + b, 0) + colW[i] / 2, startY + rowH / 2, h));
+  });
+
+  // tally drawing
+  function drawTally(x, y, count) {
+    let cx = x + 10;
+    let cy = y + rowH / 2;
+    let group = 0;
+    let remain = count;
+
+    while (remain > 0) {
+      let n = Math.min(5, remain);
+      // vertical lines
+      for (let i = 0; i < Math.min(4, n); i++) {
+        svg.appendChild(
+          el('line', {
+            x1: cx + i * 10,
+            y1: cy - 12,
+            x2: cx + i * 10,
+            y2: cy + 12,
+            stroke: '#111',
+            'stroke-width': '1.5',
+          })
+        );
+      }
+      // diagonal (5th)
+      if (n === 5) {
+        svg.appendChild(
+          el('line', {
+            x1: cx,
+            y1: cy + 12,
+            x2: cx + 30,
+            y2: cy - 12,
+            stroke: '#111',
+            'stroke-width': '1.5',
+          })
+        );
+      }
+      cx += 50;
+      remain -= n;
+    }
+  }
+
+  // rows
+  data.forEach((d, r) => {
+    const y = startY + rowH * (r + 1);
+
+    // cells
+    for (let i = 0; i < 3; i++) {
+      svg.appendChild(
+        el('rect', {
+          x: startX + colW.slice(0, i).reduce((a, b) => a + b, 0),
+          y: y,
+          width: colW[i],
+          height: rowH,
+          fill: '#fff',
+          stroke: '#9ca3af',
+          'stroke-width': '1',
+        })
+      );
+    }
+
+    // season
+    svg.appendChild(text(startX + colW[0] / 2, y + rowH / 2, d.name));
+
+    // tally
+    drawTally(startX + colW[0], y, d.count);
+
+    // frequency
+    svg.appendChild(text(startX + colW[0] + colW[1] + colW[2] / 2, y + rowH / 2, String(d.count)));
+  });
+
+  // total row
+  const totalY = startY + rowH * (data.length + 1);
+
+  for (let i = 0; i < 3; i++) {
+    svg.appendChild(
+      el('rect', {
+        x: startX + colW.slice(0, i).reduce((a, b) => a + b, 0),
+        y: totalY,
+        width: colW[i],
+        height: rowH,
+        fill: '#f3f4f6',
+        stroke: '#9ca3af',
+        'stroke-width': '1',
+      })
+    );
+  }
+
+  svg.appendChild(text(startX + colW[0] / 2, totalY + rowH / 2, '합계'));
+  svg.appendChild(text(startX + colW[0] + colW[1] + colW[2] / 2, totalY + rowH / 2, '30'));
+</script>

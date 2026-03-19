@@ -1,0 +1,102 @@
+<svg id="vis" width="100%" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', {
+    x, y,
+    'font-size': '14', 'font-weight': '500',
+    'text-anchor': 'middle', 'dominant-baseline': 'central',
+    fill: '#1E293B', ...attrs
+  });
+  t.textContent = content;
+  svg.appendChild(t);
+  return t;
+}
+
+const data = [
+  { hours: 0, count: 3 },
+  { hours: 1, count: 7 },
+  { hours: 2, count: 8 },
+  { hours: 3, count: 4 },
+  { hours: 4, count: 2 },
+  { hours: 5, count: 1 }
+];
+
+const axisY = 310;
+const startX = 140;
+const stepX = 80;
+const dotR = 12;
+const dotGap = 2;
+const dotStep = dotR * 2 + dotGap;
+
+const mean = (0*3 + 1*7 + 2*8 + 3*4 + 4*2 + 5*1) / 25;
+
+svg.appendChild(el('line', {
+  x1: 80, y1: axisY, x2: 600, y2: axisY,
+  stroke: '#64748B', 'stroke-width': '1.2'
+}));
+
+data.forEach((d, i) => {
+  const cx = startX + i * stepX;
+  const isMajor = d.hours === 2;
+
+  svg.appendChild(el('line', {
+    x1: cx, y1: axisY, x2: cx, y2: axisY + 6,
+    stroke: '#64748B', 'stroke-width': '1'
+  }));
+
+  addText(cx, axisY + 22, d.hours + '시간', {
+    'font-size': '12', 'font-weight': isMajor ? '500' : '400',
+    fill: isMajor ? '#1D4ED8' : '#475569'
+  });
+
+  for (let k = 0; k < d.count; k++) {
+    const cy = axisY - dotR - k * dotStep;
+    svg.appendChild(el('circle', {
+      cx, cy, r: dotR,
+      fill: isMajor ? '#3B82F6' : '#EFF6FF',
+      stroke: isMajor ? '#1D4ED8' : '#1D4ED8',
+      'stroke-width': '1.5'
+    }));
+  }
+
+  if (isMajor) {
+    const topCy = axisY - dotR - (d.count - 1) * dotStep;
+    addText(cx + 30, topCy - 10, '최빈값', {
+      'font-size': '12', 'font-weight': '500', fill: '#1D4ED8'
+    });
+    svg.appendChild(el('line', {
+      x1: cx + 14, y1: topCy - 10,
+      x2: cx + dotR + 2, y2: topCy,
+      stroke: '#1D4ED8', 'stroke-width': '0.5',
+      'stroke-dasharray': '3 2'
+    }));
+  }
+});
+
+const meanX = startX + mean * stepX;
+svg.appendChild(el('line', {
+  x1: meanX, y1: 60, x2: meanX, y2: axisY,
+  stroke: '#F59E0B', 'stroke-width': '1', 'stroke-dasharray': '5 3'
+}));
+
+addText(meanX, 50, '평균 ≈ 2.04시간', {
+  'font-size': '12', 'font-weight': '400', fill: '#F59E0B', 'text-anchor': 'middle'
+});
+
+addText(340, 28, '학생 25명의 하루 독서 시간 점도표', {
+  'font-size': '14', 'font-weight': '500', fill: '#1E293B'
+});
+
+addText(560, axisY + 22, '(시간)', {
+  'font-size': '12', 'font-weight': '400', fill: '#475569', 'text-anchor': 'middle'
+});
+</script>

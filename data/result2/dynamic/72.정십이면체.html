@@ -1,0 +1,81 @@
+<svg id="vis" width="100%" viewBox="0 0 680 560" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+svg.appendChild(el('rect', { width: '680', height: '560', fill: '#F8FAFC' }));
+addText(340, 36, '정십이면체 (한 변의 길이: 4)', { 'font-size': '18', 'font-weight': '600', fill: '#1E293B' });
+
+const phi = (1 + Math.sqrt(5)) / 2;
+const scale = 80;
+const cx = 340;
+const cy = 270;
+
+function iso(x, y, z) {
+  return {
+    px: Math.round(cx + (x - z) * Math.cos(Math.PI / 6) * scale),
+    py: Math.round(cy - y * scale + (x + z) * Math.sin(Math.PI / 6) * scale)
+  };
+}
+
+const rawVerts = [
+  [1, 1, 1], [1, 1, -1], [1, -1, 1], [1, -1, -1],
+  [-1, 1, 1], [-1, 1, -1], [-1, -1, 1], [-1, -1, -1],
+  [0, 1/phi, phi], [0, 1/phi, -phi], [0, -1/phi, phi], [0, -1/phi, -phi],
+  [1/phi, phi, 0], [-1/phi, phi, 0], [1/phi, -phi, 0], [-1/phi, -phi, 0],
+  [phi, 0, 1/phi], [phi, 0, -1/phi], [-phi, 0, 1/phi], [-phi, 0, -1/phi]
+];
+
+const verts = rawVerts.map(([x, y, z]) => iso(x, y, z));
+
+const faces = [
+  [0, 8, 10, 2, 16],
+  [0, 16, 17, 1, 12],
+  [0, 12, 13, 4, 8],
+  [4, 13, 5, 19, 18],
+  [4, 18, 6, 10, 8],
+  [10, 6, 15, 14, 2],
+  [2, 14, 3, 17, 16],
+  [17, 3, 11, 9, 1],
+  [1, 9, 5, 13, 12],
+  [5, 9, 11, 7, 19],
+  [19, 7, 15, 6, 18],
+  [3, 14, 15, 7, 11]
+];
+
+function avgY(face) {
+  return face.reduce((s, i) => s + rawVerts[i][1], 0) / face.length;
+}
+
+const sorted = faces.map((f, i) => ({ f, y: avgY(f), i })).sort((a, b) => a.y - b.y);
+
+const opacities = [0.06, 0.07, 0.08, 0.09, 0.10, 0.11, 0.12, 0.13, 0.14, 0.15, 0.16, 0.18];
+
+sorted.forEach(({ f, y }, idx) => {
+  const isBack = y < -0.2;
+  const pts = f.map(i => `${verts[i].px},${verts[i].py}`).join(' ');
+  svg.appendChild(el('polygon', {
+    points: pts,
+    fill: '#3B82F6',
+    'fill-opacity': String(opacities[idx]),
+    stroke: isBack ? '#94A3B8' : '#1D4ED8',
+    'stroke-width': '1.5',
+    ...(isBack ? { 'stroke-dasharray': '5 4' } : {})
+  }));
+});
+
+addText(340, 502, '꼭짓점 20개, 모서리 30개, 면 12개 (정오각형)', { 'font-size': '13', fill: '#475569' });
+addText(340, 527, `황금비 φ = (1+√5)/2 ≈ ${phi.toFixed(3)}`, { 'font-size': '13', fill: '#475569' });
+</script>

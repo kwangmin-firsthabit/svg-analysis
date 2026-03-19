@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>탈리마크 도수분포표</title>
+</head>
+<body>
+<svg id="vis" width="100%" viewBox="0 0 680 330" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function txt(x, y, s, attrs={}) {
+  const t = el('text', {x, y, 'font-size':'13', 'font-weight':'400', 'text-anchor':'middle', 'dominant-baseline':'central', fill:'#1E293B', ...attrs});
+  t.textContent = s;
+  svg.appendChild(t);
+}
+function line(x1, y1, x2, y2, attrs={}) {
+  svg.appendChild(el('line', {x1, y1, x2, y2, stroke:'#CBD5E1', 'stroke-width':'1', ...attrs}));
+}
+
+const data = [
+  { season: '봄', count: 8 },
+  { season: '여름', count: 10 },
+  { season: '가을', count: 7 },
+  { season: '겨울', count: 5 }
+];
+
+txt(340, 28, '좋아하는 계절 도수분포표 (학생 30명)', {'font-size':'14','font-weight':'600'});
+
+const ox = 30, oy = 48;
+const totalW = 620, totalH = 258;
+const rowH = 46;
+const colSeasonW = 100, colTallyW = 370, colFreqW = 80, colTotalW = 70;
+
+svg.appendChild(el('rect', {x:ox, y:oy, width:totalW, height:totalH, rx:'6', fill:'#F8FAFC', stroke:'#CBD5E1', 'stroke-width':'1.5'}));
+svg.appendChild(el('rect', {x:ox, y:oy, width:totalW, height:rowH, fill:'#E2E8F0', rx:'0', stroke:'none'}));
+svg.appendChild(el('rect', {x:ox, y:oy+5, width:totalW, height:rowH-5, fill:'#E2E8F0', rx:'0', stroke:'none'}));
+svg.appendChild(el('rect', {x:ox, y:oy, width:totalW, height:totalH, rx:'6', fill:'none', stroke:'#CBD5E1', 'stroke-width':'1.5'}));
+
+const c1 = ox + colSeasonW;
+const c2 = c1 + colTallyW;
+const c3 = c2 + colFreqW;
+
+line(c1, oy, c1, oy+totalH);
+line(c2, oy, c2, oy+totalH);
+line(c3, oy, c3, oy+totalH);
+
+line(ox, oy+rowH, ox+totalW, oy+rowH, {'stroke-width':'1.5'});
+for (let i = 1; i <= data.length; i++) {
+  line(ox, oy+rowH+i*rowH, ox+totalW, oy+rowH+i*rowH, {'stroke-width': i === data.length ? '1.5' : '1'});
+}
+
+txt(ox + colSeasonW/2, oy + rowH/2, '계절', {'font-size':'14','font-weight':'600'});
+txt(c1 + colTallyW/2, oy + rowH/2, '탈리마크', {'font-size':'14','font-weight':'600'});
+txt(c2 + colFreqW/2, oy + rowH/2, '도수', {'font-size':'14','font-weight':'600'});
+txt(c3 + colTotalW/2, oy + rowH/2, '합계', {'font-size':'14','font-weight':'600'});
+
+function drawJeongja(cx, cy, count) {
+  const fullGroups = Math.floor(count / 5);
+  const remainder = count % 5;
+  const groupW = 28;
+  const gap = 8;
+  const totalGroupW = fullGroups * (groupW + gap) + (remainder > 0 ? groupW : 0);
+  let startX = cx - totalGroupW / 2;
+
+  for (let g = 0; g < fullGroups; g++) {
+    drawGroup(startX, cy, 5);
+    startX += groupW + gap;
+  }
+  if (remainder > 0) {
+    drawGroup(startX, cy, remainder);
+  }
+}
+
+function drawGroup(x, cy, n) {
+  const w = 26, h = 26;
+  const top = cy - h/2;
+  const s = '#1E293B';
+  const sw = '1.8';
+
+  if (n >= 1) svg.appendChild(el('line', {x1:x, y1:top, x2:x+w, y2:top, stroke:s, 'stroke-width':sw}));
+  if (n >= 2) svg.appendChild(el('line', {x1:x, y1:top, x2:x, y2:top+h, stroke:s, 'stroke-width':sw}));
+  if (n >= 3) svg.appendChild(el('line', {x1:x+w, y1:top, x2:x+w, y2:top+h, stroke:s, 'stroke-width':sw}));
+  if (n >= 4) svg.appendChild(el('line', {x1:x, y1:top+h, x2:x+w, y2:top+h, stroke:s, 'stroke-width':sw}));
+  if (n >= 5) svg.appendChild(el('line', {x1:x, y1:top+h/2, x2:x+w, y2:top+h/2, stroke:s, 'stroke-width':sw}));
+}
+
+let total = 0;
+data.forEach((row, i) => {
+  const y = oy + rowH + rowH/2 + i * rowH;
+  txt(ox + colSeasonW/2, y, row.season, {'font-weight':'500'});
+  drawJeongja(c1 + colTallyW/2, y, row.count);
+  txt(c2 + colFreqW/2, y, String(row.count), {'fill':'#475569'});
+  total += row.count;
+});
+
+const sumY = oy + rowH + data.length * rowH + rowH/2;
+txt(ox + colSeasonW/2, sumY, '합계', {'font-weight':'600'});
+txt(c2 + colFreqW/2, sumY, String(total), {'font-weight':'600'});
+txt(c3 + colTotalW/2, sumY, String(total), {'font-weight':'600'});
+</script>
+</body>
+</html>

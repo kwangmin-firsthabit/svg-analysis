@@ -1,0 +1,152 @@
+<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 삼각기둥 ABC-DEF
+// 밑면: 한 변의 길이 4인 정삼각형
+// 높이: 6
+// 비스듬한 투영
+
+const side = 4;
+const sc = 48; // 1단위 = 48px
+const h = 6 * sc; // 높이 = 288px
+const a = side * sc; // 변 길이 = 192px
+
+// 정삼각형 꼭짓점 (아랫면, 3D: z방향으로 깊이)
+// 정삼각형을 xy 평면에 놓기
+// A, B, C: 아랫면 (y=0)
+// D, E, F: 윗면 (y=h)
+// 정삼각형 꼭짓점 (x, 0, z) 형태
+const triH = a * Math.sqrt(3) / 2; // 정삼각형 높이 = 4*√3/2
+
+// 투영 설정
+const ang = Math.PI / 6;
+const dep = 0.4;
+
+function proj(x, y, z) {
+  return {
+    px: x + z * Math.cos(ang) * dep,
+    py: y - z * Math.sin(ang) * dep
+  };
+}
+
+// 기준점: A (앞면 하단 왼쪽)
+const baseX = 280, baseY = 430;
+
+// 정삼각형 꼭짓점 (3D 좌표계: x=좌우, y=높이, z=깊이)
+// 아랫면 A, B, C
+// A: 왼쪽 앞, B: 오른쪽 앞, C: 뒤 가운데 (위 꼭짓점)
+const Ax = 0, Az = 0;
+const Bx = a, Bz = 0;
+const Cx = a / 2, Cz = triH;
+
+// 3D 좌표 (x, y, z)
+const verts3D = {
+  A: [Ax, 0, Az], B: [Bx, 0, Bz], C: [Cx, 0, Cz],
+  D: [Ax, h, Az], E: [Bx, h, Bz], F: [Cx, h, Cz]
+};
+
+const pts = {};
+for (const [name, [x, y, z]] of Object.entries(verts3D)) {
+  const p = proj(baseX + x, baseY - y, z);
+  pts[name] = p;
+}
+
+function line(p1, p2, dashed) {
+  const attrs = {
+    x1: p1.px, y1: p1.py, x2: p2.px, y2: p2.py,
+    stroke: '#1D4ED8', 'stroke-width': dashed ? '1' : '1.5'
+  };
+  if (dashed) { attrs['stroke-dasharray'] = '5 4'; attrs['opacity'] = '0.5'; }
+  svg.appendChild(el('line', attrs));
+}
+
+function face(names, fillOp) {
+  const pts_str = names.map(n => `${pts[n].px},${pts[n].py}`).join(' ');
+  svg.appendChild(el('polygon', {
+    points: pts_str,
+    fill: '#EFF6FF', 'fill-opacity': fillOp || '0.15', stroke: 'none'
+  }));
+}
+
+// 면 그리기
+face(['A', 'B', 'E', 'D'], '0.15');  // 앞면
+face(['B', 'C', 'F', 'E'], '0.10');  // 오른쪽 면
+face(['D', 'E', 'F'], '0.18');       // 윗면
+
+// 가려진 모서리 (점선)
+line(pts.C, pts.A, true);
+line(pts.C, pts.B, true);
+line(pts.C, pts.F, true);
+
+// 보이는 모서리 (실선)
+line(pts.A, pts.B);
+line(pts.A, pts.D);
+line(pts.B, pts.E);
+line(pts.D, pts.E);
+line(pts.D, pts.F);
+line(pts.E, pts.F);
+line(pts.B, pts.C);
+
+// 꼭짓점 라벨
+const labelOffset = {
+  A: [-16, 12], B: [14, 12], C: [14, 0],
+  D: [-16, -12], E: [14, -12], F: [14, -12]
+};
+for (const [name, [lx, ly]] of Object.entries(labelOffset)) {
+  addText(pts[name].px + lx, pts[name].py + ly, name, { 'font-size': '13', fill: '#1E293B' });
+}
+
+// 치수 라벨
+// 밑면 한 변 길이(4): AB 아래
+const abMid = { px: (pts.A.px + pts.B.px) / 2, py: (pts.A.py + pts.B.py) / 2 };
+addText(abMid.px, abMid.py + 22, '4', { 'font-size': '13', 'font-weight': '400', fill: '#475569' });
+
+// 높이(6): 왼쪽 AD 옆
+const adMid = { px: (pts.A.px + pts.D.px) / 2, py: (pts.A.py + pts.D.py) / 2 };
+addText(adMid.px - 20, adMid.py, '6', { 'font-size': '13', 'font-weight': '400', fill: '#475569' });
+
+// 높이 보조선 점선
+svg.appendChild(el('line', {
+  x1: pts.A.px - 30, y1: pts.A.py, x2: pts.D.px - 30, y2: pts.D.py,
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+svg.appendChild(el('line', { x1: pts.A.px - 36, y1: pts.A.py, x2: pts.A.px - 24, y2: pts.A.py, stroke: '#94A3B8', 'stroke-width': '0.8' }));
+svg.appendChild(el('line', { x1: pts.D.px - 36, y1: pts.D.py, x2: pts.D.px - 24, y2: pts.D.py, stroke: '#94A3B8', 'stroke-width': '0.8' }));
+
+// 밑면 정삼각형 60° 각도 표시 (꼭짓점 A)
+// A에서 AB, AC 두 변의 방향
+const A = pts.A, B = pts.B, C_vis = pts.C;
+// 각도 호 (A에서 AB, AC 방향으로 r=20)
+// AB 방향 각도
+const angAB = Math.atan2(B.py - A.py, B.px - A.px);
+const angAC = Math.atan2(C_vis.py - A.py, C_vis.px - A.px);
+const arcR = 18;
+const sx = A.px + arcR * Math.cos(angAC);
+const sy = A.py + arcR * Math.sin(angAC);
+const ex = A.px + arcR * Math.cos(angAB);
+const ey = A.py + arcR * Math.sin(angAB);
+svg.appendChild(el('path', {
+  d: `M ${sx.toFixed(1)},${sy.toFixed(1)} A ${arcR},${arcR} 0 0 1 ${ex.toFixed(1)},${ey.toFixed(1)}`,
+  fill: 'none', stroke: '#60A5FA', 'stroke-width': '1.2'
+}));
+// 60° 라벨
+const midAng = (angAB + angAC) / 2;
+addText(A.px + (arcR + 14) * Math.cos(midAng), A.py + (arcR + 14) * Math.sin(midAng), '60°', {
+  'font-size': '12', 'font-weight': '400', fill: '#60A5FA'
+});
+</script>

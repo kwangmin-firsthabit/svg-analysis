@@ -2,18 +2,22 @@ import type { Variant } from '../data/catalog'
 
 interface SvgRenderPanelProps {
   fileName: string
-  variant: Variant
+  variant?: Variant
+  variantLabel?: string
   htmlSource: string
   userPrompt: string
+  userPromptOriginal?: string
   systemPrompt: string
+  iframeClassName?: string
 }
 
-const variantLabel: Record<Variant, string> = {
+const defaultVariantLabel: Record<Variant, string> = {
   static: 'static',
   dynamic: 'dynamic',
   original: '기존 프롬프트',
   modified: '수정 프롬프트',
   v1: 'prompt.dynamic (v1)',
+  v3: 'math-visualization-v3',
   v4: 'math-visualization-v4',
   before: '원본 코드',
   after: '수정 코드',
@@ -22,15 +26,20 @@ const variantLabel: Record<Variant, string> = {
 export default function SvgRenderPanel({
   fileName,
   variant,
+  variantLabel,
   htmlSource,
   userPrompt,
+  userPromptOriginal,
   systemPrompt,
+  iframeClassName,
 }: SvgRenderPanelProps) {
+  const label = variantLabel ?? (variant ? defaultVariantLabel[variant] : '')
+  const hasDiff = userPromptOriginal !== undefined && userPrompt.startsWith(userPromptOriginal)
   return (
     <article className="rounded-xl border border-slate-300 bg-white shadow-sm">
       <header className="border-b border-slate-200 px-4 py-3">
         <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-          {variantLabel[variant]}
+          {label}
         </p>
       </header>
 
@@ -39,7 +48,7 @@ export default function SvgRenderPanel({
           title={`${variant}-${fileName}`}
           srcDoc={htmlSource}
           loading="lazy"
-          className="h-96 w-full rounded border border-slate-300 bg-white"
+          className={`w-full rounded border border-slate-300 bg-white ${iframeClassName ?? 'h-96'}`}
         />
       </div>
 
@@ -47,7 +56,12 @@ export default function SvgRenderPanel({
         <div>
           <h3 className="mb-1 text-sm font-semibold text-slate-800">유저 프롬프트</h3>
           <p className="rounded border border-slate-200 bg-slate-50 p-2 text-sm text-slate-700">
-            {userPrompt}
+            {hasDiff ? (
+              <>
+                {userPromptOriginal}
+                <span className="text-red-500">{userPrompt.slice(userPromptOriginal.length)}</span>
+              </>
+            ) : userPrompt}
           </p>
         </div>
 

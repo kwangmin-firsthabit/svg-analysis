@@ -1,0 +1,183 @@
+<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+// Parabola y = -x^2 + 4
+// Rectangle inscribed: vertices (+-x, 0) and (+-x, -x^2+4)
+// A(x) = 2x(-x^2+4), A'(x) = -6x^2+8 = 0 => x = 2/sqrt(3)
+// Width = 4*sqrt(3)/3, Height = 8/3, Area = 32*sqrt(3)/9
+
+const svg = document.getElementById("vis");
+const NS = "http://www.w3.org/2000/svg";
+
+function el(tag, attrs) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  svg.appendChild(e);
+  return e;
+}
+
+function addText(x, y, text, size, anchor, weight) {
+  const t = el("text", {
+    x, y,
+    "font-family": "system-ui, sans-serif",
+    "font-size": size || 14,
+    "font-weight": weight || 500,
+    "text-anchor": anchor || "middle",
+    "dominant-baseline": "central",
+    fill: "#111"
+  });
+  t.textContent = text;
+  return t;
+}
+
+const ox = 340, oy = 380;
+const sc = 80;
+
+function px(mx) { return ox + mx * sc; }
+function py(my) { return oy - my * sc; }
+
+const defs = el("defs", {});
+svg.appendChild(defs);
+const marker = document.createElementNS(NS, "marker");
+marker.setAttribute("id", "arrow");
+marker.setAttribute("viewBox", "0 0 10 10");
+marker.setAttribute("refX", "10");
+marker.setAttribute("refY", "5");
+marker.setAttribute("markerWidth", "6");
+marker.setAttribute("markerHeight", "6");
+marker.setAttribute("orient", "auto-start-reverse");
+const path = document.createElementNS(NS, "path");
+path.setAttribute("d", "M 0 0 L 10 5 L 0 10 z");
+path.setAttribute("fill", "#333");
+marker.appendChild(path);
+defs.appendChild(marker);
+
+// Grid lines
+for (let i = -4; i <= 4; i++) {
+  if (i === 0) continue;
+  el("line", { x1: px(i), y1: py(-1.5), x2: px(i), y2: py(5.2), stroke: "#e5e7eb", "stroke-width": 0.7 });
+}
+for (let j = -1; j <= 5; j++) {
+  if (j === 0) continue;
+  el("line", { x1: px(-4), y1: py(j), x2: px(4), y2: py(j), stroke: "#e5e7eb", "stroke-width": 0.7 });
+}
+
+// Axes
+el("line", { x1: px(-4.2), y1: oy, x2: px(4.2), y2: oy, stroke: "#333", "stroke-width": 1.5, "marker-end": "url(#arrow)" });
+el("line", { x1: ox, y1: py(-1.5), x2: ox, y2: py(5.5), stroke: "#333", "stroke-width": 1.5, "marker-end": "url(#arrow)" });
+
+addText(px(4.2) + 14, oy, "x", 14, "middle", 500);
+addText(ox, py(5.5) - 14, "y", 14, "middle", 500);
+
+// Tick marks and labels
+for (let i = -4; i <= 4; i++) {
+  if (i === 0) continue;
+  el("line", { x1: px(i), y1: oy - 4, x2: px(i), y2: oy + 4, stroke: "#333", "stroke-width": 1.2 });
+  addText(px(i), oy + 16, i, 12, "middle", 400);
+}
+for (let j = 1; j <= 5; j++) {
+  el("line", { x1: ox - 4, y1: py(j), x2: ox + 4, y2: py(j), stroke: "#333", "stroke-width": 1.2 });
+  addText(ox - 14, py(j), j, 12, "middle", 400);
+}
+addText(ox - 12, oy + 16, "O", 12, "middle", 400);
+
+// Shaded region between parabola and x-axis
+const regionPts = [];
+const steps = 200;
+for (let i = 0; i <= steps; i++) {
+  const mx = -2 + (4 * i / steps);
+  const my = -mx * mx + 4;
+  if (my >= 0) regionPts.push(`${px(mx)},${py(my)}`);
+}
+regionPts.push(`${px(2)},${oy}`);
+regionPts.push(`${px(-2)},${oy}`);
+el("polygon", { points: regionPts.join(" "), fill: "#dbeafe", "fill-opacity": 0.5, stroke: "none" });
+
+// Parabola curve
+const curvePts = [];
+for (let i = 0; i <= 400; i++) {
+  const mx = -3 + (6 * i / 400);
+  const my = -mx * mx + 4;
+  curvePts.push(`${px(mx)},${py(my)}`);
+}
+el("polyline", { points: curvePts.join(" "), fill: "none", stroke: "#2563eb", "stroke-width": 2.2 });
+
+// Optimal rectangle
+const xr = 2 / Math.sqrt(3);
+const yr = -(xr * xr) + 4; // = 8/3
+const rx1 = px(-xr), rx2 = px(xr);
+const ry1 = oy, ry2 = py(yr);
+
+el("rect", {
+  x: rx1, y: ry2,
+  width: rx2 - rx1, height: ry1 - ry2,
+  fill: "#fef3c7", "fill-opacity": 0.7,
+  stroke: "#d97706", "stroke-width": 2
+});
+
+// Rectangle corner points
+const corners = [[-xr, 0], [xr, 0], [xr, yr], [-xr, yr]];
+corners.forEach(([cx, cy]) => {
+  el("circle", { cx: px(cx), cy: py(cy), r: 3.5, fill: "#d97706", stroke: "#fff", "stroke-width": 1 });
+});
+
+// Dimension labels - width
+const dimY = oy + 36;
+el("line", { x1: rx1, y1: dimY - 6, x2: rx1, y2: dimY + 6, stroke: "#92400e", "stroke-width": 1 });
+el("line", { x1: rx2, y1: dimY - 6, x2: rx2, y2: dimY + 6, stroke: "#92400e", "stroke-width": 1 });
+el("line", { x1: rx1, y1: dimY, x2: rx2, y2: dimY, stroke: "#92400e", "stroke-width": 1.2 });
+el("line", { x1: rx1, y1: dimY, x2: rx1 + 8, y2: dimY - 4, stroke: "#92400e", "stroke-width": 1.2 });
+el("line", { x1: rx1, y1: dimY, x2: rx1 + 8, y2: dimY + 4, stroke: "#92400e", "stroke-width": 1.2 });
+el("line", { x1: rx2, y1: dimY, x2: rx2 - 8, y2: dimY - 4, stroke: "#92400e", "stroke-width": 1.2 });
+el("line", { x1: rx2, y1: dimY, x2: rx2 - 8, y2: dimY + 4, stroke: "#92400e", "stroke-width": 1.2 });
+
+const wLabel = addText((rx1 + rx2) / 2, dimY + 18, "", 13, "middle", 500);
+wLabel.setAttribute("fill", "#92400e");
+wLabel.textContent = "4\u221A3/3 \u2248 2.31";
+
+// Dimension labels - height
+const dimX = rx2 + 20;
+el("line", { x1: dimX - 6, y1: ry1, x2: dimX + 6, y2: ry1, stroke: "#92400e", "stroke-width": 1 });
+el("line", { x1: dimX - 6, y1: ry2, x2: dimX + 6, y2: ry2, stroke: "#92400e", "stroke-width": 1 });
+el("line", { x1: dimX, y1: ry1, x2: dimX, y2: ry2, stroke: "#92400e", "stroke-width": 1.2 });
+el("line", { x1: dimX, y1: ry1, x2: dimX - 4, y2: ry1 - 8, stroke: "#92400e", "stroke-width": 1.2 });
+el("line", { x1: dimX, y1: ry1, x2: dimX + 4, y2: ry1 - 8, stroke: "#92400e", "stroke-width": 1.2 });
+el("line", { x1: dimX, y1: ry2, x2: dimX - 4, y2: ry2 + 8, stroke: "#92400e", "stroke-width": 1.2 });
+el("line", { x1: dimX, y1: ry2, x2: dimX + 4, y2: ry2 + 8, stroke: "#92400e", "stroke-width": 1.2 });
+
+const hLabel = addText(dimX + 30, (ry1 + ry2) / 2, "", 13, "middle", 500);
+hLabel.setAttribute("fill", "#92400e");
+hLabel.textContent = "8/3 \u2248 2.67";
+
+// Corner coordinate labels
+const cLabel1 = addText(px(-xr), py(yr) - 14, "", 12, "middle", 400);
+cLabel1.setAttribute("fill", "#92400e");
+cLabel1.textContent = "(-2\u221A3/3, 8/3)";
+
+const cLabel2 = addText(px(xr), py(yr) - 14, "", 12, "middle", 400);
+cLabel2.setAttribute("fill", "#92400e");
+cLabel2.textContent = "(2\u221A3/3, 8/3)";
+
+// Parabola label
+const pLabel = addText(px(2.6), py(-2.6 * 2.6 + 4) - 14, "", 14, "middle", 500);
+pLabel.setAttribute("fill", "#2563eb");
+pLabel.textContent = "y = -x\u00B2 + 4";
+
+// Area label in center of rectangle
+el("rect", {
+  x: (rx1 + rx2) / 2 - 62, y: (ry1 + ry2) / 2 - 14,
+  width: 124, height: 28, rx: 4,
+  fill: "#fff", "fill-opacity": 0.85, stroke: "#d97706", "stroke-width": 1
+});
+
+const areaLabel = addText((rx1 + rx2) / 2, (ry1 + ry2) / 2, "", 14, "middle", 500);
+areaLabel.setAttribute("fill", "#92400e");
+areaLabel.textContent = "S = 32\u221A3/9 \u2248 6.16";
+
+// Title
+addText(340, 28, "y = -x\u00B2 + 4 \uC5D0 \uB0B4\uC811\uD558\uB294 \uCD5C\uB300 \uB113\uC774 \uC9C1\uC0AC\uAC01\uD615", 16, "middle", 500);
+
+// Derivation note
+const note = addText(340, 498, "", 12, "middle", 400);
+note.setAttribute("fill", "#6b7280");
+note.textContent = "A(x) = 2x(-x\u00B2+4), A'(x) = -6x\u00B2+8 = 0 \u27F9 x = 2\u221A3/3";
+</script>

@@ -1,0 +1,127 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+  const ox = 340,
+    oy = 350,
+    scale = 60;
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': '12',
+      'font-weight': '400',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: '[label-secondary]',
+      ...attrs,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 좌표축
+  svg.appendChild(
+    el('line', {
+      x1: 100,
+      y1: oy,
+      x2: 580,
+      y2: oy,
+      stroke: '[axis]',
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: 400,
+      x2: ox,
+      y2: 60,
+      stroke: '[axis]',
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  addText(575, oy + 20, 'x', { 'font-size': '14', 'font-weight': '500', fill: '[label-primary]' });
+  addText(ox + 15, 65, 'y', { 'font-size': '14', 'font-weight': '500', fill: '[label-primary]' });
+  addText(ox - 12, oy + 12, 'O');
+
+  // 2. 이차함수 y = -x^2 + 4
+  let points = '';
+  for (let x = -2.2; x <= 2.2; x += 0.1) {
+    const y = -x * x + 4;
+    const px = ox + x * scale;
+    const py = oy - y * scale;
+    if (py <= 420) points += Math.round(px * 10) / 10 + ',' + Math.round(py * 10) / 10 + ' ';
+  }
+  svg.appendChild(
+    el('polyline', { points: points.trim(), fill: 'none', stroke: '[curve-primary]', 'stroke-width': '2' })
+  );
+
+  // 3. 최대 넓이 직사각형 (x = 2/√3 ≈ 1.15)
+  const x_val = 2 / Math.sqrt(3);
+  const y_val = -(x_val * x_val) + 4;
+  const rect_x = ox - x_val * scale;
+  const rect_y = oy - y_val * scale;
+  const rect_w = 2 * x_val * scale;
+  const rect_h = y_val * scale;
+
+  svg.appendChild(
+    el('rect', {
+      x: rect_x,
+      y: rect_y,
+      width: rect_w,
+      height: rect_h,
+      fill: '[shape-fill]',
+      'fill-opacity': '0.2',
+      stroke: '[shape-stroke]',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // 주요 점 표시
+  const pts = [
+    [x_val, y_val],
+    [-x_val, y_val],
+    [x_val, 0],
+    [-x_val, 0],
+  ];
+  pts.forEach(([mx, my]) => {
+    svg.appendChild(el('circle', { cx: ox + mx * scale, cy: oy - my * scale, r: '3', fill: '[shape-stroke]' }));
+  });
+
+  // 라벨
+  addText(ox + x_val * scale, oy + 18, 'x');
+  addText(ox - x_val * scale, oy + 18, '-x');
+  addText(ox + x_val * scale + 35, oy - y_val * scale, '(x, -x²+4)', { 'text-anchor': 'start' });
+  addText(ox + 100, 100, 'y = -x² + 4', { 'font-size': '14', fill: '[curve-primary]' });
+</script>

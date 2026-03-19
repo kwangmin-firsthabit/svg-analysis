@@ -1,0 +1,264 @@
+<svg id="vis" width="100%" viewBox="0 0 860 620" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const C = {
+    sectorFill: '#dbeafe',
+    sectorStroke: '#2563eb',
+    baseFill: '#dcfce7',
+    baseStroke: '#16a34a',
+    fold: '#64748b',
+    text: '#0f172a',
+    sub: '#64748b',
+    accent: '#dc2626',
+    guide: '#94a3b8',
+  };
+
+  function el(tag, attrs = {}) {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    return node;
+  }
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      fill: C.text,
+      'font-size': 14,
+      'font-weight': 500,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      ...attrs,
+    });
+    t.textContent = str;
+    return add(t);
+  }
+  function line(x1, y1, x2, y2, attrs = {}) {
+    return add(el('line', { x1, y1, x2, y2, ...attrs }));
+  }
+  function polar(cx, cy, r, deg) {
+    const rad = (deg * Math.PI) / 180;
+    return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+  }
+  function arcPath(cx, cy, r, a1, a2) {
+    const p1 = polar(cx, cy, r, a1);
+    const p2 = polar(cx, cy, r, a2);
+    const delta = (((a2 - a1) % 360) + 360) % 360;
+    const large = delta > 180 ? 1 : 0;
+    return `M ${p1.x} ${p1.y} A ${r} ${r} 0 ${large} 1 ${p2.x} ${p2.y}`;
+  }
+
+  // scale
+  const scale = 22;
+  const baseR = 4 * scale; // 88
+  const slant = 10 * scale; // 220
+
+  // sector angle: arc length = 2π*4 = 8π, so theta = (8π)/10 = 4π/5 = 144°
+  const theta = 144;
+  const start = -162;
+  const end = start + theta;
+
+  // sector center
+  const O = { x: 300, y: 360 };
+  const A = polar(O.x, O.y, slant, start);
+  const B = polar(O.x, O.y, slant, end);
+
+  // sector
+  const sectorD = [
+    `M ${O.x} ${O.y}`,
+    `L ${A.x} ${A.y}`,
+    arcPath(O.x, O.y, slant, start, end).replace(/^M [^A]+/, ''),
+    `L ${O.x} ${O.y}`,
+    'Z',
+  ].join(' ');
+
+  add(el('rect', { x: 0, y: 0, width: 860, height: 620, fill: 'white' }));
+
+  add(
+    el('path', {
+      d: sectorD,
+      fill: C.sectorFill,
+      stroke: C.sectorStroke,
+      'stroke-width': 2.8,
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // emphasize curved edge
+  add(
+    el('path', {
+      d: arcPath(O.x, O.y, slant, start, end),
+      fill: 'none',
+      stroke: C.sectorStroke,
+      'stroke-width': 3.2,
+      'stroke-linecap': 'round',
+    })
+  );
+
+  // radii (slant edges)
+  line(O.x, O.y, A.x, A.y, {
+    stroke: C.sectorStroke,
+    'stroke-width': 2.8,
+  });
+  line(O.x, O.y, B.x, B.y, {
+    stroke: C.sectorStroke,
+    'stroke-width': 2.8,
+  });
+
+  // center angle marker
+  const angleR = 52;
+  add(
+    el('path', {
+      d: arcPath(O.x, O.y, angleR, start, end),
+      fill: 'none',
+      stroke: C.accent,
+      'stroke-width': 2,
+    })
+  );
+  text(O.x, O.y - 58, '144°', {
+    fill: C.accent,
+    'font-size': 14,
+  });
+
+  // base circle attached near lower area
+  const baseC = { x: 620, y: 390 };
+  add(
+    el('circle', {
+      cx: baseC.x,
+      cy: baseC.y,
+      r: baseR,
+      fill: C.baseFill,
+      stroke: C.baseStroke,
+      'stroke-width': 2.8,
+    })
+  );
+
+  // base radius
+  line(baseC.x, baseC.y, baseC.x + baseR, baseC.y, {
+    stroke: C.accent,
+    'stroke-width': 2.2,
+  });
+  add(el('circle', { cx: baseC.x, cy: baseC.y, r: 4.2, fill: C.baseStroke }));
+
+  // fold guide from one slant edge to base circle
+  const attachY = baseC.y - baseR;
+  line(baseC.x, attachY, B.x + 40, B.y + 18, {
+    stroke: C.fold,
+    'stroke-width': 1.8,
+    'stroke-dasharray': '7 5',
+    'marker-end': 'url(#arrow)',
+  });
+
+  // labels
+  text(280, 110, '원뿔의 옆면', {
+    fill: C.sectorStroke,
+    'font-size': 20,
+    'font-weight': 700,
+  });
+  text(baseC.x, baseC.y, '밑면', {
+    fill: C.baseStroke,
+    'font-size': 18,
+    'font-weight': 700,
+  });
+
+  // slant length labels
+  text((O.x + A.x) / 2 - 10, (O.y + A.y) / 2, '10', {
+    fill: C.sectorStroke,
+    'font-size': 15,
+  });
+  text((O.x + B.x) / 2 + 12, (O.y + B.y) / 2, '10', {
+    fill: C.sectorStroke,
+    'font-size': 15,
+  });
+
+  // base radius label
+  text(baseC.x + baseR / 2, baseC.y - 18, '반지름 4', {
+    fill: C.accent,
+    'font-size': 14,
+  });
+
+  // arc length label
+  const midAng = (start + end) / 2;
+  const labelP = polar(O.x, O.y, slant + 28, midAng);
+  text(labelP.x, labelP.y, '호의 길이 = 밑면의 둘레 = 8π', {
+    fill: C.sectorStroke,
+    'font-size': 14,
+  });
+
+  // apex
+  add(el('circle', { cx: O.x, cy: O.y, r: 4.4, fill: C.sectorStroke }));
+  text(O.x - 14, O.y + 18, 'O', {
+    fill: C.sectorStroke,
+    'font-size': 13,
+  });
+
+  // title and notes
+  text(665, 84, '원뿔의 전개도', {
+    'font-size': 24,
+    'font-weight': 700,
+  });
+  text(665, 118, '밑면의 반지름 4, 모선의 길이 10', {
+    'font-size': 14,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(665, 146, '옆면은 반지름 10인 부채꼴', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(665, 174, '부채꼴의 중심각 = 144°', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(665, 202, '호의 길이는 밑면의 둘레와 같아서 8π', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(665, 230, '밑면은 반지름 4인 원', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+
+  // guide arrows
+  line(590, 178, 430, 215, {
+    stroke: C.sub,
+    'stroke-width': 1.4,
+    'marker-end': 'url(#arrow)',
+  });
+  line(585, 228, baseC.x - 18, baseC.y - 26, {
+    stroke: C.sub,
+    'stroke-width': 1.4,
+    'marker-end': 'url(#arrow)',
+  });
+</script>

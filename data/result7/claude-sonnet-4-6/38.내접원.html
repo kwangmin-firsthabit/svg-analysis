@@ -1,0 +1,74 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '13', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 직각삼각형 ABC: 직각 C, CA=6, CB=8, AB=10
+// C=(160,340), A=(160,160), B=(480,340) — 배율 약 34px/unit
+const scale = 34;
+const Cx = 160, Cy = 340;
+const Ax = 160, Ay = Cy - 6 * scale;   // 위로 6
+const Bx = Cx + 8 * scale, By = Cy;    // 오른쪽 8
+
+// 삼각형
+svg.appendChild(el('polygon', {
+  points: `${Cx},${Cy} ${Ax},${Ay} ${Bx},${By}`,
+  fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '1.8'
+}));
+
+// 직각 마커
+const s = 12;
+svg.appendChild(el('path', {
+  d: `M ${Cx},${Cy - s} L ${Cx + s},${Cy - s} L ${Cx + s},${Cy}`,
+  fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// 내접원: r = (a+b-c)/2 = (6+8-10)/2 = 2
+// 내접원 중심 = C에서 (r, r) 이동 = (Cx+r*scale, Cy-r*scale)
+const r = 2;
+const Ix = Cx + r * scale;
+const Iy = Cy - r * scale;
+svg.appendChild(el('circle', {
+  cx: Ix, cy: Iy, r: r * scale,
+  fill: '#DBEAFE', 'fill-opacity': '0.6',
+  stroke: '#2563EB', 'stroke-width': '1.8'
+}));
+
+// 꼭짓점 점
+[[Cx, Cy], [Ax, Ay], [Bx, By]].forEach(([x, y]) => {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3.5', fill: '#1D4ED8' }));
+});
+svg.appendChild(el('circle', { cx: Ix, cy: Iy, r: '3', fill: '#2563EB' }));
+
+// 레이블
+addText(Cx - 18, Cy + 4, 'C', { fill: '#1E293B', 'font-size': '15', 'font-weight': '600' });
+addText(Ax - 18, Ay, 'A', { fill: '#1E293B', 'font-size': '15', 'font-weight': '600' });
+addText(Bx + 18, By + 4, 'B', { fill: '#1E293B', 'font-size': '15', 'font-weight': '600' });
+addText(Ix + 14, Iy - 12, 'I', { fill: '#1E293B', 'font-size': '14', 'font-weight': '600' });
+
+// 변 길이
+addText(Cx - 16, (Cy + Ay) / 2, '6', { fill: '#334155', 'font-size': '13' });
+addText((Cx + Bx) / 2, Cy + 18, '8', { fill: '#334155', 'font-size': '13' });
+// 빗변 10 (중점에서 법선 방향)
+const abMx = (Ax + Bx) / 2, abMy = (Ay + By) / 2;
+const dx = Bx - Ax, dy = By - Ay;
+const len = Math.sqrt(dx * dx + dy * dy);
+const nx = -dy / len * 16, ny = dx / len * 16;
+addText(abMx + nx, abMy + ny, '10', { fill: '#334155', 'font-size': '13' });
+
+// 반지름 보조선
+svg.appendChild(el('line', { x1: Ix, y1: Iy, x2: Cx, y2: Iy, stroke: '#94A3B8', 'stroke-dasharray': '4 3', 'stroke-width': '1' }));
+addText((Ix + Cx) / 2, Iy - 12, '2', { fill: '#64748B', 'font-size': '12' });
+</script>

@@ -1,0 +1,100 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#111',
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  // parameters
+  const r = 3;
+  const h = 8;
+  const scale = 25;
+
+  // rectangle dimensions
+  const rectW = 2 * Math.PI * r * scale;
+  const rectH = h * scale;
+
+  // rectangle position (centered)
+  const rx = (680 - rectW) / 2;
+  const ry = 140;
+
+  // draw rectangle (lateral surface)
+  svg.appendChild(
+    el('rect', {
+      x: rx,
+      y: ry,
+      width: rectW,
+      height: rectH,
+      fill: '#3b82f6',
+      'fill-opacity': '0.15',
+      stroke: '#2563eb',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // top circle
+  const cx1 = rx + rectW / 2;
+  const cy1 = ry - 70;
+  const Rpx = r * scale;
+
+  svg.appendChild(
+    el('circle', {
+      cx: cx1,
+      cy: cy1,
+      r: Rpx,
+      fill: '#10b981',
+      'fill-opacity': '0.15',
+      stroke: '#059669',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // bottom circle
+  const cx2 = cx1;
+  const cy2 = ry + rectH + 70;
+
+  svg.appendChild(
+    el('circle', {
+      cx: cx2,
+      cy: cy2,
+      r: Rpx,
+      fill: '#ef4444',
+      'fill-opacity': '0.15',
+      stroke: '#dc2626',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // labels
+  svg.appendChild(text(cx1, cy1 - Rpx - 15, '반지름 3'));
+  svg.appendChild(text(cx2, cy2 + Rpx + 15, '반지름 3'));
+
+  svg.appendChild(text(rx + rectW / 2, ry + rectH / 2, '옆면 (직사각형)', { 'font-size': '14' }));
+
+  // height label
+  svg.appendChild(
+    text(rx - 20, ry + rectH / 2, '높이 8', { 'font-size': '12', 'font-weight': '400', 'text-anchor': 'end' })
+  );
+
+  // width label (circumference)
+  svg.appendChild(text(rx + rectW / 2, ry + rectH + 18, '2πr = 6π', { 'font-size': '12', 'font-weight': '400' }));
+</script>

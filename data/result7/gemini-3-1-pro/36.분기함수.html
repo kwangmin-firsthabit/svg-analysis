@@ -1,0 +1,160 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<div id="equation-container" style="display: flex; justify-content: center; margin-bottom: 10px"></div>
+
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // 색상 팔레트 정의
+  const colors = {
+    axis: '#333333',
+    curve1: '#ff4757', // y = -x
+    curve2: '#2f3542', // y = x^2
+    labelPrimary: '#2f3542',
+    labelSecondary: '#57606f',
+    auxiliary: '#a4b0be',
+  };
+
+  const ox = 340,
+    oy = 400,
+    scale = 40;
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': '12',
+      'font-weight': '400',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: colors.labelSecondary,
+      ...attrs,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 수식 렌더링 (KaTeX)
+  katex.render(
+    'f(x) = \begin{cases} -x & (x < 0) \\ x^2 & (x \ge 0) \end{cases}',
+    document.getElementById('equation-container'),
+    {
+      displayMode: true,
+      throwOnError: false,
+    }
+  );
+
+  // 2. 좌표축
+  svg.appendChild(
+    el('line', {
+      x1: 60,
+      y1: oy,
+      x2: 620,
+      y2: oy,
+      stroke: colors.axis,
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: 440,
+      x2: ox,
+      y2: 30,
+      stroke: colors.axis,
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  addText(625, oy + 15, 'x', { 'font-size': '14', 'font-weight': '500', fill: colors.labelPrimary });
+  addText(ox - 15, 25, 'y', { 'font-size': '14', 'font-weight': '500', fill: colors.labelPrimary });
+  addText(ox - 12, oy + 12, 'O');
+
+  // 3. 눈금 표시
+  for (let i = -6; i <= 6; i++) {
+    if (i === 0) continue;
+    const px = ox + i * scale;
+    svg.appendChild(el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: colors.axis, 'stroke-width': '0.8' }));
+    addText(px, oy + 15, String(i));
+  }
+  for (let j = 2; j <= 8; j += 2) {
+    const py = oy - j * scale;
+    svg.appendChild(el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: colors.axis, 'stroke-width': '0.8' }));
+    addText(ox - 18, py, String(j), { 'text-anchor': 'end' });
+  }
+
+  // 4. 함수 그래프 그리기
+  // Part 1: y = -x (x < 0)
+  const x1_start = -6,
+    x1_end = 0;
+  const p1_start_x = ox + x1_start * scale;
+  const p1_start_y = oy - -x1_start * scale;
+  const p1_end_x = ox;
+  const p1_end_y = oy;
+  svg.appendChild(
+    el('line', {
+      x1: p1_start_x,
+      y1: p1_start_y,
+      x2: p1_end_x,
+      y2: p1_end_y,
+      stroke: colors.curve1,
+      'stroke-width': '2.5',
+      'stroke-linecap': 'round',
+    })
+  );
+
+  // Part 2: y = x^2 (x >= 0)
+  let points2 = '';
+  for (let x = 0; x <= 3; x += 0.1) {
+    const y = x * x;
+    const px = ox + x * scale;
+    const py = oy - y * scale;
+    if (py >= 20) points2 += px + ',' + Math.round(py * 10) / 10 + ' ';
+  }
+  svg.appendChild(
+    el('polyline', {
+      points: points2.trim(),
+      fill: 'none',
+      stroke: colors.curve2,
+      'stroke-width': '2.5',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // 5. 라벨 및 특징점
+  svg.appendChild(el('circle', { cx: ox, cy: oy, r: '4', fill: colors.labelPrimary }));
+  addText(ox - 80, oy - 100, 'y = -x', { fill: colors.curve1, 'font-weight': '500' });
+  addText(ox + 80, oy - 150, 'y = x²', { fill: colors.curve2, 'font-weight': '500' });
+</script>

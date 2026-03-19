@@ -1,0 +1,38 @@
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const ax = 100, ay = 230;
+const bx = 550, by = 60;
+const cxv = 370, cyv = 230;
+const dx = 550, dy = 400;
+
+const pts = `${ax},${ay} ${bx},${by} ${cxv},${cyv} ${dx},${dy}`;
+svg.appendChild(el('polygon', { points: pts, fill: '#3B82F6', 'fill-opacity': '0.12', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+
+const verts = [
+  { x: ax, y: ay, label: 'A', dx: -16, dy: 0, anchor: 'end' },
+  { x: bx, y: by, label: 'B', dx: 0, dy: -16, anchor: 'middle' },
+  { x: cxv, y: cyv, label: 'C', dx: 0, dy: 16, anchor: 'middle' },
+  { x: dx, y: dy, label: 'D', dx: 0, dy: 16, anchor: 'middle' },
+];
+for (const v of verts) {
+  svg.appendChild(el('circle', { cx: v.x, cy: v.y, r: '3.5', fill: '#1D4ED8' }));
+  addText(v.x + v.dx, v.y + v.dy, v.label, { 'font-size': '14', 'font-weight': '500', fill: '#1E293B', 'text-anchor': v.anchor });
+}
+
+addText(350, 138, '오목각 ∠C > 180°', { 'font-size': '11', fill: '#64748B' });
+</script>

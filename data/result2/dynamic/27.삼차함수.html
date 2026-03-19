@@ -1,0 +1,60 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const ox = 340, oy = 220, scale = 40;
+
+// Axes
+svg.appendChild(el('line', { x1: 40, y1: oy, x2: 640, y2: oy, stroke: '#374151', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('line', { x1: ox, y1: 420, x2: ox, y2: 20, stroke: '#374151', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+
+addText(652, oy, 'x', { 'text-anchor': 'start' });
+addText(ox, 10, 'y', {});
+addText(ox - 12, oy + 16, 'O', { 'text-anchor': 'end' });
+
+// Ticks x
+for (let i = -7; i <= 7; i++) {
+  if (i === 0) continue;
+  const px = ox + i * scale;
+  if (px < 40 || px > 630) continue;
+  svg.appendChild(el('line', { x1: px, y1: oy - 5, x2: px, y2: oy + 5, stroke: '#374151', 'stroke-width': '1' }));
+  if (i >= -4 && i <= 4) addText(px, oy + 14, String(i), { 'font-size': '11' });
+}
+// Ticks y
+for (let i = -5; i <= 5; i++) {
+  if (i === 0) continue;
+  const py = oy - i * scale;
+  if (py < 20 || py > 420) continue;
+  svg.appendChild(el('line', { x1: ox - 5, y1: py, x2: ox + 5, y2: py, stroke: '#374151', 'stroke-width': '1' }));
+  addText(ox - 14, py, String(i), { 'text-anchor': 'end', 'font-size': '11' });
+}
+
+// y = x(x-2)(x+2) = x^3 - 4x, pixel-by-pixel polyline
+const ptsArr = [];
+for (let px = 40; px <= 640; px++) {
+  const mx = (px - ox) / scale;
+  const my = mx * mx * mx - 4 * mx;
+  const py = Math.round(oy - my * scale);
+  if (py >= 20 && py <= 420) ptsArr.push(`${px},${py}`);
+}
+svg.appendChild(el('polyline', { points: ptsArr.join(' '), fill: 'none', stroke: '#2563EB', 'stroke-width': '2' }));
+
+// Root labels: x=-2,0,2 on x-axis
+addText(ox + 2 * scale + 8, oy + 14, '2', { 'font-size': '11' });
+addText(ox - 2 * scale - 8, oy + 14, '-2', { 'font-size': '11' });
+
+addText(ox + 115, 20, 'y = x(x−2)(x+2)', { 'font-size': '13', 'font-weight': '500', 'text-anchor': 'start', fill: '#1E293B' });
+</script>

@@ -1,87 +1,77 @@
 <svg id="vis" width="100%" viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg">
-<defs>
-  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
-</defs>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
 </svg>
 <script>
 const svg = document.getElementById('vis');
 const ns = 'http://www.w3.org/2000/svg';
+
 function el(tag, attrs) {
   const e = document.createElementNS(ns, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
   return e;
 }
 
-const lineY = 130;
-const origin = 340;
-const scale = 50;
-const lineLeft = 70;
-const lineRight = 610;
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  return t;
+}
 
-// 부등식 제목
-const title = el('text', { x: 340, y: 42, fill: '#1E293B', 'font-size': 16, 'font-weight': 500, 'dominant-baseline': 'central', 'font-family': 'serif', 'text-anchor': 'middle' });
-title.textContent = 'x² − x − 6 > 0의 해';
-svg.appendChild(title);
+function drawNumberLine(oy) {
+  const ox = 310, scale = 70;
+  const xMin = -4, xMax = 4;
+  const lineX1 = ox + xMin * scale - 10;
+  const lineX2 = ox + xMax * scale + 10;
 
-// 수직선 (축)
-svg.appendChild(el('line', { x1: lineLeft, y1: lineY, x2: lineRight, y2: lineY, stroke: '#64748B', 'stroke-width': 1.5, 'marker-end': 'url(#arrow)' }));
-// 왼쪽 화살표
-svg.appendChild(el('line', { x1: lineLeft + 10, y1: lineY, x2: lineLeft, y2: lineY, stroke: '#64748B', 'stroke-width': 1.5, 'marker-end': 'url(#arrow)' }));
+  svg.appendChild(el('line', { x1: lineX1, y1: oy, x2: lineX2, y2: oy, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)', 'marker-start': 'url(#arrow)' }));
 
-// 눈금 및 라벨
-const ticks = [-4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
-ticks.forEach(n => {
-  const px = Math.round(origin + n * scale);
-  svg.appendChild(el('line', { x1: px, y1: lineY - 6, x2: px, y2: lineY + 6, stroke: '#64748B', 'stroke-width': 1.2 }));
-  const lbl = el('text', { x: px, y: lineY + 22, fill: '#475569', 'font-size': 13, 'font-weight': 400, 'dominant-baseline': 'central', 'font-family': 'sans-serif', 'text-anchor': 'middle' });
-  lbl.textContent = String(n);
-  svg.appendChild(lbl);
-});
+  for (let i = xMin; i <= xMax; i++) {
+    const px = ox + i * scale;
+    svg.appendChild(el('line', { x1: px, y1: oy - 5, x2: px, y2: oy + 5, stroke: '#64748B', 'stroke-width': '0.8' }));
+    svg.appendChild(txt(px, oy + 18, String(i), { 'font-size': '12', 'font-weight': '400', fill: '#475569' }));
+  }
 
-// x = -2, x = 3 픽셀 좌표
-const px_neg2 = Math.round(origin + (-2) * scale); // 240
-const px_3 = Math.round(origin + 3 * scale);       // 490
+  svg.appendChild(txt(lineX2 + 16, oy, 'x', { 'font-size': '13', 'font-weight': '500', fill: '#64748B' }));
+  return { ox, scale, lineX1, lineX2 };
+}
 
-// 빨간 해 범위 선: x < -2 (왼쪽)
-svg.appendChild(el('line', { x1: px_neg2, y1: lineY, x2: lineLeft, y2: lineY, stroke: '#EF4444', 'stroke-width': 3.5, 'stroke-linecap': 'round', 'marker-end': 'url(#arrow)' }));
+// 행 1: x ≤ -2
+const { ox: ox1, scale: sc1, lineX1: lx1a } = drawNumberLine(60);
+const pm2 = ox1 + (-2) * sc1;
+svg.appendChild(el('circle', { cx: pm2, cy: 60, r: '5', fill: '#3B82F6' }));
+svg.appendChild(el('line', { x1: pm2, y1: 60, x2: lx1a, y2: 60, stroke: '#3B82F6', 'stroke-width': '2.5', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(txt(ox1 + (-3) * sc1, 44, 'x ≤ −2', { 'font-size': '12', 'font-weight': '500', fill: '#3B82F6' }));
 
-// 빨간 해 범위 선: x > 3 (오른쪽)
-svg.appendChild(el('line', { x1: px_3, y1: lineY, x2: lineRight, y2: lineY, stroke: '#EF4444', 'stroke-width': 3.5, 'stroke-linecap': 'round', 'marker-end': 'url(#arrow)' }));
-
-// 열린 점: x = -2
-svg.appendChild(el('circle', { cx: px_neg2, cy: lineY, r: 6, fill: 'white', stroke: '#EF4444', 'stroke-width': 2.5 }));
-
-// 열린 점: x = 3
-svg.appendChild(el('circle', { cx: px_3, cy: lineY, r: 6, fill: 'white', stroke: '#EF4444', 'stroke-width': 2.5 }));
-
-// x = -2 라벨 강조 (위쪽)
-const lbl_neg2 = el('text', { x: px_neg2, y: lineY - 20, fill: '#EF4444', 'font-size': 13, 'font-weight': 600, 'dominant-baseline': 'central', 'font-family': 'sans-serif', 'text-anchor': 'middle' });
-lbl_neg2.textContent = '−2';
-svg.appendChild(lbl_neg2);
-
-// x = 3 라벨 강조 (위쪽)
-const lbl_3 = el('text', { x: px_3, y: lineY - 20, fill: '#EF4444', 'font-size': 13, 'font-weight': 600, 'dominant-baseline': 'central', 'font-family': 'sans-serif', 'text-anchor': 'middle' });
-lbl_3.textContent = '3';
-svg.appendChild(lbl_3);
-
-// 인수분해 과정 텍스트 (수직선 아래)
-const step1 = el('text', { x: 340, y: 185, fill: '#1E293B', 'font-size': 14, 'font-weight': 400, 'dominant-baseline': 'central', 'font-family': 'serif', 'text-anchor': 'middle' });
-step1.textContent = '(x + 2)(x − 3) > 0';
-svg.appendChild(step1);
-
-const step2 = el('text', { x: 340, y: 215, fill: '#EF4444', 'font-size': 15, 'font-weight': 600, 'dominant-baseline': 'central', 'font-family': 'serif', 'text-anchor': 'middle' });
-step2.textContent = 'x < −2  또는  x > 3';
-svg.appendChild(step2);
+// 행 2: x > 1
+const { ox: ox2, scale: sc2, lineX2: lx2b } = drawNumberLine(130);
+const p1 = ox2 + 1 * sc2;
+svg.appendChild(el('circle', { cx: p1, cy: 130, r: '5', fill: 'white', stroke: '#F59E0B', 'stroke-width': '1.5' }));
+svg.appendChild(el('line', { x1: p1, y1: 130, x2: lx2b, y2: 130, stroke: '#F59E0B', 'stroke-width': '2.5', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(txt(ox2 + 2.5 * sc2, 114, 'x > 1', { 'font-size': '12', 'font-weight': '500', fill: '#F59E0B' }));
 
 // 구분선
-svg.appendChild(el('line', { x1: 160, y1: 200, x2: 520, y2: 200, stroke: '#94A3B8', 'stroke-width': 0.8, 'stroke-dasharray': '4 3' }));
+svg.appendChild(el('line', { x1: 80, y1: 168, x2: 600, y2: 168, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+svg.appendChild(txt(340, 176, '↓  합집합  ↓', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' }));
 
-// 해 범위 라벨 (선 위)
-const rangeLeft = el('text', { x: Math.round((lineLeft + px_neg2) / 2), y: lineY - 42, fill: '#EF4444', 'font-size': 12, 'font-weight': 500, 'dominant-baseline': 'central', 'font-family': 'sans-serif', 'text-anchor': 'middle' });
-rangeLeft.textContent = 'x < −2';
-svg.appendChild(rangeLeft);
+// 행 3: 합집합
+const { ox: ox3, scale: sc3, lineX1: lx3a, lineX2: lx3b } = drawNumberLine(220);
+const pm2b = ox3 + (-2) * sc3;
+const p1b = ox3 + 1 * sc3;
 
-const rangeRight = el('text', { x: Math.round((px_3 + lineRight) / 2), y: lineY - 42, fill: '#EF4444', 'font-size': 12, 'font-weight': 500, 'dominant-baseline': 'central', 'font-family': 'sans-serif', 'text-anchor': 'middle' });
-rangeRight.textContent = 'x > 3';
-svg.appendChild(rangeRight);
+// 빈 구간 강조 (빗금 표시)
+svg.appendChild(el('rect', { x: pm2b, y: 220 - 10, width: p1b - pm2b, height: 20, fill: '#F1F5F9', 'fill-opacity': '0.5', rx: '2' }));
+svg.appendChild(txt((pm2b + p1b) / 2, 220, '빈 구간', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' }));
+
+// x ≤ -2 부분 (파란색)
+svg.appendChild(el('line', { x1: pm2b, y1: 220, x2: lx3a, y2: 220, stroke: '#3B82F6', 'stroke-width': '2.5', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('circle', { cx: pm2b, cy: 220, r: '5', fill: '#3B82F6' }));
+
+// x > 1 부분 (주황색)
+svg.appendChild(el('line', { x1: p1b, y1: 220, x2: lx3b, y2: 220, stroke: '#F59E0B', 'stroke-width': '2.5', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('circle', { cx: p1b, cy: 220, r: '5', fill: 'white', stroke: '#F59E0B', 'stroke-width': '1.5' }));
+
+// 결론 라벨
+svg.appendChild(txt(340, 256, 'x ≤ −2  또는  x > 1  (빈 구간: −2 < x ≤ 1)', { 'font-size': '13', 'font-weight': '500', fill: '#1D4ED8' }));
+
+svg.setAttribute('viewBox', '0 0 680 274');
 </script>

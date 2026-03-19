@@ -1,0 +1,75 @@
+<svg id="vis" width="100%" viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  return t;
+}
+
+function drawNumberLine(oy, label) {
+  const ox = 300, scale = 70;
+  const xMin = -3, xMax = 5;
+  const lineX1 = ox + xMin * scale - 10;
+  const lineX2 = ox + xMax * scale + 10;
+
+  svg.appendChild(el('line', { x1: lineX1, y1: oy, x2: lineX2, y2: oy, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)', 'marker-start': 'url(#arrow)' }));
+
+  for (let i = xMin; i <= xMax; i++) {
+    const px = ox + i * scale;
+    svg.appendChild(el('line', { x1: px, y1: oy - 5, x2: px, y2: oy + 5, stroke: '#64748B', 'stroke-width': '0.8' }));
+    svg.appendChild(txt(px, oy + 18, String(i), { 'font-size': '12', 'font-weight': '400', fill: '#475569' }));
+  }
+
+  svg.appendChild(txt(lineX2 + 16, oy, 'x', { 'font-size': '13', 'font-weight': '500', fill: '#64748B' }));
+  svg.appendChild(txt(lineX1 - 30, oy, label, { 'font-size': '12', 'font-weight': '500', fill: '#475569', 'text-anchor': 'start' }));
+
+  return { ox, scale };
+}
+
+// 행 1: x > -1
+const { ox: ox1, scale: sc1 } = drawNumberLine(60, '①');
+const p1 = ox1 + (-1) * sc1;
+// 열린점
+svg.appendChild(el('circle', { cx: p1, cy: 60, r: '5', fill: 'white', stroke: '#3B82F6', 'stroke-width': '1.5' }));
+// 오른쪽 화살표 영역
+svg.appendChild(el('line', { x1: p1, y1: 60, x2: ox1 + 5 * sc1 + 10, y2: 60, stroke: '#3B82F6', 'stroke-width': '2.5', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(txt(ox1 + 3 * sc1, 44, 'x > −1', { 'font-size': '12', 'font-weight': '500', fill: '#3B82F6' }));
+
+// 행 2: x ≤ 3
+const { ox: ox2, scale: sc2 } = drawNumberLine(130, '②');
+const p2 = ox2 + 3 * sc2;
+svg.appendChild(el('circle', { cx: p2, cy: 130, r: '5', fill: '#F59E0B' }));
+// 왼쪽 화살표 영역
+svg.appendChild(el('line', { x1: p2, y1: 130, x2: ox2 + (-3) * sc2 - 10, y2: 130, stroke: '#F59E0B', 'stroke-width': '2.5', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(txt(ox2 + 0 * sc2, 114, 'x ≤ 3', { 'font-size': '12', 'font-weight': '500', fill: '#F59E0B' }));
+
+// 구분선
+svg.appendChild(el('line', { x1: 80, y1: 168, x2: 600, y2: 168, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+svg.appendChild(txt(340, 176, '↓  교집합  ↓', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' }));
+
+// 행 3: 교집합 -1 < x ≤ 3
+const { ox: ox3, scale: sc3 } = drawNumberLine(220, '①∩②');
+const pa = ox3 + (-1) * sc3;
+const pb = ox3 + 3 * sc3;
+// 색상 영역
+svg.appendChild(el('rect', { x: pa, y: 220 - 10, width: pb - pa, height: 20, fill: '#EFF6FF', 'fill-opacity': '0.7', rx: '3' }));
+svg.appendChild(el('line', { x1: pa, y1: 220 - 10, x2: pb, y2: 220 - 10, stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+svg.appendChild(el('line', { x1: pa, y1: 220 + 10, x2: pb, y2: 220 + 10, stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+// 열린점 (-1), 닫힌점 (3)
+svg.appendChild(el('circle', { cx: pa, cy: 220, r: '5', fill: 'white', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+svg.appendChild(el('circle', { cx: pb, cy: 220, r: '5', fill: '#1D4ED8' }));
+svg.appendChild(txt(340, 253, '−1 < x ≤ 3', { 'font-size': '14', 'font-weight': '500', fill: '#1D4ED8' }));
+
+svg.setAttribute('viewBox', '0 0 680 272');
+</script>

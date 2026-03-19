@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>분기별 매출액 비교</title>
+</head>
+<body>
+<div style="position:relative;width:100%;height:360px;">
+  <canvas id="chart1"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+new Chart(document.getElementById('chart1'), {
+  type: 'bar',
+  data: {
+    labels: ['1분기', '2분기', '3분기', '4분기'],
+    datasets: [
+      {
+        label: '2022년',
+        data: [120, 145, 132, 178],
+        backgroundColor: '#3B82F6',
+        borderColor: '#2563EB',
+        borderWidth: 1,
+        borderRadius: 3
+      },
+      {
+        label: '2023년',
+        data: [135, 162, 148, 195],
+        backgroundColor: '#F59E0B',
+        borderColor: '#D97706',
+        borderWidth: 1,
+        borderRadius: 3
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+        labels: { color: '#1E293B', font: { size: 12 } }
+      },
+      title: {
+        display: true,
+        text: '분기별 매출액 비교 (억원)',
+        font: { size: 16, weight: 'bold' },
+        color: '#1E293B',
+        padding: { bottom: 8 }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { color: '#475569', font: { size: 12 } }
+      },
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: '매출액 (억원)',
+          color: '#475569',
+          font: { size: 12 }
+        },
+        ticks: { color: '#64748B', font: { size: 11 } },
+        grid: { color: '#E2E8F0' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<div style="position: relative; width: 100%; height: 420px;">
+  <canvas id="scatterChart"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const rawData = [
+  {x:1,y:45},{x:2,y:52},{x:2,y:58},{x:3,y:61},{x:3,y:70},
+  {x:4,y:72},{x:4,y:78},{x:5,y:80},{x:5,y:85},{x:6,y:88},{x:7,y:91},{x:8,y:95}
+];
+
+const highlightPlugin = {
+  id: 'highlights',
+  afterDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    const xScale = chart.scales.x;
+    const yScale = chart.scales.y;
+
+    const points = [
+      { x: 1, y: 45, label: '(1, 45)' },
+      { x: 8, y: 95, label: '(8, 95)' }
+    ];
+
+    points.forEach(p => {
+      const px = xScale.getPixelForValue(p.x);
+      const py = yScale.getPixelForValue(p.y);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(px, py, 8, 0, Math.PI * 2);
+      ctx.fillStyle = '#1D4ED8';
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+
+      ctx.save();
+      ctx.font = '500 12px sans-serif';
+      ctx.fillStyle = '#1E293B';
+      ctx.textAlign = p.x < 5 ? 'left' : 'right';
+      ctx.textBaseline = 'middle';
+      const offX = p.x < 5 ? 14 : -14;
+      ctx.fillText(p.label, px + offX, py);
+      ctx.restore();
+    });
+
+    ctx.save();
+    ctx.font = '500 13px sans-serif';
+    ctx.fillStyle = '#1D4ED8';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'top';
+    ctx.fillText('상관계수 r ≈ 0.99', chart.chartArea.right, chart.chartArea.top + 8);
+    ctx.restore();
+  }
+};
+
+new Chart(document.getElementById('scatterChart'), {
+  type: 'scatter',
+  data: {
+    datasets: [
+      {
+        label: '학생 데이터',
+        data: rawData,
+        backgroundColor: '#93C5FD',
+        borderColor: '#3B82F6',
+        borderWidth: 1.5,
+        pointRadius: 6,
+        pointHoverRadius: 8
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => '공부 ' + ctx.parsed.x + '시간, 점수 ' + ctx.parsed.y + '점'
+        }
+      }
+    },
+    scales: {
+      x: {
+        min: 0,
+        max: 9,
+        title: { display: true, text: '하루 공부 시간 (시간)', font: { size: 12 }, color: '#475569' },
+        ticks: {
+          stepSize: 1,
+          font: { size: 12 },
+          color: '#475569'
+        },
+        grid: { color: '#E2E8F0' }
+      },
+      y: {
+        min: 35,
+        max: 105,
+        title: { display: true, text: '시험 점수 (점)', font: { size: 12 }, color: '#475569' },
+        ticks: {
+          stepSize: 10,
+          font: { size: 11 },
+          color: '#475569'
+        },
+        grid: { color: '#E2E8F0' }
+      }
+    }
+  },
+  plugins: [highlightPlugin]
+});
+</script>

@@ -1,0 +1,123 @@
+<svg id="vis2" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis2');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const colors = {
+    axis: '#4b5563',
+    line: '#2563eb',
+    parabola: '#16a34a',
+    point: '#dc2626',
+    guide: '#9ca3af',
+    text: '#111827',
+  };
+
+  const ox = 300;
+  const oy = 340;
+  const sx = 70;
+  const sy = 35;
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+
+  function px(x) {
+    return ox + x * sx;
+  }
+  function py(y) {
+    return oy - y * sy;
+  }
+
+  // axes
+  svg.appendChild(
+    el('line', {
+      x1: 60,
+      y1: oy,
+      x2: 640,
+      y2: oy,
+      stroke: colors.axis,
+      'stroke-width': 1.2,
+      'marker-end': 'url(#arrow2)',
+    })
+  );
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: 390,
+      x2: ox,
+      y2: 30,
+      stroke: colors.axis,
+      'stroke-width': 1.2,
+      'marker-end': 'url(#arrow2)',
+    })
+  );
+
+  // labels
+  function text(x, y, str) {
+    const t = el('text', { x, y, 'font-size': 12, 'text-anchor': 'middle', fill: colors.text });
+    t.textContent = str;
+    svg.appendChild(t);
+  }
+
+  // ticks
+  for (let i = -3; i <= 4; i++) {
+    if (i === 0) continue;
+    const x = px(i);
+    svg.appendChild(el('line', { x1: x, y1: oy - 4, x2: x, y2: oy + 4, stroke: colors.axis }));
+    text(x, oy + 18, i);
+  }
+
+  for (let j = 1; j <= 6; j++) {
+    const y = py(j);
+    svg.appendChild(el('line', { x1: ox - 4, y1: y, x2: ox + 4, y2: y, stroke: colors.axis }));
+    text(ox - 18, y, j);
+  }
+
+  // y = -x (x<0)
+  let pts1 = '';
+  for (let x = -3; x < 0; x += 0.02) {
+    const y = -x;
+    pts1 += px(x) + ',' + py(y) + ' ';
+  }
+  svg.appendChild(
+    el('polyline', {
+      points: pts1.trim(),
+      fill: 'none',
+      stroke: colors.line,
+      'stroke-width': 2.5,
+    })
+  );
+
+  // y = x^2 (x>=0)
+  let pts2 = '';
+  for (let x = 0; x <= 2.5; x += 0.02) {
+    const y = x * x;
+    pts2 += px(x) + ',' + py(y) + ' ';
+  }
+  svg.appendChild(
+    el('polyline', {
+      points: pts2.trim(),
+      fill: 'none',
+      stroke: colors.parabola,
+      'stroke-width': 2.5,
+    })
+  );
+
+  // point (0,0)
+  svg.appendChild(el('circle', { cx: px(0), cy: py(0), r: 4.5, fill: colors.point }));
+
+  text(px(0) + 28, py(0) - 12, '(0,0)');
+
+  // labels
+  text(140, 80, 'y = -x (x < 0)');
+  text(470, 120, 'y = x² (x ≥ 0)');
+</script>

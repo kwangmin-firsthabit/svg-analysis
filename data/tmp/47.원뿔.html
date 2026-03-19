@@ -1,0 +1,232 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L8,3 z" fill="#475569"/>
+  </marker>
+</defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+// oblique projection
+function project(x, y, z) {
+  return {
+    px: Math.round(x + z * Math.cos(Math.PI / 4) * 0.5),
+    py: Math.round(y - z * Math.sin(Math.PI / 4) * 0.5)
+  };
+}
+
+// 스케일 및 오프셋
+const scale = 28;
+const cx = 290;
+const cy = 260;
+
+// r=4, h=6 -> 꼭짓점 D(0,6,0), 밑면 중심 O(0,0,0)
+// 밑면 타원 점들 (z축이 위)
+// 밑면: y=0 평면에서 x축, z축으로 퍼짐
+// 꼭짓점: (0, h, 0) -> 투영
+const apex = project(0, -6 * scale, 0);
+const apexPx = { px: cx + apex.px, py: cy + apex.py };
+
+const baseCenter = project(0, 0, 0);
+const baseCxPx = cx + baseCenter.px;
+const baseCyPx = cy + baseCenter.py;
+
+// 밑면 타원: x축 -> 수평, z축 -> oblique
+// 밑면 반지름 r=4
+// x방향 점: (4,0,0), (-4,0,0)
+const bRight = project(4 * scale, 0, 0);
+const bLeft = project(-4 * scale, 0, 0);
+const bFront = project(0, 0, 4 * scale);
+const bBack = project(0, 0, -4 * scale);
+
+// 타원 rx, ry 계산 (근사)
+const ellRx = Math.round(4 * scale); // x축 방향
+const ellRyX = Math.round(4 * scale * Math.sin(Math.PI / 4) * 0.5); // oblique z축의 y성분
+const ellRyZ = Math.round(4 * scale * Math.cos(Math.PI / 4) * 0.5); // oblique z축의 x성분
+
+// 모선의 왼쪽(-4,0,0) 및 오른쪽(4,0,0)
+const leftBase = { px: cx + bLeft.px, py: cy + bLeft.py };
+const rightBase = { px: cx + bRight.px, py: cy + bRight.py };
+// 앞 모선 점
+const frontBase = { px: cx + bFront.px, py: cy + bFront.py };
+
+// l = sqrt(r^2 + h^2) = sqrt(16+36) = sqrt(52) = 2sqrt(13)
+const l = Math.sqrt(52);
+
+// 밑면 타원 - 가려진 반원 (뒤쪽, 점선)
+svg.appendChild(el('path', {
+  d: `M ${leftBase.px} ${leftBase.py} A ${ellRx} ${Math.round(ellRx * 0.25)} 0 0 0 ${rightBase.px} ${rightBase.py}`,
+  fill: 'none',
+  stroke: '#94A3B8',
+  'stroke-width': '1',
+  'stroke-dasharray': '5 4',
+  opacity: '0.5'
+}));
+
+// 밑면 채우기 (앞쪽 반타원)
+svg.appendChild(el('ellipse', {
+  cx: baseCxPx,
+  cy: baseCyPx,
+  rx: ellRx,
+  ry: Math.round(ellRx * 0.25),
+  fill: '#3B82F6',
+  'fill-opacity': '0.12',
+  stroke: 'none'
+}));
+
+// 밑면 앞쪽 반원 (실선)
+svg.appendChild(el('path', {
+  d: `M ${leftBase.px} ${leftBase.py} A ${ellRx} ${Math.round(ellRx * 0.25)} 0 0 1 ${rightBase.px} ${rightBase.py}`,
+  fill: 'none',
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5',
+  opacity: '1'
+}));
+
+// 가려진 왼쪽 모선 (뒤쪽, 점선)
+const backBase = { px: cx + bBack.px, py: cy + bBack.py };
+svg.appendChild(el('line', {
+  x1: apexPx.px, y1: apexPx.py,
+  x2: backBase.px, y2: backBase.py,
+  stroke: '#94A3B8',
+  'stroke-width': '1',
+  'stroke-dasharray': '5 4',
+  opacity: '0.5'
+}));
+
+// 옆면 채우기 (왼쪽)
+svg.appendChild(el('polygon', {
+  points: `${apexPx.px},${apexPx.py} ${leftBase.px},${leftBase.py} ${baseCxPx},${baseCyPx}`,
+  fill: '#3B82F6',
+  'fill-opacity': '0.10',
+  stroke: 'none'
+}));
+
+// 옆면 채우기 (오른쪽)
+svg.appendChild(el('polygon', {
+  points: `${apexPx.px},${apexPx.py} ${rightBase.px},${rightBase.py} ${baseCxPx},${baseCyPx}`,
+  fill: '#3B82F6',
+  'fill-opacity': '0.12',
+  stroke: 'none'
+}));
+
+// 실선 모서리: 왼쪽 모선, 오른쪽 모선
+svg.appendChild(el('line', {
+  x1: apexPx.px, y1: apexPx.py,
+  x2: leftBase.px, y2: leftBase.py,
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5',
+  opacity: '1'
+}));
+svg.appendChild(el('line', {
+  x1: apexPx.px, y1: apexPx.py,
+  x2: rightBase.px, y2: rightBase.py,
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5',
+  opacity: '1'
+}));
+
+// 높이 표시 (수직선, 꼭짓점 -> 밑면 중심)
+svg.appendChild(el('line', {
+  x1: apexPx.px, y1: apexPx.py,
+  x2: baseCxPx, y2: baseCyPx,
+  stroke: '#94A3B8',
+  'stroke-width': '1',
+  'stroke-dasharray': '4 3',
+  opacity: '0.8'
+}));
+
+// 반지름 표시 (밑면 중심 -> 오른쪽)
+svg.appendChild(el('line', {
+  x1: baseCxPx, y1: baseCyPx,
+  x2: rightBase.px, y2: rightBase.py,
+  stroke: '#475569',
+  'stroke-width': '1',
+  'stroke-dasharray': '3 2'
+}));
+
+// 꼭짓점 A 표시
+svg.appendChild(el('circle', {
+  cx: apexPx.px, cy: apexPx.py, r: '3',
+  fill: '#1D4ED8'
+}));
+
+// 꼭짓점 라벨
+svg.appendChild(Object.assign(el('text', {
+  x: apexPx.px - 14, y: apexPx.py,
+  'font-size': '14', fill: '#1E293B',
+  'font-family': 'serif',
+  'dominant-baseline': 'central'
+}), { textContent: 'A' }));
+
+// 밑면 중심 O
+svg.appendChild(el('circle', {
+  cx: baseCxPx, cy: baseCyPx, r: '3',
+  fill: '#475569'
+}));
+svg.appendChild(Object.assign(el('text', {
+  x: baseCxPx - 12, y: baseCyPx + 14,
+  'font-size': '13', fill: '#475569',
+  'font-family': 'serif',
+  'dominant-baseline': 'central'
+}), { textContent: 'O' }));
+
+// 반지름 라벨 r=4
+svg.appendChild(Object.assign(el('text', {
+  x: Math.round((baseCxPx + rightBase.px) / 2), y: baseCyPx + 16,
+  'font-size': '13', fill: '#475569',
+  'font-family': 'serif',
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central'
+}), { textContent: 'r = 4' }));
+
+// 높이 라벨 h=6
+svg.appendChild(Object.assign(el('text', {
+  x: apexPx.px + 10, y: Math.round((apexPx.py + baseCyPx) / 2),
+  'font-size': '13', fill: '#475569',
+  'font-family': 'serif',
+  'dominant-baseline': 'central'
+}), { textContent: 'h = 6' }));
+
+// 오른쪽 텍스트 영역 구분선
+svg.appendChild(el('line', {
+  x1: '460', y1: '60',
+  x2: '460', y2: '380',
+  stroke: '#E2E8F0',
+  'stroke-width': '1'
+}));
+
+// 오른쪽 정보 텍스트
+const textData = [
+  { y: 100, text: '원뿔', size: '18', weight: 'bold', fill: '#1E293B' },
+  { y: 135, text: 'r = 4,  h = 6', size: '14', fill: '#475569' },
+  { y: 175, text: '모선 l = √(r² + h²)', size: '13', fill: '#1E293B' },
+  { y: 200, text: '= √(16 + 36) = √52', size: '13', fill: '#1E293B' },
+  { y: 225, text: '= 2√13 ≈ 7.21', size: '14', weight: 'bold', fill: '#1D4ED8' },
+  { y: 270, text: '겉넓이 S = πr² + πrl', size: '13', fill: '#1E293B' },
+  { y: 295, text: '= 16π + 4π × 2√13', size: '13', fill: '#1E293B' },
+  { y: 320, text: '= π(16 + 8√13)', size: '13', fill: '#1E293B' },
+  { y: 345, text: '≈ 141.37', size: '14', weight: 'bold', fill: '#1D4ED8' },
+];
+
+for (const d of textData) {
+  const t = el('text', {
+    x: '480',
+    y: d.y,
+    'font-size': d.size || '13',
+    fill: d.fill || '#1E293B',
+    'font-family': 'serif',
+    'dominant-baseline': 'central',
+    ...(d.weight ? { 'font-weight': d.weight } : {})
+  });
+  t.textContent = d.text;
+  svg.appendChild(t);
+}
+</script>

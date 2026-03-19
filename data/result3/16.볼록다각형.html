@@ -1,0 +1,122 @@
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 볼록 오각형 ABCDE: 모든 내각 < 180°
+const verts = [
+  { x: 340, y: 60,  label: 'A' },  // 위
+  { x: 520, y: 155, label: 'B' },  // 우상
+  { x: 470, y: 360, label: 'C' },  // 우하
+  { x: 210, y: 360, label: 'D' },  // 좌하
+  { x: 160, y: 155, label: 'E' },  // 좌상
+];
+
+const pts_str = verts.map(v => v.x + ',' + v.y).join(' ');
+
+// 도형
+svg.appendChild(el('polygon', {
+  points: pts_str,
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 꼭짓점 점
+verts.forEach(v => {
+  svg.appendChild(el('circle', { cx: v.x, cy: v.y, r: '3.5', fill: '#1D4ED8' }));
+});
+
+// 꼭짓점 라벨
+const labelOffsets = [
+  { dx: 0, dy: -20 },   // A 위
+  { dx: 20, dy: -10 },  // B 우상
+  { dx: 18, dy: 16 },   // C 우하
+  { dx: -18, dy: 16 },  // D 좌하
+  { dx: -20, dy: -10 }, // E 좌상
+];
+
+verts.forEach((v, i) => {
+  addText(v.x + labelOffsets[i].dx, v.y + labelOffsets[i].dy, v.label);
+});
+
+// B 꼭짓점에 내각 호 표시
+const Bv = verts[1];  // B
+const Av = verts[0];  // A (이전)
+const Cv = verts[2];  // C (다음)
+const arcR = 28;
+
+const angA = Math.atan2(Av.y - Bv.y, Av.x - Bv.x);
+const angC = Math.atan2(Cv.y - Bv.y, Cv.x - Bv.x);
+
+// 내각 호 (B에서 A방향과 C방향 사이)
+const sx = Bv.x + arcR * Math.cos(angA);
+const sy = Bv.y + arcR * Math.sin(angA);
+const ex = Bv.x + arcR * Math.cos(angC);
+const ey = Bv.y + arcR * Math.sin(angC);
+
+// 볼록 다각형 B의 내각 (약 90°~120°)
+svg.appendChild(el('path', {
+  d: `M ${sx.toFixed(1)} ${sy.toFixed(1)} A ${arcR} ${arcR} 0 0 1 ${ex.toFixed(1)} ${ey.toFixed(1)}`,
+  fill: 'none', stroke: '#60A5FA', 'stroke-width': '1.2'
+}));
+
+// 각도 라벨
+const midAng = (angA + angC) / 2;
+addText(
+  (Bv.x + 48 * Math.cos(midAng)).toFixed(1),
+  (Bv.y + 48 * Math.sin(midAng)).toFixed(1),
+  '∠B',
+  { 'font-size': '12', 'font-weight': '400', fill: '#475569' }
+);
+
+// E 꼭짓점에서 외각 표시
+// E = verts[4], 인접: D=verts[3], A=verts[0]
+const Ev = verts[4];
+const Dv = verts[3];
+// EA 방향의 연장선
+const dirDA_x = Ev.x - Dv.x, dirDA_y = Ev.y - Dv.y;
+const lenDA = Math.sqrt(dirDA_x * dirDA_x + dirDA_y * dirDA_y);
+const extLen = 80;
+const extX = Ev.x + (dirDA_x / lenDA) * extLen;
+const extY = Ev.y + (dirDA_y / lenDA) * extLen;
+
+// 연장선 (점선)
+svg.appendChild(el('line', {
+  x1: Ev.x, y1: Ev.y, x2: extX.toFixed(1), y2: extY.toFixed(1),
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '5 4'
+}));
+
+// 외각 호
+const Av2 = verts[0]; // EA 방향
+const angEA = Math.atan2(Av2.y - Ev.y, Av2.x - Ev.x);
+const angExt = Math.atan2(extY - Ev.y, extX - Ev.x);
+
+const arcR2 = 24;
+const sx2 = Ev.x + arcR2 * Math.cos(angEA);
+const sy2 = Ev.y + arcR2 * Math.sin(angEA);
+const ex2 = Ev.x + arcR2 * Math.cos(angExt);
+const ey2 = Ev.y + arcR2 * Math.sin(angExt);
+
+svg.appendChild(el('path', {
+  d: `M ${sx2.toFixed(1)} ${sy2.toFixed(1)} A ${arcR2} ${arcR2} 0 0 0 ${ex2.toFixed(1)} ${ey2.toFixed(1)}`,
+  fill: '#60A5FA', 'fill-opacity': '0.2', stroke: '#60A5FA', 'stroke-width': '1'
+}));
+
+addText(Ev.x - 55, Ev.y - 15, '외각', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 안내 텍스트
+addText(340, 420, '볼록다각형: 모든 내각 < 180°', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

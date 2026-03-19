@@ -1,0 +1,212 @@
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+<defs>
+</defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function project(x, y, z) {
+  return {
+    px: x + z * Math.cos(Math.PI / 4) * 0.5,
+    py: y - z * Math.sin(Math.PI / 4) * 0.5
+  };
+}
+
+// 황금비
+const phi = (1 + Math.sqrt(5)) / 2;
+// 변의 길이 a=5, 단위 좌표에서 변의 길이 = 2 -> scale = a/2 = 2.5
+const a = 5;
+const unitScale = a / 2;
+
+// 12개 꼭짓점 (단위 좌표, 변의 길이=2)
+const rawVerts = [
+  [0,  1,  phi], [0, -1,  phi], [0,  1, -phi], [0, -1, -phi],
+  [ 1,  phi, 0], [-1,  phi, 0], [ 1, -phi, 0], [-1, -phi, 0],
+  [ phi, 0,  1], [-phi, 0,  1], [ phi, 0, -1], [-phi, 0, -1]
+];
+
+// 스케일 적용
+const verts3d = rawVerts.map(v => [v[0] * unitScale, v[1] * unitScale, v[2] * unitScale]);
+
+// 중심 (원점)
+const scale = 30;
+const offX = 220;
+const offY = 230;
+
+function toScreen(v) {
+  const p = project(v[0] * scale, -v[1] * scale, v[2] * scale);
+  return { px: Math.round(offX + p.px), py: Math.round(offY + p.py) };
+}
+
+const sv = verts3d.map(v => toScreen(v));
+
+// 정이십면체 20개 면 (꼭짓점 인덱스, 인접 조건: 거리 = a=5)
+function dist3(i, j) {
+  const dx = verts3d[i][0] - verts3d[j][0];
+  const dy = verts3d[i][1] - verts3d[j][1];
+  const dz = verts3d[i][2] - verts3d[j][2];
+  return Math.sqrt(dx * dx + dy * dy + dz * dz);
+}
+
+// 인접 모서리 찾기 (거리 ≈ a)
+const edges = [];
+for (let i = 0; i < 12; i++) {
+  for (let j = i + 1; j < 12; j++) {
+    if (Math.abs(dist3(i, j) - a) < 0.01) {
+      edges.push([i, j]);
+    }
+  }
+}
+
+// 삼각형 면 찾기: 3개 꼭짓점이 모두 서로 인접
+const edgeSet = new Set(edges.map(([i, j]) => `${i}-${j}`));
+function isEdge(i, j) {
+  return edgeSet.has(`${Math.min(i,j)}-${Math.max(i,j)}`);
+}
+
+const faces = [];
+for (let i = 0; i < 12; i++) {
+  for (let j = i + 1; j < 12; j++) {
+    for (let k = j + 1; k < 12; k++) {
+      if (isEdge(i, j) && isEdge(j, k) && isEdge(i, k)) {
+        faces.push([i, j, k]);
+      }
+    }
+  }
+}
+
+// 각 면의 법선 벡터와 z 깊이로 정렬 (painter's algorithm)
+function faceNormalZ(f) {
+  const v0 = verts3d[f[0]];
+  const v1 = verts3d[f[1]];
+  const v2 = verts3d[f[2]];
+  // 법선 벡터 계산
+  const ax = v1[0]-v0[0], ay = v1[1]-v0[1], az = v1[2]-v0[2];
+  const bx = v2[0]-v0[0], by = v2[1]-v0[1], bz = v2[2]-v0[2];
+  const nx = ay*bz - az*by;
+  const ny = az*bx - ax*bz;
+  const nz = ax*by - ay*bx;
+  return { nx, ny, nz };
+}
+
+// 뷰 방향 (oblique: 카메라가 약간 위쪽 앞에서 바라봄)
+const viewDir = { x: 0.3, y: -0.7, z: 1.0 };
+const viewLen = Math.sqrt(viewDir.x**2 + viewDir.y**2 + viewDir.z**2);
+
+// 면 평균 깊이 (z좌표)로 정렬
+function faceDepth(f) {
+  return (verts3d[f[0]][2] + verts3d[f[1]][2] + verts3d[f[2]][2]) / 3;
+}
+
+// 면이 앞을 향하는지 판단 (법선의 뷰 방향 내적)
+function isFrontFace(f) {
+  const { nx, ny, nz } = faceNormalZ(f);
+  return nx * viewDir.x + ny * viewDir.y + nz * viewDir.z > 0;
+}
+
+// 정렬: 깊이 역순 (뒤쪽부터 그리기)
+const sortedFaces = [...faces].sort((a, b) => faceDepth(a) - faceDepth(b));
+
+// 뒤쪽 면 (반투명, 점선 테두리)
+for (const f of sortedFaces) {
+  const front = isFrontFace(f);
+  const pts = f.map(i => `${sv[i].px},${sv[i].py}`).join(' ');
+  if (!front) {
+    svg.appendChild(el('polygon', {
+      points: pts,
+      fill: '#3B82F6',
+      'fill-opacity': '0.04',
+      stroke: '#94A3B8',
+      'stroke-width': '0.8',
+      'stroke-dasharray': '4 3',
+      opacity: '0.4'
+    }));
+  }
+}
+
+// 앞쪽 면
+for (const f of sortedFaces) {
+  const front = isFrontFace(f);
+  if (front) {
+    const pts = f.map(i => `${sv[i].px},${sv[i].py}`).join(' ');
+    svg.appendChild(el('polygon', {
+      points: pts,
+      fill: '#3B82F6',
+      'fill-opacity': '0.10',
+      stroke: '#1D4ED8',
+      'stroke-width': '1.2',
+      opacity: '1'
+    }));
+  }
+}
+
+// 꼭짓점 점
+for (let i = 0; i < 12; i++) {
+  svg.appendChild(el('circle', {
+    cx: sv[i].px, cy: sv[i].py, r: '2.5',
+    fill: '#1D4ED8',
+    opacity: '0.7'
+  }));
+}
+
+// 오른쪽 구분선
+svg.appendChild(el('line', {
+  x1: '420', y1: '40',
+  x2: '420', y2: '430',
+  stroke: '#E2E8F0',
+  'stroke-width': '1'
+}));
+
+// 오른쪽 텍스트
+const textData = [
+  { y: 75, text: '정이십면체', size: '18', weight: 'bold', fill: '#1E293B' },
+  { y: 110, text: '변의 길이 a = 5', size: '14', fill: '#475569' },
+  { y: 155, text: '꼭짓점  V = 12', size: '14', fill: '#1E293B' },
+  { y: 185, text: '모서리  E = 30', size: '14', fill: '#1E293B' },
+  { y: 215, text: '면        F = 20', size: '14', fill: '#1E293B' },
+  { y: 260, text: '오일러 공식', size: '14', weight: 'bold', fill: '#1E293B' },
+  { y: 290, text: 'V - E + F = 2', size: '15', weight: 'bold', fill: '#1D4ED8' },
+  { y: 325, text: '12 - 30 + 20', size: '13', fill: '#475569' },
+  { y: 350, text: '= 2  ✓', size: '14', weight: 'bold', fill: '#059669' },
+];
+
+for (const d of textData) {
+  const t = el('text', {
+    x: '438',
+    y: d.y,
+    'font-size': d.size || '13',
+    fill: d.fill || '#1E293B',
+    'font-family': 'serif',
+    'dominant-baseline': 'central',
+    ...(d.weight ? { 'font-weight': d.weight } : {})
+  });
+  t.textContent = d.text;
+  svg.appendChild(t);
+}
+
+// 정보 박스 배경
+svg.insertBefore(el('rect', {
+  x: '422', y: '248',
+  width: '240', height: '120',
+  rx: '6',
+  fill: '#F0F9FF',
+  stroke: '#BAE6FD',
+  'stroke-width': '1'
+}), svg.querySelector('text'));
+
+// 제목 텍스트 배경
+svg.insertBefore(el('rect', {
+  x: '422', y: '62',
+  width: '240', height: '38',
+  rx: '4',
+  fill: '#EFF6FF',
+  stroke: '#BFDBFE',
+  'stroke-width': '1'
+}), svg.querySelector('text'));
+</script>

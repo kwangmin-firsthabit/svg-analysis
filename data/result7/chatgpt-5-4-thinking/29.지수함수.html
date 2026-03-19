@@ -1,0 +1,197 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const colors = {
+    axis: '#475569',
+    curve: '#2563eb',
+    point: '#dc2626',
+    labelPrimary: '#0f172a',
+    labelSecondary: '#64748b',
+    guide: '#94a3b8',
+  };
+
+  const ox = 210;
+  const oy = 330;
+  const scaleX = 70;
+  const scaleY = 55;
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: colors.labelPrimary,
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  function px(x) {
+    return ox + x * scaleX;
+  }
+
+  function py(y) {
+    return oy - y * scaleY;
+  }
+
+  add(
+    el('line', {
+      x1: 60,
+      y1: oy,
+      x2: 630,
+      y2: oy,
+      stroke: colors.axis,
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  add(
+    el('line', {
+      x1: ox,
+      y1: 400,
+      x2: ox,
+      y2: 30,
+      stroke: colors.axis,
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+
+  add(text(625, oy - 14, 'x'));
+  add(text(ox + 14, 42, 'y'));
+  add(text(ox - 14, oy + 16, 'O', { 'font-size': '12', 'font-weight': '400', fill: colors.labelSecondary }));
+
+  for (let i = -2; i <= 5; i++) {
+    if (i === 0) continue;
+    const x = px(i);
+    add(el('line', { x1: x, y1: oy - 4, x2: x, y2: oy + 4, stroke: colors.axis, 'stroke-width': '0.8' }));
+    add(text(x, oy + 18, String(i), { 'font-size': '12', 'font-weight': '400', fill: colors.labelSecondary }));
+  }
+
+  for (let j = 1; j <= 5; j++) {
+    const y = py(j);
+    add(el('line', { x1: ox - 4, y1: y, x2: ox + 4, y2: y, stroke: colors.axis, 'stroke-width': '0.8' }));
+    add(
+      text(ox - 18, y, String(j), {
+        'font-size': '12',
+        'font-weight': '400',
+        fill: colors.labelSecondary,
+        'text-anchor': 'end',
+      })
+    );
+  }
+
+  let pts = [];
+  for (let x = -2.2; x <= 2.55; x += 0.015) {
+    const y = Math.pow(2, x);
+    const sx = px(x);
+    const sy = py(y);
+    if (sx >= 60 && sx <= 630 && sy >= 20 && sy <= 400) {
+      pts.push(`${(Math.round(sx * 10) / 10).toFixed(1)},${(Math.round(sy * 10) / 10).toFixed(1)}`);
+    }
+  }
+
+  add(
+    el('polyline', {
+      points: pts.join(' '),
+      fill: 'none',
+      stroke: colors.curve,
+      'stroke-width': '2.5',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  const pX = px(0);
+  const pY = py(1);
+
+  add(
+    el('line', {
+      x1: pX,
+      y1: oy,
+      x2: pX,
+      y2: pY,
+      stroke: colors.guide,
+      'stroke-width': '0.8',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  add(
+    el('line', {
+      x1: ox,
+      y1: pY,
+      x2: pX,
+      y2: pY,
+      stroke: colors.guide,
+      'stroke-width': '0.8',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  add(el('circle', { cx: pX, cy: pY, r: '4.5', fill: colors.point }));
+  add(
+    text(pX + 52, pY - 18, '(0, 1)', {
+      'font-size': '12',
+      'font-weight': '400',
+      fill: colors.point,
+      'text-anchor': 'start',
+    })
+  );
+
+  add(text(470, 92, 'y = 2ˣ', { fill: colors.curve }));
+  add(
+    text(470, 116, '오른쪽 위로 급격히 증가', { 'font-size': '12', 'font-weight': '400', fill: colors.labelSecondary })
+  );
+
+  const endX = px(2.45);
+  const endY = py(Math.pow(2, 2.45));
+  add(
+    el('path', {
+      d: `M ${endX - 14} ${endY + 30} L ${endX} ${endY} L ${endX + 10} ${endY - 26}`,
+      fill: 'none',
+      stroke: colors.curve,
+      'stroke-width': '2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+    })
+  );
+</script>

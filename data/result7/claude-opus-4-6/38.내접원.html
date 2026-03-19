@@ -1,0 +1,145 @@
+<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+<script>
+// 직각삼각형 6-8-10, 직각 꼭짓점 C
+// 내접원 반지름 r = (a + b - c) / 2 = (6 + 8 - 10) / 2 = 2
+const s = document.getElementById('vis');
+const u = 42;
+const r = 2 * u;
+
+const C = [140, 420];
+const A = [C[0] + 6 * u, C[1]];
+const B = [C[0], C[1] - 8 * u];
+
+// 내접원 중심: 직각 꼭짓점에서 각 직각변 방향으로 r만큼
+const I = [C[0] + r, C[1] - r];
+
+// 접점
+const T1 = [I[0], C[1]];
+const T2 = [C[0], I[1]];
+// AB 위의 접점: I에서 AB로 수선의 발
+const abx = B[0] - A[0], aby = B[1] - A[1];
+const t = ((I[0] - A[0]) * abx + (I[1] - A[1]) * aby) / (abx * abx + aby * aby);
+const T3 = [A[0] + t * abx, A[1] + t * aby];
+
+function el(tag, attrs) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  s.appendChild(e);
+  return e;
+}
+function addText(x, y, text, size, weight, fill, anchor) {
+  const e = el('text', {
+    x, y,
+    'font-size': size || 14,
+    'font-weight': weight || 500,
+    'font-family': 'system-ui, sans-serif',
+    fill: fill || '#333',
+    'text-anchor': anchor || 'middle',
+    'dominant-baseline': 'central'
+  });
+  e.textContent = text;
+  return e;
+}
+
+// 삼각형 채우기
+el('polygon', {
+  points: `${C[0]},${C[1]} ${A[0]},${A[1]} ${B[0]},${B[1]}`,
+  fill: '#f0efe8', stroke: 'none'
+});
+
+// 내접원 채우기
+el('circle', { cx: I[0], cy: I[1], r, fill: '#e8f0fb', stroke: 'none' });
+
+// 중심에서 접점까지 반지름 점선
+[[I, T1], [I, T2], [I, T3]].forEach(([p1, p2]) => {
+  el('line', {
+    x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1],
+    stroke: '#4a90d9', 'stroke-width': 1, 'stroke-dasharray': '5 3'
+  });
+});
+
+// 삼각형 변
+[[C, A], [C, B], [A, B]].forEach(([p1, p2]) => {
+  el('line', {
+    x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1],
+    stroke: '#333', 'stroke-width': 2, 'stroke-linecap': 'round'
+  });
+});
+
+// 내접원
+el('circle', { cx: I[0], cy: I[1], r, fill: 'none', stroke: '#1a6bb5', 'stroke-width': 1.8 });
+
+// 직각 기호 (C)
+const sq = 14;
+el('polyline', {
+  points: `${C[0]+sq},${C[1]} ${C[0]+sq},${C[1]-sq} ${C[0]},${C[1]-sq}`,
+  fill: 'none', stroke: '#333', 'stroke-width': 1.2
+});
+
+// 접점 직각 기호 (T1: CA변 위)
+{
+  const d = 9;
+  el('polyline', {
+    points: `${T1[0]-d},${T1[1]} ${T1[0]-d},${T1[1]-d} ${T1[0]},${T1[1]-d}`,
+    fill: 'none', stroke: '#4a90d9', 'stroke-width': 1
+  });
+}
+// 접점 직각 기호 (T2: CB변 위)
+{
+  const d = 9;
+  el('polyline', {
+    points: `${T2[0]},${T2[1]+d} ${T2[0]+d},${T2[1]+d} ${T2[0]+d},${T2[1]}`,
+    fill: 'none', stroke: '#4a90d9', 'stroke-width': 1
+  });
+}
+// 접점 직각 기호 (T3: AB변 위)
+{
+  const d = 9;
+  const len = Math.sqrt(abx * abx + aby * aby);
+  const tx = abx / len, ty = aby / len;
+  const nx = -ty, ny = tx;
+  const toI = [(I[0] - T3[0]), (I[1] - T3[1])];
+  const dot = toI[0] * nx + toI[1] * ny;
+  const snx = dot > 0 ? nx : -nx, sny = dot > 0 ? ny : -ny;
+  const p1 = [T3[0] + tx * d, T3[1] + ty * d];
+  const p2 = [T3[0] + tx * d + snx * d, T3[1] + ty * d + sny * d];
+  const p3 = [T3[0] + snx * d, T3[1] + sny * d];
+  el('polyline', {
+    points: `${p1[0]},${p1[1]} ${p2[0]},${p2[1]} ${p3[0]},${p3[1]}`,
+    fill: 'none', stroke: '#4a90d9', 'stroke-width': 1
+  });
+}
+
+// 접점 점
+[T1, T2, T3].forEach(p => {
+  el('circle', { cx: p[0], cy: p[1], r: 3.5, fill: '#e63956', stroke: '#fff', 'stroke-width': 1.2 });
+});
+
+// 내접원 중심 점
+el('circle', { cx: I[0], cy: I[1], r: 4, fill: '#1a6bb5', stroke: '#fff', 'stroke-width': 1.5 });
+
+// 꼭짓점 점
+[C, A, B].forEach(p => {
+  el('circle', { cx: p[0], cy: p[1], r: 3, fill: '#333', stroke: '#fff', 'stroke-width': 1 });
+});
+
+// 꼭짓점 라벨
+addText(C[0] - 16, C[1] + 18, 'C', 14, 500, '#333');
+addText(A[0] + 16, A[1] + 18, 'A', 14, 500, '#333');
+addText(B[0] - 16, B[1] - 10, 'B', 14, 500, '#333');
+
+// 변 길이 라벨
+addText((C[0] + A[0]) / 2, C[1] + 22, '6', 14, 500, '#333');
+addText(C[0] - 18, (C[1] + B[1]) / 2, '8', 14, 500, '#333');
+addText((A[0] + B[0]) / 2 + 18, (A[1] + B[1]) / 2, '10', 14, 500, '#333', 'start');
+
+// 내접원 중심 라벨
+addText(I[0] + 14, I[1] - 12, 'I', 14, 500, '#1a6bb5', 'start');
+
+// 반지름 라벨
+addText((I[0] + T1[0]) / 2 + 12, (I[1] + T1[1]) / 2, 'r=2', 12, 400, '#1a6bb5', 'start');
+
+// 공식
+addText(340, 490, 'r = (a + b − c) / 2 = (6 + 8 − 10) / 2 = 2', 12, 400, '#666');
+</script>
+</svg>

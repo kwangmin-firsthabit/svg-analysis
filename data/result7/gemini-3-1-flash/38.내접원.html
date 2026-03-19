@@ -1,0 +1,126 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // 설정: 삼각형의 실제 수치를 화면에 맞게 스케일링 (1단위 = 45px)
+  const scale = 45;
+  const ox = 180,
+    oy = 350; // 직각 꼭짓점(A)의 위치
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': '14',
+      'font-weight': '500',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: '#1e293b',
+      ...attrs,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 꼭짓점 좌표 계산
+  const ax = ox,
+    ay = oy; // 직각 꼭짓점
+  const bx = ox + 8 * scale,
+    by = oy; // 밑변 끝점
+  const cx = ox,
+    cy = oy - 6 * scale; // 높이 끝점
+
+  // 2. 삼각형 그리기
+  svg.appendChild(
+    el('polygon', {
+      points: `${ax},${ay} ${bx},${by} ${cx},${cy}`,
+      fill: '#2563eb',
+      'fill-opacity': '0.1',
+      stroke: '#2563eb',
+      'stroke-width': '1.5',
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // 3. 내접원 그리기 (반지름 r=2, 중심은 (2, 2))
+  const rx = ox + 2 * scale;
+  const ry = oy - 2 * scale;
+  const r_px = 2 * scale;
+
+  svg.appendChild(
+    el('circle', {
+      cx: rx,
+      cy: ry,
+      r: r_px,
+      fill: 'none',
+      stroke: '#dc2626',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // 내접원 중심 점
+  svg.appendChild(el('circle', { cx: rx, cy: ry, r: '3', fill: '#dc2626' }));
+
+  // 4. 보조선: 반지름 표시 및 직각 표시
+  // 밑변 접점까지의 반지름
+  svg.appendChild(
+    el('line', { x1: rx, y1: ry, x2: rx, y2: oy, stroke: '#dc2626', 'stroke-width': '1', 'stroke-dasharray': '3 2' })
+  );
+  addText(rx + 15, ry + (oy - ry) / 2, 'r=2', { 'font-size': '12', fill: '#dc2626', 'text-anchor': 'start' });
+
+  // 직각 표시 (A 지점)
+  const s = 15;
+  svg.appendChild(
+    el('path', {
+      d: `M ${ax + s},${ay} L ${ax + s},${ay - s} L ${ax},${ay - s}`,
+      fill: 'none',
+      stroke: '#94a3b8',
+      'stroke-width': '0.8',
+    })
+  );
+
+  // 5. 라벨링
+  // 변 길이 라벨
+  addText(ox + 4 * scale, oy + 20, '8', { fill: '#64748b' }); // 밑변
+  addText(ox - 20, oy - 3 * scale, '6', { fill: '#64748b' }); // 높이
+  const mx = (bx + cx) / 2,
+    my = (by + cy) / 2;
+  addText(mx + 15, my - 15, '10', { fill: '#64748b' }); // 빗변
+
+  // 꼭짓점 라벨
+  addText(ax - 15, ay + 15, 'A');
+  addText(bx + 15, by + 15, 'B');
+  addText(cx - 15, cy - 15, 'C');
+
+  // 원의 중심 라벨
+  addText(rx, ry - 15, 'I', { fill: '#dc2626' });
+</script>

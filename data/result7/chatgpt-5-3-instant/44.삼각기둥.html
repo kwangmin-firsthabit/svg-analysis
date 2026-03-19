@@ -1,0 +1,135 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#111',
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  // parameters
+  const s = 4;
+  const h = 6;
+  const scale = 40;
+
+  // base triangle ABC (equilateral)
+  const baseY = 320;
+  const baseX = 260;
+  const side = s * scale;
+  const heightTri = (side * Math.sqrt(3)) / 2;
+
+  const A = { x: baseX, y: baseY };
+  const B = { x: baseX + side, y: baseY };
+  const C = { x: baseX + side / 2, y: baseY - heightTri };
+
+  // prism height direction (slanted for 3D effect)
+  const dx = h * scale * 0.6;
+  const dy = -h * scale * 0.6;
+
+  // top triangle DEF
+  const D = { x: A.x + dx, y: A.y + dy };
+  const E = { x: B.x + dx, y: B.y + dy };
+  const F = { x: C.x + dx, y: C.y + dy };
+
+  // draw faces
+  // base
+  svg.appendChild(
+    el('polygon', {
+      points: `${A.x},${A.y} ${B.x},${B.y} ${C.x},${C.y}`,
+      fill: '#3b82f6',
+      'fill-opacity': '0.15',
+      stroke: '#2563eb',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // top
+  svg.appendChild(
+    el('polygon', {
+      points: `${D.x},${D.y} ${E.x},${E.y} ${F.x},${F.y}`,
+      fill: '#10b981',
+      'fill-opacity': '0.15',
+      stroke: '#059669',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // sides
+  svg.appendChild(
+    el('polygon', {
+      points: `${A.x},${A.y} ${B.x},${B.y} ${E.x},${E.y} ${D.x},${D.y}`,
+      fill: '#f59e0b',
+      'fill-opacity': '0.15',
+      stroke: '#d97706',
+      'stroke-width': '1.2',
+    })
+  );
+
+  svg.appendChild(
+    el('polygon', {
+      points: `${B.x},${B.y} ${C.x},${C.y} ${F.x},${F.y} ${E.x},${E.y}`,
+      fill: '#ef4444',
+      'fill-opacity': '0.15',
+      stroke: '#dc2626',
+      'stroke-width': '1.2',
+    })
+  );
+
+  svg.appendChild(
+    el('polygon', {
+      points: `${C.x},${C.y} ${A.x},${A.y} ${D.x},${D.y} ${F.x},${F.y}`,
+      fill: '#8b5cf6',
+      'fill-opacity': '0.15',
+      stroke: '#7c3aed',
+      'stroke-width': '1.2',
+    })
+  );
+
+  // vertices
+  [A, B, C, D, E, F].forEach(p => {
+    svg.appendChild(el('circle', { cx: p.x, cy: p.y, r: 3.5, fill: '#111' }));
+  });
+
+  // labels
+  svg.appendChild(text(A.x - 15, A.y + 15, 'A'));
+  svg.appendChild(text(B.x + 15, B.y + 15, 'B'));
+  svg.appendChild(text(C.x, C.y - 15, 'C'));
+
+  svg.appendChild(text(D.x - 15, D.y + 15, 'D'));
+  svg.appendChild(text(E.x + 15, E.y + 15, 'E'));
+  svg.appendChild(text(F.x, F.y - 15, 'F'));
+
+  // side length labels
+  function mid(p, q) {
+    return { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 };
+  }
+
+  const mAB = mid(A, B);
+  const mBC = mid(B, C);
+  const mCA = mid(C, A);
+
+  svg.appendChild(text(mAB.x, mAB.y + 18, '4', { 'font-size': '12', 'font-weight': '400' }));
+  svg.appendChild(text(mBC.x + 18, mBC.y, '4', { 'font-size': '12', 'font-weight': '400' }));
+  svg.appendChild(text(mCA.x - 18, mCA.y, '4', { 'font-size': '12', 'font-weight': '400' }));
+
+  // height label
+  const mAD = mid(A, D);
+  svg.appendChild(text(mAD.x + 15, mAD.y, '6', { 'font-size': '12', 'font-weight': '400' }));
+</script>

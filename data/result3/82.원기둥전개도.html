@@ -1,0 +1,73 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  return t;
+}
+
+// 원기둥: r=3, h=8
+const r = 3, hCyl = 8;
+// 스케일: 1단위 = 22px
+const U = 22;
+const rPx = r * U;          // 66
+const hPx = hCyl * U;       // 176
+const circumPx = 2 * Math.PI * r * U; // 2π×3×22 ≈ 415 → 픽셀로 좁히기 위해 U 조정
+
+// 밑면 원 반지름을 40px로 고정
+const rDraw = 40;
+const circumDraw = Math.round(2 * Math.PI * 3 * 10) / 10; // 실제 수치 18.85
+const rectW = Math.round(2 * Math.PI * 3 * 19.5); // 픽셀: 약 369px
+const rectH = hCyl * 20; // 160px
+
+const centerX = 340;
+const topCircleY = 80;
+const rectY = topCircleY + rDraw + 20;
+const botCircleY = rectY + rectH + rDraw + 20;
+
+// 위 원 (밑면)
+svg.appendChild(el('ellipse', { cx: centerX, cy: topCircleY, rx: rDraw, ry: rDraw * 0.4, fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+svg.appendChild(el('line', { x1: centerX, y1: topCircleY, x2: centerX + rDraw, y2: topCircleY, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+txt(centerX + rDraw / 2, topCircleY - 12, 'r=3', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+txt(centerX, topCircleY - rDraw * 0.4 - 14, '밑면 (원)', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 직사각형 (옆면)
+const rectX = centerX - rectW / 2;
+svg.appendChild(el('rect', { x: rectX, y: rectY, width: rectW, height: rectH, fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+txt(centerX, rectY + rectH / 2, '옆면 (직사각형)', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+txt(centerX, rectY + rectH / 2 + 20, '넓이 = 2πr × h = 6π × 8 = 48π', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 가로 길이 라벨 (2πr = 6π ≈ 18.85)
+const arrowY = rectY - 16;
+svg.appendChild(el('line', { x1: rectX, y1: arrowY, x2: rectX + rectW, y2: arrowY, stroke: '#3B82F6', 'stroke-width': '1', 'stroke-dasharray': '4 3' }));
+svg.appendChild(el('line', { x1: rectX, y1: arrowY - 4, x2: rectX, y2: arrowY + 4, stroke: '#3B82F6', 'stroke-width': '1' }));
+svg.appendChild(el('line', { x1: rectX + rectW, y1: arrowY - 4, x2: rectX + rectW, y2: arrowY + 4, stroke: '#3B82F6', 'stroke-width': '1' }));
+txt(centerX, arrowY - 14, '2πr = 6π ≈ 18.85', { 'font-size': '12', 'font-weight': '400', fill: '#3B82F6' });
+
+// 높이 라벨
+const hLabelX = rectX - 16;
+svg.appendChild(el('line', { x1: hLabelX, y1: rectY, x2: hLabelX, y2: rectY + rectH, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+txt(hLabelX - 14, rectY + rectH / 2, 'h=8', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8', 'text-anchor': 'end' });
+
+// 아래 원 (밑면)
+svg.appendChild(el('ellipse', { cx: centerX, cy: botCircleY, rx: rDraw, ry: rDraw * 0.4, fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+svg.appendChild(el('line', { x1: centerX, y1: botCircleY, x2: centerX + rDraw, y2: botCircleY, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+txt(centerX + rDraw / 2, botCircleY - 12, 'r=3', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+txt(centerX, botCircleY + rDraw * 0.4 + 14, '밑면 (원)', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 제목
+txt(340, 30, '원기둥 전개도  (r = 3, 높이 h = 8)', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+
+const maxY = botCircleY + rDraw * 0.4 + 30;
+svg.setAttribute('viewBox', '0 0 680 ' + Math.round(maxY));
+</script>

@@ -1,0 +1,95 @@
+<svg id="vis" width="100%" viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '13', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 표 구조
+const data = [
+  { season: '봄', count: 8 },
+  { season: '여름', count: 11 },
+  { season: '가을', count: 7 },
+  { season: '겨울', count: 4 },
+];
+const total = data.reduce((s, d) => s + d.count, 0);
+
+const cols = [80, 200, 500, 610];
+const colW = [120, 300, 110, 90];
+const rowH = 52;
+const headerY = 80;
+const startX = 60;
+
+// 테두리 및 헤더
+const tableW = 570, tableH = rowH * (data.length + 1) + 2;
+svg.appendChild(el('rect', { x: startX, y: headerY - rowH / 2, width: tableW, height: tableH, fill: '#F8FAFC', stroke: '#CBD5E1', 'stroke-width': '1.5', rx: '4' }));
+
+// 헤더 배경
+svg.appendChild(el('rect', { x: startX, y: headerY - rowH / 2, width: tableW, height: rowH, fill: '#1E3A8A', rx: '4' }));
+svg.appendChild(el('rect', { x: startX, y: headerY - rowH / 2 + rowH - 2, width: tableW, height: 2, fill: '#1E3A8A' }));
+
+// 헤더 텍스트
+const headers = ['계절', '탈리마크', '도수(명)'];
+const hx = [startX + 60, startX + 250, startX + 490];
+headers.forEach((h, i) => addText(hx[i], headerY, h, { fill: '#FFFFFF', 'font-weight': '600', 'font-size': '14' }));
+
+// 세로 구분선
+[startX + 120, startX + 400].forEach(lx => {
+  svg.appendChild(el('line', { x1: lx, y1: headerY - rowH / 2, x2: lx, y2: headerY - rowH / 2 + tableH, stroke: '#CBD5E1', 'stroke-width': '1' }));
+});
+
+// 탈리마크 그리기 함수
+function drawTally(svg, x, y, count) {
+  const groupOf5 = Math.floor(count / 5);
+  const remainder = count % 5;
+  let cx = x - (groupOf5 * 28 + remainder * 10) / 2;
+
+  for (let g = 0; g < groupOf5; g++) {
+    // 4개 세로선
+    for (let i = 0; i < 4; i++) {
+      const lx = cx + i * 7;
+      svg.appendChild(el('line', { x1: lx, y1: y - 12, x2: lx, y2: y + 12, stroke: '#1E293B', 'stroke-width': '1.8', 'stroke-linecap': 'round' }));
+    }
+    // 사선 (5번째)
+    svg.appendChild(el('line', { x1: cx - 2, y1: y + 10, x2: cx + 26, y2: y - 10, stroke: '#1E293B', 'stroke-width': '1.8', 'stroke-linecap': 'round' }));
+    cx += 34;
+  }
+  for (let i = 0; i < remainder; i++) {
+    svg.appendChild(el('line', { x1: cx + i * 7, y1: y - 12, x2: cx + i * 7, y2: y + 12, stroke: '#1E293B', 'stroke-width': '1.8', 'stroke-linecap': 'round' }));
+  }
+}
+
+// 데이터 행
+data.forEach((row, i) => {
+  const rowY = headerY + rowH * (i + 1);
+  const bg = i % 2 === 0 ? '#FFFFFF' : '#F1F5F9';
+  svg.appendChild(el('rect', { x: startX + 1, y: rowY - rowH / 2 + 1, width: tableW - 2, height: rowH - 1, fill: bg }));
+
+  // 가로 구분선
+  svg.appendChild(el('line', { x1: startX, y1: rowY - rowH / 2, x2: startX + tableW, y2: rowY - rowH / 2, stroke: '#E2E8F0', 'stroke-width': '1' }));
+
+  addText(hx[0], rowY, row.season, { 'font-size': '14', 'font-weight': '500' });
+  drawTally(svg, hx[1], rowY, row.count);
+  addText(hx[2], rowY, String(row.count), { 'font-size': '14', 'font-weight': '600', fill: '#1D4ED8' });
+});
+
+// 합계 행
+const sumY = headerY + rowH * (data.length + 1);
+svg.appendChild(el('rect', { x: startX + 1, y: sumY - rowH / 2 + 1, width: tableW - 2, height: rowH - 1, fill: '#EFF6FF' }));
+svg.appendChild(el('line', { x1: startX, y1: sumY - rowH / 2, x2: startX + tableW, y2: sumY - rowH / 2, stroke: '#93C5FD', 'stroke-width': '1.5' }));
+addText(hx[0], sumY, '합계', { 'font-size': '14', 'font-weight': '700' });
+addText(hx[2], sumY, String(total), { 'font-size': '14', 'font-weight': '700', fill: '#1D4ED8' });
+
+// 제목
+addText(340, 36, '좋아하는 계절 도수분포표 (탈리마크)', { 'font-size': '15', fill: '#0F172A', 'font-weight': '700' });
+</script>

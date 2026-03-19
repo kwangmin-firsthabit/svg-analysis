@@ -1,0 +1,93 @@
+<svg id="vis" width="100%" viewBox="0 0 680 302" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+// 정오각형: 변의 길이 5, r_px = 128 (side ≈ 150.5px)
+// 꼭짓점 순서: A(위), B(오른위), C(오른아래), D(왼아래), E(왼위) → k=0..4
+const r = 128;
+const cx = 340, cy = 178; // cy = 50 + r
+
+const vx = [], vy = [];
+for (let k = 0; k < 5; k++) {
+  const angle = 2 * Math.PI * k / 5 - Math.PI / 2;
+  vx[k] = Math.round(cx + r * Math.cos(angle));
+  vy[k] = Math.round(cy + r * Math.sin(angle));
+}
+
+// 오각형 채우기
+const pts = vx.map((x, i) => `${x},${vy[i]}`).join(' ');
+svg.appendChild(el('polygon', {
+  points: pts,
+  fill: '#3B82F6',
+  'fill-opacity': '0.12',
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5'
+}));
+
+// 대각선 5개: 인접하지 않은 꼭짓점 쌍
+const diagonals = [[0,2],[0,3],[1,3],[1,4],[2,4]];
+for (const [a, b] of diagonals) {
+  svg.appendChild(el('line', {
+    x1: vx[a], y1: vy[a], x2: vx[b], y2: vy[b],
+    stroke: '#1D4ED8',
+    'stroke-width': '1.2',
+    'stroke-dasharray': '5 3'
+  }));
+}
+
+// 꼭짓점 점
+for (let k = 0; k < 5; k++) {
+  svg.appendChild(el('circle', {
+    cx: vx[k], cy: vy[k], r: '3',
+    fill: '#1D4ED8'
+  }));
+}
+
+// 꼭짓점 라벨 A~E
+const names = ['A', 'B', 'C', 'D', 'E'];
+const offsets = [
+  { dx: 0, dy: -18 },   // A 위
+  { dx: 18, dy: 0 },    // B 오른쪽
+  { dx: 14, dy: 14 },   // C 오른아래
+  { dx: -14, dy: 14 },  // D 왼아래
+  { dx: -18, dy: 0 }    // E 왼쪽
+];
+for (let k = 0; k < 5; k++) {
+  svg.appendChild(el('text', {
+    x: vx[k] + offsets[k].dx,
+    y: vy[k] + offsets[k].dy,
+    'dominant-baseline': 'central',
+    'text-anchor': 'middle',
+    'font-size': '14px',
+    'font-weight': '500',
+    fill: '#1E293B'
+  })).textContent = names[k];
+}
+
+// 변 길이 라벨 (한 변에만 표시)
+// AB 변(k=0→k=1) 중점 바깥쪽
+const mx01 = Math.round((vx[0] + vx[1]) / 2);
+const my01 = Math.round((vy[0] + vy[1]) / 2);
+// 바깥 법선 방향
+const dx01 = vx[1] - vx[0], dy01 = vy[1] - vy[0];
+const len01 = Math.sqrt(dx01**2 + dy01**2);
+// 오각형 중심에서 멀어지는 방향
+const nx01 = Math.round(mx01 + (mx01 - cx) / Math.sqrt((mx01-cx)**2+(my01-cy)**2) * 14);
+const ny01 = Math.round(my01 + (my01 - cy) / Math.sqrt((mx01-cx)**2+(my01-cy)**2) * 14);
+svg.appendChild(el('text', {
+  x: nx01, y: ny01,
+  'dominant-baseline': 'central',
+  'text-anchor': 'middle',
+  'font-size': '12px',
+  'font-weight': '400',
+  fill: '#475569'
+})).textContent = '5';
+</script>

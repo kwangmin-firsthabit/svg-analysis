@@ -1,0 +1,125 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // 설정: 원점(340, 320), 스케일(1단위당 50px)
+  const ox = 340,
+    oy = 320,
+    scale = 50;
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': '12',
+      'font-weight': '400',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: '#64748b', // label-secondary
+      ...attrs,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 좌표축 그리기
+  svg.appendChild(
+    el('line', {
+      x1: 80,
+      y1: oy,
+      x2: 600,
+      y2: oy,
+      stroke: '#334155',
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  ); // x축
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: 400,
+      x2: ox,
+      y2: 40,
+      stroke: '#334155',
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  ); // y축
+
+  addText(595, oy + 20, 'x', { 'font-size': '14', 'font-weight': '500', fill: '#1e293b' });
+  addText(ox - 20, 45, 'y', { 'font-size': '14', 'font-weight': '500', fill: '#1e293b' });
+  addText(ox - 12, oy + 12, 'O');
+
+  // 2. 눈금 및 주요 점 표시 (0, 1)
+  const p1y = oy - 1 * scale;
+  svg.appendChild(el('line', { x1: ox - 4, y1: p1y, x2: ox + 4, y2: p1y, stroke: '#334155', 'stroke-width': '0.8' }));
+  addText(ox - 15, p1y, '1', { 'text-anchor': 'end' });
+  svg.appendChild(el('circle', { cx: ox, cy: p1y, r: '3.5', fill: '#2563eb' })); // 점 (0, 1) 강조
+
+  // 3. 지수함수 곡선 y = 2^x 계산 및 그리기
+  let points = '';
+  const minX = -5,
+    maxX = 2.5; // 화면 범위 내 적절한 x값 설정
+  const step = 0.05;
+
+  for (let x = minX; x <= maxX; x += step) {
+    const y = Math.pow(2, x);
+    const px = ox + x * scale;
+    const py = oy - y * scale;
+
+    // ViewBox 내부에 있을 때만 점 추가
+    if (px >= 40 && px <= 640 && py >= 40 && py <= 420) {
+      points += Math.round(px * 10) / 10 + ',' + Math.round(py * 10) / 10 + ' ';
+    }
+  }
+
+  svg.appendChild(
+    el('polyline', {
+      points: points.trim(),
+      fill: 'none',
+      stroke: '#2563eb', // curve-primary
+      'stroke-width': '2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // 4. 함수식 라벨
+  addText(ox + 80, oy - Math.pow(2, 1.8) * scale, 'y = 2ˣ', {
+    'font-size': '14',
+    'font-weight': '500',
+    'text-anchor': 'start',
+    fill: '#2563eb',
+  });
+
+  // 점 (0, 1) 설명 보조 라벨
+  addText(ox + 45, p1y - 10, '(0, 1)', { 'font-size': '12', fill: '#64748b' });
+</script>

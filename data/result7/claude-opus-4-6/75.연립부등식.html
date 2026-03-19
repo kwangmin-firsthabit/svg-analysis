@@ -1,0 +1,66 @@
+<svg id="vis" width="100%" viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="ah" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6" fill="#334155"/></marker>
+</defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  svg.appendChild(e);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = document.createElementNS(ns, 'text');
+  Object.entries({ x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#334155', ...attrs }).forEach(([k, v]) => t.setAttribute(k, v));
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 수직선 설정: -3 ~ 6
+const minVal = -3, maxVal = 6;
+const padL = 60, padR = 60;
+const lineY = 100;
+const lineW = 680 - padL - padR;
+function xOf(v) { return padL + (v - minVal) / (maxVal - minVal) * lineW; }
+
+// 수직선 (화살표 양쪽)
+el('line', { x1: padL - 20, y1: lineY, x2: 680 - padR + 20, y2: lineY, stroke: '#334155', 'stroke-width': '2', 'marker-end': 'url(#ah)' });
+el('line', { x1: padL - 20, y1: lineY, x2: padL - 20, y2: lineY, stroke: '#334155', 'stroke-width': '2' });
+
+// 왼쪽 화살표 (역방향)
+el('path', { d: `M${padL - 20},${lineY - 3} L${padL - 28},${lineY} L${padL - 20},${lineY + 3}`, fill: '#334155' });
+
+// 눈금과 숫자
+for (let v = minVal; v <= maxVal; v++) {
+  const x = xOf(v);
+  el('line', { x1: x, y1: lineY - 8, x2: x, y2: lineY + 8, stroke: '#334155', 'stroke-width': '1.5' });
+  addText(x, lineY + 24, String(v), { 'font-size': '13', 'font-weight': '400', fill: '#475569' });
+}
+
+// 해 영역 강조: -1 <= x < 4
+const x1 = xOf(-1), x2 = xOf(4);
+el('rect', { x: x1, y: lineY - 5, width: x2 - x1, height: 10, fill: '#3B82F6', opacity: '0.25', rx: '2' });
+el('line', { x1: x1, y1: lineY, x2: x2, y2: lineY, stroke: '#3B82F6', 'stroke-width': '4', 'stroke-linecap': 'round' });
+
+// 닫힌 점 (x = -1, 채워진 원)
+el('circle', { cx: x1, cy: lineY, r: '7', fill: '#2563EB', stroke: '#1E40AF', 'stroke-width': '2' });
+
+// 열린 점 (x = 4, 빈 원)
+el('circle', { cx: x2, cy: lineY, r: '7', fill: '#FFFFFF', stroke: '#2563EB', 'stroke-width': '2.5' });
+
+// 부등식 라벨
+addText(340, 46, '-1 ≤ x < 4', { 'font-size': '18', 'font-weight': '600', fill: '#1E40AF' });
+
+// x = -1, x = 4 값 라벨 (점 위에)
+addText(x1, lineY - 22, '-1', { 'font-size': '12', 'font-weight': '600', fill: '#1E40AF' });
+addText(x2, lineY - 22, '4', { 'font-size': '12', 'font-weight': '600', fill: '#1E40AF' });
+
+// 범례
+el('circle', { cx: 200, cy: 170, r: '5', fill: '#2563EB', stroke: '#1E40AF', 'stroke-width': '1.5' });
+addText(230, 170, '닫힌 점 (포함)', { 'font-size': '12', 'font-weight': '400', fill: '#64748B', 'text-anchor': 'start' });
+el('circle', { cx: 380, cy: 170, r: '5', fill: '#FFFFFF', stroke: '#2563EB', 'stroke-width': '2' });
+addText(410, 170, '열린 점 (미포함)', { 'font-size': '12', 'font-weight': '400', fill: '#64748B', 'text-anchor': 'start' });
+</script>

@@ -1,274 +1,102 @@
-<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
-<defs>
-</defs>
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
 </svg>
 <script>
 const svg = document.getElementById('vis');
 const ns = 'http://www.w3.org/2000/svg';
+
 function el(tag, attrs) {
   const e = document.createElementNS(ns, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
   return e;
 }
 
-// scale: 1 unit = 32px
-const scale = 32;
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
 
-// C = 직각 꼭짓점 (오른쪽 하단)
-// a=BC=5(수직), b=AC=12(수평), c=AB=13(빗변)
-// C를 원점 기준으로 배치
-const originX = 160;
-const originY = 340;
+// 직각삼각형: 변 6, 8, 10
+// scale: 1단위 = 32px
+const sc = 32;
+// 직각 꼭짓점 C (하단 왼쪽)
+const cx = 200, cy = 380;
+// A = C에서 위로 6*sc
+const ax = cx, ay = cy - 6 * sc; // 수직 변 6
+// B = C에서 오른쪽으로 8*sc
+const bx = cx + 8 * sc, by = cy; // 수평 변 8
 
-const Cx = originX + 12 * scale; // C
-const Cy = originY;
-const Ax = originX;               // A (C에서 왼쪽으로 12)
-const Ay = originY;
-const Bx = originX + 12 * scale; // B (C에서 위로 5)
-const By = originY - 5 * scale;
+// 내접원 반지름 r = (a + b - c) / 2 = (6 + 8 - 10) / 2 = 2
+// 내접원 중심: (C.x + r, C.y - r) = (cx + 2*sc, cy - 2*sc)
+const r = 2 * sc;
+const icx = cx + r, icy = cy - r;
 
-// 내접원 반지름 r=2, 내접원 중심
-// 직각삼각형에서 내접원 중심 = 직각꼭짓점으로부터 r씩 떨어진 지점
-const inR = 2 * scale;
-const incX = Cx - inR; // C에서 왼쪽 r, 위로 r
-const incY = Cy - inR;
+// 삼각형 그리기
+svg.appendChild(el('polygon', {
+  points: `${ax},${ay} ${bx},${by} ${cx},${cy}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
 
-// 삼각형 채우기
-const tri = el('polygon', {
-  points: `${Ax},${Ay} ${Bx},${By} ${Cx},${Cy}`,
-  fill: '#3B82F6',
-  'fill-opacity': '0.12',
-  stroke: '#1D4ED8',
-  'stroke-width': '1.5'
-});
-svg.appendChild(tri);
+// 직각 기호
+const sqS = 10;
+svg.appendChild(el('path', {
+  d: `M ${cx + sqS},${cy} L ${cx + sqS},${cy - sqS} L ${cx},${cy - sqS}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.8'
+}));
 
-// 내접원
-const incCircle = el('circle', {
-  cx: incX, cy: incY,
-  r: inR,
-  fill: 'none',
-  stroke: '#1D4ED8',
-  'stroke-width': '1.5'
-});
-svg.appendChild(incCircle);
-
-// 직각 표시 (C에서)
-const sqSize = 14;
-const sqPath = el('path', {
-  d: `M ${Cx - sqSize} ${Cy} L ${Cx - sqSize} ${Cy - sqSize} L ${Cx} ${Cy - sqSize}`,
-  fill: 'none',
-  stroke: '#1D4ED8',
-  'stroke-width': '1.2'
-});
-svg.appendChild(sqPath);
+// 내접원 그리기
+svg.appendChild(el('circle', {
+  cx: icx, cy: icy, r: r,
+  fill: '#EFF6FF', 'fill-opacity': '0.12', stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
 
 // 접점 계산
-// D: AC변(AB=수평) 위 접점 → (incX, Cy) (수직선에서 Cy와 같은 y)
-const Dx = incX;
-const Dy = Cy;
-// E: BC변(수직) 위 접점 → (Cx, incY)
-const Ex = Cx;
-const Ey = incY;
-// F: AB(빗변) 위 접점
-// AB 방향 벡터
-const abDx = Bx - Ax;
-const abDy = By - Ay;
-const abLen = Math.sqrt(abDx * abDx + abDy * abDy);
-const abUx = abDx / abLen;
-const abUy = abDy / abLen;
+// D: AC 변(수직, x=cx)에서의 접점 = (cx, icy) = (cx, cy - r)
+const dx = cx, dy = icy;
+// E: BC 변(수평, y=cy)에서의 접점 = (icx, cy) = (cx + r, cy)
+const ex = icx, ey = cy;
+// F: AB 빗변에서의 접점
+// AB 직선: x/8 + y_math/6 = 1 (수학 좌표)
+// 법선 방향: (6, 8)/10 → 접점 = 내접원 중심에서 법선으로 r만큼 이동
+// AB 직선 방정식 (픽셀): 6x + 8y = ... 계산
+// AB 법선의 단위벡터 (삼각형 내부 방향)
+const abvx = bx - ax, abvy = by - ay; // (256, 192)
+const abLen = Math.sqrt(abvx * abvx + abvy * abvy);
+const abnx = abvy / abLen, abny = -abvx / abLen; // 법선 (내부 방향)
+// 실제 내부 방향 확인: 법선이 C 방향인지 체크
+// (icx - ax)*abnx + (icy - ay)*abny 가 양수면 내부
+// 접점 = 내접원 중심 - r * 법선단위벡터 (외부 방향)
 // 내접원 중심에서 AB에 수선의 발
-// t = dot(incCenter - A, AB_unit)
-const tF = (incX - Ax) * abUx + (incY - Ay) * abUy;
-const Fx = Math.round(Ax + tF * abUx);
-const Fy = Math.round(Ay + tF * abUy);
+// AB 직선: parametric, P = A + t*(B-A)
+// t = ((I-A)·(B-A)) / |B-A|²
+const IA_x = icx - ax, IA_y = icy - ay;
+const t = (IA_x * abvx + IA_y * abvy) / (abLen * abLen);
+const fx = ax + t * abvx, fy = ay + t * abvy;
 
-// 내접원 중심에서 접점까지 보조선
-svg.appendChild(el('line', {
-  x1: incX, y1: incY, x2: Dx, y2: Dy,
-  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
-}));
-svg.appendChild(el('line', {
-  x1: incX, y1: incY, x2: Ex, y2: Ey,
-  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
-}));
-svg.appendChild(el('line', {
-  x1: incX, y1: incY, x2: Fx, y2: Fy,
-  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
-}));
+// 접점 D, E, F 표시
+[[dx, dy, 'D', -18, 0], [ex, ey, 'E', 0, 18], [Math.round(fx), Math.round(fy), 'F', 14, -14]].forEach(([px, py, label, lox, loy]) => {
+  svg.appendChild(el('circle', { cx: px, cy: py, r: '4', fill: '#1D4ED8' }));
+  addText(px + lox, py + loy, label, { 'font-size': '13', fill: '#1E293B' });
+});
 
-// 접점 직각 표시 - D (AC 위)
-const sqD = 10;
-svg.appendChild(el('path', {
-  d: `M ${Dx} ${Dy - sqD} L ${Dx + sqD} ${Dy - sqD} L ${Dx + sqD} ${Dy}`,
-  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1'
-}));
-
-// 접점 직각 표시 - E (BC 위)
-svg.appendChild(el('path', {
-  d: `M ${Ex - sqD} ${Ey} L ${Ex - sqD} ${Ey + sqD} L ${Ex} ${Ey + sqD}`,
-  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1'
-}));
-
-// 꼭짓점 점
-function dot(x, y) {
-  return el('circle', { cx: x, cy: y, r: '4', fill: '#1E293B' });
-}
-svg.appendChild(dot(Ax, Ay));
-svg.appendChild(dot(Bx, By));
-svg.appendChild(dot(Cx, Cy));
+// 반지름 점선 (중심 → 접점 D)
+svg.appendChild(el('line', { x1: icx, y1: icy, x2: dx, y2: dy, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+// r=2 라벨 (반지름 선 중간)
+addText((icx + dx) / 2 + 18, (icy + dy) / 2, 'r = 2', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
 
 // 내접원 중심 점
-svg.appendChild(el('circle', { cx: incX, cy: incY, r: '3', fill: '#1D4ED8' }));
-
-// 접점 점
-function tangentDot(x, y) {
-  return el('circle', { cx: x, cy: y, r: '4', fill: '#F59E0B' });
-}
-svg.appendChild(tangentDot(Dx, Dy));
-svg.appendChild(tangentDot(Ex, Ey));
-svg.appendChild(tangentDot(Fx, Fy));
+svg.appendChild(el('circle', { cx: icx, cy: icy, r: '3', fill: '#3B82F6' }));
+addText(icx + 16, icy - 14, 'I', { 'font-size': '13', fill: '#1E293B' });
 
 // 꼭짓점 라벨
-function label(x, y, text, dx, dy) {
-  const t = el('text', {
-    x: x + dx, y: y + dy,
-    'font-size': '14', 'font-weight': '500',
-    fill: '#1E293B',
-    'text-anchor': 'middle',
-    'dominant-baseline': 'central'
-  });
-  t.textContent = text;
-  svg.appendChild(t);
-}
-label(Ax, Ay, 'A', -14, 0);
-label(Bx, By, 'B', 14, 0);
-label(Cx, Cy, 'C', 14, 14);
+addText(ax - 18, ay, 'A', { 'font-size': '14', fill: '#1E293B' });
+addText(bx + 18, by + 14, 'B', { 'font-size': '14', fill: '#1E293B' });
+addText(cx - 18, cy + 14, 'C', { 'font-size': '14', fill: '#1E293B' });
 
-// 내접원 중심 라벨 I
-const incLabel = el('text', {
-  x: incX - 14, y: incY,
-  'font-size': '12', 'font-weight': '400',
-  fill: '#1D4ED8',
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central'
-});
-incLabel.textContent = 'I';
-svg.appendChild(incLabel);
-
-// 접점 라벨
-function tangentLabel(x, y, text, dx, dy) {
-  const t = el('text', {
-    x: x + dx, y: y + dy,
-    'font-size': '14', 'font-weight': '500',
-    fill: '#F59E0B',
-    'text-anchor': 'middle',
-    'dominant-baseline': 'central'
-  });
-  t.textContent = text;
-  svg.appendChild(t);
-}
-tangentLabel(Dx, Dy, 'D', 0, 18);
-tangentLabel(Ex, Ey, 'E', 16, 0);
-tangentLabel(Fx, Fy, 'F', -16, -10);
-
-// 변 길이 라벨
-// AC = 12 (수평 아래)
-const lAC = el('text', {
-  x: Math.round((Ax + Cx) / 2), y: Ay + 22,
-  'font-size': '12', 'font-weight': '400',
-  fill: '#475569',
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central'
-});
-lAC.textContent = '12';
-svg.appendChild(lAC);
-
-// BC = 5 (수직 오른쪽)
-const lBC = el('text', {
-  x: Cx + 20, y: Math.round((By + Cy) / 2),
-  'font-size': '12', 'font-weight': '400',
-  fill: '#475569',
-  'text-anchor': 'start',
-  'dominant-baseline': 'central'
-});
-lBC.textContent = '5';
-svg.appendChild(lBC);
-
-// AB = 13 (빗변 중간)
-const lABx = Math.round((Ax + Bx) / 2) - 18;
-const lABy = Math.round((Ay + By) / 2);
-const lAB = el('text', {
-  x: lABx, y: lABy,
-  'font-size': '12', 'font-weight': '400',
-  fill: '#475569',
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central'
-});
-lAB.textContent = '13';
-svg.appendChild(lAB);
-
-// 내접원 반지름 라벨 r=2
-const rLabelX = Math.round((incX + Dx) / 2) + 14;
-const rLabelY = Math.round((incY + Dy) / 2);
-const rLabel = el('text', {
-  x: rLabelX, y: rLabelY,
-  'font-size': '12', 'font-weight': '400',
-  fill: '#94A3B8',
-  'text-anchor': 'start',
-  'dominant-baseline': 'central'
-});
-rLabel.textContent = 'r = 2';
-svg.appendChild(rLabel);
-
-// 정보 텍스트 (우측)
-const infoX = 490;
-const infoY = 100;
-
-svg.appendChild(el('rect', {
-  x: infoX - 10, y: infoY - 20,
-  width: '172', height: '230',
-  rx: '8',
-  fill: '#F8FAFC',
-  stroke: '#CBD5E1',
-  'stroke-width': '1'
-}));
-
-function infoText(x, y, text, size, weight, color) {
-  const t = el('text', {
-    x, y,
-    'font-size': size, 'font-weight': weight,
-    fill: color,
-    'text-anchor': 'start',
-    'dominant-baseline': 'central'
-  });
-  t.textContent = text;
-  svg.appendChild(t);
-}
-
-infoText(infoX + 66, infoY, '직각삼각형 ABC', '14', '500', '#1E293B');
-svg.appendChild(el('line', {
-  x1: infoX - 5, y1: infoY + 14, x2: infoX + 157, y2: infoY + 14,
-  stroke: '#CBD5E1', 'stroke-width': '1'
-}));
-infoText(infoX, infoY + 34, '세 변: 5, 12, 13', '12', '400', '#475569');
-infoText(infoX, infoY + 56, '5² + 12² = 13²  ✓', '12', '400', '#475569');
-
-svg.appendChild(el('line', {
-  x1: infoX - 5, y1: infoY + 72, x2: infoX + 157, y2: infoY + 72,
-  stroke: '#CBD5E1', 'stroke-width': '1'
-}));
-
-infoText(infoX, infoY + 92, '내접원 반지름', '12', '400', '#475569');
-infoText(infoX, infoY + 112, 'r = (5+12−13)/2 = 2', '12', '400', '#1E293B');
-
-svg.appendChild(el('line', {
-  x1: infoX - 5, y1: infoY + 128, x2: infoX + 157, y2: infoY + 128,
-  stroke: '#CBD5E1', 'stroke-width': '1'
-}));
-
-infoText(infoX, infoY + 148, '접점', '12', '400', '#475569');
-infoText(infoX, infoY + 170, 'D: AC 변 위', '12', '400', '#475569');
-infoText(infoX, infoY + 190, 'E: BC 변 위', '12', '400', '#475569');
-infoText(infoX, infoY + 210, 'F: AB 빗변 위', '12', '400', '#475569');
+// 변의 길이 라벨
+addText(cx - 16, (ay + cy) / 2, '6', { 'font-size': '12', 'font-weight': '400', fill: '#475569', 'text-anchor': 'end' });
+addText((cx + bx) / 2, cy + 18, '8', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+const abmx = (ax + bx) / 2 + 18, abmy = (ay + by) / 2 - 10;
+addText(abmx, abmy, '10', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
 </script>

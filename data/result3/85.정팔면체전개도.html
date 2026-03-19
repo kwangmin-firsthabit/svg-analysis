@@ -1,0 +1,110 @@
+<svg id="vis" width="100%" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  return t;
+}
+
+// 정팔면체 전개도: 삼각형 8개
+// 한 변 길이 = 6, 픽셀: side = 120px
+const side = 110;
+const h = side * Math.sqrt(3) / 2; // 높이 ≈ 95.3px
+
+// 전개도 레이아웃: 2행 4열 마름모꼴 패턴
+// 윗행: 아래방향 삼각형 4개
+// 아랫행: 위방향 삼각형 4개 (엇갈려서 공유 변 형성)
+
+function drawTriangle(pts, dashed) {
+  // 공유 변(접히는 변)은 점선으로 별도 표시
+  const ptStr = pts.map(p => p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+  svg.appendChild(el('polygon', {
+    points: ptStr,
+    fill: '#EFF6FF', 'fill-opacity': '0.15',
+    stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+  }));
+}
+
+function centroid(pts) {
+  return [
+    pts.reduce((s, p) => s + p[0], 0) / 3,
+    pts.reduce((s, p) => s + p[1], 0) / 3
+  ];
+}
+
+const startX = 340 - side * 2;
+const baseY = 120;
+
+// 정팔면체 전개도: 마름모 형태 4개를 나란히
+// 각 마름모 = 위로 향한 삼각형 + 아래로 향한 삼각형
+const triangles = [];
+
+for (let i = 0; i < 4; i++) {
+  const x0 = startX + i * side;
+  // 위 방향 삼각형 (꼭짓점 위)
+  const t_up = [
+    [x0, baseY],
+    [x0 + side, baseY],
+    [x0 + side / 2, baseY - h]
+  ];
+  // 아래 방향 삼각형 (꼭짓점 아래)
+  const t_dn = [
+    [x0, baseY],
+    [x0 + side, baseY],
+    [x0 + side / 2, baseY + h]
+  ];
+  triangles.push(t_up, t_dn);
+}
+
+// 모든 삼각형 그리기
+triangles.forEach(t => drawTriangle(t));
+
+// 접히는 변 (공유 변) 점선 오버레이
+// 내부 공유 변: 각 삼각형 쌍의 공유 변 (baseY 수평선 부분들)
+for (let i = 0; i < 4; i++) {
+  const x0 = startX + i * side;
+  svg.appendChild(el('line', {
+    x1: x0.toFixed(1), y1: baseY, x2: (x0 + side).toFixed(1), y2: baseY,
+    stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '5 4'
+  }));
+}
+// 위 삼각형끼리 공유하는 수직 변도 점선 (접히는 변)
+for (let i = 1; i < 4; i++) {
+  const x0 = startX + i * side;
+  const topX = x0 - side / 2;
+  const topY = baseY - h;
+  svg.appendChild(el('line', {
+    x1: x0.toFixed(1), y1: baseY, x2: topX.toFixed(1), y2: topY.toFixed(1),
+    stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '5 4'
+  }));
+}
+
+// 넓이 라벨
+triangles.forEach((t, i) => {
+  const [cx, cy] = centroid(t);
+  txt(cx, cy - 6, '9√3', { 'font-size': '11', 'font-weight': '400', fill: '#475569' });
+  txt(cx, cy + 10, '≈15.6', { 'font-size': '10', 'font-weight': '400', fill: '#94A3B8' });
+});
+
+// 변 길이 라벨 (맨 아래 변)
+txt(startX + side / 2, baseY + h + 16, '6', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' });
+txt(startX + side * 1.5, baseY - h - 14, '6', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' });
+
+// 제목
+txt(340, 44, '정팔면체 전개도  (한 변의 길이 6)', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+txt(340, 66, '각 면의 넓이 = 9√3 ≈ 15.6  (접히는 변: 점선)', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+txt(340, 86, '전체 넓이 = 8 × 9√3 = 72√3 ≈ 124.7', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+const maxY = baseY + h + 34;
+svg.setAttribute('viewBox', '0 0 680 ' + Math.round(maxY));
+</script>

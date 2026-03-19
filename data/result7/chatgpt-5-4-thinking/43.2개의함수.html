@@ -1,0 +1,253 @@
+<svg id="vis" width="100%" viewBox="0 0 760 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const C = {
+    axis: '#475569',
+    exp: '#2563eb',
+    log: '#16a34a',
+    line: '#dc2626',
+    diag: '#94a3b8',
+    pointA: '#1d4ed8',
+    pointB: '#15803d',
+    text: '#0f172a',
+    sub: '#64748b',
+    guide: '#cbd5e1',
+  };
+
+  const ox = 130;
+  const oy = 390;
+  const sx = 78;
+  const sy = 52;
+
+  function el(tag, attrs = {}) {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    return node;
+  }
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': 14,
+      'font-weight': 500,
+      fill: C.text,
+      'dominant-baseline': 'central',
+      'text-anchor': 'middle',
+      ...attrs,
+    });
+    t.textContent = str;
+    return add(t);
+  }
+  function px(x) {
+    return ox + x * sx;
+  }
+  function py(y) {
+    return oy - y * sy;
+  }
+
+  function polylineFrom(fn, x0, x1, step, color, width = 2.6) {
+    const pts = [];
+    for (let x = x0; x <= x1; x += step) {
+      const y = fn(x);
+      const X = px(x),
+        Y = py(y);
+      if (X >= 35 && X <= 735 && Y >= 20 && Y <= 460) pts.push(`${X.toFixed(1)},${Y.toFixed(1)}`);
+    }
+    add(
+      el('polyline', {
+        points: pts.join(' '),
+        fill: 'none',
+        stroke: color,
+        'stroke-width': width,
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+      })
+    );
+  }
+
+  // axes
+  add(
+    el('line', { x1: 40, y1: oy, x2: 735, y2: oy, stroke: C.axis, 'stroke-width': 1.3, 'marker-end': 'url(#arrow)' })
+  );
+  add(
+    el('line', { x1: ox, y1: 455, x2: ox, y2: 28, stroke: C.axis, 'stroke-width': 1.3, 'marker-end': 'url(#arrow)' })
+  );
+
+  text(726, oy - 14, 'x');
+  text(ox + 16, 40, 'y');
+  text(ox - 16, oy + 18, 'O', { 'font-size': 12, 'font-weight': 400, fill: C.sub });
+
+  // ticks
+  for (let i = -1; i <= 7; i++) {
+    if (i === 0) continue;
+    const X = px(i);
+    add(el('line', { x1: X, y1: oy - 4, x2: X, y2: oy + 4, stroke: C.axis, 'stroke-width': 0.8 }));
+    text(X, oy + 18, String(i), { 'font-size': 12, 'font-weight': 400, fill: C.sub });
+  }
+  for (let j = 1; j <= 6; j++) {
+    const Y = py(j);
+    add(el('line', { x1: ox - 4, y1: Y, x2: ox + 4, y2: Y, stroke: C.axis, 'stroke-width': 0.8 }));
+    text(ox - 16, Y, String(j), { 'font-size': 12, 'font-weight': 400, fill: C.sub, 'text-anchor': 'end' });
+  }
+
+  // y = x
+  add(
+    el('line', {
+      x1: px(-0.7),
+      y1: py(-0.7),
+      x2: px(5.9),
+      y2: py(5.9),
+      stroke: C.diag,
+      'stroke-width': 1.4,
+      'stroke-dasharray': '6 5',
+    })
+  );
+  text(px(5.25), py(5.25) - 10, 'y = x', { fill: C.sub, 'font-size': 12, 'font-weight': 400 });
+
+  // curves
+  polylineFrom(x => Math.pow(2, x), -1.2, 2.7, 0.015, C.exp);
+  polylineFrom(x => Math.log2(x), 0.08, 6.2, 0.015, C.log);
+
+  // choose an intersection parameter a
+  const a = 1.5;
+  const ya = Math.pow(2, a); // 2^a
+  const k = a + ya;
+
+  const A = { x: a, y: ya };
+  const B = { x: ya, y: a };
+  const M = { x: (A.x + B.x) / 2, y: (A.y + B.y) / 2 };
+
+  // secant line y = -x + k
+  add(
+    el('line', {
+      x1: px(-0.2),
+      y1: py(k + 0.2),
+      x2: px(6.1),
+      y2: py(k - 6.1),
+      stroke: C.line,
+      'stroke-width': 2.6,
+    })
+  );
+
+  // helper dashed lines to axes
+  for (const P of [A, B]) {
+    add(
+      el('line', {
+        x1: px(P.x),
+        y1: py(P.y),
+        x2: px(P.x),
+        y2: py(0),
+        stroke: C.guide,
+        'stroke-width': 0.9,
+        'stroke-dasharray': '4 4',
+      })
+    );
+    add(
+      el('line', {
+        x1: px(P.x),
+        y1: py(P.y),
+        x2: px(0),
+        y2: py(P.y),
+        stroke: C.guide,
+        'stroke-width': 0.9,
+        'stroke-dasharray': '4 4',
+      })
+    );
+  }
+
+  // segment AB
+  add(
+    el('line', {
+      x1: px(A.x),
+      y1: py(A.y),
+      x2: px(B.x),
+      y2: py(B.y),
+      stroke: '#f59e0b',
+      'stroke-width': 1.8,
+      'stroke-dasharray': '5 4',
+    })
+  );
+
+  // midpoint
+  add(el('circle', { cx: px(M.x), cy: py(M.y), r: 4.2, fill: '#f59e0b' }));
+  text(px(M.x) + 14, py(M.y) - 12, 'M', { fill: '#b45309', 'text-anchor': 'start' });
+
+  // points
+  add(el('circle', { cx: px(A.x), cy: py(A.y), r: 5.2, fill: C.pointA }));
+  add(el('circle', { cx: px(B.x), cy: py(B.y), r: 5.2, fill: C.pointB }));
+
+  text(px(A.x) - 10, py(A.y) - 18, 'A', { fill: C.pointA });
+  text(px(B.x) + 14, py(B.y) - 14, 'B', { fill: C.pointB, 'text-anchor': 'start' });
+
+  text(px(A.x) - 8, py(A.y) + 20, '(a, 2^a)', {
+    fill: C.pointA,
+    'font-size': 12,
+    'font-weight': 400,
+  });
+  text(px(B.x) + 10, py(B.y) + 20, '(2^a, a)', {
+    fill: C.pointB,
+    'font-size': 12,
+    'font-weight': 400,
+    'text-anchor': 'start',
+  });
+
+  // labels for graphs
+  text(px(2.15), py(5.2), 'y = 2^x', { fill: C.exp });
+  text(px(4.9), py(2.45), 'y = log₂x', { fill: C.log });
+  text(px(5.2), py(k - 5.2) - 18, 'y = -x + k', { fill: C.line });
+
+  // headline relations
+  text(555, 70, '교점의 관계', { 'font-size': 18, 'font-weight': 700 });
+  text(555, 98, 'A(a, 2^a),  B(2^a, a)', { fill: C.sub, 'font-size': 13, 'font-weight': 400 });
+  text(555, 120, '두 점은 y = x에 대칭', { fill: C.sub, 'font-size': 13, 'font-weight': 400 });
+  text(555, 142, '중점 M은 항상 y = x 위', { fill: C.sub, 'font-size': 13, 'font-weight': 400 });
+  text(555, 164, '또한  a + 2^a = k', { fill: C.sub, 'font-size': 13, 'font-weight': 400 });
+
+  // arrow hints
+  add(
+    el('path', {
+      d: `M ${px(2.32)} ${py(Math.pow(2, 2.32))} L ${px(2.52)} ${py(Math.pow(2, 2.52))}`,
+      fill: 'none',
+      stroke: C.exp,
+      'stroke-width': 2.1,
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  add(
+    el('path', {
+      d: `M ${px(5.55)} ${py(Math.log2(5.55))} L ${px(5.85)} ${py(Math.log2(5.85))}`,
+      fill: 'none',
+      stroke: C.log,
+      'stroke-width': 2.1,
+      'marker-end': 'url(#arrow)',
+    })
+  );
+</script>

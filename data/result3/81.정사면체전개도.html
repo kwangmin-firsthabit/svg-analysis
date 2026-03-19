@@ -1,0 +1,76 @@
+<svg id="vis" width="100%" viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  return t;
+}
+
+function triangle(pts, filled) {
+  svg.appendChild(el('polygon', {
+    points: pts.map(p => p[0] + ',' + p[1]).join(' '),
+    fill: '#EFF6FF', 'fill-opacity': '0.15',
+    stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+  }));
+}
+
+// 한 변의 길이 6, 픽셀: 1단위 = 26px → 변 길이 = 156px
+const side = 156;
+const h = side * Math.sqrt(3) / 2; // 높이 ≈ 135px
+
+// 정사면체 전개도: 삼각형 4개를 한 줄로 배치
+// 아래 방향 삼각형 3개 + 위 방향 삼각형 1개(맨 왼쪽 꼭대기)
+// 표준 전개도: 맨 위에 삼각형 1개, 아래에 3개 연결
+
+const startX = 340 - side * 1.5;
+const baseY = 160;
+
+// 삼각형 1: 위 방향 (꼭짓점이 위)
+const t1 = [[startX, baseY], [startX + side, baseY], [startX + side / 2, baseY - h]];
+triangle(t1);
+const c1 = [(t1[0][0] + t1[1][0] + t1[2][0]) / 3, (t1[0][1] + t1[1][1] + t1[2][1]) / 3];
+txt(c1[0], c1[1], '9√3', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+txt(c1[0], c1[1] + 16, '≈15.6', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
+
+// 삼각형 2: 아래 방향 (꼭짓점이 아래) — t1 오른쪽에 붙음
+const t2 = [[startX + side, baseY], [startX + 2 * side, baseY], [startX + 1.5 * side, baseY + h]];
+triangle(t2);
+const c2 = [(t2[0][0] + t2[1][0] + t2[2][0]) / 3, (t2[0][1] + t2[1][1] + t2[2][1]) / 3];
+txt(c2[0], c2[1], '9√3', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+txt(c2[0], c2[1] + 16, '≈15.6', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
+
+// 삼각형 3: 위 방향 — t2 오른쪽에 붙음 (공유 변)
+const t3 = [[startX + 2 * side, baseY], [startX + 3 * side, baseY], [startX + 2.5 * side, baseY - h]];
+triangle(t3);
+const c3 = [(t3[0][0] + t3[1][0] + t3[2][0]) / 3, (t3[0][1] + t3[1][1] + t3[2][1]) / 3];
+txt(c3[0], c3[1], '9√3', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+txt(c3[0], c3[1] + 16, '≈15.6', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
+
+// 삼각형 4: t3 오른쪽에 아래 방향
+const t4 = [[startX + 3 * side, baseY], [startX + 4 * side, baseY], [startX + 3.5 * side, baseY + h]];
+triangle(t4);
+const c4 = [(t4[0][0] + t4[1][0] + t4[2][0]) / 3, (t4[0][1] + t4[1][1] + t4[2][1]) / 3];
+txt(c4[0], c4[1], '9√3', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+txt(c4[0], c4[1] + 16, '≈15.6', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
+
+// 변 길이 라벨
+txt(startX + side / 2, baseY + 16, '6', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' });
+txt(startX + 1.5 * side, baseY - 16, '6', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' });
+
+// 제목
+txt(340, 40, '정사면체 전개도  (한 변의 길이 6)', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+txt(340, 62, '넓이 = 9√3 ≈ 15.6  ×  4 = 36√3 ≈ 62.4', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+const maxY = Math.max(baseY + h, baseY) + 30;
+svg.setAttribute('viewBox', '0 0 680 ' + Math.round(maxY));
+</script>

@@ -1,0 +1,86 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+function project(x, y, z) {
+  return {
+    px: Math.round(x + z * Math.cos(Math.PI / 6) * 0.5),
+    py: Math.round(y - z * Math.sin(Math.PI / 6) * 0.5)
+  };
+}
+
+const scale = 50;
+const W = 4 * scale; // 200 (가로)
+const D = 3 * scale; // 150 (세로/깊이)
+const H = 6 * scale; // 300 (높이)
+const ox = 165, oy = 420;
+
+function pt(x3, y3, z3) {
+  const p = project(x3, y3, z3);
+  return { x: ox + p.px - x3, y: oy - y3 + p.py - y3 };
+}
+
+// 3D → SVG
+function svgPt(x3, h3, z3) {
+  const px = Math.round(ox + x3 + z3 * Math.cos(Math.PI / 6) * 0.5);
+  const py = Math.round(oy - h3 - z3 * Math.sin(Math.PI / 6) * 0.5);
+  return [px, py];
+}
+
+const A = svgPt(0,  0, 0);
+const B = svgPt(W,  0, 0);
+const C = svgPt(W,  0, D);
+const D_ = svgPt(0, 0, D);
+const E = svgPt(0,  H, 0);
+const F = svgPt(W,  H, 0);
+const G = svgPt(W,  H, D);
+const Hv = svgPt(0, H, D);
+
+function pts(arr) { return arr.map(p => p.join(',')).join(' '); }
+
+// 가려진 모서리 (점선)
+const dashed = { stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '5 4' };
+svg.appendChild(el('line', { x1: A[0], y1: A[1], x2: D_[0], y2: D_[1], ...dashed }));
+svg.appendChild(el('line', { x1: D_[0], y1: D_[1], x2: Hv[0], y2: Hv[1], ...dashed }));
+svg.appendChild(el('line', { x1: D_[0], y1: D_[1], x2: C[0], y2: C[1], ...dashed }));
+
+// 보이는 면
+const solid = { fill: '#3B82F6', 'fill-opacity': '0.12', stroke: '#1D4ED8', 'stroke-width': '1.5' };
+svg.appendChild(el('polygon', { points: pts([A, B, C, D_]), ...solid }));
+svg.appendChild(el('polygon', { points: pts([A, B, F, E]), ...solid }));
+svg.appendChild(el('polygon', { points: pts([B, C, G, F]), ...solid }));
+svg.appendChild(el('polygon', { points: pts([E, F, G, Hv]), ...solid }));
+
+// 꼭짓점 라벨
+const lbl = { 'font-size': '14', 'font-weight': '500', fill: '#1E293B', 'dominant-baseline': 'central' };
+function addLabel(x, y, text, anchor) {
+  const t = el('text', { x, y, 'text-anchor': anchor, ...lbl });
+  t.textContent = text;
+  svg.appendChild(t);
+}
+addLabel(A[0] - 8, A[1] + 8, 'A', 'end');
+addLabel(B[0] + 8, B[1] + 8, 'B', 'start');
+addLabel(C[0] + 8, C[1] + 4, 'C', 'start');
+addLabel(D_[0] - 8, D_[1] + 4, 'D', 'end');
+addLabel(E[0] - 8, E[1] - 4, 'E', 'end');
+addLabel(F[0] + 8, F[1] - 4, 'F', 'start');
+addLabel(G[0] + 8, G[1] - 4, 'G', 'start');
+addLabel(Hv[0] - 8, Hv[1] - 4, 'H', 'end');
+
+// 치수 라벨
+addText((A[0] + B[0]) / 2, A[1] + 20, '4');
+addText((B[0] + C[0]) / 2 + 10, (B[1] + C[1]) / 2 + 10, '3');
+addText(A[0] - 16, (A[1] + E[1]) / 2, '6');
+</script>

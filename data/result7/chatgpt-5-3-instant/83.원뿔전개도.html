@@ -1,0 +1,100 @@
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#111',
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  // parameters
+  const r = 4;
+  const l = 10;
+  const scale = 20;
+
+  // sector angle θ = (arc length / radius) = (2πr / l)
+  const theta = (2 * Math.PI * r) / l;
+
+  // convert to degrees
+  const deg = (theta * 180) / Math.PI;
+
+  // center of sector
+  const cx = 340;
+  const cy = 240;
+
+  // radius in px
+  const R = l * scale;
+
+  // start/end angles (centered downward)
+  const start = -theta / 2;
+  const end = theta / 2;
+
+  // arc endpoints
+  const x1 = cx + R * Math.cos(start);
+  const y1 = cy + R * Math.sin(start);
+  const x2 = cx + R * Math.cos(end);
+  const y2 = cy + R * Math.sin(end);
+
+  // sector path
+  const largeArc = theta > Math.PI ? 1 : 0;
+
+  const d = `
+M ${cx} ${cy}
+L ${x1} ${y1}
+A ${R} ${R} 0 ${largeArc} 1 ${x2} ${y2}
+Z
+`;
+
+  svg.appendChild(
+    el('path', {
+      d: d,
+      fill: '#3b82f6',
+      'fill-opacity': '0.2',
+      stroke: '#2563eb',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // base circle
+  const bcx = 340;
+  const bcy = 420;
+  const br = r * scale;
+
+  svg.appendChild(
+    el('circle', {
+      cx: bcx,
+      cy: bcy,
+      r: br,
+      fill: '#10b981',
+      'fill-opacity': '0.15',
+      stroke: '#059669',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // labels
+  svg.appendChild(text(cx, cy - R - 20, '모선 = 10', { 'font-size': '12', 'font-weight': '400' }));
+  svg.appendChild(text(cx, cy + 20, '부채꼴 (옆면)', { 'font-size': '14' }));
+
+  svg.appendChild(text(bcx, bcy + br + 18, '밑면 반지름 4', { 'font-size': '12', 'font-weight': '400' }));
+
+  // angle label
+  svg.appendChild(text(cx + 80, cy, '중심각 ≈ ' + Math.round(deg) + '°', { 'font-size': '12', 'font-weight': '400' }));
+</script>

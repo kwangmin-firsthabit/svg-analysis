@@ -1,0 +1,80 @@
+<svg id="vis" width="100%" viewBox="0 0 680 580" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '13', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+function quad(pts, fill, stroke) {
+  svg.appendChild(el('polygon', { points: pts.map(p => p.join(',')).join(' '), fill, 'fill-opacity': '0.18', stroke, 'stroke-width': '1.5' }));
+}
+
+// 직각삼각형: C=(340,420), A=(340,120), B=(580,420) — 3:4:5, scale=60
+const sc = 60;
+const Cx = 340, Cy = 420;
+const Ax = 340, Ay = Cy - 4 * sc; // CA=4*60=240 위로 → Ay=180 (수직)
+const Bx = Cx + 3 * sc, By = Cy;  // CB=3*60=180 오른쪽
+
+// 직각 마커
+const s = 14;
+svg.appendChild(el('path', { d: `M ${Cx},${Cy - s} L ${Cx + s},${Cy - s} L ${Cx + s},${Cy}`, fill: 'none', stroke: '#374151', 'stroke-width': '1.5' }));
+
+// 삼각형
+svg.appendChild(el('polygon', { points: `${Cx},${Cy} ${Ax},${Ay} ${Bx},${By}`, fill: '#DBEAFE', 'fill-opacity': '0.5', stroke: '#1D4ED8', 'stroke-width': '2' }));
+
+// 빗변 벡터: AB = (Bx-Ax, By-Ay)
+const abx = Bx - Ax, aby = By - Ay;
+const abLen = Math.sqrt(abx * abx + aby * aby);
+const abnx = abx / abLen, abny = aby / abLen;
+// 빗변 수직 벡터(바깥 방향)
+const perpx = -abny, perpy = abnx; // 실제로는 반시계 방향 법선
+
+// 변 CB=3 정사각형 (아래)
+const cbx = Bx - Cx, cby = By - Cy;
+const cbLen = Math.sqrt(cbx * cbx + cby * cby);
+const cnx = cbx / cbLen, cny = cby / cbLen;
+const cpx = cny, cpy = -cnx; // 아래쪽 바깥
+const sq3a = [Cx, Cy], sq3b = [Bx, By];
+const sq3c = [Bx + cpx * 3 * sc, By + cpy * 3 * sc];
+const sq3d = [Cx + cpx * 3 * sc, Cy + cpy * 3 * sc];
+quad([sq3a, sq3b, sq3c, sq3d], '#FEF08A', '#CA8A04');
+addText((sq3a[0] + sq3b[0] + sq3c[0] + sq3d[0]) / 4, (sq3a[1] + sq3b[1] + sq3c[1] + sq3d[1]) / 4, '9', { 'font-size': '14', fill: '#92400E', 'font-weight': '600' });
+
+// 변 CA=4 정사각형 (왼쪽)
+const sq4a = [Cx, Cy], sq4b = [Ax, Ay];
+const sq4c = [Ax - 4 * sc, Ay];
+const sq4d = [Cx - 4 * sc, Cy];
+quad([sq4a, sq4b, sq4c, sq4d], '#BBF7D0', '#16A34A');
+addText((sq4a[0] + sq4b[0] + sq4c[0] + sq4d[0]) / 4, (sq4a[1] + sq4b[1] + sq4c[1] + sq4d[1]) / 4, '16', { 'font-size': '14', fill: '#14532D', 'font-weight': '600' });
+
+// 변 AB=5 정사각형 (바깥)
+const nx = -aby / abLen, ny = abx / abLen;
+const sq5a = [Ax, Ay], sq5b = [Bx, By];
+const sq5c = [Bx + nx * 5 * sc, By + ny * 5 * sc];
+const sq5d = [Ax + nx * 5 * sc, Ay + ny * 5 * sc];
+quad([sq5a, sq5b, sq5c, sq5d], '#FED7AA', '#EA580C');
+addText((sq5a[0] + sq5b[0] + sq5c[0] + sq5d[0]) / 4, (sq5a[1] + sq5b[1] + sq5c[1] + sq5d[1]) / 4, '25', { 'font-size': '14', fill: '#7C2D12', 'font-weight': '600' });
+
+// 꼭짓점 점/레이블
+[[Cx, Cy, 'C', 14, 14], [Ax, Ay, 'A', -14, -4], [Bx, By, 'B', 14, 14]].forEach(([x, y, label, dx, dy]) => {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3.5', fill: '#1D4ED8' }));
+  addText(x + dx, y + dy, label, { 'font-size': '15', 'font-weight': '700', fill: '#1D4ED8' });
+});
+
+// 변 길이
+addText(Cx - 22, (Cy + Ay) / 2, '4', { fill: '#334155' });
+addText((Cx + Bx) / 2, Cy + 18, '3', { fill: '#334155' });
+addText((Ax + Bx) / 2 + 20, (Ay + By) / 2 - 16, '5', { fill: '#334155' });
+
+// 등식
+addText(340, 555, '3² + 4² = 5²  →  9 + 16 = 25', { 'font-size': '13', fill: '#374151', 'font-weight': '500' });
+</script>

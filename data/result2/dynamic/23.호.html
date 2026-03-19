@@ -1,0 +1,38 @@
+<svg id="vis" width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const cx = 340, cy = 260, r = 120;
+// Arc from 210deg to 330deg (120deg sweep across top)
+const aAngle = 210 * Math.PI / 180;
+const bAngle = 330 * Math.PI / 180;
+const ax = Math.round(cx + r * Math.cos(aAngle));
+const ay = Math.round(cy + r * Math.sin(aAngle));
+const bx = Math.round(cx + r * Math.cos(bAngle));
+const by = Math.round(cy + r * Math.sin(bAngle));
+
+svg.appendChild(el('path', {
+  d: `M ${ax} ${ay} A ${r} ${r} 0 0 1 ${bx} ${by}`,
+  fill: 'none', stroke: '#1D4ED8', 'stroke-width': '2'
+}));
+
+svg.appendChild(el('circle', { cx: ax, cy: ay, r: '3', fill: '#1D4ED8' }));
+svg.appendChild(el('circle', { cx: bx, cy: by, r: '3', fill: '#1D4ED8' }));
+
+addText(ax - 14, ay, 'A', { 'font-size': '14', 'font-weight': '500', 'text-anchor': 'end', fill: '#1E293B' });
+addText(bx + 14, by, 'B', { 'font-size': '14', 'font-weight': '500', 'text-anchor': 'start', fill: '#1E293B' });
+addText(cx, cy - r - 14, '호 AB = 10', {});
+</script>

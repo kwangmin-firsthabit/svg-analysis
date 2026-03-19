@@ -1,14 +1,10 @@
-<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
-<clipPath id="plot-area">
-<rect x="60" y="30" width="560" height="420"/>
-</clipPath>
-</defs>
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
 </svg>
 <script>
 const svg = document.getElementById('vis');
 const ns = 'http://www.w3.org/2000/svg';
+const ox = 340, oy = 300, scale = 55;
 
 function el(tag, attrs) {
   const e = document.createElementNS(ns, tag);
@@ -16,189 +12,71 @@ function el(tag, attrs) {
   return e;
 }
 
-const ox = 340;
-const oy = 280;
-const scale = 50;
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
 
-function tx(x) { return Math.round(ox + x * scale); }
-function ty(y) { return Math.round(oy - y * scale); }
+// 좌표축
+svg.appendChild(el('line', { x1: 60, y1: oy, x2: 630, y2: oy, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('line', { x1: ox, y1: 430, x2: ox, y2: 50, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+addText(622, oy - 14, 'x', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(ox + 14, 62, 'y', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(ox - 14, oy + 14, 'O', { 'font-size': '12', fill: '#475569' });
 
-// x축
-svg.appendChild(el('line', {
-  x1: 60, y1: oy, x2: 620, y2: oy,
-  stroke: '#64748B', 'stroke-width': '1.5',
-  'marker-end': 'url(#arrow)'
-}));
-// y축
-svg.appendChild(el('line', {
-  x1: ox, y1: 450, x2: ox, y2: 30,
-  stroke: '#64748B', 'stroke-width': '1.5',
-  'marker-end': 'url(#arrow)'
-}));
-
-// 원점 라벨
-const originLabel = el('text', {
-  x: ox - 12, y: oy + 16,
-  fill: '#1E293B', 'font-size': '13', 'font-family': 'serif',
-  'dominant-baseline': 'central', 'text-anchor': 'middle'
-});
-originLabel.textContent = 'O';
-svg.appendChild(originLabel);
-
-// 축 라벨
-const xLabel = el('text', {
-  x: 632, y: oy,
-  fill: '#1E293B', 'font-size': '13', 'font-family': 'serif',
-  'dominant-baseline': 'central', 'text-anchor': 'start'
-});
-xLabel.textContent = 'x';
-svg.appendChild(xLabel);
-
-const yLabel = el('text', {
-  x: ox, y: 18,
-  fill: '#1E293B', 'font-size': '13', 'font-family': 'serif',
-  'dominant-baseline': 'central', 'text-anchor': 'middle'
-});
-yLabel.textContent = 'y';
-svg.appendChild(yLabel);
-
-// x축 눈금 (-4 ~ 4, 0 제외)
+// 눈금
 for (let i = -4; i <= 4; i++) {
   if (i === 0) continue;
-  const px = tx(i);
-  svg.appendChild(el('line', {
-    x1: px, y1: oy - 4, x2: px, y2: oy + 4,
-    stroke: '#64748B', 'stroke-width': '1'
-  }));
-  const t = el('text', {
-    x: px, y: oy + 16,
-    fill: '#475569', 'font-size': '11', 'font-family': 'serif',
-    'dominant-baseline': 'central', 'text-anchor': 'middle'
-  });
-  t.textContent = i;
-  svg.appendChild(t);
+  const px = ox + i * scale;
+  if (px < 70 || px > 620) continue;
+  svg.appendChild(el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: '#64748B', 'stroke-width': '0.8' }));
+  addText(px, oy + 16, String(i));
+}
+for (let j = 1; j <= 4; j++) {
+  const py = oy - j * scale;
+  if (py < 60) continue;
+  svg.appendChild(el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: '#64748B', 'stroke-width': '0.8' }));
+  addText(ox - 16, py, String(j), { 'text-anchor': 'end' });
 }
 
-// y축 눈금 (-1 ~ 9, 0 제외)
-for (let i = -1; i <= 9; i++) {
-  if (i === 0) continue;
-  const py = ty(i);
-  if (py < 30 || py > 450) continue;
-  svg.appendChild(el('line', {
-    x1: ox - 4, y1: py, x2: ox + 4, y2: py,
-    stroke: '#64748B', 'stroke-width': '1'
-  }));
-  const t = el('text', {
-    x: ox - 10, y: py,
-    fill: '#475569', 'font-size': '11', 'font-family': 'serif',
-    'dominant-baseline': 'central', 'text-anchor': 'end'
-  });
-  t.textContent = i;
-  svg.appendChild(t);
-}
-
-// 구간 1: x < -1, y = x² + 1
-// x: -4 ~ -1 (열린 끝점)
-{
-  const pts = [];
-  const steps = 200;
-  for (let i = 0; i <= steps; i++) {
-    const x = -4 + i * ((-1 - (-4)) / steps);
-    if (x >= -1) continue;
-    const y = x * x + 1;
-    pts.push(`${tx(x)},${ty(y)}`);
-  }
-  svg.appendChild(el('polyline', {
-    points: pts.join(' '),
-    fill: 'none',
-    stroke: '#3B82F6',
-    'stroke-width': '2.2',
-    'clip-path': 'url(#plot-area)'
-  }));
-}
-
-// 구간 2: -1 ≤ x < 1, y = 2x + 3
-// x: -1 ~ 1 (왼쪽 닫힌, 오른쪽 열린)
-{
-  const x1 = -1;
-  const x2 = 1 - 0.001;
-  const y1 = 2 * x1 + 3; // 1
-  const y2 = 2 * x2 + 3; // ~5
-  svg.appendChild(el('line', {
-    x1: tx(x1), y1: ty(y1),
-    x2: tx(x2), y2: ty(y2),
-    stroke: '#3B82F6',
-    'stroke-width': '2.2',
-    'clip-path': 'url(#plot-area)'
-  }));
-}
-
-// 구간 3: x ≥ 1, y = -x + 4
-// x: 1 ~ 4 (왼쪽 닫힌)
-{
-  const x1 = 1;
-  const x2 = 4;
-  const y1 = -x1 + 4; // 3
-  const y2 = -x2 + 4; // 0
-  svg.appendChild(el('line', {
-    x1: tx(x1), y1: ty(y1),
-    x2: tx(x2), y2: ty(y2),
-    stroke: '#3B82F6',
-    'stroke-width': '2.2',
-    'clip-path': 'url(#plot-area)'
-  }));
-}
-
-// 경계점 처리
-// x = -1:
-//   왼쪽 극한 (x→-1-): (-1)²+1 = 2 → 열린 점
-//   함수값 f(-1) = 2×(-1)+3 = 1 → 닫힌 점
-// x = 1:
-//   왼쪽 극한 (x→1-): 2×1+3 = 5 → 열린 점
-//   함수값 f(1) = -1+4 = 3 → 닫힌 점
-
-const dotColor = '#1D4ED8';
-const dotR = 4;
-
-// x=-1, y=2 (열린 점)
-svg.appendChild(el('circle', {
-  cx: tx(-1), cy: ty(2), r: dotR,
-  fill: 'white', stroke: dotColor, 'stroke-width': '2'
+// x < 0 일 때 y = -x (직선, 기울기 -1)
+// x = -4 에서 x = 0(열린점) 까지
+const leftStartX = ox - 4 * scale;
+const leftStartY = oy - (-(-4)); // y = -(-4) = 4 -> oy - 4*scale
+const leftEndX = ox; // x = 0
+const leftEndY = oy; // y = 0
+svg.appendChild(el('line', {
+  x1: ox - 4 * scale, y1: oy - 4 * scale,
+  x2: ox, y2: oy,
+  stroke: '#3B82F6', 'stroke-width': '2', 'stroke-linecap': 'round'
 }));
 
-// x=-1, y=1 (닫힌 점)
-svg.appendChild(el('circle', {
-  cx: tx(-1), cy: ty(1), r: dotR,
-  fill: dotColor, stroke: dotColor, 'stroke-width': '2'
-}));
-
-// x=1, y=5 (열린 점)
-svg.appendChild(el('circle', {
-  cx: tx(1), cy: ty(5), r: dotR,
-  fill: 'white', stroke: dotColor, 'stroke-width': '2'
-}));
-
-// x=1, y=3 (닫힌 점)
-svg.appendChild(el('circle', {
-  cx: tx(1), cy: ty(3), r: dotR,
-  fill: dotColor, stroke: dotColor, 'stroke-width': '2'
-}));
-
-// 수식 라벨 (오른쪽 상단)
-const lines = [
-  { text: 'x²+1       (x < -1)',   y: 60 },
-  { text: 'y = { 2x+3    (-1 ≤ x < 1)', y: 82 },
-  { text: '-x+4      (x ≥ 1)',     y: 104 }
-];
-
-for (const line of lines) {
-  const t = el('text', {
-    x: 600, y: line.y,
-    fill: '#1E293B', 'font-size': '12', 'font-family': 'serif',
-    'dominant-baseline': 'central', 'text-anchor': 'end',
-    'font-style': 'italic'
-  });
-  t.textContent = line.text;
-  svg.appendChild(t);
+// x >= 0 일 때 y = x²
+let pts = '';
+for (let px = ox; px <= ox + 3 * scale; px += 2) {
+  const mx = (px - ox) / scale;
+  const my = mx * mx;
+  const py = oy - my * scale;
+  if (py >= 60 && py <= 420) pts += px + ',' + py.toFixed(1) + ' ';
 }
+svg.appendChild(el('polyline', { points: pts.trim(), fill: 'none', stroke: '#3B82F6', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+
+// x=0에서 경계: 왼쪽(x<0) 열린점, 오른쪽(x>=0) 닫힌점
+// 열린점 ○: x=0, y=0 (x<0 구간 끝)
+svg.appendChild(el('circle', { cx: ox, cy: oy, r: '5', fill: 'white', stroke: '#3B82F6', 'stroke-width': '2' }));
+// 닫힌점 ●: x=0, y=0 (x>=0 구간 시작)
+svg.appendChild(el('circle', { cx: ox, cy: oy, r: '4', fill: '#3B82F6' }));
+
+// 두 구간의 식 라벨
+addText(ox - 2 * scale, oy - 2 * scale - 30, 'y = -x', { 'font-size': '13', 'font-weight': '500', fill: '#3B82F6' });
+addText(ox - 2 * scale, oy - 2 * scale - 12, '(x < 0)', { 'font-size': '11', fill: '#475569' });
+
+addText(ox + 2 * scale + 10, oy - 4 * scale + 20, 'y = x²', { 'font-size': '13', 'font-weight': '500', fill: '#3B82F6' });
+addText(ox + 2 * scale + 10, oy - 4 * scale + 38, '(x ≥ 0)', { 'font-size': '11', fill: '#475569' });
+
+// x=0 경계 표시 라벨
+addText(ox, oy + 30, 'x = 0', { 'font-size': '11', fill: '#94A3B8' });
+addText(ox - 35, oy + 44, '○ 열린점', { 'font-size': '10', fill: '#94A3B8' });
+addText(ox + 35, oy + 44, '● 닫힌점', { 'font-size': '10', fill: '#94A3B8' });
 </script>

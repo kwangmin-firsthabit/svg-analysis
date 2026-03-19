@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>줄기-잎 그림</title>
+</head>
+<body>
+<svg id="vis" width="100%" viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function txt(x, y, s, attrs={}) {
+  const t = el('text', {x, y, 'font-size':'13', 'font-weight':'400', 'text-anchor':'middle', 'dominant-baseline':'central', fill:'#1E293B', ...attrs});
+  t.textContent = s;
+  svg.appendChild(t);
+}
+function line(x1, y1, x2, y2, attrs={}) {
+  svg.appendChild(el('line', {x1, y1, x2, y2, stroke:'#CBD5E1', 'stroke-width':'1', ...attrs}));
+}
+
+const data = [
+  { stem: 5, leaves: [2, 5] },
+  { stem: 6, leaves: [1, 3, 7, 8] },
+  { stem: 7, leaves: [1, 3, 4, 6, 8] },
+  { stem: 8, leaves: [1, 2, 5, 7, 8] },
+  { stem: 9, leaves: [1, 3, 5, 8] }
+];
+
+txt(340, 28, '수학 점수 줄기-잎 그림', {'font-size':'14','font-weight':'600'});
+
+const ox = 80, oy = 50;
+const totalW = 500, totalH = 240;
+const rowH = 40;
+const stemW = 120;
+
+svg.appendChild(el('rect', {x:ox, y:oy, width:totalW, height:totalH, rx:'6', fill:'#F8FAFC', stroke:'#CBD5E1', 'stroke-width':'1.5'}));
+
+svg.appendChild(el('rect', {x:ox, y:oy, width:totalW, height:rowH, fill:'#E2E8F0', rx:'0', stroke:'none'}));
+svg.appendChild(el('rect', {x:ox, y:oy, width:stemW, height:totalH, fill:'#E2E8F0', rx:'0', stroke:'none'}));
+line(ox, oy, ox, oy + totalH, {'stroke-width':'0'});
+line(ox+totalW, oy, ox+totalW, oy+totalH, {'stroke-width':'0'});
+
+svg.appendChild(el('rect', {x:ox, y:oy, width:totalW, height:totalH, rx:'6', fill:'none', stroke:'#CBD5E1', 'stroke-width':'1.5'}));
+
+svg.appendChild(el('line', {x1:ox+stemW, y1:oy, x2:ox+stemW, y2:oy+totalH, stroke:'#1D4ED8', 'stroke-width':'2'}));
+
+line(ox, oy+rowH, ox+totalW, oy+rowH, {'stroke-width':'1.5'});
+txt(ox + stemW/2, oy + rowH/2, '줄기', {'font-size':'14','font-weight':'600'});
+txt(ox + stemW + (totalW - stemW)/2, oy + rowH/2, '잎', {'font-size':'14','font-weight':'600'});
+
+data.forEach((row, i) => {
+  const y = oy + rowH + rowH/2 + i * rowH;
+  if (i > 0) line(ox, oy + rowH + i*rowH, ox+totalW, oy + rowH + i*rowH);
+  txt(ox + stemW/2, y, String(row.stem), {'font-size':'14','font-weight':'500'});
+  const leafStr = row.leaves.join('   ');
+  const t = el('text', {x: ox+stemW+16, y, 'font-size':'14', 'font-weight':'400', 'text-anchor':'start', 'dominant-baseline':'central', fill:'#475569'});
+  t.textContent = leafStr;
+  svg.appendChild(t);
+});
+
+txt(340, 308, '(단위: 점)', {'font-size':'12','fill':'#475569'});
+</script>
+</body>
+</html>

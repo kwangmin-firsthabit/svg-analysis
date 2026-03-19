@@ -1,0 +1,75 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  return t;
+}
+
+// 원뿔대: 윗면 r=3, 아랫면 R=6, 높이 h=5
+// 모선 길이 = √((R-r)² + h²) = √(9+25) = √34 ≈ 5.83
+
+// 픽셀 스케일: 1단위 = 28px
+const U = 28;
+const rU = 3 * U;   // 84px
+const RU = 6 * U;   // 168px
+const hU = 5 * U;   // 140px
+
+const cx = 340;
+const topY = 120;
+const botY = topY + hU; // 260
+
+// 사다리꼴 측면 (앞면만)
+const topLeft = cx - rU;
+const topRight = cx + rU;
+const botLeft = cx - RU;
+const botRight = cx + RU;
+
+// 옆면 사다리꼴
+svg.appendChild(el('polygon', {
+  points: `${topLeft},${topY} ${topRight},${topY} ${botRight},${botY} ${botLeft},${botY}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 윗면 타원
+svg.appendChild(el('ellipse', { cx, cy: topY, rx: rU, ry: rU * 0.35, fill: '#EFF6FF', 'fill-opacity': '0.2', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+
+// 아랫면 타원
+svg.appendChild(el('ellipse', { cx, cy: botY, rx: RU, ry: RU * 0.35, fill: '#EFF6FF', 'fill-opacity': '0.1', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+
+// 윗면 반지름 라벨 (r=3)
+svg.appendChild(el('line', { x1: cx, y1: topY, x2: topRight, y2: topY, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+txt(cx + rU / 2, topY - 16, 'r = 3', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 아랫면 반지름 라벨 (R=6)
+svg.appendChild(el('line', { x1: cx, y1: botY, x2: botRight, y2: botY, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+txt(cx + RU / 2, botY + 20, 'R = 6', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 높이 점선 (h=5) — 중심축
+svg.appendChild(el('line', { x1: cx, y1: topY, x2: cx, y2: botY, stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '5 4' }));
+txt(cx + 16, (topY + botY) / 2, 'h = 5', { 'font-size': '12', 'font-weight': '400', fill: '#475569', 'text-anchor': 'start' });
+
+// 모선 길이 라벨 (√34 ≈ 5.83)
+// 오른쪽 모선 중점
+const slantMidX = (topRight + botRight) / 2 + 14;
+const slantMidY = (topY + botY) / 2;
+txt(slantMidX + 26, slantMidY, '√34', { 'font-size': '12', 'font-weight': '400', fill: '#3B82F6' });
+txt(slantMidX + 26, slantMidY + 16, '≈ 5.83', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
+
+// 제목
+txt(340, 50, '원뿔대  (윗면 r = 3, 아랫면 R = 6, 높이 h = 5)', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+txt(340, 74, '모선 길이 = √((R−r)² + h²) = √(9 + 25) = √34 ≈ 5.83', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+const maxY = botY + RU * 0.35 + 40;
+svg.setAttribute('viewBox', '0 0 680 ' + Math.round(maxY));
+</script>

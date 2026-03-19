@@ -1,0 +1,133 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#111',
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  // center and scale
+  const cx = 340;
+  const cy = 220;
+  const scale = 20; // 1 unit = 20px
+
+  const R = 8;
+  const chord = 8;
+
+  // half chord
+  const half = chord / 2;
+
+  // distance from center to chord: d = sqrt(R^2 - (L/2)^2)
+  const d = Math.sqrt(R * R - half * half);
+
+  // chord endpoints
+  const yChord = cy + d * scale;
+  const x1 = cx - half * scale;
+  const x2 = cx + half * scale;
+
+  // angles for arc
+  const theta = Math.asin(half / R);
+  const startAngle = Math.PI / 2 - theta;
+  const endAngle = Math.PI / 2 + theta;
+
+  // arc endpoints
+  const ax1 = cx + R * scale * Math.cos(startAngle);
+  const ay1 = cy + R * scale * Math.sin(startAngle);
+  const ax2 = cx + R * scale * Math.cos(endAngle);
+  const ay2 = cy + R * scale * Math.sin(endAngle);
+
+  // circular arc (minor arc)
+  const largeArc = 0;
+
+  // sector fill (segment)
+  const pathData = `
+M ${x1} ${yChord}
+L ${ax1} ${ay1}
+A ${R * scale} ${R * scale} 0 ${largeArc} 1 ${ax2} ${ay2}
+L ${x2} ${yChord}
+Z
+`;
+
+  svg.appendChild(
+    el('path', {
+      d: pathData,
+      fill: '#3b82f6',
+      'fill-opacity': '0.2',
+      stroke: '#2563eb',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // chord
+  svg.appendChild(
+    el('line', {
+      x1: x1,
+      y1: yChord,
+      x2: x2,
+      y2: yChord,
+      stroke: '#dc2626',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // radius lines
+  svg.appendChild(
+    el('line', {
+      x1: cx,
+      y1: cy,
+      x2: ax1,
+      y2: ay1,
+      stroke: '#666',
+      'stroke-width': '0.8',
+      'stroke-dasharray': '4 3',
+    })
+  );
+  svg.appendChild(
+    el('line', {
+      x1: cx,
+      y1: cy,
+      x2: ax2,
+      y2: ay2,
+      stroke: '#666',
+      'stroke-width': '0.8',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  // center point
+  svg.appendChild(el('circle', { cx: cx, cy: cy, r: 3.5, fill: '#111' }));
+  svg.appendChild(text(cx, cy - 18, 'O', { 'font-size': '12', 'font-weight': '400' }));
+
+  // labels
+  svg.appendChild(text((x1 + x2) / 2, yChord + 18, '현의 길이 8', { 'font-size': '12', 'font-weight': '400' }));
+  svg.appendChild(
+    text(cx + (R * scale * Math.cos(startAngle)) / 2, cy + (R * scale * Math.sin(startAngle)) / 2, '8', {
+      'font-size': '12',
+      'font-weight': '400',
+    })
+  );
+  svg.appendChild(
+    text(cx + (R * scale * Math.cos(endAngle)) / 2, cy + (R * scale * Math.sin(endAngle)) / 2, '8', {
+      'font-size': '12',
+      'font-weight': '400',
+    })
+  );
+</script>

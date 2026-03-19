@@ -1,0 +1,72 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  return t;
+}
+
+function rect(x, y, w, h, label, sublabel) {
+  svg.appendChild(el('rect', { x, y, width: w, height: h, fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+  svg.appendChild(txt(x + w / 2, y + h / 2 - (sublabel ? 10 : 0), label, { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' }));
+  if (sublabel) {
+    svg.appendChild(txt(x + w / 2, y + h / 2 + 12, sublabel, { 'font-size': '12', 'font-weight': '400', fill: '#475569' }));
+  }
+}
+
+// 가로 a=5, 세로 b=3, 높이 c=4
+// 픽셀 단위: 1단위 = 36px
+const U = 36;
+const a = 5 * U; // 180
+const b = 3 * U; // 108
+const c = 4 * U; // 144
+
+// 전개도 레이아웃 (십자형)
+// 중앙 기준점
+const cx = 340, cy = 260;
+
+// 윗면 (가로 a x 세로 b) — 가운데 위쪽
+const topX = cx - a / 2, topY = cy - c - b;
+rect(topX, topY, a, b, '윗면  (5×3)', '넓이 = 15');
+
+// 앞면 (가로 a x 높이 c)
+const frontX = cx - a / 2, frontY = cy - c;
+rect(frontX, frontY, a, c, '앞면  (5×4)', '넓이 = 20');
+
+// 아랫면 (가로 a x 세로 b)
+const botX = cx - a / 2, botY = cy;
+rect(botX, botY, a, b, '아랫면  (5×3)', '넓이 = 15');
+
+// 뒷면 (가로 a x 높이 c)
+const backX = cx - a / 2, backY = cy + b;
+rect(backX, backY, a, c, '뒷면  (5×4)', '넓이 = 20');
+
+// 왼쪽면 (세로 b x 높이 c) — 앞면 왼쪽
+const leftX = cx - a / 2 - b, leftY = cy - c;
+rect(leftX, leftY, b, c, '왼쪽  (3×4)', '넓이 = 12');
+
+// 오른쪽면 (세로 b x 높이 c) — 앞면 오른쪽
+const rightX = cx + a / 2, rightY = cy - c;
+rect(rightX, rightY, b, c, '오른쪽  (3×4)', '넓이 = 12');
+
+// 치수 라벨 (변 길이)
+svg.appendChild(txt(cx, topY - 14, '가로 5', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' }));
+svg.appendChild(txt(leftX - 16, leftY + c / 2, '높이 4', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8', 'text-anchor': 'end' }));
+svg.appendChild(txt(topX + a / 2, topY - 26, '세로 3', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8', 'text-anchor': 'middle' }));
+
+// 제목
+svg.appendChild(txt(340, topY - 44, '직육면체 전개도  (가로 5, 세로 3, 높이 4)', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' }));
+
+const maxY = cy + b + c + 24;
+svg.setAttribute('viewBox', '0 0 680 ' + maxY);
+</script>

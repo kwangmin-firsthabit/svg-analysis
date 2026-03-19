@@ -1,0 +1,77 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+svg.appendChild(el('rect', { width: '680', height: '500', fill: '#F8FAFC' }));
+addText(340, 38, '정사면체 전개도 (한 변의 길이: 6)', { 'font-size': '18', 'font-weight': '600', fill: '#1E293B' });
+
+const side = 6;
+const scale = 30;
+const s = side * scale;
+const h = Math.round(s * Math.sqrt(3) / 2);
+
+const cx = 340;
+const topY = 90;
+
+const A = [cx - s, topY];
+const B = [cx, topY];
+const C = [cx + s, topY];
+const D = [cx - s / 2, topY + h];
+const E = [cx + s / 2, topY + h];
+const F = [cx, topY + 2 * h];
+
+function tri(p1, p2, p3, label, opacity) {
+  const pts = [p1, p2, p3].map(p => p.join(',')).join(' ');
+  svg.appendChild(el('polygon', {
+    points: pts,
+    fill: '#3B82F6', 'fill-opacity': String(opacity),
+    stroke: '#1D4ED8', 'stroke-width': '1.5'
+  }));
+  const mx = Math.round((p1[0] + p2[0] + p3[0]) / 3);
+  const my = Math.round((p1[1] + p2[1] + p3[1]) / 3);
+  addText(mx, my, label, { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+}
+
+tri(A, B, D, '면 1', 0.15);
+tri(B, C, E, '면 2', 0.12);
+tri(B, D, E, '면 3', 0.12);
+tri(D, E, F, '면 4', 0.10);
+
+function midLabel(p1, p2, text) {
+  const mx = Math.round((p1[0] + p2[0]) / 2);
+  const my = Math.round((p1[1] + p2[1]) / 2);
+  const dx = p2[1] - p1[1];
+  const dy = p1[0] - p2[0];
+  const len = Math.sqrt(dx * dx + dy * dy);
+  const nx = Math.round(mx + (dx / len) * 14);
+  const ny = Math.round(my + (dy / len) * 14);
+  addText(nx, ny, text, { 'font-size': '12', fill: '#475569' });
+}
+
+midLabel(A, B, `${side}`);
+midLabel(B, C, `${side}`);
+midLabel(A, D, `${side}`);
+midLabel(B, D, `${side}`);
+midLabel(B, E, `${side}`);
+midLabel(C, E, `${side}`);
+midLabel(D, E, `${side}`);
+midLabel(D, F, `${side}`);
+midLabel(E, F, `${side}`);
+
+const sa = (Math.sqrt(3) * side * side).toFixed(1);
+addText(340, 448, '꼭짓점 4개, 모서리 6개, 면 4개 (정삼각형)', { 'font-size': '13', fill: '#475569' });
+addText(340, 472, `겉넓이: √3 × ${side}² ≈ ${sa}`, { 'font-size': '13', fill: '#475569' });
+</script>

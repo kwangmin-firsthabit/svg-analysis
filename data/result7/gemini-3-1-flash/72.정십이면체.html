@@ -1,0 +1,124 @@
+<svg id="vis" width="100%" viewBox="0 0 680 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // 설정: 한 변 a=4, 스케일 1단위당 12px (오각형 한 변 약 48px)
+  const a = 4;
+  const side = a * 12;
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  // 정오각형 꼭짓점 계산 함수
+  function getPentagonPoints(cx, cy, side, rotation = 0) {
+    const r = side / (2 * Math.sin(Math.PI / 5)); // 외접원 반지름
+    let points = [];
+    for (let i = 0; i < 5; i++) {
+      const angle = ((i * 72 + rotation - 90) * Math.PI) / 180;
+      points.push({
+        x: cx + r * Math.cos(angle),
+        y: cy + r * Math.sin(angle),
+      });
+    }
+    return points;
+  }
+
+  function drawPentagon(points, isFoldLine = false) {
+    const ptsStr = points.map(p => `${p.x},${p.y}`).join(' ');
+    svg.appendChild(
+      el('polygon', {
+        points: ptsStr,
+        fill: '[shape-fill]',
+        'fill-opacity': isFoldLine ? '0.05' : '0.15',
+        stroke: '[shape-stroke]',
+        'stroke-width': '1.2',
+        'stroke-linejoin': 'round',
+      })
+    );
+  }
+
+  // 덩어리(중앙1+주변5) 그리기 함수
+  function drawCluster(cx, cy, rot) {
+    const centerPts = getPentagonPoints(cx, cy, side, rot);
+    drawPentagon(centerPts);
+
+    // 주변 5개 오각형
+    for (let i = 0; i < 5; i++) {
+      const p1 = centerPts[i];
+      const p2 = centerPts[(i + 1) % 5];
+      const midX = (p1.x + p2.x) / 2;
+      const midY = (p1.y + p2.y) / 2;
+
+      // 오각형 높이 계산 (변에서 맞은편 꼭짓점까지)
+      const h = (side / 2) * Math.sqrt(5 + 2 * Math.sqrt(5));
+      const distToNewCenter = h;
+
+      // 바깥쪽 방향 벡터
+      const vx = midX - cx;
+      const vy = midY - cy;
+      const len = Math.sqrt(vx * vx + vy * vy);
+      const nX = vx / len;
+      const nY = vy / len;
+
+      const newCx = midX + nX * (side * 0.688); // 기하학적 중심 거리 보정
+      const newCy = midY + nY * (side * 0.688);
+
+      const newPts = getPentagonPoints(newCx, newCy, side, rot + 180 + i * 72);
+      drawPentagon(newPts);
+    }
+  }
+
+  // 좌우 두 개의 클러스터 배치
+  drawCluster(220, 300, 0);
+  drawCluster(460, 300, 180);
+
+  // 연결선 강조 (두 전개도가 만나는 지점)
+  svg.appendChild(
+    el('line', {
+      x1: 340,
+      y1: 200,
+      x2: 340,
+      y2: 400,
+      stroke: '[auxiliary-line]',
+      'stroke-width': '1',
+      'stroke-dasharray': '4 4',
+    })
+  );
+
+  // 라벨링
+  const text = (x, y, txt) => {
+    const t = el('text', { x, y, 'text-anchor': 'middle', 'font-size': '14', fill: '[label-primary]' });
+    t.textContent = txt;
+    svg.appendChild(t);
+  };
+
+  text(340, 50, '정십이면체 전개도 (한 변 = 4)');
+  text(220, 300, '상단');
+  text(460, 300, '하단');
+</script>

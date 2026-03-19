@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>세로 나눗셈: 847 ÷ 7</title>
+</head>
+<body>
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+function addLine(x1, y1, x2, y2, attrs = {}) {
+  svg.appendChild(el('line', { x1, y1, x2, y2, stroke: '#1E293B', 'stroke-width': '2', ...attrs }));
+}
+
+svg.appendChild(el('rect', { width: '680', height: '460', fill: '#FFFFFF' }));
+addText(340, 36, '세로 나눗셈: 847 ÷ 7 = 121', { 'font-size': '17', 'font-weight': '700' });
+addText(340, 80, '847 ÷ 7의 나눗셈 과정', { 'font-size': '14', fill: '#475569' });
+
+const fs = '32';
+const fsMed = '28';
+
+addText(264, 130, '1', { 'font-size': fs, 'font-weight': '700', fill: '#DC2626' });
+addText(304, 130, '2', { 'font-size': fs, 'font-weight': '700', fill: '#DC2626' });
+addText(344, 130, '1', { 'font-size': fs, 'font-weight': '700', fill: '#DC2626' });
+addLine(245, 140, 365, 140);
+
+addText(222, 180, '7', { 'font-size': fs, 'font-weight': '700', fill: '#2563EB' });
+addLine(232, 155, 232, 185);
+addLine(232, 155, 370, 155);
+addText(264, 180, '8', { 'font-size': fs, 'font-weight': '700' });
+addText(304, 180, '4', { 'font-size': fs, 'font-weight': '700' });
+addText(344, 180, '7', { 'font-size': fs, 'font-weight': '700' });
+
+addText(264, 222, '−', { 'font-size': fsMed, fill: '#64748B' });
+addText(282, 222, '7', { 'font-size': fsMed, fill: '#475569' });
+addLine(248, 232, 300, 232, { stroke: '#94A3B8', 'stroke-width': '1.5' });
+
+addText(270, 264, '1', { 'font-size': fsMed, fill: '#475569' });
+addText(298, 264, '4', { 'font-size': fsMed, fill: '#475569' });
+
+addText(244, 306, '−', { 'font-size': fsMed, fill: '#64748B' });
+addText(270, 306, '1', { 'font-size': fsMed, fill: '#475569' });
+addText(298, 306, '4', { 'font-size': fsMed, fill: '#475569' });
+addLine(248, 316, 320, 316, { stroke: '#94A3B8', 'stroke-width': '1.5' });
+
+addText(310, 350, '7', { 'font-size': fsMed, fill: '#475569' });
+
+addText(288, 392, '−', { 'font-size': fsMed, fill: '#64748B' });
+addText(310, 392, '7', { 'font-size': fsMed, fill: '#475569' });
+addLine(292, 402, 330, 402, { stroke: '#94A3B8', 'stroke-width': '1.5' });
+
+addText(310, 436, '0', { 'font-size': fsMed, 'font-weight': '700', fill: '#16A34A' });
+addText(420, 436, '← 나머지', { 'font-size': '15', 'text-anchor': 'start', fill: '#475569' });
+</script>
+</body>
+</html>

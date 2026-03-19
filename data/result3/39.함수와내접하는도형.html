@@ -1,298 +1,101 @@
-<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
-<defs>
-  <marker id="arrowX" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-    <path d="M0,0 L0,6 L8,3 z" fill="#64748B"/>
-  </marker>
-  <marker id="arrowY" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-    <path d="M0,0 L0,6 L8,3 z" fill="#64748B"/>
-  </marker>
-</defs>
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
 </svg>
 <script>
 const svg = document.getElementById('vis');
 const ns = 'http://www.w3.org/2000/svg';
+// y = -x² + 4, x축과 (-2,0), (2,0) 교점
+// 최대 넓이 직사각형: 꼭짓점 (t, 0), (-t, 0), (-t, -t²+4), (t, -t²+4)
+// 넓이 = 2t(-t²+4), 미분 = 2(-3t²+4) = 0, t = 2/√3
+const ox = 340, oy = 300, scale = 60;
+
 function el(tag, attrs) {
   const e = document.createElementNS(ns, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
   return e;
 }
 
-// 좌표계 설정
-// x: -4 ~ 4, y: -1 ~ 10.5
-// scale: 60px/unit
-const scaleX = 60;
-const scaleY = 38;
-const originX = 340;
-const originY = 400;
-
-function px(x) { return Math.round(originX + x * scaleX); }
-function py(y) { return Math.round(originY - y * scaleY); }
-
-// x축
-svg.appendChild(el('line', {
-  x1: px(-4.2), y1: py(0), x2: px(4.5), y2: py(0),
-  stroke: '#64748B', 'stroke-width': '1.5',
-  'marker-end': 'url(#arrowX)'
-}));
-
-// y축
-svg.appendChild(el('line', {
-  x1: px(0), y1: py(-0.8), x2: px(0), y2: py(10.5),
-  stroke: '#64748B', 'stroke-width': '1.5',
-  'marker-end': 'url(#arrowY)'
-}));
-
-// 축 라벨
-function axisLabel(x, y, text, anchor) {
-  const t = el('text', {
-    x, y,
-    'font-size': '14', 'font-weight': '500',
-    fill: '#64748B',
-    'text-anchor': anchor,
-    'dominant-baseline': 'central'
-  });
-  t.textContent = text;
-  svg.appendChild(t);
-}
-axisLabel(px(4.5) + 10, py(0), 'x', 'start');
-axisLabel(px(0) - 10, py(10.5), 'y', 'middle');
-
-// 눈금 x축
-for (let x = -4; x <= 4; x++) {
-  if (x === 0) continue;
-  svg.appendChild(el('line', {
-    x1: px(x), y1: py(0) - 4, x2: px(x), y2: py(0) + 4,
-    stroke: '#64748B', 'stroke-width': '1'
-  }));
-  const t = el('text', {
-    x: px(x), y: py(0) + 16,
-    'font-size': '12', 'font-weight': '400',
-    fill: '#475569',
-    'text-anchor': 'middle',
-    'dominant-baseline': 'central'
-  });
-  t.textContent = x;
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
   svg.appendChild(t);
 }
 
-// 눈금 y축
-for (let y = 1; y <= 10; y++) {
-  svg.appendChild(el('line', {
-    x1: px(0) - 4, y1: py(y), x2: px(0) + 4, y2: py(y),
-    stroke: '#64748B', 'stroke-width': '1'
-  }));
-  if (y % 2 === 0 || y === 9) {
-    const t = el('text', {
-      x: px(0) - 10, y: py(y),
-      'font-size': '12', 'font-weight': '400',
-      fill: '#475569',
-      'text-anchor': 'end',
-      'dominant-baseline': 'central'
-    });
-    t.textContent = y;
-    svg.appendChild(t);
-  }
+// 좌표축
+svg.appendChild(el('line', { x1: 60, y1: oy, x2: 620, y2: oy, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('line', { x1: ox, y1: 410, x2: ox, y2: 50, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+addText(612, oy - 14, 'x', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(ox + 14, 62, 'y', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(ox - 14, oy + 14, 'O', { 'font-size': '12', fill: '#475569' });
+
+// 눈금
+for (let i = -3; i <= 3; i++) {
+  if (i === 0) continue;
+  const px = ox + i * scale;
+  svg.appendChild(el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: '#64748B', 'stroke-width': '0.8' }));
+  addText(px, oy + 16, String(i));
+}
+for (let j = 1; j <= 4; j++) {
+  const py = oy - j * scale;
+  if (py < 60) continue;
+  svg.appendChild(el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: '#64748B', 'stroke-width': '0.8' }));
+  addText(ox - 16, py, String(j), { 'text-anchor': 'end' });
 }
 
-// 원점 라벨
-const oLabel = el('text', {
-  x: px(0) - 10, y: py(0) + 16,
-  'font-size': '12', 'font-weight': '400',
-  fill: '#475569',
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central'
-});
-oLabel.textContent = 'O';
-svg.appendChild(oLabel);
-
-// 포물선 y = -x² + 9 그리기 (-3.5 ~ 3.5)
-const steps = 200;
-const xStart = -3.5;
-const xEnd = 3.5;
-let pathD = '';
-for (let i = 0; i <= steps; i++) {
-  const xv = xStart + (xEnd - xStart) * i / steps;
-  const yv = -xv * xv + 9;
-  const pxv = px(xv);
-  const pyv = py(yv);
-  if (i === 0) pathD = `M ${pxv} ${pyv}`;
-  else pathD += ` L ${pxv} ${pyv}`;
+// y = -x² + 4 그래프
+let pts = '';
+for (let px = ox - 2 * scale; px <= ox + 2 * scale; px += 2) {
+  const mx = (px - ox) / scale;
+  const my = -mx * mx + 4;
+  const py = oy - my * scale;
+  if (py >= 60 && py <= 400) pts += px + ',' + py.toFixed(1) + ' ';
 }
-const curvePath = el('path', {
-  d: pathD,
-  fill: 'none',
-  stroke: '#3B82F6',
-  'stroke-width': '2'
-});
-svg.appendChild(curvePath);
+svg.appendChild(el('polyline', { points: pts.trim(), fill: 'none', stroke: '#3B82F6', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
 
-// 포물선 곡선 아래 x축 위 영역 채우기 (-3 ~ 3)
-let fillD = `M ${px(-3)} ${py(0)}`;
-const fillSteps = 200;
-for (let i = 0; i <= fillSteps; i++) {
-  const xv = -3 + 6 * i / fillSteps;
-  const yv = -xv * xv + 9;
-  fillD += ` L ${px(xv)} ${py(yv)}`;
-}
-fillD += ` L ${px(3)} ${py(0)} Z`;
-svg.appendChild(el('path', {
-  d: fillD,
-  fill: '#3B82F6',
-  'fill-opacity': '0.06',
-  stroke: 'none'
-}));
+// 꼭짓점 (0, 4)
+svg.appendChild(el('circle', { cx: ox, cy: oy - 4 * scale, r: '4', fill: '#3B82F6' }));
+addText(ox + 28, oy - 4 * scale, '(0, 4)', { 'font-size': '12', fill: '#1E293B', 'font-weight': '500' });
 
-// 최대 직사각형: x = ±√3, 높이 = 6
-const t = Math.sqrt(3); // ≈ 1.732
-const rectH = 6;
-const rectX1 = px(-t);
-const rectX2 = px(t);
-const rectY1 = py(rectH);
-const rectY2 = py(0);
+// 함수 라벨
+addText(ox + 2.5 * scale, oy - 2 * scale, 'y = -x² + 4', { 'font-size': '14', 'font-weight': '500', fill: '#3B82F6' });
+
+// 최대 넓이 직사각형: t = 2/√3
+const t = 2 / Math.sqrt(3);
+const rectH = -t * t + 4; // y = -t² + 4 = 4 - 4/3 = 8/3 ≈ 2.667
+// 픽셀 좌표
+const rx1 = ox - t * scale, rx2 = ox + t * scale;
+const ry1 = oy - rectH * scale, ry2 = oy;
 
 svg.appendChild(el('rect', {
-  x: rectX1,
-  y: rectY1,
-  width: rectX2 - rectX1,
-  height: rectY2 - rectY1,
-  fill: '#F59E0B',
-  'fill-opacity': '0.20',
-  stroke: '#F59E0B',
-  'stroke-width': '1.8'
+  x: rx1, y: ry1,
+  width: (rx2 - rx1), height: (ry2 - ry1),
+  fill: '#F59E0B', 'fill-opacity': '0.12', stroke: '#F59E0B', 'stroke-width': '1.5'
 }));
 
-// 직사각형 꼭짓점 점
-const rectPts = [
-  [t, 0], [-t, 0], [t, rectH], [-t, rectH]
-];
-for (const [xv, yv] of rectPts) {
-  svg.appendChild(el('circle', {
-    cx: px(xv), cy: py(yv), r: '4', fill: '#F59E0B'
-  }));
-}
+// 직사각형 꼭짓점 좌표 라벨
+const tRound = (2 / Math.sqrt(3)).toFixed(2); // ≈1.15 → 2/√3
+const hRound = (8 / 3).toFixed(2); // ≈2.67
 
-// x교점 (-3, 0), (3, 0)
-svg.appendChild(el('circle', { cx: px(-3), cy: py(0), r: '4', fill: '#1D4ED8' }));
-svg.appendChild(el('circle', { cx: px(3), cy: py(0), r: '4', fill: '#1D4ED8' }));
+// 네 꼭짓점
+addText(rx1 - 50, ry2 + 14, `(-2/√3, 0)`, { 'font-size': '11', fill: '#F59E0B', 'font-weight': '500' });
+addText(rx2 + 50, ry2 + 14, `(2/√3, 0)`, { 'font-size': '11', fill: '#F59E0B', 'font-weight': '500' });
+addText(rx1 - 60, ry1, `(-2/√3, 8/3)`, { 'font-size': '11', fill: '#F59E0B', 'font-weight': '500' });
+addText(rx2 + 60, ry1, `(2/√3, 8/3)`, { 'font-size': '11', fill: '#F59E0B', 'font-weight': '500' });
 
-// 꼭짓점 (0, 9)
-svg.appendChild(el('circle', { cx: px(0), cy: py(9), r: '4', fill: '#1D4ED8' }));
+// 가로 길이 라벨 (하단)
+const rectWidth = (4 / Math.sqrt(3)).toFixed(2);
+addText((rx1 + rx2) / 2, ry2 + 28, `가로: 4/√3 ≈ ${rectWidth}`, { 'font-size': '11', fill: '#475569' });
+// 세로 길이 라벨 (우측)
+addText(rx2 + 80, (ry1 + ry2) / 2, `세로: 8/3 ≈ ${hRound}`, { 'font-size': '11', fill: '#475569' });
 
-// 보조선: x = ±√3 (수직 점선)
-svg.appendChild(el('line', {
-  x1: px(t), y1: py(0), x2: px(t), y2: py(rectH),
-  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
-}));
-svg.appendChild(el('line', {
-  x1: px(-t), y1: py(0), x2: px(-t), y2: py(rectH),
-  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
-}));
-// 보조선: y = 6 (수평 점선)
-svg.appendChild(el('line', {
-  x1: px(0), y1: py(rectH), x2: px(t + 0.1), y2: py(rectH),
-  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
-}));
-
-// 라벨: x교점
-function ptLabel(x, y, text, dx, dy, anchor) {
-  const t = el('text', {
-    x: px(x) + dx, y: py(y) + dy,
-    'font-size': '12', 'font-weight': '400',
-    fill: '#1D4ED8',
-    'text-anchor': anchor,
-    'dominant-baseline': 'central'
-  });
-  t.textContent = text;
-  svg.appendChild(t);
-}
-ptLabel(-3, 0, '-3', -2, 18, 'middle');
-ptLabel(3, 0, '3', 2, 18, 'middle');
-ptLabel(0, 9, '(0, 9)', -10, -18, 'middle');
-
-// 직사각형 꼭짓점 x좌표 라벨
-const tLabelX1 = el('text', {
-  x: px(-t), y: py(0) + 18,
-  'font-size': '12', 'font-weight': '400',
-  fill: '#F59E0B',
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central'
+// 꼭짓점 점
+[[rx1, ry1], [rx2, ry1], [rx1, ry2], [rx2, ry2]].forEach(([x, y]) => {
+  svg.appendChild(el('circle', { cx: Math.round(x), cy: Math.round(y), r: '3.5', fill: '#F59E0B' }));
 });
-tLabelX1.textContent = '-√3';
-svg.appendChild(tLabelX1);
 
-const tLabelX2 = el('text', {
-  x: px(t), y: py(0) + 18,
-  'font-size': '12', 'font-weight': '400',
-  fill: '#F59E0B',
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central'
-});
-tLabelX2.textContent = '√3';
-svg.appendChild(tLabelX2);
-
-// y=6 라벨
-const yLabel6 = el('text', {
-  x: px(0) - 12, y: py(6),
-  'font-size': '12', 'font-weight': '400',
-  fill: '#F59E0B',
-  'text-anchor': 'end',
-  'dominant-baseline': 'central'
-});
-yLabel6.textContent = '6';
-svg.appendChild(yLabel6);
-
-// 함수식 라벨
-const funcLabel = el('text', {
-  x: px(3.2), y: py(8.2),
-  'font-size': '14', 'font-weight': '500',
-  fill: '#1D4ED8',
-  'text-anchor': 'start',
-  'dominant-baseline': 'central'
-});
-funcLabel.textContent = 'y = -x² + 9';
-svg.appendChild(funcLabel);
-
-// 정보 박스
-const infoX = 30;
-const infoY = 40;
-
-svg.appendChild(el('rect', {
-  x: infoX - 10, y: infoY - 18,
-  width: '220', height: '190',
-  rx: '8',
-  fill: '#F8FAFC',
-  stroke: '#CBD5E1',
-  'stroke-width': '1'
-}));
-
-function infoText(x, y, text, size, weight, color, anchor) {
-  const t = el('text', {
-    x, y,
-    'font-size': size, 'font-weight': weight,
-    fill: color,
-    'text-anchor': anchor || 'start',
-    'dominant-baseline': 'central'
-  });
-  t.textContent = text;
-  svg.appendChild(t);
-}
-
-infoText(infoX + 90, infoY, '최대 넓이 직사각형', '14', '500', '#1E293B', 'middle');
-svg.appendChild(el('line', {
-  x1: infoX - 5, y1: infoY + 14, x2: infoX + 205, y2: infoY + 14,
-  stroke: '#CBD5E1', 'stroke-width': '1'
-}));
-
-infoText(infoX, infoY + 34, 'S(t) = 2t(−t² + 9)', '12', '400', '#475569');
-infoText(infoX, infoY + 56, "S'(t) = −6t² + 18 = 0", '12', '400', '#475569');
-infoText(infoX, infoY + 78, 't = √3  (t > 0)', '12', '400', '#475569');
-
-svg.appendChild(el('line', {
-  x1: infoX - 5, y1: infoY + 94, x2: infoX + 205, y2: infoY + 94,
-  stroke: '#CBD5E1', 'stroke-width': '1'
-}));
-
-infoText(infoX, infoY + 114, '너비 = 2√3', '12', '400', '#1E293B');
-infoText(infoX, infoY + 136, '높이 = 6', '12', '400', '#1E293B');
-infoText(infoX, infoY + 158, '최대 넓이 = 12√3', '14', '500', '#F59E0B');
+// x축 교점 (-2, 0), (2, 0) 표시
+svg.appendChild(el('circle', { cx: ox - 2 * scale, cy: oy, r: '4', fill: '#3B82F6' }));
+svg.appendChild(el('circle', { cx: ox + 2 * scale, cy: oy, r: '4', fill: '#3B82F6' }));
+addText(ox - 2 * scale, oy + 16, '-2');
+addText(ox + 2 * scale, oy + 16, '2');
 </script>

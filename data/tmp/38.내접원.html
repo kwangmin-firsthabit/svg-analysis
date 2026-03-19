@@ -1,0 +1,274 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+<defs>
+</defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+// scale: 1 unit = 32px
+const scale = 32;
+
+// C = 직각 꼭짓점 (오른쪽 하단)
+// a=BC=5(수직), b=AC=12(수평), c=AB=13(빗변)
+// C를 원점 기준으로 배치
+const originX = 160;
+const originY = 340;
+
+const Cx = originX + 12 * scale; // C
+const Cy = originY;
+const Ax = originX;               // A (C에서 왼쪽으로 12)
+const Ay = originY;
+const Bx = originX + 12 * scale; // B (C에서 위로 5)
+const By = originY - 5 * scale;
+
+// 내접원 반지름 r=2, 내접원 중심
+// 직각삼각형에서 내접원 중심 = 직각꼭짓점으로부터 r씩 떨어진 지점
+const inR = 2 * scale;
+const incX = Cx - inR; // C에서 왼쪽 r, 위로 r
+const incY = Cy - inR;
+
+// 삼각형 채우기
+const tri = el('polygon', {
+  points: `${Ax},${Ay} ${Bx},${By} ${Cx},${Cy}`,
+  fill: '#3B82F6',
+  'fill-opacity': '0.12',
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5'
+});
+svg.appendChild(tri);
+
+// 내접원
+const incCircle = el('circle', {
+  cx: incX, cy: incY,
+  r: inR,
+  fill: 'none',
+  stroke: '#1D4ED8',
+  'stroke-width': '1.5'
+});
+svg.appendChild(incCircle);
+
+// 직각 표시 (C에서)
+const sqSize = 14;
+const sqPath = el('path', {
+  d: `M ${Cx - sqSize} ${Cy} L ${Cx - sqSize} ${Cy - sqSize} L ${Cx} ${Cy - sqSize}`,
+  fill: 'none',
+  stroke: '#1D4ED8',
+  'stroke-width': '1.2'
+});
+svg.appendChild(sqPath);
+
+// 접점 계산
+// D: AC변(AB=수평) 위 접점 → (incX, Cy) (수직선에서 Cy와 같은 y)
+const Dx = incX;
+const Dy = Cy;
+// E: BC변(수직) 위 접점 → (Cx, incY)
+const Ex = Cx;
+const Ey = incY;
+// F: AB(빗변) 위 접점
+// AB 방향 벡터
+const abDx = Bx - Ax;
+const abDy = By - Ay;
+const abLen = Math.sqrt(abDx * abDx + abDy * abDy);
+const abUx = abDx / abLen;
+const abUy = abDy / abLen;
+// 내접원 중심에서 AB에 수선의 발
+// t = dot(incCenter - A, AB_unit)
+const tF = (incX - Ax) * abUx + (incY - Ay) * abUy;
+const Fx = Math.round(Ax + tF * abUx);
+const Fy = Math.round(Ay + tF * abUy);
+
+// 내접원 중심에서 접점까지 보조선
+svg.appendChild(el('line', {
+  x1: incX, y1: incY, x2: Dx, y2: Dy,
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+svg.appendChild(el('line', {
+  x1: incX, y1: incY, x2: Ex, y2: Ey,
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+svg.appendChild(el('line', {
+  x1: incX, y1: incY, x2: Fx, y2: Fy,
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+
+// 접점 직각 표시 - D (AC 위)
+const sqD = 10;
+svg.appendChild(el('path', {
+  d: `M ${Dx} ${Dy - sqD} L ${Dx + sqD} ${Dy - sqD} L ${Dx + sqD} ${Dy}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1'
+}));
+
+// 접점 직각 표시 - E (BC 위)
+svg.appendChild(el('path', {
+  d: `M ${Ex - sqD} ${Ey} L ${Ex - sqD} ${Ey + sqD} L ${Ex} ${Ey + sqD}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1'
+}));
+
+// 꼭짓점 점
+function dot(x, y) {
+  return el('circle', { cx: x, cy: y, r: '4', fill: '#1E293B' });
+}
+svg.appendChild(dot(Ax, Ay));
+svg.appendChild(dot(Bx, By));
+svg.appendChild(dot(Cx, Cy));
+
+// 내접원 중심 점
+svg.appendChild(el('circle', { cx: incX, cy: incY, r: '3', fill: '#1D4ED8' }));
+
+// 접점 점
+function tangentDot(x, y) {
+  return el('circle', { cx: x, cy: y, r: '4', fill: '#F59E0B' });
+}
+svg.appendChild(tangentDot(Dx, Dy));
+svg.appendChild(tangentDot(Ex, Ey));
+svg.appendChild(tangentDot(Fx, Fy));
+
+// 꼭짓점 라벨
+function label(x, y, text, dx, dy) {
+  const t = el('text', {
+    x: x + dx, y: y + dy,
+    'font-size': '14', 'font-weight': '500',
+    fill: '#1E293B',
+    'text-anchor': 'middle',
+    'dominant-baseline': 'central'
+  });
+  t.textContent = text;
+  svg.appendChild(t);
+}
+label(Ax, Ay, 'A', -14, 0);
+label(Bx, By, 'B', 14, 0);
+label(Cx, Cy, 'C', 14, 14);
+
+// 내접원 중심 라벨 I
+const incLabel = el('text', {
+  x: incX - 14, y: incY,
+  'font-size': '12', 'font-weight': '400',
+  fill: '#1D4ED8',
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central'
+});
+incLabel.textContent = 'I';
+svg.appendChild(incLabel);
+
+// 접점 라벨
+function tangentLabel(x, y, text, dx, dy) {
+  const t = el('text', {
+    x: x + dx, y: y + dy,
+    'font-size': '14', 'font-weight': '500',
+    fill: '#F59E0B',
+    'text-anchor': 'middle',
+    'dominant-baseline': 'central'
+  });
+  t.textContent = text;
+  svg.appendChild(t);
+}
+tangentLabel(Dx, Dy, 'D', 0, 18);
+tangentLabel(Ex, Ey, 'E', 16, 0);
+tangentLabel(Fx, Fy, 'F', -16, -10);
+
+// 변 길이 라벨
+// AC = 12 (수평 아래)
+const lAC = el('text', {
+  x: Math.round((Ax + Cx) / 2), y: Ay + 22,
+  'font-size': '12', 'font-weight': '400',
+  fill: '#475569',
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central'
+});
+lAC.textContent = '12';
+svg.appendChild(lAC);
+
+// BC = 5 (수직 오른쪽)
+const lBC = el('text', {
+  x: Cx + 20, y: Math.round((By + Cy) / 2),
+  'font-size': '12', 'font-weight': '400',
+  fill: '#475569',
+  'text-anchor': 'start',
+  'dominant-baseline': 'central'
+});
+lBC.textContent = '5';
+svg.appendChild(lBC);
+
+// AB = 13 (빗변 중간)
+const lABx = Math.round((Ax + Bx) / 2) - 18;
+const lABy = Math.round((Ay + By) / 2);
+const lAB = el('text', {
+  x: lABx, y: lABy,
+  'font-size': '12', 'font-weight': '400',
+  fill: '#475569',
+  'text-anchor': 'middle',
+  'dominant-baseline': 'central'
+});
+lAB.textContent = '13';
+svg.appendChild(lAB);
+
+// 내접원 반지름 라벨 r=2
+const rLabelX = Math.round((incX + Dx) / 2) + 14;
+const rLabelY = Math.round((incY + Dy) / 2);
+const rLabel = el('text', {
+  x: rLabelX, y: rLabelY,
+  'font-size': '12', 'font-weight': '400',
+  fill: '#94A3B8',
+  'text-anchor': 'start',
+  'dominant-baseline': 'central'
+});
+rLabel.textContent = 'r = 2';
+svg.appendChild(rLabel);
+
+// 정보 텍스트 (우측)
+const infoX = 490;
+const infoY = 100;
+
+svg.appendChild(el('rect', {
+  x: infoX - 10, y: infoY - 20,
+  width: '172', height: '230',
+  rx: '8',
+  fill: '#F8FAFC',
+  stroke: '#CBD5E1',
+  'stroke-width': '1'
+}));
+
+function infoText(x, y, text, size, weight, color) {
+  const t = el('text', {
+    x, y,
+    'font-size': size, 'font-weight': weight,
+    fill: color,
+    'text-anchor': 'start',
+    'dominant-baseline': 'central'
+  });
+  t.textContent = text;
+  svg.appendChild(t);
+}
+
+infoText(infoX + 66, infoY, '직각삼각형 ABC', '14', '500', '#1E293B');
+svg.appendChild(el('line', {
+  x1: infoX - 5, y1: infoY + 14, x2: infoX + 157, y2: infoY + 14,
+  stroke: '#CBD5E1', 'stroke-width': '1'
+}));
+infoText(infoX, infoY + 34, '세 변: 5, 12, 13', '12', '400', '#475569');
+infoText(infoX, infoY + 56, '5² + 12² = 13²  ✓', '12', '400', '#475569');
+
+svg.appendChild(el('line', {
+  x1: infoX - 5, y1: infoY + 72, x2: infoX + 157, y2: infoY + 72,
+  stroke: '#CBD5E1', 'stroke-width': '1'
+}));
+
+infoText(infoX, infoY + 92, '내접원 반지름', '12', '400', '#475569');
+infoText(infoX, infoY + 112, 'r = (5+12−13)/2 = 2', '12', '400', '#1E293B');
+
+svg.appendChild(el('line', {
+  x1: infoX - 5, y1: infoY + 128, x2: infoX + 157, y2: infoY + 128,
+  stroke: '#CBD5E1', 'stroke-width': '1'
+}));
+
+infoText(infoX, infoY + 148, '접점', '12', '400', '#475569');
+infoText(infoX, infoY + 170, 'D: AC 변 위', '12', '400', '#475569');
+infoText(infoX, infoY + 190, 'E: BC 변 위', '12', '400', '#475569');
+infoText(infoX, infoY + 210, 'F: AB 빗변 위', '12', '400', '#475569');
+</script>

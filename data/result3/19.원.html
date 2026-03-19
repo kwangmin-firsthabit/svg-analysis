@@ -1,0 +1,64 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 원: 중심 O, 반지름 5 (시각적: r=170px)
+const cx = 340, cy = 205, r = 170;
+
+// 지름 (점선) - 수평
+svg.appendChild(el('line', {
+  x1: cx - r, y1: cy, x2: cx + r, y2: cy,
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '5 4'
+}));
+
+// 원
+svg.appendChild(el('circle', {
+  cx, cy, r,
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// 반지름 OA (중심에서 오른쪽 위 45° 방향)
+const angR = -Math.PI / 4;
+const ax = cx + r * Math.cos(angR);
+const ay = cy + r * Math.sin(angR);
+
+svg.appendChild(el('line', {
+  x1: cx, y1: cy, x2: ax.toFixed(1), y2: ay.toFixed(1),
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// 중심 O
+svg.appendChild(el('circle', { cx, cy, r: '3.5', fill: '#1D4ED8' }));
+addText(cx - 16, cy + 16, 'O');
+
+// 점 A
+svg.appendChild(el('circle', { cx: ax.toFixed(1), cy: ay.toFixed(1), r: '3.5', fill: '#1D4ED8' }));
+addText((ax + 18).toFixed(1), (ay - 14).toFixed(1), 'A');
+
+// r=5 라벨 (반지름 중점)
+const midX = (cx + ax) / 2;
+const midY = (cy + ay) / 2;
+addText((midX + 22).toFixed(1), (midY - 16).toFixed(1), 'r = 5', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 지름 끝점 라벨
+addText(cx - r - 16, cy, 'B', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+addText(cx + r + 16, cy, 'C', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 지름 라벨
+addText(cx, cy + 20, '지름', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
+</script>

@@ -1,0 +1,128 @@
+<svg id="vis" width="100%" viewBox="0 0 680 540" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 직육면체 ABCD-EFGH: 가로 4, 세로 3, 높이 6
+// 비스듬한 투영 (oblique)
+// scale
+const sc = 40;
+const w = 4 * sc, d = 3 * sc, h = 6 * sc;
+// 투영 각도: 45도, 깊이 비율 0.4
+const ang = Math.PI / 6;
+const dep = 0.45;
+
+function proj(x, y, z) {
+  return {
+    px: x + z * Math.cos(ang) * dep,
+    py: y - z * Math.sin(ang) * dep
+  };
+}
+
+// 기준점 (앞면 하단 왼쪽 = A)
+const baseX = 160, baseY = 430;
+
+// 8개 꼭짓점 3D 좌표: x=가로, y=세로(높이), z=깊이
+// 앞 하단: A(0,0,0), B(w,0,0)
+// 앞 상단: E(0,h,0), F(w,h,0)
+// 뒤 하단: D(0,0,d), C(w,0,d)
+// 뒤 상단: H(0,h,d), G(w,h,d)
+// (문제에서 ABCD는 아랫면, EFGH는 윗면)
+// A-B-C-D 아랫면, E-F-G-H 윗면
+// A 아래 앞 왼, B 아래 앞 오른, C 아래 뒤 오른, D 아래 뒤 왼
+// E 위 앞 왼, F 위 앞 오른, G 위 뒤 오른, H 위 뒤 왼
+
+const pts3D = {
+  A: [0, 0, 0], B: [w, 0, 0], C: [w, 0, d], D: [0, 0, d],
+  E: [0, h, 0], F: [w, h, 0], G: [w, h, d], H: [0, h, d]
+};
+
+const pts = {};
+for (const [name, [x, y, z]] of Object.entries(pts3D)) {
+  const p = proj(baseX + x, baseY - y, z);
+  pts[name] = p;
+}
+
+function line(p1, p2, dashed, opacity) {
+  const attrs = {
+    x1: p1.px, y1: p1.py, x2: p2.px, y2: p2.py,
+    stroke: '#1D4ED8', 'stroke-width': dashed ? '1' : '1.5'
+  };
+  if (dashed) { attrs['stroke-dasharray'] = '5 4'; attrs['opacity'] = opacity || '0.5'; }
+  svg.appendChild(el('line', attrs));
+}
+
+function face(verts, fillOp) {
+  const pts_str = verts.map(v => `${pts[v].px},${pts[v].py}`).join(' ');
+  svg.appendChild(el('polygon', {
+    points: pts_str,
+    fill: '#EFF6FF', 'fill-opacity': fillOp || '0.15', stroke: 'none'
+  }));
+}
+
+// 면 그리기 (뒤부터)
+face(['D', 'C', 'G', 'H'], '0.08'); // 뒤 면 (가려짐)
+face(['A', 'B', 'F', 'E'], '0.15'); // 앞 면
+face(['B', 'C', 'G', 'F'], '0.12'); // 오른쪽 면
+face(['A', 'B', 'C', 'D'], '0.10'); // 아래 면
+face(['E', 'F', 'G', 'H'], '0.18'); // 위 면
+
+// 보이지 않는 모서리 (점선)
+line(pts.D, pts.A, true);
+line(pts.D, pts.C, true);
+line(pts.D, pts.H, true);
+
+// 보이는 모서리 (실선)
+// 아래 면
+line(pts.A, pts.B); line(pts.B, pts.C); line(pts.C, pts.G);
+// 위 면
+line(pts.E, pts.F); line(pts.F, pts.G); line(pts.G, pts.H); line(pts.H, pts.E);
+// 수직 모서리
+line(pts.A, pts.E); line(pts.B, pts.F); line(pts.C, pts.G);
+// 뒤 위 모서리
+
+// 밑면 대각선 (점선): A-C와 B-D
+svg.appendChild(el('line', {
+  x1: pts.A.px, y1: pts.A.py, x2: pts.C.px, y2: pts.C.py,
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+svg.appendChild(el('line', {
+  x1: pts.B.px, y1: pts.B.py, x2: pts.D.px, y2: pts.D.py,
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+
+// 꼭짓점 라벨
+const labels = {
+  A: [-14, 12], B: [14, 12], C: [14, 12], D: [-14, 12],
+  E: [-14, -12], F: [14, -12], G: [14, -12], H: [-14, -12]
+};
+for (const [name, [lx, ly]] of Object.entries(labels)) {
+  addText(pts[name].px + lx, pts[name].py + ly, name, { 'font-size': '13', fill: '#1E293B' });
+}
+
+// 치수 라벨
+// 가로 4: AB 아래
+const abMid = { x: (pts.A.px + pts.B.px) / 2, y: (pts.A.py + pts.B.py) / 2 };
+addText(abMid.x, abMid.y + 22, '4', { 'font-size': '13', 'font-weight': '400', fill: '#475569' });
+
+// 세로 3: BC 오른쪽 아래 (깊이 방향)
+const bcMid = { x: (pts.B.px + pts.C.px) / 2, y: (pts.B.py + pts.C.py) / 2 };
+addText(bcMid.x + 18, bcMid.y + 12, '3', { 'font-size': '13', 'font-weight': '400', fill: '#475569' });
+
+// 높이 6: AE 왼쪽
+const aeMid = { x: (pts.A.px + pts.E.px) / 2, y: (pts.A.py + pts.E.py) / 2 };
+addText(aeMid.x - 18, aeMid.y, '6', { 'font-size': '13', 'font-weight': '400', fill: '#475569' });
+</script>

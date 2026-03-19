@@ -1,0 +1,263 @@
+
+<div style="display:flex; flex-direction:column; align-items:center; padding: 2rem 0 1.5rem;">
+  <canvas id="c" width="400" height="400" style="max-width:400px; width:100%;"></canvas>
+  <button id="btn" onclick="restart()" style="margin-top:1.2rem; padding: 8px 28px; font-size:14px; cursor:pointer;">다시 보기</button>
+  <p style="margin-top:0.8rem; font-size:13px; color:var(--color-text-secondary); text-align:center;">구(球)는 축구공과 같은 모양이에요</p>
+</div>
+
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const W = 400, H = 400, CX = 200, CY = 200, R = 130;
+
+let startTime = null;
+let raf = null;
+const PHASE1 = 1200;
+const PHASE2 = 2800;
+const TOTAL = PHASE2 + 400;
+
+function easeInOut(t) {
+  return t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+}
+
+function drawSphere(alpha) {
+  ctx.clearRect(0, 0, W, H);
+
+  // Sphere base
+  const grad = ctx.createRadialGradient(CX - R*0.3, CY - R*0.3, R*0.05, CX, CY, R);
+  grad.addColorStop(0, `rgba(255,255,255,${alpha})`);
+  grad.addColorStop(0.35, `rgba(200,210,230,${alpha})`);
+  grad.addColorStop(0.8, `rgba(130,150,180,${alpha})`);
+  grad.addColorStop(1, `rgba(60,80,110,${alpha})`);
+
+  ctx.beginPath();
+  ctx.arc(CX, CY, R, 0, Math.PI * 2);
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Specular highlight
+  ctx.beginPath();
+  ctx.ellipse(CX - R*0.28, CY - R*0.28, R*0.18, R*0.12, -Math.PI/4, 0, Math.PI*2);
+  ctx.fillStyle = `rgba(255,255,255,${alpha * 0.7})`;
+  ctx.fill();
+}
+
+// Soccer ball pentagon/hexagon pattern via geodesic seams
+function getSoccerSeams() {
+  // Classic truncated icosahedron projection seams
+  // We project 3D seams onto 2D circle
+  const seams = [];
+
+  // Top pentagon
+  const topPent = [];
+  for(let i=0;i<5;i++){
+    const angle = (i/5)*Math.PI*2 - Math.PI/2;
+    const r = R * 0.38;
+    topPent.push([CX + Math.cos(angle)*r, CY - R*0.55 + Math.sin(angle)*r*0.45]);
+  }
+  seams.push({type:'poly', pts: topPent, closed: true});
+
+  // Bottom pentagon
+  const botPent = [];
+  for(let i=0;i<5;i++){
+    const angle = (i/5)*Math.PI*2 + Math.PI/2;
+    const r = R * 0.38;
+    botPent.push([CX + Math.cos(angle)*r, CY + R*0.55 + Math.sin(angle)*r*0.45]);
+  }
+  seams.push({type:'poly', pts: botPent, closed: true});
+
+  // Middle band - 5 hexagon outlines approximated
+  const midHex = [];
+  for(let i=0;i<5;i++){
+    const baseAngle = (i/5)*Math.PI*2;
+    const pts = [];
+    for(let j=0;j<6;j++){
+      const a = baseAngle + (j/6)*Math.PI*2;
+      const rr = R * 0.32;
+      const x = CX + Math.cos(a) * rr * 1.05;
+      const y = CY + Math.sin(a) * rr * 0.5;
+      pts.push([x, y]);
+    }
+    midHex.push({type:'poly', pts, closed: true});
+  }
+  seams.push(...midHex);
+
+  // Connecting lines from top pentagon to middle
+  for(let i=0;i<5;i++){
+    const a1 = (i/5)*Math.PI*2 - Math.PI/2;
+    const a2 = ((i+0.5)/5)*Math.PI*2;
+    const x1 = topPent[i][0], y1 = topPent[i][1];
+    const x2 = CX + Math.cos(a2)*R*0.52*0.95;
+    const y2 = CY + Math.sin(a2)*R*0.52*0.35;
+    seams.push({type:'line', x1, y1, x2, y2});
+  }
+
+  return seams;
+}
+
+function drawSoccerBall(progress) {
+  ctx.clearRect(0, 0, W, H);
+
+  // Ball base - white/light
+  const grad = ctx.createRadialGradient(CX - R*0.3, CY - R*0.3, R*0.05, CX, CY, R);
+  grad.addColorStop(0, '#ffffff');
+  grad.addColorStop(0.5, '#e8e8e8');
+  grad.addColorStop(0.85, '#c0c0c8');
+  grad.addColorStop(1, '#8888a0');
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(CX, CY, R, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Pentagon patches (black) with fade-in
+  const pentagonData = [
+    // top center
+    { cx: CX, cy: CY - R*0.72, rx: R*0.26, ry: R*0.2, rot: 0 },
+    // bottom center
+    { cx: CX, cy: CY + R*0.72, rx: R*0.26, ry: R*0.2, rot: Math.PI },
+    // middle 5 patches
+    ...Array.from({length:5}, (_,i) => {
+      const a = (i/5)*Math.PI*2 - Math.PI*0.5;
+      return { cx: CX + Math.cos(a)*R*0.56, cy: CY + Math.sin(a)*R*0.42, rx: R*0.24, ry: R*0.175, rot: a };
+    })
+  ];
+
+  ctx.globalAlpha = progress;
+  pentagonData.forEach(p => {
+    ctx.save();
+    ctx.translate(p.cx, p.cy);
+    ctx.rotate(p.rot);
+    ctx.beginPath();
+    // Draw pentagon
+    for(let i=0;i<5;i++){
+      const a = (i/5)*Math.PI*2 - Math.PI/2;
+      const x = Math.cos(a)*p.rx;
+      const y = Math.sin(a)*p.ry;
+      i===0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fill();
+    ctx.restore();
+  });
+
+  // Seam lines
+  ctx.globalAlpha = progress * 0.5;
+  ctx.strokeStyle = '#444466';
+  ctx.lineWidth = 1.2;
+
+  // Draw hex grid seams connecting pentagons
+  for(let i=0;i<5;i++){
+    const a1 = (i/5)*Math.PI*2 - Math.PI/2;
+    const a2 = ((i+1)/5)*Math.PI*2 - Math.PI/2;
+    const m = (a1+a2)/2;
+    const p1x = CX + Math.cos(a1)*R*0.56, p1y = CY + Math.sin(a1)*R*0.42;
+    const p2x = CX + Math.cos(a2)*R*0.56, p2y = CY + Math.sin(a2)*R*0.42;
+    const mx = CX + Math.cos(m)*R*0.62, my = CY + Math.sin(m)*R*0.5;
+    ctx.beginPath();
+    ctx.moveTo(p1x, p1y);
+    ctx.quadraticCurveTo(mx, my, p2x, p2y);
+    ctx.stroke();
+    // to top
+    const tx = CX + Math.cos(a1)*R*0.26*0.8, ty = CY - R*0.72 + Math.sin(a1)*R*0.1;
+    ctx.beginPath();
+    ctx.moveTo(p1x, p1y);
+    ctx.lineTo(tx, ty);
+    ctx.stroke();
+    // to bottom  
+    const bx = CX + Math.cos(a1)*R*0.26*0.8, by = CY + R*0.72 - Math.sin(a1)*R*0.1;
+    ctx.beginPath();
+    ctx.moveTo(p1x, p1y);
+    ctx.lineTo(bx, by);
+    ctx.stroke();
+  }
+
+  ctx.globalAlpha = 1;
+  ctx.restore();
+
+  // Clip outline stroke
+  ctx.beginPath();
+  ctx.arc(CX, CY, R, 0, Math.PI * 2);
+  ctx.strokeStyle = '#334466';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Specular highlight
+  ctx.beginPath();
+  ctx.ellipse(CX - R*0.28, CY - R*0.28, R*0.2, R*0.13, -Math.PI/4, 0, Math.PI*2);
+  ctx.fillStyle = `rgba(255,255,255,${0.55 * (1 - progress * 0.4)})`;
+  ctx.fill();
+}
+
+// Label display
+function drawLabel(text, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.font = '500 18px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#3a3a5c';
+  ctx.fillText(text, CX, CY + R + 36);
+  ctx.restore();
+}
+
+function animate(ts) {
+  if(!startTime) startTime = ts;
+  const elapsed = ts - startTime;
+
+  if(elapsed < PHASE1) {
+    // Phase 1: pure sphere
+    const fadeIn = Math.min(elapsed / 600, 1);
+    drawSphere(fadeIn);
+    const labelAlpha = elapsed > 300 ? Math.min((elapsed-300)/500, 1) : 0;
+    drawLabel('구 (球)', labelAlpha);
+  } else if(elapsed < PHASE2) {
+    // Phase 2: transition sphere → soccer ball
+    const t = (elapsed - PHASE1) / (PHASE2 - PHASE1);
+    const p = easeInOut(t);
+
+    // Fade sphere out, soccer ball in
+    drawSphere(1 - p * 0.9);
+    drawSoccerBall(p);
+
+    // Label transition
+    ctx.save();
+    ctx.font = '500 18px sans-serif';
+    ctx.textAlign = 'center';
+    // Old label fades
+    ctx.globalAlpha = Math.max(0, 1 - p * 2);
+    ctx.fillStyle = '#3a3a5c';
+    ctx.fillText('구 (球)', CX, CY + R + 36);
+    // New label appears
+    ctx.globalAlpha = Math.max(0, p * 2 - 1);
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillText('구 = 축구공의 모양', CX, CY + R + 36);
+    ctx.restore();
+  } else {
+    // Phase 3: final soccer ball
+    const holdT = Math.min((elapsed - PHASE2) / 300, 1);
+    drawSoccerBall(1);
+    ctx.save();
+    ctx.font = '500 18px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.globalAlpha = holdT;
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillText('구 = 축구공의 모양', CX, CY + R + 36);
+    ctx.restore();
+  }
+
+  if(elapsed < TOTAL) {
+    raf = requestAnimationFrame(animate);
+  }
+}
+
+function restart() {
+  if(raf) cancelAnimationFrame(raf);
+  startTime = null;
+  raf = requestAnimationFrame(animate);
+}
+
+raf = requestAnimationFrame(animate);
+</script>

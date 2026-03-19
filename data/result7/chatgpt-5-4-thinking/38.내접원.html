@@ -1,0 +1,207 @@
+<svg id="vis" width="100%" viewBox="0 0 700 460" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const C = {
+    tri: '#0f172a',
+    circle: '#2563eb',
+    radius: '#dc2626',
+    guide: '#94a3b8',
+    fillTri: '#f8fafc',
+    fillCircle: '#dbeafe',
+    text: '#0f172a',
+    sub: '#64748b',
+    right: '#16a34a',
+    tangent: '#7c3aed',
+  };
+
+  function el(tag, attrs = {}) {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    return node;
+  }
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      fill: C.text,
+      'font-size': 14,
+      'font-weight': 500,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      ...attrs,
+    });
+    t.textContent = str;
+    return add(t);
+  }
+
+  // 6-8-10 right triangle scaled by 40
+  const A = { x: 120, y: 360 }; // right angle
+  const B = { x: 440, y: 360 }; // horizontal leg = 8
+  const Cc = { x: 120, y: 120 }; // vertical leg = 6
+
+  // incircle radius = 2 -> scaled radius = 80
+  const r = 80;
+  const I = { x: A.x + r, y: A.y - r }; // incenter for right triangle
+
+  // tangent points
+  const T1 = { x: 200, y: 360 }; // on AB
+  const T2 = { x: 120, y: 280 }; // on AC
+  const T3 = { x: 248, y: 264 }; // on BC from geometry
+
+  // background
+  add(el('rect', { x: 0, y: 0, width: 700, height: 460, fill: 'white' }));
+
+  // triangle fill
+  add(
+    el('polygon', {
+      points: `${A.x},${A.y} ${B.x},${B.y} ${Cc.x},${Cc.y}`,
+      fill: C.fillTri,
+      stroke: C.tri,
+      'stroke-width': 2.5,
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // incircle
+  add(
+    el('circle', {
+      cx: I.x,
+      cy: I.y,
+      r: r,
+      fill: C.fillCircle,
+      stroke: C.circle,
+      'stroke-width': 2.5,
+    })
+  );
+
+  // radii to tangent points
+  for (const P of [T1, T2, T3]) {
+    add(
+      el('line', {
+        x1: I.x,
+        y1: I.y,
+        x2: P.x,
+        y2: P.y,
+        stroke: C.radius,
+        'stroke-width': 2,
+      })
+    );
+  }
+
+  // tangent points
+  for (const P of [T1, T2, T3]) {
+    add(el('circle', { cx: P.x, cy: P.y, r: 4.5, fill: C.tangent }));
+  }
+
+  // incenter
+  add(el('circle', { cx: I.x, cy: I.y, r: 4.8, fill: C.circle }));
+
+  // right angle mark
+  add(
+    el('path', {
+      d: `M ${A.x + 24} ${A.y} L ${A.x + 24} ${A.y - 24} L ${A.x} ${A.y - 24}`,
+      fill: 'none',
+      stroke: C.right,
+      'stroke-width': 2,
+    })
+  );
+
+  // vertices
+  for (const P of [A, B, Cc]) {
+    add(el('circle', { cx: P.x, cy: P.y, r: 4, fill: C.tri }));
+  }
+
+  // labels for vertices
+  text(A.x - 16, A.y + 18, 'A', { 'font-size': 13 });
+  text(B.x + 16, B.y + 2, 'B', { 'font-size': 13 });
+  text(Cc.x - 16, Cc.y - 6, 'C', { 'font-size': 13 });
+  text(I.x + 16, I.y - 12, 'I', { fill: C.circle, 'text-anchor': 'start' });
+
+  // side length labels
+  text((A.x + B.x) / 2, A.y + 24, '8', { 'font-size': 16, fill: C.sub });
+  text(A.x - 24, (A.y + Cc.y) / 2, '6', { 'font-size': 16, fill: C.sub });
+  text((B.x + Cc.x) / 2 + 20, (B.y + Cc.y) / 2 - 8, '10', { 'font-size': 16, fill: C.sub });
+
+  // radius label
+  text((I.x + T1.x) / 2, I.y + 18, '2', {
+    'font-size': 16,
+    fill: C.radius,
+  });
+
+  // tangent labels
+  text(T1.x, T1.y + 18, 'T₁', { 'font-size': 12, fill: C.tangent });
+  text(T2.x - 18, T2.y, 'T₂', { 'font-size': 12, fill: C.tangent, 'text-anchor': 'end' });
+  text(T3.x + 16, T3.y - 10, 'T₃', { 'font-size': 12, fill: C.tangent, 'text-anchor': 'start' });
+
+  // title
+  text(510, 80, '6, 8, 10 직각삼각형의 내접원', {
+    'font-size': 20,
+    'font-weight': 700,
+  });
+  text(510, 110, '모든 변과 접하는 반지름 2의 원', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+
+  // explanation notes
+  text(515, 170, '중심 I는 각의 이등분선의 교점', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(515, 198, '세 반지름은 각 변에 수직', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+
+  // perpendicular markers at tangent points
+  function rightMarkAtBase(x, y, dx, dy, size = 10) {
+    add(
+      el('path', {
+        d: `M ${x} ${y} l ${dx * size} ${dy * size} l ${-dy * size} ${dx * size} l ${-dx * size} ${-dy * size}`,
+        fill: 'none',
+        stroke: C.right,
+        'stroke-width': 1.7,
+      })
+    );
+  }
+
+  // on AB
+  rightMarkAtBase(T1.x, T1.y, 1, 0, 10);
+  // on AC
+  rightMarkAtBase(T2.x, T2.y, 0, -1, 10);
+  // on BC (use edge direction 4,-3 normalized pattern)
+  const ux = 4 / 5,
+    uy = -3 / 5;
+  rightMarkAtBase(T3.x, T3.y, ux, uy, 10);
+</script>

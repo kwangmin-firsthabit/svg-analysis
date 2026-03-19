@@ -1,0 +1,112 @@
+<svg id="vis" width="100%" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 직각삼각형: 직각을 기준으로 배치
+// 변의 길이 3, 4, 5 (피타고라스 3-4-5)
+// scale: 1단위 = 50px
+const s = 50;
+
+// 직각삼각형 꼭짓점
+// C(직각) = 중앙 기준
+const cx = 340, cy = 340;
+// A = C에서 위로 3*s (세로 변 3)
+const ax = cx, ay = cy - 3 * s; // (340, 190)
+// B = C에서 오른쪽으로 4*s (가로 변 4)
+const bx = cx + 4 * s, by = cy; // (540, 340)
+
+// 직각삼각형 그리기
+svg.appendChild(el('polygon', {
+  points: `${ax},${ay} ${bx},${by} ${cx},${cy}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 직각 기호 (C에서)
+const sqS = 10;
+svg.appendChild(el('path', {
+  d: `M ${cx + sqS},${cy} L ${cx + sqS},${cy - sqS} L ${cx},${cy - sqS}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.8'
+}));
+
+// 꼭짓점 라벨
+addText(ax - 18, ay, 'A', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(bx + 18, by + 14, 'B', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(cx - 18, cy + 14, 'C', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+
+// --- 변 AC를 한 변으로 하는 정사각형 (왼쪽, 변의 길이 3) ---
+// AC는 수직선 (x=cx, y: ay~cy)
+// 정사각형은 왼쪽으로 펼침
+const sq3 = 3 * s;
+// 꼭짓점: C, A, A-왼쪽, C-왼쪽
+const s3x1 = cx, s3y1 = cy;           // C
+const s3x2 = ax, s3y2 = ay;           // A
+const s3x3 = ax - sq3, s3y3 = ay;     // A에서 왼쪽
+const s3x4 = cx - sq3, s3y4 = cy;     // C에서 왼쪽
+svg.appendChild(el('polygon', {
+  points: `${s3x1},${s3y1} ${s3x2},${s3y2} ${s3x3},${s3y3} ${s3x4},${s3y4}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+// 넓이 라벨 (중심에)
+const s3cx = (s3x1 + s3x2 + s3x3 + s3x4) / 4;
+const s3cy = (s3y1 + s3y2 + s3y3 + s3y4) / 4;
+addText(s3cx, s3cy, '9', { 'font-size': '18', 'font-weight': '500', fill: '#1D4ED8' });
+
+// --- 변 BC를 한 변으로 하는 정사각형 (아래, 변의 길이 4) ---
+// BC는 수평선 (y=cy, x: cx~bx)
+// 정사각형은 아래로 펼침
+const sq4 = 4 * s;
+const s4x1 = cx, s4y1 = cy;           // C
+const s4x2 = bx, s4y2 = by;           // B
+const s4x3 = bx, s4y3 = by + sq4;     // B에서 아래
+const s4x4 = cx, s4y4 = cy + sq4;     // C에서 아래
+svg.appendChild(el('polygon', {
+  points: `${s4x1},${s4y1} ${s4x2},${s4y2} ${s4x3},${s4y3} ${s4x4},${s4y4}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+const s4cx = (s4x1 + s4x2 + s4x3 + s4x4) / 4;
+const s4cy = (s4y1 + s4y2 + s4y3 + s4y4) / 4;
+addText(s4cx, s4cy, '16', { 'font-size': '18', 'font-weight': '500', fill: '#1D4ED8' });
+
+// --- 변 AB를 한 변으로 하는 정사각형 (빗변, 변의 길이 5) ---
+// AB 방향 벡터
+const abx = bx - ax, aby = by - ay; // (200, 150)
+const abLen = Math.sqrt(abx * abx + aby * aby); // 250
+// 단위 법선 벡터 (바깥쪽)
+const nx = -aby / abLen, ny = abx / abLen; // 바깥방향 (왼쪽 위)
+// 정사각형 꼭짓점: A, B, B+5*n, A+5*n
+const sq5 = 5 * s;
+const s5x1 = ax, s5y1 = ay;
+const s5x2 = bx, s5y2 = by;
+const s5x3 = bx + nx * sq5, s5y3 = by + ny * sq5;
+const s5x4 = ax + nx * sq5, s5y4 = ay + ny * sq5;
+svg.appendChild(el('polygon', {
+  points: `${s5x1},${s5y1} ${s5x2},${s5y2} ${Math.round(s5x3)},${Math.round(s5y3)} ${Math.round(s5x4)},${Math.round(s5y4)}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+const s5cx = (s5x1 + s5x2 + s5x3 + s5x4) / 4;
+const s5cy = (s5y1 + s5y2 + s5y3 + s5y4) / 4;
+addText(Math.round(s5cx), Math.round(s5cy), '25', { 'font-size': '18', 'font-weight': '500', fill: '#1D4ED8' });
+
+// 변 길이 라벨
+// AC 변 (왼쪽)
+addText(cx - 10, (ay + cy) / 2, '3', { 'font-size': '12', 'font-weight': '400', fill: '#475569', 'text-anchor': 'end' });
+// BC 변 (아래)
+addText((cx + bx) / 2, cy + 14, '4', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+// AB 빗변 (중간)
+const abmx = (ax + bx) / 2 + 14, abmy = (ay + by) / 2;
+addText(abmx + 10, abmy, '5', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

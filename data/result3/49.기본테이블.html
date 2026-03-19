@@ -1,0 +1,101 @@
+<svg id="vis" width="100%" viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '13', 'font-weight': '400', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 테이블 데이터
+const students = ['A', 'B', 'C', 'D', 'E'];
+const subjects = ['국어', '수학', '영어', '과학'];
+const scores = [
+  [85, 92, 78, 88, 95],
+  [90, 76, 84, 91, 82],
+  [88, 95, 70, 83, 79],
+  [76, 80, 92, 74, 86],
+];
+const avgs = [87.6, 84.6, 83.0, 81.6];
+
+// 레이아웃
+const tableX = 60;
+const tableY = 40;
+const colW = [80, 80, 80, 80, 80, 80]; // 이름열 + 학생5명 + 평균
+const rowH = 36;
+const headerW = 80;
+const cols = ['학생', ...students, '평균'];
+const totalCols = cols.length; // 7
+const totalRows = subjects.length + 2; // 헤더 + 4과목 + 평균행 = but 평균행 포함하면 6
+// 실제: 헤더(1) + 과목4 + 평균(1) = 6행
+
+function drawCell(x, y, w, h, content, isHeader, isAvgRow, isAvgCol) {
+  let fillColor = 'none';
+  if (isHeader) fillColor = '#EFF6FF';
+  else if (isAvgRow) fillColor = '#F1F5F9';
+  else if (isAvgCol) fillColor = '#F8FAFC';
+
+  svg.appendChild(el('rect', { x, y, width: w, height: h, fill: fillColor, stroke: '#94A3B8', 'stroke-width': '0.5' }));
+
+  const weight = (isHeader || isAvgRow) ? '500' : '400';
+  const color = (isHeader) ? '#1D4ED8' : (isAvgRow || isAvgCol) ? '#475569' : '#1E293B';
+  txt(x + w / 2, y + h / 2, content, { 'font-size': '13', 'font-weight': weight, fill: color });
+}
+
+// 열 너비 배열 (과목명: 80, 학생5: 각 72, 평균: 78)
+const cw = [90, 72, 72, 72, 72, 72, 78];
+let totalW = cw.reduce((a, b) => a + b, 0);
+let startX = (680 - totalW) / 2;
+
+// 헤더 행
+const headerLabels = ['과목', ...students, '평균'];
+let xPos = startX;
+headerLabels.forEach((label, i) => {
+  drawCell(xPos, tableY, cw[i], rowH, label, true, false, i === headerLabels.length - 1);
+  xPos += cw[i];
+});
+
+// 과목별 행
+subjects.forEach((subj, si) => {
+  let xp = startX;
+  const rowY = tableY + rowH * (si + 1);
+  // 과목명
+  drawCell(xp, rowY, cw[0], rowH, subj, false, false, false);
+  xp += cw[0];
+  // 학생 점수
+  students.forEach((_, idx) => {
+    drawCell(xp, rowY, cw[idx + 1], rowH, String(scores[si][idx]), false, false, false);
+    xp += cw[idx + 1];
+  });
+  // 평균
+  drawCell(xp, rowY, cw[6], rowH, avgs[si].toFixed(1), false, false, true);
+});
+
+// 평균 행 (학생별 평균)
+const avgRowY = tableY + rowH * (subjects.length + 1);
+const studentAvgs = students.map((_, idx) => {
+  const total = scores.reduce((sum, row) => sum + row[idx], 0);
+  return (total / subjects.length).toFixed(1);
+});
+
+let xp = startX;
+drawCell(xp, avgRowY, cw[0], rowH, '평균', false, true, false);
+xp += cw[0];
+students.forEach((_, idx) => {
+  drawCell(xp, avgRowY, cw[idx + 1], rowH, studentAvgs[idx], false, true, false);
+  xp += cw[idx + 1];
+});
+// 전체 평균
+const total = scores.reduce((sum, row) => sum + row.reduce((s, v) => s + v, 0), 0);
+const overallAvg = (total / (students.length * subjects.length)).toFixed(1);
+drawCell(xp, avgRowY, cw[6], rowH, overallAvg, false, true, true);
+</script>

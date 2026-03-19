@@ -1,0 +1,162 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+<div
+  id="math-display"
+  style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 15px"
+>
+  <div id="eq1"></div>
+  <div id="eq2"></div>
+</div>
+
+<svg id="vis" width="100%" viewBox="0 0 680 540" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  (function () {
+    const svg = document.getElementById('vis');
+    const ns = 'http://www.w3.org/2000/svg';
+
+    // 1. 계산 및 수식 렌더링
+    // 중심각 x = (반지름/모선) * 360 = (4/10) * 360 = 144도
+    katex.render('\\text{부채꼴의 호의 길이} = 2 \\pi \\times 4 = 8\\pi', document.getElementById('eq1'));
+    katex.render(
+      '\\text{부채꼴의 중심각} = \\frac{4}{10} \\times 360^\\circ = 144^\\circ',
+      document.getElementById('eq2')
+    );
+
+    const scale = 22; // 1단위 당 22px
+    const r = 4 * scale;
+    const l = 10 * scale;
+    const angleDeg = 144;
+    const angleRad = (angleDeg * Math.PI) / 180;
+
+    const cx = 340,
+      cy = 50; // 부채꼴의 꼭짓점 (원뿔의顶点)
+
+    function el(tag, attrs) {
+      const e = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      return e;
+    }
+
+    function addText(x, y, content, attrs = {}) {
+      const t = el('text', {
+        x,
+        y,
+        'text-anchor': 'middle',
+        'dominant-baseline': 'central',
+        'font-size': '14',
+        'font-weight': '500',
+        fill: '#212529',
+        ...attrs,
+      });
+      t.textContent = content;
+      svg.appendChild(t);
+    }
+
+    // 2. 부채꼴 (옆면) 그리기
+    // 부채꼴이 아래를 향하도록 배치 (중앙 기준 좌우 대칭)
+    const startAng = ((90 - angleDeg / 2) * Math.PI) / 180;
+    const endAng = ((90 + angleDeg / 2) * Math.PI) / 180;
+
+    const x1 = cx + l * Math.cos(startAng);
+    const y1 = cy + l * Math.sin(startAng);
+    const x2 = cx + l * Math.cos(endAng);
+    const y2 = cy + l * Math.sin(endAng);
+
+    const sectorPath = `M ${cx} ${cy} L ${x1} ${y1} A ${l} ${l} 0 0 1 ${x2} ${y2} Z`;
+    svg.appendChild(
+      el('path', {
+        d: sectorPath,
+        fill: 'rgba(0, 123, 255, 0.1)',
+        stroke: '#007bff',
+        'stroke-width': '1.5',
+      })
+    );
+
+    // 3. 밑면 (원) 그리기
+    // 부채꼴 호의 중앙 아래에 배치
+    const circleCenterX = cx;
+    const circleCenterY = cy + l + r;
+    svg.appendChild(
+      el('circle', {
+        cx: circleCenterX,
+        cy: circleCenterY,
+        r: r,
+        fill: 'rgba(255, 71, 87, 0.1)',
+        stroke: '#ff4757',
+        'stroke-width': '1.5',
+      })
+    );
+
+    // 4. 보조선 및 라벨
+    // 모선의 길이 (부채꼴 반지름)
+    svg.appendChild(
+      el('line', {
+        x1: cx,
+        y1: cy,
+        x2: x1,
+        y2: y1,
+        stroke: '#007bff',
+        'stroke-width': '1',
+        'stroke-dasharray': '4 3',
+      })
+    );
+    addText((cx + x1) / 2 - 25, (cy + y1) / 2, '모선 10', { fill: '#007bff', 'font-size': '12' });
+
+    // 중심각 표시
+    const arcR = 40;
+    const ax1 = cx + arcR * Math.cos(startAng);
+    const ay1 = cy + arcR * Math.sin(startAng);
+    const ax2 = cx + arcR * Math.cos(endAng);
+    const ay2 = cy + arcR * Math.sin(endAng);
+    svg.appendChild(
+      el('path', {
+        d: `M ${ax1} ${ay1} A ${arcR} ${arcR} 0 0 1 ${ax2} ${ay2}`,
+        fill: 'none',
+        stroke: '#6c757d',
+        'stroke-width': '1',
+      })
+    );
+    addText(cx, cy + 55, '144°', { fill: '#6c757d', 'font-size': '12' });
+
+    // 밑면 반지름 표시
+    svg.appendChild(
+      el('line', {
+        x1: circleCenterX,
+        y1: circleCenterY,
+        x2: circleCenterX + r,
+        y2: circleCenterY,
+        stroke: '#ff4757',
+        'stroke-width': '1',
+        'stroke-dasharray': '3 2',
+      })
+    );
+    svg.appendChild(el('circle', { cx: circleCenterX, cy: circleCenterY, r: '2.5', fill: '#ff4757' }));
+    addText(circleCenterX + r / 2, circleCenterY + 15, 'r=4', { fill: '#ff4757', 'font-size': '12' });
+
+    // 호의 길이 라벨
+    addText(cx, cy + l - 15, '호의 길이 = 8π', { fill: '#007bff', 'font-size': '13' });
+  })();
+</script>

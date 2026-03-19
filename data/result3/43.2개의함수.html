@@ -1,0 +1,130 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+// y=2^x, y=log₂x 는 y=x 대칭
+// y=-x+k와 y=2^x의 교점, y=-x+k와 y=log₂x의 교점을 구한다
+// y=2^x와 y=-x+k가 접하는 조건: 2^x = -x+k, 2^x*ln2 = -1 → x = log₂(1/ln2) = -log₂(ln2)
+// t = -1/ln2, 접점: x₁ = log₂(1/ln2), y₁ = 1/ln2
+// k = 1/ln2 + log₂(1/ln2) = 1/ln2 - log₂(ln2)
+// 수치 계산
+const ln2 = Math.log(2);
+const x1 = Math.log(1 / ln2) / ln2; // 접점 x (2^x와 직선)
+const y1 = 1 / ln2;                  // 접점 y
+const k = y1 + x1;                   // k 값 (y = -x + k)
+
+// y=log₂x와 y=-x+k의 교점: log₂x = -x+k → by symmetry with y=x, 접점은 (y1, x1)
+const x2 = y1, y2 = x1;
+
+const ox = 200, oy = 320, scale = 70;
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+function toSVG(mx, my) {
+  return { px: ox + mx * scale, py: oy - my * scale };
+}
+
+// 좌표축
+svg.appendChild(el('line', { x1: 60, y1: oy, x2: 630, y2: oy, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('line', { x1: ox, y1: 460, x2: ox, y2: 50, stroke: '#64748B', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+addText(622, oy - 14, 'x', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(ox + 14, 62, 'y', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(ox - 14, oy + 14, 'O', { 'font-size': '12', fill: '#475569' });
+
+// 눈금
+for (let i = -2; i <= 5; i++) {
+  if (i === 0) continue;
+  const px = ox + i * scale;
+  if (px < 70 || px > 620) continue;
+  svg.appendChild(el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: '#64748B', 'stroke-width': '0.8' }));
+  addText(px, oy + 16, String(i));
+}
+for (let j = -2; j <= 4; j++) {
+  if (j === 0) continue;
+  const py = oy - j * scale;
+  if (py < 60 || py > 450) continue;
+  svg.appendChild(el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: '#64748B', 'stroke-width': '0.8' }));
+  addText(ox - 16, py, String(j), { 'text-anchor': 'end' });
+}
+
+// y = x 대칭축 점선
+{
+  const p1 = toSVG(-1.5, -1.5), p2 = toSVG(4, 4);
+  svg.appendChild(el('line', {
+    x1: p1.px, y1: p1.py, x2: p2.px, y2: p2.py,
+    stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '6 4'
+  }));
+  addText(p2.px + 20, p2.py - 10, 'y = x', { 'font-size': '12', fill: '#94A3B8' });
+}
+
+// y = 2^x
+let pts1 = '';
+for (let px = 70; px <= 620; px += 2) {
+  const mx = (px - ox) / scale;
+  const my = Math.pow(2, mx);
+  const py = oy - my * scale;
+  if (py >= 60 && py <= 450) pts1 += px + ',' + py.toFixed(1) + ' ';
+}
+svg.appendChild(el('polyline', { points: pts1.trim(), fill: 'none', stroke: '#3B82F6', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+addText(ox + 2.8 * scale, oy - 3.5 * scale, 'y = 2ˣ', { 'font-size': '13', 'font-weight': '500', fill: '#3B82F6' });
+
+// y = log₂x
+let pts2 = '';
+for (let px = ox + 2; px <= 620; px += 2) {
+  const mx = (px - ox) / scale;
+  if (mx <= 0) continue;
+  const my = Math.log(mx) / ln2;
+  const py = oy - my * scale;
+  if (py >= 60 && py <= 450) pts2 += px + ',' + py.toFixed(1) + ' ';
+}
+svg.appendChild(el('polyline', { points: pts2.trim(), fill: 'none', stroke: '#F59E0B', 'stroke-width': '2', 'stroke-linecap': 'round', 'stroke-linejoin': 'round' }));
+addText(ox + 3.5 * scale, oy - 1.5 * scale, 'y = log₂x', { 'font-size': '13', 'font-weight': '500', fill: '#F59E0B' });
+
+// y = -x + k 직선
+{
+  // 직선의 x 범위: x에서 y가 뷰박스 안에 오도록
+  const xL = (oy - 50 - oy) / scale + k; // y = 4 → x = k-4
+  const xR = k + 2.5;
+  const p1 = toSVG(k - 4.5, 4.5), p2 = toSVG(k + 2, k - (k + 2) + k);
+  // y = -x + k에서 범위 계산
+  const x_at_top = k - 4.5, y_at_top = 4.5;
+  const x_at_bot = k + 2.5, y_at_bot = -2.5;
+  const pt1 = toSVG(x_at_top, y_at_top), pt2 = toSVG(x_at_bot, y_at_bot);
+  svg.appendChild(el('line', {
+    x1: Math.max(70, pt1.px), y1: pt1.py,
+    x2: Math.min(620, pt2.px), y2: pt2.py,
+    stroke: '#64748B', 'stroke-width': '1.5', 'stroke-dasharray': '6 3'
+  }));
+  const kRound = k.toFixed(2);
+  addText(toSVG(x_at_top + 0.5, y_at_top - 0.3).px, toSVG(x_at_top + 0.5, y_at_top - 0.3).py, `y = -x + k`, { 'font-size': '12', fill: '#475569', 'text-anchor': 'start' });
+}
+
+// 교점 1: y=2^x와 직선 교점 (x1, y1)
+const ep1 = toSVG(x1, y1);
+svg.appendChild(el('circle', { cx: ep1.px, cy: ep1.py, r: '5', fill: '#3B82F6' }));
+addText(ep1.px - 55, ep1.py - 14, `(${x1.toFixed(2)}, ${y1.toFixed(2)})`, { 'font-size': '11', fill: '#3B82F6', 'font-weight': '500' });
+
+// 교점 2: y=log₂x와 직선 교점 (x2, y2)
+const ep2 = toSVG(x2, y2);
+svg.appendChild(el('circle', { cx: ep2.px, cy: ep2.py, r: '5', fill: '#F59E0B' }));
+addText(ep2.px + 60, ep2.py + 14, `(${x2.toFixed(2)}, ${y2.toFixed(2)})`, { 'font-size': '11', fill: '#F59E0B', 'font-weight': '500' });
+
+// 두 교점 연결 (대칭 관계)
+svg.appendChild(el('line', {
+  x1: ep1.px, y1: ep1.py, x2: ep2.px, y2: ep2.py,
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '3 3'
+}));
+addText((ep1.px + ep2.px) / 2 + 30, (ep1.py + ep2.py) / 2, 'y=x에 대해 대칭', { 'font-size': '11', fill: '#94A3B8' });
+</script>

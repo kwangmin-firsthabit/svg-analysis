@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>학년별 장래 희망 직업 분포</title>
+</head>
+<body>
+<svg id="vis" width="100%" viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+svg.appendChild(el('rect', { width: '680', height: '340', fill: '#FFFFFF' }));
+addText(340, 32, '학년별 장래 희망 직업 분포 (%)', { 'font-size': '17', 'font-weight': '700' });
+
+const colors = { '의사': '#2563EB', '교사': '#16A34A', '개발자': '#D97706', '기타': '#94A3B8' };
+const grades = [
+  { label: '1학년', data: [25, 30, 20, 25] },
+  { label: '2학년', data: [20, 25, 35, 20] },
+  { label: '3학년', data: [15, 20, 40, 25] }
+];
+const catColors = ['#2563EB', '#16A34A', '#D97706', '#94A3B8'];
+const barX = 80, barW = 600, barH = 40;
+
+grades.forEach((grade, gi) => {
+  const barY = 80 + gi * 80;
+  addText(55, barY + barH / 2, grade.label, { 'font-size': '13', 'font-weight': '600', 'text-anchor': 'middle' });
+  let cx = barX;
+  grade.data.forEach((pct, ci) => {
+    const w = barW * pct / 100;
+    svg.appendChild(el('rect', { x: cx, y: barY, width: w, height: barH, fill: catColors[ci] }));
+    addText(cx + w / 2, barY + barH / 2, pct + '%', { 'font-size': '12', 'font-weight': '600', fill: '#FFFFFF' });
+    cx += w;
+  });
+});
+
+const legendItems = [
+  { label: '의사', color: '#2563EB' },
+  { label: '교사', color: '#16A34A' },
+  { label: '개발자', color: '#D97706' },
+  { label: '기타', color: '#94A3B8' }
+];
+let lx = 160;
+legendItems.forEach(item => {
+  svg.appendChild(el('rect', { x: lx, y: 278, width: 16, height: 14, fill: item.color }));
+  addText(lx + 28, 285, item.label, { 'font-size': '12', 'text-anchor': 'start' });
+  lx += item.label.length > 2 ? 90 : 70;
+});
+</script>
+</body>
+</html>

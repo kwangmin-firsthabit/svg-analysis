@@ -1,0 +1,187 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+<div id="equation" style="margin-bottom: 10px"></div>
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+  const ox = 240,
+    oy = 360,
+    scale = 50;
+  const k = 6; // y = -x + k 의 k 값
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#1e293b',
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  // 1. 좌표축 및 배경 보조선
+  svg.appendChild(
+    el('line', {
+      x1: 40,
+      y1: oy,
+      x2: 600,
+      y2: oy,
+      stroke: '#334155',
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: 460,
+      x2: ox,
+      y2: 40,
+      stroke: '#334155',
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  svg.appendChild(text(590, oy + 20, 'x', { fill: '#64748b' }));
+  svg.appendChild(text(ox - 20, 50, 'y', { fill: '#64748b' }));
+  svg.appendChild(text(ox - 15, oy + 15, 'O', { 'font-size': '12' }));
+
+  // y = x 대칭축
+  svg.appendChild(
+    el('line', {
+      x1: 100,
+      y1: oy - ((100 - ox) / scale) * scale,
+      x2: 500,
+      y2: oy - ((500 - ox) / scale) * scale,
+      stroke: '#94a3b8',
+      'stroke-width': '1',
+      'stroke-dasharray': '4 3',
+    })
+  );
+  svg.appendChild(text(480, 100, 'y = x', { fill: '#94a3b8', 'font-size': '12' }));
+
+  // 2. 함수 곡선
+  // y = 2^x
+  let expPoints = '';
+  for (let x = -4; x <= 2.8; x += 0.1) {
+    const y = Math.pow(2, x);
+    const px = ox + x * scale;
+    const py = oy - y * scale;
+    if (py > 20) expPoints += `${px},${py} `;
+  }
+  svg.appendChild(el('polyline', { points: expPoints.trim(), fill: 'none', stroke: '#2563eb', 'stroke-width': '2' }));
+
+  // y = log2(x)
+  let logPoints = '';
+  for (let x = 0.05; x <= 8; x += 0.1) {
+    const y = Math.log2(x);
+    const px = ox + x * scale;
+    const py = oy - y * scale;
+    if (px < 640 && py < 460) logPoints += `${px},${py} `;
+  }
+  svg.appendChild(el('polyline', { points: logPoints.trim(), fill: 'none', stroke: '#dc2626', 'stroke-width': '2' }));
+
+  // 3. 직선 y = -x + k
+  const x1_line = 0,
+    y1_line = k;
+  const x2_line = k,
+    y2_line = 0;
+  svg.appendChild(
+    el('line', {
+      x1: ox + x1_line * scale,
+      y1: oy - y1_line * scale,
+      x2: ox + x2_line * scale,
+      y2: oy - y2_line * scale,
+      stroke: '#059669',
+      'stroke-width': '1.5',
+    })
+  );
+  svg.appendChild(
+    text(ox + 4.5 * scale, oy - 2.5 * scale, `y = -x + ${k}`, { fill: '#059669', 'text-anchor': 'start' })
+  );
+
+  // 4. 교점 계산 (수치 해석 - 이분법)
+  function findIntersection() {
+    let low = 0,
+      high = k;
+    for (let i = 0; i < 20; i++) {
+      let mid = (low + high) / 2;
+      if (Math.pow(2, mid) + mid < k) low = mid;
+      else high = mid;
+    }
+    return low;
+  }
+
+  const a = findIntersection();
+  const b = Math.pow(2, a); // 교점 P(a, b)
+
+  // 교점 P(a, b) 표시
+  const px_p = ox + a * scale;
+  const py_p = oy - b * scale;
+  svg.appendChild(el('circle', { cx: px_p, cy: py_p, r: '4', fill: '#1e293b' }));
+  svg.appendChild(text(px_p - 10, py_p - 15, `P(${a.toFixed(1)}, ${b.toFixed(1)})`, { 'text-anchor': 'end' }));
+
+  // 교점 Q(b, a) 표시
+  const px_q = ox + b * scale;
+  const py_q = oy - a * scale;
+  svg.appendChild(el('circle', { cx: px_q, cy: py_q, r: '4', fill: '#1e293b' }));
+  svg.appendChild(text(px_q + 10, py_q + 15, `Q(${b.toFixed(1)}, ${a.toFixed(1)})`, { 'text-anchor': 'start' }));
+
+  // 대칭 연결선
+  svg.appendChild(
+    el('line', {
+      x1: px_p,
+      y1: py_p,
+      x2: px_q,
+      y2: py_q,
+      stroke: '#94a3b8',
+      'stroke-width': '0.8',
+      'stroke-dasharray': '2 2',
+    })
+  );
+
+  // KaTeX 수식 렌더링
+  katex.render(
+    'y = 2^x \\text{ 와 } y = \\log_2 x \\text{ 의 교점 관계 } (k=' + k + ')',
+    document.getElementById('equation'),
+    {
+      displayMode: true,
+      throwOnError: false,
+    }
+  );
+</script>

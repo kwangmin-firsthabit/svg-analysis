@@ -1,0 +1,124 @@
+<svg id="vis" width="100%" viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#212529',
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  // 1. 기하학적 상수 설정
+  const s = 120; // 화면 표시용 한 변의 길이 (px)
+  const h = (s * Math.sqrt(3)) / 2; // 정삼각형의 높이
+  const offsetX = 70;
+  const offsetY = 100;
+
+  // 2. 꼭짓점 좌표 계산 (지그재그 리본 형태)
+  // 상단 점들 (y = 0)
+  const topPts = [];
+  for (let i = 0; i < 5; i++) {
+    topPts.push({ x: offsetX + (i + 0.5) * s, y: offsetY });
+  }
+
+  // 하단 점들 (y = h)
+  const botPts = [];
+  for (let i = 0; i < 5; i++) {
+    botPts.push({ x: offsetX + i * s, y: offsetY + h });
+  }
+
+  // 3. 전체 외곽선 그리기
+  // 경로: 하단0 -> 상단0 -> 상단1 -> 상단2 -> 상단3 -> 상단4 -> 하단4 -> 하단3 -> 하단2 -> 하단1 -> 하단0
+  const boundary = [
+    botPts[0],
+    topPts[0],
+    topPts[1],
+    topPts[2],
+    topPts[3],
+    topPts[4],
+    botPts[4],
+    botPts[3],
+    botPts[2],
+    botPts[1],
+  ];
+  const pointsAttr = boundary.map(p => `${p.x},${p.y}`).join(' ');
+
+  svg.appendChild(
+    el('polygon', {
+      points: pointsAttr,
+      fill: 'rgba(0, 123, 255, 0.05)',
+      stroke: '#007bff',
+      'stroke-width': '1.5',
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // 4. 내부 접는 선 (Fold Lines)
+  const foldLines = [
+    [topPts[0], botPts[1]],
+    [topPts[1], botPts[1]],
+    [topPts[1], botPts[2]],
+    [topPts[2], botPts[2]],
+    [topPts[2], botPts[3]],
+    [topPts[3], botPts[3]],
+    [topPts[3], botPts[4]],
+  ];
+
+  foldLines.forEach(([p1, p2]) => {
+    svg.appendChild(
+      el('line', {
+        x1: p1.x,
+        y1: p1.y,
+        x2: p2.x,
+        y2: p2.y,
+        stroke: '#6c757d',
+        'stroke-width': '1',
+        'stroke-dasharray': '4 3',
+      })
+    );
+  });
+
+  // 5. 라벨링
+  // 한 변의 길이 '6' 표시
+  addTextLabel(botPts[0].x + s / 2, botPts[0].y + 20, '6', '12', '400', '#495057');
+
+  // 제목
+  addTextLabel(340, 50, '정팔면체의 전개도 (한 변의 길이: 6)', '16', '500', '#212529');
+
+  function addTextLabel(x, y, content, size, weight, color) {
+    const t = text(x, y, content, { 'font-size': size, 'font-weight': weight, fill: color });
+    svg.appendChild(t);
+  }
+
+  // 6. 면 번호 매기기 (중앙에 1~8)
+  const centers = [
+    { x: (botPts[0].x + topPts[0].x + botPts[1].x) / 3, y: (botPts[0].y + topPts[0].y + botPts[1].y) / 3 },
+    { x: (topPts[0].x + botPts[1].x + topPts[1].x) / 3, y: (topPts[0].y + botPts[1].y + topPts[1].y) / 3 },
+    { x: (botPts[1].x + topPts[1].x + botPts[2].x) / 3, y: (botPts[1].y + topPts[1].y + botPts[2].y) / 3 },
+    { x: (topPts[1].x + botPts[2].x + topPts[2].x) / 3, y: (topPts[1].y + botPts[2].y + topPts[2].y) / 3 },
+    { x: (botPts[2].x + topPts[2].x + botPts[3].x) / 3, y: (botPts[2].y + topPts[2].y + botPts[3].y) / 3 },
+    { x: (topPts[2].x + botPts[3].x + topPts[3].x) / 3, y: (topPts[2].y + botPts[3].y + topPts[3].y) / 3 },
+    { x: (botPts[3].x + topPts[3].x + botPts[4].x) / 3, y: (botPts[3].y + topPts[3].y + botPts[4].y) / 3 },
+    { x: (topPts[3].x + botPts[4].x + topPts[4].x) / 3, y: (topPts[3].y + botPts[4].y + topPts[4].y) / 3 },
+  ];
+
+  centers.forEach((p, i) => {
+    addTextLabel(p.x, p.y, i + 1, '12', '400', '#6c757d');
+  });
+</script>

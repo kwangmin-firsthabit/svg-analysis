@@ -1,0 +1,284 @@
+<svg id="vis" width="100%" viewBox="0 0 860 560" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const C = {
+    axis: '#475569',
+    grid: '#e2e8f0',
+    histFill: '#bfdbfe',
+    histStroke: '#2563eb',
+    poly: '#dc2626',
+    point: '#b91c1c',
+    text: '#0f172a',
+    sub: '#64748b',
+    box: '#f8fafc',
+  };
+
+  function el(tag, attrs = {}) {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    return node;
+  }
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      fill: C.text,
+      'font-size': 14,
+      'font-weight': 500,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      ...attrs,
+    });
+    t.textContent = str;
+    return add(t);
+  }
+  function line(x1, y1, x2, y2, attrs = {}) {
+    return add(el('line', { x1, y1, x2, y2, ...attrs }));
+  }
+  function rect(x, y, width, height, attrs = {}) {
+    return add(el('rect', { x, y, width, height, ...attrs }));
+  }
+  function circle(cx, cy, r, attrs = {}) {
+    return add(el('circle', { cx, cy, r, ...attrs }));
+  }
+
+  // 예시 데이터: 학생 40명의 통학 시간(분)
+  const classes = [
+    { start: 0, end: 10, freq: 3 },
+    { start: 10, end: 20, freq: 7 },
+    { start: 20, end: 30, freq: 12 },
+    { start: 30, end: 40, freq: 9 },
+    { start: 40, end: 50, freq: 6 },
+    { start: 50, end: 60, freq: 3 },
+  ];
+
+  const total = classes.reduce((s, d) => s + d.freq, 0);
+
+  // chart area
+  const left = 90;
+  const right = 620;
+  const top = 90;
+  const bottom = 450;
+  const width = right - left;
+  const height = bottom - top;
+
+  const xMin = 0;
+  const xMax = 60;
+  const yMax = 14;
+
+  function px(x) {
+    return left + ((x - xMin) / (xMax - xMin)) * width;
+  }
+  function py(y) {
+    return bottom - (y / yMax) * height;
+  }
+
+  // background
+  add(el('rect', { x: 0, y: 0, width: 860, height: 560, fill: 'white' }));
+  rect(50, 48, 770, 470, { fill: C.box, rx: 18 });
+
+  // horizontal grid and y ticks
+  for (let y = 0; y <= yMax; y += 2) {
+    line(left, py(y), right, py(y), {
+      stroke: C.grid,
+      'stroke-width': 1,
+    });
+    if (y > 0) {
+      text(left - 20, py(y), String(y), {
+        fill: C.sub,
+        'font-size': 12,
+        'font-weight': 400,
+      });
+    }
+  }
+
+  // vertical grid and x ticks
+  for (let x = 0; x <= 60; x += 10) {
+    line(px(x), top, px(x), bottom, {
+      stroke: C.grid,
+      'stroke-width': 1,
+    });
+    text(px(x), bottom + 20, String(x), {
+      fill: C.sub,
+      'font-size': 12,
+      'font-weight': 400,
+    });
+  }
+
+  // axes
+  line(left, bottom, right + 16, bottom, {
+    stroke: C.axis,
+    'stroke-width': 1.8,
+    'marker-end': 'url(#arrow)',
+  });
+  line(left, bottom, left, top - 16, {
+    stroke: C.axis,
+    'stroke-width': 1.8,
+    'marker-end': 'url(#arrow)',
+  });
+
+  // histogram bars
+  for (const d of classes) {
+    const x = px(d.start);
+    const w = px(d.end) - px(d.start);
+    const y = py(d.freq);
+    const h = bottom - y;
+    rect(x, y, w, h, {
+      fill: C.histFill,
+      stroke: C.histStroke,
+      'stroke-width': 2,
+      opacity: 0.85,
+    });
+    text(x + w / 2, y - 14, String(d.freq), {
+      fill: C.histStroke,
+      'font-size': 12,
+      'font-weight': 700,
+    });
+  }
+
+  // frequency polygon points
+  const polyPts = [];
+  polyPts.push(`${px(0)},${py(0)}`);
+  for (const d of classes) {
+    const mid = (d.start + d.end) / 2;
+    polyPts.push(`${px(mid)},${py(d.freq)}`);
+  }
+  polyPts.push(`${px(60)},${py(0)}`);
+
+  add(
+    el('polyline', {
+      points: polyPts.join(' '),
+      fill: 'none',
+      stroke: C.poly,
+      'stroke-width': 3,
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // points on polygon
+  for (const d of classes) {
+    const mid = (d.start + d.end) / 2;
+    circle(px(mid), py(d.freq), 5, {
+      fill: C.point,
+      stroke: 'white',
+      'stroke-width': 1.5,
+    });
+  }
+
+  // labels
+  text((left + right) / 2, 68, '학생 40명의 통학 시간', {
+    'font-size': 22,
+    'font-weight': 700,
+  });
+  text((left + right) / 2, 95, '히스토그램과 도수다각형을 겹쳐 나타낸 복합 차트', {
+    fill: C.sub,
+    'font-size': 13,
+    'font-weight': 400,
+  });
+
+  text(right + 34, bottom - 6, '시간(분)', {
+    fill: C.text,
+    'font-size': 14,
+  });
+  text(left - 38, top - 8, '도수', {
+    fill: C.text,
+    'font-size': 14,
+  });
+
+  // class interval labels
+  for (const d of classes) {
+    const label = `${d.start}~${d.end}`;
+    text((px(d.start) + px(d.end)) / 2, bottom + 42, label, {
+      fill: C.sub,
+      'font-size': 11,
+      'font-weight': 400,
+    });
+  }
+
+  // legend
+  rect(650, 130, 150, 110, {
+    fill: 'white',
+    stroke: '#cbd5e1',
+    'stroke-width': 1.2,
+    rx: 12,
+  });
+
+  rect(670, 155, 28, 18, {
+    fill: C.histFill,
+    stroke: C.histStroke,
+    'stroke-width': 2,
+  });
+  text(740, 164, '히스토그램', {
+    'text-anchor': 'middle',
+    fill: C.text,
+    'font-size': 13,
+  });
+
+  line(670, 195, 698, 195, {
+    stroke: C.poly,
+    'stroke-width': 3,
+  });
+  circle(684, 195, 4.5, {
+    fill: C.point,
+    stroke: 'white',
+    'stroke-width': 1.2,
+  });
+  text(748, 195, '도수다각형', {
+    'text-anchor': 'middle',
+    fill: C.text,
+    'font-size': 13,
+  });
+
+  text(725, 225, `전체 학생 수 = ${total}명`, {
+    fill: C.sub,
+    'font-size': 13,
+    'font-weight': 400,
+  });
+
+  // callout
+  text(725, 300, '가장 많은 학생이', {
+    fill: C.sub,
+    'font-size': 13,
+    'font-weight': 400,
+  });
+  text(725, 325, '20~30분 구간에 분포', {
+    fill: C.histStroke,
+    'font-size': 15,
+    'font-weight': 700,
+  });
+
+  line(690, 340, px(25), py(12) - 10, {
+    stroke: C.sub,
+    'stroke-width': 1.4,
+    'marker-end': 'url(#arrow)',
+  });
+</script>

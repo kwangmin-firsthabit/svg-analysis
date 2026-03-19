@@ -1,0 +1,164 @@
+<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 원뿔대: 밑면 반지름 R=5, 윗면 반지름 r=2, 높이 h=6
+const R = 5, r = 2, h = 6;
+const sc = 32;
+const cx = 340, baseY = 360, topY = baseY - h * sc;
+
+const Rx = R * sc; // 160
+const rx = r * sc; // 64
+const eRatio = 0.3; // ellipse minor/major ratio for oblique view
+const Ry = Rx * eRatio; // bottom ellipse ry
+const ry = rx * eRatio; // top ellipse ry
+
+// bottom ellipse back half (dashed/hidden)
+svg.appendChild(el('path', {
+  d: `M ${cx - Rx} ${baseY} A ${Rx} ${Ry} 0 0 1 ${cx + Rx} ${baseY}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1.2', 'stroke-dasharray': '6 4'
+}));
+
+// bottom ellipse fill (front half area for subtle shading)
+svg.appendChild(el('path', {
+  d: `M ${cx - Rx} ${baseY} A ${Rx} ${Ry} 0 0 0 ${cx + Rx} ${baseY} Z`,
+  fill: '#DBEAFE', 'fill-opacity': '0.3', stroke: 'none'
+}));
+
+// side faces: left and right tangent lines connecting ellipses
+// left side line (front, solid)
+svg.appendChild(el('line', {
+  x1: cx - Rx, y1: baseY, x2: cx - rx, y2: topY,
+  stroke: '#2563EB', 'stroke-width': '1.8'
+}));
+
+// right side line (front, solid)
+svg.appendChild(el('line', {
+  x1: cx + Rx, y1: baseY, x2: cx + rx, y2: topY,
+  stroke: '#2563EB', 'stroke-width': '1.8'
+}));
+
+// back side lines (dashed)
+// approximate back tangent points using ellipse geometry
+const backAngle = Math.PI * 0.15;
+const bLeftX = cx + Rx * Math.cos(Math.PI - backAngle);
+const bLeftY = baseY - Ry * Math.sin(Math.PI - backAngle);
+const tLeftX = cx + rx * Math.cos(Math.PI - backAngle);
+const tLeftY = topY - ry * Math.sin(Math.PI - backAngle);
+const bRightX = cx + Rx * Math.cos(backAngle);
+const bRightY = baseY - Ry * Math.sin(backAngle);
+const tRightX = cx + rx * Math.cos(backAngle);
+const tRightY = topY - ry * Math.sin(backAngle);
+
+// top ellipse fill (subtle)
+svg.appendChild(el('ellipse', {
+  cx, cy: topY, rx: rx, ry: ry,
+  fill: '#EDE9FE', 'fill-opacity': '0.5', stroke: 'none'
+}));
+
+// top ellipse back half (dashed)
+svg.appendChild(el('path', {
+  d: `M ${cx - rx} ${topY} A ${rx} ${ry} 0 0 1 ${cx + rx} ${topY}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1.2', 'stroke-dasharray': '6 4'
+}));
+
+// top ellipse front half (solid)
+svg.appendChild(el('path', {
+  d: `M ${cx - rx} ${topY} A ${rx} ${ry} 0 0 0 ${cx + rx} ${topY}`,
+  fill: 'none', stroke: '#6366F1', 'stroke-width': '1.8'
+}));
+
+// bottom ellipse front half (solid) - drawn last to be on top
+svg.appendChild(el('path', {
+  d: `M ${cx - Rx} ${baseY} A ${Rx} ${Ry} 0 0 0 ${cx + Rx} ${baseY}`,
+  fill: 'none', stroke: '#2563EB', 'stroke-width': '1.8'
+}));
+
+// center vertical axis (dashed)
+svg.appendChild(el('line', {
+  x1: cx, y1: baseY, x2: cx, y2: topY,
+  stroke: '#64748B', 'stroke-width': '1', 'stroke-dasharray': '4 3'
+}));
+
+// center points O₁ and O₂
+svg.appendChild(el('circle', { cx, cy: baseY, r: 3, fill: '#1E293B' }));
+svg.appendChild(el('circle', { cx, cy: topY, r: 3, fill: '#1E293B' }));
+
+addText(cx - 18, baseY + 18, 'O\u2081', { 'font-size': '14', 'font-weight': '500' });
+addText(cx - 18, topY - 16, 'O\u2082', { 'font-size': '14', 'font-weight': '500' });
+
+// height label (h = 6) - vertical dimension line on the left
+const dimX = cx - Rx - 40;
+svg.appendChild(el('line', {
+  x1: dimX, y1: baseY, x2: dimX, y2: topY,
+  stroke: '#DC2626', 'stroke-width': '1.2'
+}));
+svg.appendChild(el('line', { x1: dimX - 5, y1: baseY, x2: dimX + 5, y2: baseY, stroke: '#DC2626', 'stroke-width': '1.2' }));
+svg.appendChild(el('line', { x1: dimX - 5, y1: topY, x2: dimX + 5, y2: topY, stroke: '#DC2626', 'stroke-width': '1.2' }));
+// arrows
+svg.appendChild(el('path', { d: `M ${dimX} ${baseY} l -3 -7 l 6 0 Z`, fill: '#DC2626' }));
+svg.appendChild(el('path', { d: `M ${dimX} ${topY} l -3 7 l 6 0 Z`, fill: '#DC2626' }));
+addText(dimX - 20, (baseY + topY) / 2, 'h = 6', { 'font-size': '12', 'font-weight': '400', fill: '#DC2626' });
+
+// bottom radius label (R = 5)
+svg.appendChild(el('line', {
+  x1: cx, y1: baseY, x2: cx + Rx, y2: baseY,
+  stroke: '#2563EB', 'stroke-width': '1.2'
+}));
+svg.appendChild(el('circle', { cx: cx + Rx, cy: baseY, r: 2.5, fill: '#2563EB' }));
+addText(cx + Rx / 2, baseY + 20, 'R = 5', { 'font-size': '12', 'font-weight': '400', fill: '#2563EB' });
+
+// top radius label (r = 2)
+svg.appendChild(el('line', {
+  x1: cx, y1: topY, x2: cx + rx, y2: topY,
+  stroke: '#6366F1', 'stroke-width': '1.2'
+}));
+svg.appendChild(el('circle', { cx: cx + rx, cy: topY, r: 2.5, fill: '#6366F1' }));
+addText(cx + rx / 2, topY + 18, 'r = 2', { 'font-size': '12', 'font-weight': '400', fill: '#6366F1' });
+
+// slant height label (l)
+// slant height = sqrt(h² + (R-r)²) = sqrt(36 + 9) = sqrt(45) = 3√5
+const slantH = Math.sqrt(h * h + (R - r) * (R - r));
+const slantLabel = '3\u221A5';
+
+// slant line on right side with label
+const slMidX = (cx + Rx + cx + rx) / 2;
+const slMidY = (baseY + topY) / 2;
+addText(slMidX + 28, slMidY, 'l = ' + slantLabel, { 'font-size': '12', 'font-weight': '400', fill: '#059669' });
+
+// slant height indicator (small marks on the right side edge)
+svg.appendChild(el('line', {
+  x1: cx + Rx, y1: baseY, x2: cx + rx, y2: topY,
+  stroke: '#059669', 'stroke-width': '1.5', 'stroke-dasharray': '0'
+}));
+
+// formulas below
+const fY = baseY + 60;
+// 모선 길이
+addText(cx, fY, 'l = \u221A(h\u00B2 + (R \u2212 r)\u00B2) = \u221A(36 + 9) = 3\u221A5', {
+  'font-size': '13', 'font-weight': '400', fill: '#334155'
+});
+
+// 옆넓이
+addText(cx, fY + 28, 'S\u1D65 = \u03C0(R + r)l = \u03C0 \u00D7 7 \u00D7 3\u221A5 = 21\u221A5\u03C0', {
+  'font-size': '13', 'font-weight': '400', fill: '#334155'
+});
+
+// 부피
+addText(cx, fY + 56, 'V = (\u03C0h/3)(R\u00B2 + Rr + r\u00B2) = 2\u03C0 \u00D7 33 = 66\u03C0', {
+  'font-size': '13', 'font-weight': '400', fill: '#334155'
+});
+</script>

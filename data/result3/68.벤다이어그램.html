@@ -1,117 +1,82 @@
-<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
-<defs>
-  <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
-  <clipPath id="clipA">
-    <circle cx="270" cy="195" r="105"/>
-  </clipPath>
-  <clipPath id="clipB">
-    <circle cx="410" cy="195" r="105"/>
-  </clipPath>
-  <clipPath id="clipC">
-    <circle cx="340" cy="310" r="105"/>
-  </clipPath>
-  <clipPath id="clipAB">
-    <circle cx="270" cy="195" r="105"/>
-  </clipPath>
-  <clipPath id="clipAC">
-    <circle cx="270" cy="195" r="105"/>
-  </clipPath>
-  <clipPath id="clipBC">
-    <circle cx="410" cy="195" r="105"/>
-  </clipPath>
-</defs>
-</svg>
+<svg id="vis" width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg"></svg>
 <script>
 const svg = document.getElementById('vis');
 const ns = 'http://www.w3.org/2000/svg';
+
 function el(tag, attrs) {
   const e = document.createElementNS(ns, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
   return e;
 }
 
-// 전체 집합 직사각형
-svg.appendChild(el('rect', { x: 30, y: 20, width: 620, height: 375, rx: 8, fill: 'none', stroke: '#64748B', 'stroke-width': 2 }));
-
-// U 라벨
-const uLabel = el('text', { x: 44, y: 38, fill: '#475569', 'font-size': 14, 'font-weight': 500, 'dominant-baseline': 'central', 'font-family': 'serif', 'font-style': 'italic' });
-uLabel.textContent = 'U';
-svg.appendChild(uLabel);
-
-const cx = { A: 270, B: 410, C: 340 };
-const cy = { A: 195, B: 195, C: 310 };
-const r = 105;
-
-// 원 A (수학)
-svg.appendChild(el('circle', { cx: cx.A, cy: cy.A, r, fill: '#3B82F6', 'fill-opacity': 0.12, stroke: '#1D4ED8', 'stroke-width': 1.8 }));
-// 원 B (과학)
-svg.appendChild(el('circle', { cx: cx.B, cy: cy.B, r, fill: '#3B82F6', 'fill-opacity': 0.12, stroke: '#1D4ED8', 'stroke-width': 1.8 }));
-// 원 C (영어)
-svg.appendChild(el('circle', { cx: cx.C, cy: cy.C, r, fill: '#3B82F6', 'fill-opacity': 0.12, stroke: '#1D4ED8', 'stroke-width': 1.8 }));
-
-// 원 라벨
-const labelA = el('text', { x: 195, y: 145, fill: '#1E293B', 'font-size': 15, 'font-weight': 600, 'dominant-baseline': 'central', 'font-family': 'sans-serif', 'text-anchor': 'middle' });
-labelA.textContent = '수학';
-svg.appendChild(labelA);
-
-const labelB = el('text', { x: 485, y: 145, fill: '#1E293B', 'font-size': 15, 'font-weight': 600, 'dominant-baseline': 'central', 'font-family': 'sans-serif', 'text-anchor': 'middle' });
-labelB.textContent = '과학';
-svg.appendChild(labelB);
-
-const labelC = el('text', { x: 340, y: 395, fill: '#1E293B', 'font-size': 15, 'font-weight': 600, 'dominant-baseline': 'central', 'font-family': 'sans-serif', 'text-anchor': 'middle' });
-labelC.textContent = '영어';
-svg.appendChild(labelC);
-
-// 각 영역 숫자 배치 함수
-function addNum(x, y, val) {
-  const t = el('text', { x, y, fill: '#1E293B', 'font-size': 16, 'font-weight': 500, 'dominant-baseline': 'central', 'font-family': 'sans-serif', 'text-anchor': 'middle' });
-  t.textContent = String(val);
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
   svg.appendChild(t);
 }
 
-// A만: 14 (수학 전용 영역 - 왼쪽 위)
-addNum(210, 185, 14);
-
-// B만: 10 (과학 전용 영역 - 오른쪽 위)
-addNum(470, 185, 10);
-
-// C만: 10 (영어 전용 영역 - 아래 중앙)
-addNum(340, 365, 10);
-
-// A∩B만: 5 (수학∩과학, C 제외 - 위쪽 중앙)
-addNum(340, 168, 5);
-
-// A∩C만: 3 (수학∩영어, B 제외 - 왼쪽 아래)
-addNum(278, 290, 3);
-
-// B∩C만: 2 (과학∩영어, A 제외 - 오른쪽 아래)
-addNum(402, 290, 2);
-
-// A∩B∩C: 3 (중앙)
-addNum(340, 240, 3);
-
-// 여집합: 3 (오른쪽 아래 모서리)
-addNum(610, 370, 3);
-
-// 전체 집합 표기
-const totalLabel = el('text', { x: 340, y: 405, fill: '#475569', 'font-size': 12, 'font-weight': 400, 'dominant-baseline': 'central', 'font-family': 'sans-serif', 'text-anchor': 'middle' });
-totalLabel.textContent = '';
-svg.appendChild(totalLabel);
-
 // 제목
-const title = el('text', { x: 340, y: 12, fill: '#1E293B', 'font-size': 14, 'font-weight': 500, 'dominant-baseline': 'central', 'font-family': 'sans-serif', 'text-anchor': 'middle' });
-title.textContent = '3집합 벤 다이어그램 (전체 학생 50명)';
-svg.appendChild(title);
+txt(340, 36, '벤 다이어그램 — 전체 학생 40명', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
 
-// 범례 - 오른쪽 위
-const legendItems = [
-  { label: '수학 (A) = 25명', x: 500, y: 32 },
-  { label: '과학 (B) = 20명', x: 500, y: 52 },
-  { label: '영어 (C) = 18명', x: 500, y: 72 },
+// 전체 집합 사각형
+const rectX = 60, rectY = 60, rectW = 560, rectH = 260;
+svg.appendChild(el('rect', { x: rectX, y: rectY, width: rectW, height: rectH, rx: '14', fill: 'none', stroke: '#94A3B8', 'stroke-width': '1.2' }));
+txt(rectX + 28, rectY + 18, 'U = 40', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' });
+
+// 두 원의 중심
+const cy = rectY + rectH / 2;
+const r = 90;
+const cx1 = 240;  // 수영
+const cx2 = 420;  // 농구
+const gap = cx2 - cx1;  // 겹침 = 2r - gap = 180 - 180 = 0 → gap=180, 겹침=0? gap=180이면 딱 붙음
+// 실제로 교집합 7명이 있으므로 겹치게 배치: cx1=230, cx2=430 → gap=200, overlap=180-200<0: 안겹침
+// gap을 160으로 하면 overlap = 2*90 - 160 = 20px 겹침
+
+const c1x = 235, c2x = 425;
+
+// clipPath 이용 없이 두 원 겹쳐 그리기
+// 교집합 영역: 두 원 모두 채움 → 겹치는 부분은 stroke로만 구분
+// 수영 원 (왼쪽)
+svg.appendChild(el('circle', { cx: c1x, cy, r, fill: '#EFF6FF', 'fill-opacity': '0.5', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+// 농구 원 (오른쪽)
+svg.appendChild(el('circle', { cx: c2x, cy, r, fill: '#EFF6FF', 'fill-opacity': '0.5', stroke: '#F59E0B', 'stroke-width': '1.5' }));
+
+// 원 이름 레이블
+txt(c1x - 30, rectY + 20, '수영', { 'font-size': '13', 'font-weight': '500', fill: '#1D4ED8' });
+txt(c2x + 30, rectY + 20, '농구', { 'font-size': '13', 'font-weight': '500', fill: '#F59E0B' });
+
+// 수영만 영역 (15명)
+txt(c1x - 44, cy, '15', { 'font-size': '22', 'font-weight': '500', fill: '#1D4ED8' });
+txt(c1x - 44, cy + 28, '수영만', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 교집합 영역 (7명)
+const midX = (c1x + c2x) / 2;
+txt(midX, cy, '7', { 'font-size': '22', 'font-weight': '500', fill: '#1E293B' });
+txt(midX, cy + 28, '둘 다', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 농구만 영역 (11명)
+txt(c2x + 44, cy, '11', { 'font-size': '22', 'font-weight': '500', fill: '#F59E0B' });
+txt(c2x + 44, cy + 28, '농구만', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 아무것도 안 좋아하는 학생 (7명) — 우측 하단 코너
+txt(rectX + rectW - 40, rectY + rectH - 28, '7', { 'font-size': '18', 'font-weight': '500', fill: '#94A3B8' });
+txt(rectX + rectW - 40, rectY + rectH - 10, '없음', { 'font-size': '12', 'font-weight': '400', fill: '#94A3B8' });
+
+// 하단 범례 및 검산
+const legendY = rectY + rectH + 34;
+txt(340, legendY, '15 + 7 + 11 + 7 = 40명   ✓', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 집합 정보 레이블
+const infoY = legendY + 30;
+const items = [
+  { label: '수영 집합 n(A) = 22', color: '#1D4ED8' },
+  { label: '농구 집합 n(B) = 18', color: '#F59E0B' },
+  { label: '교집합 n(A∩B) = 7', color: '#1E293B' },
 ];
-legendItems.forEach(item => {
-  const lt = el('text', { x: item.x, y: item.y, fill: '#475569', 'font-size': 11, 'font-weight': 400, 'dominant-baseline': 'central', 'font-family': 'sans-serif' });
-  lt.textContent = item.label;
-  svg.appendChild(lt);
+const infoStartX = 120;
+items.forEach((item, i) => {
+  const ix = infoStartX + i * 160;
+  svg.appendChild(el('rect', { x: ix - 8, y: infoY - 10, width: 150, height: 22, rx: '5', fill: '#EFF6FF', stroke: item.color, 'stroke-width': '0.8' }));
+  txt(ix + 67, infoY, item.label, { 'font-size': '12', 'font-weight': '400', fill: item.color, 'text-anchor': 'middle' });
 });
 </script>

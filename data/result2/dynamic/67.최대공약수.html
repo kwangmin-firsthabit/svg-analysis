@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>최대공약수: 84와 60</title>
+</head>
+<body>
+<svg id="vis" width="100%" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+function addLine(x1, y1, x2, y2, attrs = {}) {
+  svg.appendChild(el('line', { x1, y1, x2, y2, stroke: '#1E293B', 'stroke-width': '2.5', ...attrs }));
+}
+
+svg.appendChild(el('rect', { width: '680', height: '380', fill: '#FFFFFF' }));
+addText(340, 36, '84와 60의 최대공약수 (ㄴ자 방식)', { 'font-size': '17', 'font-weight': '700' });
+addText(340, 70, '공약수로 나누어 최대공약수를 구한다', { 'font-size': '14', fill: '#475569' });
+
+const steps = [
+  { divisor: '2', left: '84', right: '60', cy: 126 },
+  { divisor: '2', left: '42', right: '30', cy: 194 },
+  { divisor: '3', left: '21', right: '15', cy: 262 }
+];
+const fs = '28';
+
+steps.forEach(step => {
+  addText(270, step.cy, step.divisor, { 'font-size': fs, 'font-weight': '700', fill: '#DC2626' });
+  addLine(285, step.cy - 18, 285, step.cy + 16);
+  addLine(285, step.cy + 16, 450, step.cy + 16);
+  addText(335, step.cy, step.left, { 'font-size': fs, 'font-weight': '700' });
+  addText(415, step.cy, step.right, { 'font-size': fs, 'font-weight': '700' });
+});
+
+addText(335, 320, '7', { 'font-size': fs, 'font-weight': '700', fill: '#475569' });
+addText(415, 320, '5', { 'font-size': fs, 'font-weight': '700', fill: '#475569' });
+
+const rect = el('rect', { x: '120', y: '336', width: '440', height: '32', rx: '6', fill: '#F0FDF4', stroke: '#16A34A', 'stroke-width': '1.5' });
+svg.appendChild(rect);
+addText(340, 353, 'GCD = 2 × 2 × 3 = 12', { 'font-size': '16', 'font-weight': '700', fill: '#16A34A' });
+</script>
+</body>
+</html>

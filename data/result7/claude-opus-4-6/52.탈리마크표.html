@@ -1,0 +1,117 @@
+<svg id="vis" width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+  return t;
+}
+
+const data = [
+  { season: '봄', count: 6 },
+  { season: '여름', count: 10 },
+  { season: '가을', count: 8 },
+  { season: '겨울', count: 6 }
+];
+const total = data.reduce((s, d) => s + d.count, 0);
+
+// Table layout
+const tableX = 60;
+const tableW = 560;
+const colWidths = [100, 320, 140];
+const colX = [tableX, tableX + colWidths[0], tableX + colWidths[0] + colWidths[1]];
+const colCenterX = [colX[0] + colWidths[0] / 2, colX[1] + colWidths[1] / 2, colX[2] + colWidths[2] / 2];
+const rowH = 48;
+const headerY = 80;
+
+// Title
+addText(340, 34, '좋아하는 계절 조사 (도수분포표)', { 'font-size': '15', 'font-weight': '700', fill: '#0F172A' });
+
+// Header background
+svg.appendChild(el('rect', { x: tableX, y: headerY, width: tableW, height: rowH, fill: '#1E3A8A', rx: '4', ry: '4' }));
+svg.appendChild(el('rect', { x: tableX, y: headerY + rowH - 4, width: tableW, height: 4, fill: '#1E3A8A' }));
+
+// Header text
+const headers = ['계절', '탈리(정 표시)', '도수(명)'];
+headers.forEach((h, i) => addText(colCenterX[i], headerY + rowH / 2, h, { fill: '#FFFFFF', 'font-weight': '600', 'font-size': '14' }));
+
+// Partial tally strokes for remainder after 正 groups
+function drawPartialTally(cx, cy, n) {
+  const strokeH = 18;
+  const strokeGap = 5;
+  const startX = cx - (n - 1) * strokeGap / 2;
+  for (let i = 0; i < n; i++) {
+    svg.appendChild(el('line', {
+      x1: startX + i * strokeGap, y1: cy - strokeH / 2,
+      x2: startX + i * strokeGap, y2: cy + strokeH / 2,
+      stroke: '#1E293B', 'stroke-width': '2', 'stroke-linecap': 'round'
+    }));
+  }
+}
+
+// Data rows
+data.forEach((row, i) => {
+  const ry = headerY + rowH * (i + 1);
+  const bg = i % 2 === 0 ? '#FFFFFF' : '#F1F5F9';
+  svg.appendChild(el('rect', { x: tableX, y: ry, width: tableW, height: rowH, fill: bg }));
+
+  // Season name
+  addText(colCenterX[0], ry + rowH / 2, row.season, { 'font-size': '14', 'font-weight': '500' });
+
+  // Tally marks using 正 character for groups of 5
+  const fullGroups = Math.floor(row.count / 5);
+  const remainder = row.count % 5;
+  const tallyY = ry + rowH / 2;
+  const charSpacing = 36;
+  const totalChars = fullGroups + (remainder > 0 ? 1 : 0);
+  const tallyStartX = colCenterX[1] - (totalChars - 1) * charSpacing / 2;
+
+  for (let g = 0; g < fullGroups; g++) {
+    addText(tallyStartX + g * charSpacing, tallyY, '正', { 'font-size': '22', 'font-weight': '500', fill: '#1E293B' });
+  }
+
+  // Draw remainder strokes
+  if (remainder > 0) {
+    const remX = tallyStartX + fullGroups * charSpacing;
+    drawPartialTally(remX, tallyY, remainder);
+  }
+
+  // Frequency
+  addText(colCenterX[2], ry + rowH / 2, String(row.count), { 'font-size': '14', 'font-weight': '600', fill: '#1D4ED8' });
+});
+
+// Total row
+const totalRowY = headerY + rowH * (data.length + 1);
+svg.appendChild(el('rect', { x: tableX, y: totalRowY, width: tableW, height: rowH, fill: '#EFF6FF' }));
+addText(colCenterX[0], totalRowY + rowH / 2, '합계', { 'font-size': '14', 'font-weight': '700' });
+addText(colCenterX[2], totalRowY + rowH / 2, String(total), { 'font-size': '14', 'font-weight': '700', fill: '#1D4ED8' });
+
+// Table border
+svg.appendChild(el('rect', { x: tableX, y: headerY, width: tableW, height: rowH * (data.length + 2), fill: 'none', stroke: '#CBD5E1', 'stroke-width': '1.5', rx: '4' }));
+
+// Vertical column dividers
+[colX[1], colX[2]].forEach(lx => {
+  svg.appendChild(el('line', { x1: lx, y1: headerY, x2: lx, y2: headerY + rowH * (data.length + 2), stroke: '#CBD5E1', 'stroke-width': '1' }));
+});
+
+// Horizontal row dividers
+for (let i = 1; i <= data.length + 1; i++) {
+  const ly = headerY + rowH * i;
+  const color = i === data.length + 1 ? '#93C5FD' : '#E2E8F0';
+  const sw = i === data.length + 1 ? '1.5' : '1';
+  svg.appendChild(el('line', { x1: tableX, y1: ly, x2: tableX + tableW, y2: ly, stroke: color, 'stroke-width': sw }));
+}
+
+// Adjust viewBox height
+const maxY = headerY + rowH * (data.length + 2) + 20;
+svg.setAttribute('viewBox', '0 0 680 ' + maxY);
+</script>

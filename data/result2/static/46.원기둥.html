@@ -1,0 +1,34 @@
+<svg width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+  <!-- 원기둥: 반지름 3, 높이 8 (scale=45px) -->
+  <!-- r=135, h=360 -->
+  <!-- 하단 타원: cx=340, cy=420, rx=135, ry=34 -->
+  <!-- 상단 타원: cx=340, cy=60, rx=135, ry=34 -->
+
+  <!-- 하단 타원: 뒤쪽 반원 점선 -->
+  <path d="M 205 420 A 135 34 0 0 0 475 420" fill="none" stroke="#94A3B8" stroke-width="1" stroke-dasharray="5 4"/>
+  <!-- 하단 타원: 앞쪽 반원 실선 -->
+  <path d="M 205 420 A 135 34 0 0 1 475 420" fill="none" stroke="#1D4ED8" stroke-width="1.5"/>
+
+  <!-- 옆면 사각형 (앞부분) -->
+  <rect x="205" y="60" width="270" height="360" fill="#3B82F6" fill-opacity="0.12" stroke="none"/>
+  <!-- 옆 수직선 -->
+  <line x1="205" y1="60" x2="205" y2="420" stroke="#1D4ED8" stroke-width="1.5"/>
+  <line x1="475" y1="60" x2="475" y2="420" stroke="#1D4ED8" stroke-width="1.5"/>
+
+  <!-- 상단 타원: 뒤쪽 반원 점선 -->
+  <path d="M 205 60 A 135 34 0 0 0 475 60" fill="none" stroke="#94A3B8" stroke-width="1" stroke-dasharray="5 4"/>
+  <!-- 상단 타원: 앞쪽 반원 실선 (위에 그려야 옆면 위에 표시됨) -->
+  <path d="M 205 60 A 135 34 0 0 1 475 60" fill="#3B82F6" fill-opacity="0.12" stroke="#1D4ED8" stroke-width="1.5"/>
+
+  <!-- 반지름 표시 -->
+  <line x1="340" y1="60" x2="475" y2="60" stroke="#94A3B8" stroke-width="1" stroke-dasharray="4 3"/>
+  <!-- 높이 표시 -->
+  <line x1="510" y1="60" x2="510" y2="420" stroke="#94A3B8" stroke-width="1" stroke-dasharray="4 3"/>
+  <!-- 높이 끝점 마크 -->
+  <line x1="505" y1="60" x2="515" y2="60" stroke="#94A3B8" stroke-width="1"/>
+  <line x1="505" y1="420" x2="515" y2="420" stroke="#94A3B8" stroke-width="1"/>
+
+  <!-- 치수 라벨 -->
+  <text x="410" y="48" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="400" fill="#475569">3</text>
+  <text x="524" y="240" text-anchor="start" dominant-baseline="central" font-size="12" font-weight="400" fill="#475569">8</text>
+</svg>

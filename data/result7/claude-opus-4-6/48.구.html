@@ -1,0 +1,95 @@
+<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<linearGradient id="sphereGrad" x1="35%" y1="25%" x2="75%" y2="80%">
+<stop offset="0%" stop-color="#ffffff" stop-opacity="0.35" />
+<stop offset="100%" stop-color="#3B82F6" stop-opacity="0.12" />
+</linearGradient>
+</defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// sphere parameters
+const r = 5;
+const scale = 30;
+const R = r * scale; // 150px
+const cx = 340, cy = 220;
+const eqRy = R * 0.3; // equator ellipse minor axis
+const merRx = R * 0.25; // meridian ellipse minor axis
+
+// outer circle (sphere silhouette) with gradient shading
+svg.appendChild(el('circle', {
+  cx, cy, r: R,
+  fill: 'url(#sphereGrad)',
+  stroke: '#2563EB', 'stroke-width': '1.5'
+}));
+
+// equator ellipse - back half (dashed)
+svg.appendChild(el('path', {
+  d: `M ${cx - R} ${cy} A ${R} ${eqRy} 0 0 1 ${cx + R} ${cy}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '5 4'
+}));
+
+// equator ellipse - front half (solid)
+svg.appendChild(el('path', {
+  d: `M ${cx - R} ${cy} A ${R} ${eqRy} 0 0 0 ${cx + R} ${cy}`,
+  fill: 'none', stroke: '#2563EB', 'stroke-width': '1.2'
+}));
+
+// meridian ellipse - back half (dashed)
+svg.appendChild(el('path', {
+  d: `M ${cx} ${cy - R} A ${merRx} ${R} 0 0 0 ${cx} ${cy + R}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '5 4'
+}));
+
+// meridian ellipse - front half (solid)
+svg.appendChild(el('path', {
+  d: `M ${cx} ${cy - R} A ${merRx} ${R} 0 0 1 ${cx} ${cy + R}`,
+  fill: 'none', stroke: '#2563EB', 'stroke-width': '1.2'
+}));
+
+// radius line from center to upper-right on the sphere surface
+const angle = -35 * Math.PI / 180;
+const rx = cx + R * Math.cos(angle);
+const ry = cy + R * Math.sin(angle);
+svg.appendChild(el('line', {
+  x1: cx, y1: cy, x2: rx, y2: ry,
+  stroke: '#DC2626', 'stroke-width': '1.5'
+}));
+
+// endpoint dot on radius
+svg.appendChild(el('circle', { cx: rx, cy: ry, r: 3, fill: '#DC2626' }));
+
+// radius label r = 5
+const labelX = (cx + rx) / 2 + 5;
+const labelY = (cy + ry) / 2 - 14;
+addText(labelX, labelY, 'r = 5', { fill: '#DC2626', 'font-size': '14', 'font-weight': '500' });
+
+// center point O
+svg.appendChild(el('circle', { cx, cy, r: 3.5, fill: '#1E293B' }));
+addText(cx - 16, cy + 2, 'O', { 'text-anchor': 'end', 'font-size': '14', 'font-weight': '500' });
+
+// formulas below the sphere
+const formulaY = cy + R + 50;
+
+// surface area formula: S = 4πr² = 4π(5)² = 100π
+addText(cx, formulaY, 'S = 4\u03C0r\u00B2 = 4\u03C0 \u00D7 5\u00B2 = 100\u03C0', {
+  'font-size': '14', 'font-weight': '500', fill: '#334155'
+});
+
+// volume formula: V = (4/3)πr³ = (4/3)π(5)³ = 500π/3
+addText(cx, formulaY + 30, 'V = (4/3)\u03C0r\u00B3 = (4/3)\u03C0 \u00D7 5\u00B3 = 500\u03C0/3', {
+  'font-size': '14', 'font-weight': '500', fill: '#334155'
+});
+</script>

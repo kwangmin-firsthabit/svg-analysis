@@ -1,0 +1,110 @@
+<svg id="vis" width="100%" viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '13', 'font-weight': '400', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 탈리마크 그리기 함수
+// 탈리마크: 4획 세로선 + 1획 사선 = 5개 묶음
+function drawTallyGroup(x, y, count) {
+  const lineH = 16;
+  const spacing = 7;
+  let drawn = 0;
+
+  while (drawn < count) {
+    const groupCount = Math.min(5, count - drawn);
+    const groupX = x + Math.floor(drawn / 5) * (spacing * 5 + 6);
+
+    for (let i = 0; i < Math.min(groupCount, 4); i++) {
+      const lx = groupX + i * spacing;
+      svg.appendChild(el('line', {
+        x1: lx, y1: y - lineH / 2,
+        x2: lx, y2: y + lineH / 2,
+        stroke: '#1E293B', 'stroke-width': '1.2', 'stroke-linecap': 'round'
+      }));
+    }
+    // 5번째는 사선
+    if (groupCount === 5) {
+      const slashX1 = groupX - 2;
+      const slashX2 = groupX + spacing * 4 + 2;
+      svg.appendChild(el('line', {
+        x1: slashX1, y1: y + lineH / 2,
+        x2: slashX2, y2: y - lineH / 2,
+        stroke: '#1E293B', 'stroke-width': '1.2', 'stroke-linecap': 'round'
+      }));
+    }
+    drawn += groupCount;
+  }
+}
+
+// 데이터
+const seasons = ['봄', '여름', '가을', '겨울'];
+const counts = [8, 11, 7, 4];
+const total = counts.reduce((a, b) => a + b, 0); // 30
+
+// 레이아웃
+const tableX = 60;
+const tableY = 50;
+const rowH = 54;
+const colW = [80, 280, 70];
+const totalW = colW.reduce((a, b) => a + b, 0);
+const startX = (680 - totalW) / 2;
+
+// 제목
+txt(340, 25, '좋아하는 계절 조사 (학생 30명)', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+
+// 헤더
+const headers = ['계절', '탈리마크', '합계'];
+let xp = startX;
+headers.forEach((h, i) => {
+  svg.appendChild(el('rect', { x: xp, y: tableY, width: colW[i], height: rowH * 0.8, fill: '#EFF6FF', stroke: '#94A3B8', 'stroke-width': '0.5' }));
+  txt(xp + colW[i] / 2, tableY + rowH * 0.4, h, { 'font-size': '13', 'font-weight': '500', fill: '#1D4ED8' });
+  xp += colW[i];
+});
+
+// 각 계절 행
+seasons.forEach((season, si) => {
+  const rowY = tableY + rowH * 0.8 + si * rowH;
+  let xp2 = startX;
+
+  // 계절명 셀
+  svg.appendChild(el('rect', { x: xp2, y: rowY, width: colW[0], height: rowH, fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.5' }));
+  txt(xp2 + colW[0] / 2, rowY + rowH / 2, season, { 'font-size': '13', 'font-weight': '400', fill: '#1E293B' });
+  xp2 += colW[0];
+
+  // 탈리마크 셀
+  svg.appendChild(el('rect', { x: xp2, y: rowY, width: colW[1], height: rowH, fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.5' }));
+  drawTallyGroup(xp2 + 20, rowY + rowH / 2, counts[si]);
+  xp2 += colW[1];
+
+  // 합계 셀
+  svg.appendChild(el('rect', { x: xp2, y: rowY, width: colW[2], height: rowH, fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.5' }));
+  txt(xp2 + colW[2] / 2, rowY + rowH / 2, String(counts[si]), { 'font-size': '13', 'font-weight': '400', fill: '#1E293B' });
+  xp2 += colW[2];
+});
+
+// 총계 행
+const totalRowY = tableY + rowH * 0.8 + seasons.length * rowH;
+let xp3 = startX;
+svg.appendChild(el('rect', { x: xp3, y: totalRowY, width: colW[0], height: rowH * 0.85, fill: '#F1F5F9', stroke: '#94A3B8', 'stroke-width': '0.5' }));
+txt(xp3 + colW[0] / 2, totalRowY + rowH * 0.425, '합계', { 'font-size': '13', 'font-weight': '500', fill: '#475569' });
+xp3 += colW[0];
+
+svg.appendChild(el('rect', { x: xp3, y: totalRowY, width: colW[1], height: rowH * 0.85, fill: '#F1F5F9', stroke: '#94A3B8', 'stroke-width': '0.5' }));
+xp3 += colW[1];
+
+svg.appendChild(el('rect', { x: xp3, y: totalRowY, width: colW[2], height: rowH * 0.85, fill: '#F1F5F9', stroke: '#94A3B8', 'stroke-width': '0.5' }));
+txt(xp3 + colW[2] / 2, totalRowY + rowH * 0.425, String(total), { 'font-size': '13', 'font-weight': '500', fill: '#475569' });
+</script>

@@ -1,0 +1,122 @@
+<svg id="vis" width="100%" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 둔각삼각형: 내각 30°, 30°, 120°
+// 정점 C = 120° (둔각), A,B = 각 30°
+// 삼각형 배치: C를 위쪽 중앙, A,B를 아래
+// 사인 법칙: a/sin(A) = b/sin(B) = c/sin(C)
+// 변의 비율: sin(30)=0.5, sin(30)=0.5, sin(120)=√3/2
+// AB (C와 대변) : BC (A와 대변) : AC (B와 대변) = sin(120):sin(30):sin(30) = √3/2 : 0.5 : 0.5
+// 설정: BC = AC = 150, AB = 150 * √3 (대각 비율 맞추기)
+// 실제로 sin법칙: C=120도이고 A=B=30도
+// c(AB) / sin(120) = a(BC) / sin(30) -> AB = BC * sin(120)/sin(30) = BC * √3
+const k = 130; // BC = AC = k
+const AB = k * Math.sqrt(3);
+
+// C를 위쪽, A는 왼쪽 아래, B는 오른쪽 아래
+// 밑변 AB 수평 배치, C를 위에
+// C에서 AB의 수선 높이 h
+// 삼각형 면적 = 0.5 * AB * h = 0.5 * BC * AC * sin(120) = 0.5 * k^2 * √3/2
+// h = k^2 * √3/2 / AB = k^2 * √3/2 / (k*√3) = k/2
+const h = k / 2;
+const Ax = 340 - AB/2, Ay = 320;
+const Bx = 340 + AB/2, By = 320;
+const Cx = 340, Cy = 320 - h; // C는 AB 위쪽 중앙 (A=B=30°이므로 이등변)
+
+const A = [Ax, Ay];
+const B = [Bx, By];
+const C = [Cx, Cy];
+
+// 도형
+svg.appendChild(el('polygon', {
+  points: A[0]+','+A[1]+' '+B[0]+','+B[1]+' '+C[0]+','+C[1],
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 꼭짓점 점
+[A, B, C].forEach(([x, y]) => {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3.5', fill: '#1D4ED8' }));
+});
+
+// 꼭짓점 라벨
+addText(A[0] - 20, A[1] + 16, 'A');
+addText(B[0] + 20, B[1] + 16, 'B');
+addText(C[0], C[1] - 20, 'C');
+
+// 각도 호 함수 (내부 방향 호)
+function drawAngleArc(vx, vy, p1, p2, r) {
+  const a1 = Math.atan2(p1[1] - vy, p1[0] - vx);
+  const a2 = Math.atan2(p2[1] - vy, p2[0] - vx);
+  let start = a1, end = a2;
+  let diff = end - start;
+  if (diff < 0) diff += 2 * Math.PI;
+  if (diff > Math.PI) { const tmp = start; start = end; end = tmp; diff = 2*Math.PI - diff; }
+  const sx = vx + r * Math.cos(start);
+  const sy = vy + r * Math.sin(start);
+  const ex = vx + r * Math.cos(end);
+  const ey = vy + r * Math.sin(end);
+  svg.appendChild(el('path', {
+    d: 'M '+sx+' '+sy+' A '+r+' '+r+' 0 0 1 '+ex+' '+ey,
+    fill: 'none', stroke: '#60A5FA', 'stroke-width': '1'
+  }));
+}
+
+// A = 30° 호
+drawAngleArc(A[0], A[1], B, C, 25);
+// B = 30° 호
+drawAngleArc(B[0], B[1], A, C, 25);
+// C = 120° 호 (큰 호 필요)
+const aC1 = Math.atan2(A[1]-C[1], A[0]-C[0]);
+const aC2 = Math.atan2(B[1]-C[1], B[0]-C[0]);
+let cStart = aC1, cEnd = aC2;
+let cDiff = cEnd - cStart;
+if (cDiff < 0) cDiff += 2*Math.PI;
+// 내부 방향으로 큰 호 (120도)
+if (cDiff < Math.PI) { const tmp = cStart; cStart = cEnd; cEnd = tmp; cDiff = 2*Math.PI - cDiff; }
+{
+  const r = 28;
+  const sx = C[0] + r * Math.cos(cStart);
+  const sy = C[1] + r * Math.sin(cStart);
+  const ex = C[0] + r * Math.cos(cEnd);
+  const ey = C[1] + r * Math.sin(cEnd);
+  const large = cDiff > Math.PI ? 1 : 0;
+  svg.appendChild(el('path', {
+    d: 'M '+sx+' '+sy+' A '+r+' '+r+' 0 '+large+' 1 '+ex+' '+ey,
+    fill: 'none', stroke: '#60A5FA', 'stroke-width': '1'
+  }));
+}
+
+// 각도 라벨
+function angleLabelPos(vx, vy, p1, p2, r, label) {
+  const a1 = Math.atan2(p1[1] - vy, p1[0] - vx);
+  const a2 = Math.atan2(p2[1] - vy, p2[0] - vx);
+  let start = a1, end = a2;
+  let diff = end - start;
+  if (diff < 0) diff += 2 * Math.PI;
+  if (diff > Math.PI) { const tmp = start; start = end; end = tmp; }
+  const mid = (start + end) / 2;
+  addText(vx + r*Math.cos(mid), vy + r*Math.sin(mid), label, { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+}
+
+angleLabelPos(A[0], A[1], B, C, 42, '30°');
+angleLabelPos(B[0], B[1], A, C, 42, '30°');
+
+// C의 120° 라벨: 내부 방향 중간각
+const cMid = (cStart + cEnd) / 2;
+addText(C[0] + 48*Math.cos(cMid), C[1] + 48*Math.sin(cMid), '120°', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

@@ -1,0 +1,67 @@
+<svg id="vis" width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 직각삼각형: 두 변 3, 4, 빗변 5, 배율 40
+const scale = 40;
+// C가 직각 꼭짓점: C=(340, 320), A=(340, 320-4*40)=(340,160), B=(340+3*40, 320)=(460,320)
+// 수평 중앙 맞추기: cx=340
+// 가로 3*40=120, 세로 4*40=160
+// 중앙 배치: 전체 폭 120, 전체 높이 160
+// 좌우 여백 고려: 시작 x = 340 - 60 = 280 (B방향)
+const C = [290, 320];
+const A = [290, 320 - 4*scale];  // 위 꼭짓점
+const B = [290 + 3*scale, 320];  // 오른쪽 꼭짓점
+
+// C=(290,320), A=(290,160), B=(410,320)
+
+// 도형
+svg.appendChild(el('polygon', {
+  points: A[0]+','+A[1]+' '+B[0]+','+B[1]+' '+C[0]+','+C[1],
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 꼭짓점 점
+[A, B, C].forEach(([x, y]) => {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3.5', fill: '#1D4ED8' }));
+});
+
+// 꼭짓점 라벨
+addText(A[0] - 20, A[1], 'A');
+addText(B[0] + 20, B[1] + 8, 'B');
+addText(C[0] - 20, C[1] + 8, 'C');
+
+// 직각 기호 C에 표시 (s=10)
+const s = 10;
+svg.appendChild(el('path', {
+  d: 'M '+(C[0]+s)+','+(C[1])+' L '+(C[0]+s)+','+(C[1]-s)+' L '+(C[0])+','+(C[1]-s),
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.8'
+}));
+
+// 변 길이 라벨
+// BC = 3 (수평): 중간점 아래
+const mBC = [(B[0]+C[0])/2, (B[1]+C[1])/2];
+addText(mBC[0], mBC[1] + 18, '3', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// AC = 4 (수직): 중간점 왼쪽
+const mAC = [(A[0]+C[0])/2, (A[1]+C[1])/2];
+addText(mAC[0] - 18, mAC[1], '4', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// AB = 5 (빗변): 중간점 오른쪽-위
+const mAB = [(A[0]+B[0])/2, (A[1]+B[1])/2];
+addText(mAB[0] + 20, mAB[1], '5', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

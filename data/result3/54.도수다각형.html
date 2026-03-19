@@ -1,0 +1,85 @@
+<svg id="vis" width="100%" viewBox="0 0 680 60" xmlns="http://www.w3.org/2000/svg">
+<text x="340" y="36" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#1E293B">통학 시간 도수다각형 (학생 40명)</text>
+</svg>
+<div style="position: relative; width: 100%; height: 340px; padding: 0 20px; box-sizing: border-box;">
+  <canvas id="chart54"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+// 각 계급의 중앙값: 5, 15, 25, 35, 45
+// 양 끝에 (−5, 0)과 (55, 0) 추가하여 다각형이 닫히도록
+const midpoints = [-5, 5, 15, 25, 35, 45, 55];
+const frequencies = [0, 5, 12, 14, 7, 2, 0];
+const labels = ['-5', '5', '15', '25', '35', '45', '55'];
+
+const ctx = document.getElementById('chart54').getContext('2d');
+
+new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [{
+      label: '도수다각형',
+      data: frequencies,
+      borderColor: '#3B82F6',
+      borderWidth: 2,
+      backgroundColor: '#EFF6FF',
+      fill: true,
+      pointBackgroundColor: '#3B82F6',
+      pointBorderColor: '#ffffff',
+      pointBorderWidth: 2,
+      pointRadius: 5,
+      tension: 0,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    layout: { padding: { top: 30, right: 30, bottom: 10, left: 10 } },
+    plugins: {
+      legend: { display: false },
+      tooltip: { enabled: false }
+    },
+    scales: {
+      x: {
+        title: { display: true, text: '계급 중앙값 (분)', color: '#475569', font: { size: 12 } },
+        grid: { color: '#F1F5F9' },
+        ticks: { color: '#475569', font: { size: 12 } }
+      },
+      y: {
+        title: { display: true, text: '도수 (명)', color: '#475569', font: { size: 12 } },
+        min: 0, max: 18,
+        ticks: { stepSize: 2, color: '#475569', font: { size: 12 } },
+        grid: { color: '#F1F5F9' }
+      }
+    },
+    animation: { duration: 0 }
+  },
+  plugins: [
+    {
+      id: 'pointLabels',
+      afterDatasetsDraw(chart) {
+        const { ctx: c } = chart;
+        const meta = chart.getDatasetMeta(0);
+        const data = chart.data.datasets[0].data;
+        const xLabels = chart.data.labels;
+
+        meta.data.forEach((point, i) => {
+          if (data[i] === 0) return;
+          const xVal = xLabels[i];
+          const yVal = data[i];
+          const label = '(' + xVal + ', ' + yVal + ')';
+
+          c.save();
+          c.fillStyle = '#1D4ED8';
+          c.font = '400 11px sans-serif';
+          c.textAlign = 'center';
+          c.textBaseline = 'bottom';
+          c.fillText(label, point.x, point.y - 8);
+          c.restore();
+        });
+      }
+    }
+  ]
+});
+</script>

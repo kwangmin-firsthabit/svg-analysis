@@ -1,0 +1,107 @@
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '12',
+      'font-weight': '400',
+      fill: '#444',
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  const ox = 340,
+    oy = 360,
+    scale = 60;
+
+  // axes
+  svg.appendChild(
+    el('line', { x1: 60, y1: oy, x2: 630, y2: oy, stroke: '#000', 'stroke-width': 1.2, 'marker-end': 'url(#arrow)' })
+  );
+  svg.appendChild(
+    el('line', { x1: ox, y1: 420, x2: ox, y2: 30, stroke: '#000', 'stroke-width': 1.2, 'marker-end': 'url(#arrow)' })
+  );
+
+  // parabola y = -x^2 + 4
+  let pts = '';
+  for (let px = 60; px <= 620; px += 2) {
+    let x = (px - ox) / scale;
+    let y = -x * x + 4;
+    let py = oy - y * scale;
+    if (py > 20 && py < 420) pts += px + ',' + py + ' ';
+  }
+  svg.appendChild(el('polyline', { points: pts, fill: 'none', stroke: '#2563eb', 'stroke-width': 2 }));
+
+  // optimal rectangle: x = ±sqrt(4/3)
+  const a = Math.sqrt(4 / 3);
+  const h = -a * a + 4;
+
+  const left = ox - a * scale;
+  const right = ox + a * scale;
+  const top = oy - h * scale;
+
+  // rectangle
+  svg.appendChild(
+    el('rect', {
+      x: left,
+      y: top,
+      width: right - left,
+      height: oy - top,
+      fill: '#ef4444',
+      'fill-opacity': '0.2',
+      stroke: '#dc2626',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // top vertices
+  svg.appendChild(el('circle', { cx: left, cy: top, r: 3.5, fill: '#dc2626' }));
+  svg.appendChild(el('circle', { cx: right, cy: top, r: 3.5, fill: '#dc2626' }));
+
+  // labels
+  svg.appendChild(text(520, 80, 'y = -x² + 4', { 'font-size': '14', 'font-weight': '500', fill: '#2563eb' }));
+  svg.appendChild(
+    text((left + right) / 2, top - 15, '최대 직사각형', { 'font-size': '14', 'font-weight': '500', fill: '#dc2626' })
+  );
+
+  // width label
+  svg.appendChild(text((left + right) / 2, oy + 18, '2a', { 'font-size': '12' }));
+
+  // height label
+  svg.appendChild(text(right + 20, (top + oy) / 2, '4-a²', { 'font-size': '12', 'text-anchor': 'start' }));
+</script>

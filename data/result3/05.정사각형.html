@@ -1,0 +1,97 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 정사각형: 변 3 -> 시각화 배율 60px
+const side = 180;
+const left = 340 - side/2, top = 200 - side/2;
+const right = left + side, bottom = top + side;
+
+// A=왼위, B=오위, C=오아래, D=왼아래
+const A = [left, top];
+const B = [right, top];
+const C = [right, bottom];
+const D = [left, bottom];
+
+// 도형
+svg.appendChild(el('polygon', {
+  points: A[0]+','+A[1]+' '+B[0]+','+B[1]+' '+C[0]+','+C[1]+' '+D[0]+','+D[1],
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 꼭짓점 점
+[A, B, C, D].forEach(([x, y]) => {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3.5', fill: '#1D4ED8' }));
+});
+
+// 꼭짓점 라벨
+addText(A[0] - 18, A[1] - 14, 'A');
+addText(B[0] + 18, B[1] - 14, 'B');
+addText(C[0] + 18, C[1] + 14, 'C');
+addText(D[0] - 18, D[1] + 14, 'D');
+
+// 직각 기호 4곳
+const s = 10;
+function rightAngle(vx, vy, d1x, d1y, d2x, d2y) {
+  svg.appendChild(el('path', {
+    d: 'M '+(vx+d1x*s)+','+(vy+d1y*s)+' L '+(vx+d1x*s+d2x*s)+','+(vy+d1y*s+d2y*s)+' L '+(vx+d2x*s)+','+(vy+d2y*s),
+    fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.8'
+  }));
+}
+
+// A: 오른쪽, 아래
+rightAngle(A[0], A[1], 1, 0, 0, 1);
+// B: 왼쪽, 아래
+rightAngle(B[0], B[1], -1, 0, 0, 1);
+// C: 왼쪽, 위
+rightAngle(C[0], C[1], -1, 0, 0, -1);
+// D: 오른쪽, 위
+rightAngle(D[0], D[1], 1, 0, 0, -1);
+
+// 단선(|) 표시 - 4변 중점
+function drawTick(p1, p2) {
+  const mx = (p1[0]+p2[0])/2;
+  const my = (p1[1]+p2[1])/2;
+  const dx = p2[0]-p1[0], dy = p2[1]-p1[1];
+  const len = Math.sqrt(dx*dx+dy*dy);
+  const nx = -dy/len * 8, ny = dx/len * 8;
+  svg.appendChild(el('line', {
+    x1: mx+nx, y1: my+ny, x2: mx-nx, y2: my-ny,
+    stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linecap': 'round'
+  }));
+}
+
+drawTick(A, B);
+drawTick(B, C);
+drawTick(C, D);
+drawTick(D, A);
+
+// 두 대각선 (점선)
+svg.appendChild(el('line', {
+  x1: A[0], y1: A[1], x2: C[0], y2: C[1],
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+svg.appendChild(el('line', {
+  x1: B[0], y1: B[1], x2: D[0], y2: D[1],
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+
+// 변 길이 라벨 (3)
+addText((A[0]+B[0])/2, A[1] - 16, '3', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

@@ -1,0 +1,108 @@
+<svg id="vis" width="100%" viewBox="0 0 680 180" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#111',
+      ...attrs,
+    });
+    t.textContent = str;
+    return t;
+  }
+
+  // number line setup
+  const y = 90;
+  const xStart = 80;
+  const xEnd = 600;
+
+  // scale mapping (-2 ~ 5)
+  function map(x) {
+    return xStart + ((x + 2) * (xEnd - xStart)) / 7;
+  }
+
+  // axis line
+  svg.appendChild(
+    el('line', {
+      x1: xStart,
+      y1: y,
+      x2: xEnd,
+      y2: y,
+      stroke: '#000',
+      'stroke-width': '1.2',
+    })
+  );
+
+  // ticks and labels
+  for (let i = -2; i <= 5; i++) {
+    const px = map(i);
+    svg.appendChild(
+      el('line', {
+        x1: px,
+        y1: y - 5,
+        x2: px,
+        y2: y + 5,
+        stroke: '#000',
+        'stroke-width': '0.8',
+      })
+    );
+    svg.appendChild(text(px, y + 18, String(i), { 'font-size': '12', 'font-weight': '400' }));
+  }
+
+  // interval segment [-1, 4)
+  const left = map(-1);
+  const right = map(4);
+
+  // segment line
+  svg.appendChild(
+    el('line', {
+      x1: left,
+      y1: y,
+      x2: right,
+      y2: y,
+      stroke: '#2563eb',
+      'stroke-width': '4',
+    })
+  );
+
+  // closed dot at -1
+  svg.appendChild(
+    el('circle', {
+      cx: left,
+      cy: y,
+      r: 5,
+      fill: '#2563eb',
+    })
+  );
+
+  // open dot at 4
+  svg.appendChild(
+    el('circle', {
+      cx: right,
+      cy: y,
+      r: 5,
+      fill: '#fff',
+      stroke: '#2563eb',
+      'stroke-width': '2',
+    })
+  );
+
+  // labels
+  svg.appendChild(text(left, y - 20, '-1', { 'font-size': '12' }));
+  svg.appendChild(text(right, y - 20, '4', { 'font-size': '12' }));
+
+  svg.appendChild(text(340, 30, '-1 ≤ x < 4', { 'font-size': '14', 'font-weight': '500' }));
+</script>

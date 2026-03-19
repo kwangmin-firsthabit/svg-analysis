@@ -1,0 +1,77 @@
+<svg id="vis" width="100%" viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+    <path d="M0,0 L0,6 L8,3 z" fill="#475569"/>
+  </marker>
+  <marker id="arrowL" markerWidth="8" markerHeight="8" refX="2" refY="3" orient="auto">
+    <path d="M8,0 L8,6 L0,3 z" fill="#475569"/>
+  </marker>
+</defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+svg.appendChild(el('rect', { width: '680', height: '280', fill: '#F8FAFC' }));
+addText(340, 36, '절댓값 부등식: |x - 1| ≤ 3', { 'font-size': '18', 'font-weight': '600', fill: '#1E293B' });
+
+const center = 1;
+const radius = 3;
+const lo = center - radius;
+const hi = center + radius;
+
+const originX = 340;
+const axisY = 130;
+const unit = 80;
+
+svg.appendChild(el('line', {
+  x1: 60, y1: axisY, x2: 620, y2: axisY,
+  stroke: '#475569', 'stroke-width': '1.5',
+  'marker-start': 'url(#arrowL)', 'marker-end': 'url(#arrow)'
+}));
+
+const ticks = [-4, -3, -2, -1, 0, 1, 2, 3, 4, 5];
+ticks.forEach(n => {
+  const px = Math.round(originX + n * unit);
+  if (px >= 70 && px <= 610) {
+    svg.appendChild(el('line', { x1: px, y1: axisY - 8, x2: px, y2: axisY + 8, stroke: '#475569', 'stroke-width': '1.5' }));
+    addText(px, axisY + 22, String(n), { 'font-size': '13', fill: '#475569' });
+  }
+});
+
+const loPx = Math.round(originX + lo * unit);
+const hiPx = Math.round(originX + hi * unit);
+const cPx = Math.round(originX + center * unit);
+
+svg.appendChild(el('line', {
+  x1: loPx, y1: axisY, x2: hiPx, y2: axisY,
+  stroke: '#1D4ED8', 'stroke-width': '3'
+}));
+
+svg.appendChild(el('circle', { cx: loPx, cy: axisY, r: '6', fill: '#1D4ED8' }));
+svg.appendChild(el('circle', { cx: hiPx, cy: axisY, r: '6', fill: '#1D4ED8' }));
+
+svg.appendChild(el('line', {
+  x1: loPx, y1: 100, x2: hiPx, y2: 100,
+  stroke: '#1D4ED8', 'stroke-width': '1', 'stroke-dasharray': '4 3',
+  'marker-start': 'url(#arrowL)', 'marker-end': 'url(#arrow)'
+}));
+
+addText(cPx, 88, `중심 x = ${center}, 반지름 ${radius}`, { 'font-size': '12', fill: '#1D4ED8' });
+addText(Math.round((loPx + cPx) / 2), 112, `← ${radius}`, { 'font-size': '11', fill: '#1D4ED8' });
+addText(Math.round((cPx + hiPx) / 2), 112, `${radius} →`, { 'font-size': '11', fill: '#1D4ED8' });
+
+addText(340, 210, `해: ${lo} ≤ x ≤ ${hi}`, { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+addText(340, 235, `|x - ${center}| ≤ ${radius}  ⟺  ${center} - ${radius} ≤ x ≤ ${center} + ${radius}`, { 'font-size': '13', fill: '#475569' });
+addText(340, 258, '양쪽 모두 닫힌 점(채운 원)', { 'font-size': '13', fill: '#475569' });
+</script>

@@ -1,0 +1,135 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+<script>
+const svg = document.getElementById('vis');
+function el(tag, attrs) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  svg.appendChild(e);
+  return e;
+}
+function addText(x, y, text, attrs = {}) {
+  const e = el('text', { x, y, 'dominant-baseline': 'central', 'text-anchor': 'middle', 'font-family': 'system-ui, sans-serif', 'font-size': 14, 'font-weight': 500, fill: '#333', ...attrs });
+  e.textContent = text;
+  return e;
+}
+
+// Cone: base radius r=4, slant height l=10
+// Central angle: theta = 2*pi*r / l = 8pi/10 = 4pi/5 rad = 144 deg
+// Arc length = 2*pi*r = 8*pi
+const r = 4;
+const l = 10;
+const theta = (2 * Math.PI * r) / l; // 4pi/5 rad = 144 deg
+const thetaDeg = 144;
+const scale = 17;
+const sectorR = l * scale; // 170px
+
+// Sector center (left side)
+const sx = 195;
+const sy = 235;
+const halfTheta = theta / 2; // 72 deg in rad
+const startAngle = -Math.PI / 2 - halfTheta;
+const endAngle = -Math.PI / 2 + halfTheta;
+
+const ax1 = sx + sectorR * Math.cos(startAngle);
+const ay1 = sy + sectorR * Math.sin(startAngle);
+const ax2 = sx + sectorR * Math.cos(endAngle);
+const ay2 = sy + sectorR * Math.sin(endAngle);
+const largeArc = theta > Math.PI ? 1 : 0;
+
+// Sector fill + stroke
+el('path', {
+  d: `M${sx},${sy} L${ax1},${ay1} A${sectorR},${sectorR} 0 ${largeArc} 1 ${ax2},${ay2} Z`,
+  fill: '#EAF3DE',
+  stroke: '#444441',
+  'stroke-width': 1.5,
+  'stroke-linejoin': 'round'
+});
+
+// Slant height label on left radius
+const lMidX = sx + (sectorR * 0.52) * Math.cos(startAngle);
+const lMidY = sy + (sectorR * 0.52) * Math.sin(startAngle);
+const lNx = -Math.sin(startAngle);
+const lNy = Math.cos(startAngle);
+addText(lMidX + lNx * 16, lMidY + lNy * 16, 'l = 10', { fill: '#185FA5', 'font-size': 14, 'font-weight': 500 });
+
+// Central angle arc
+const angleArcR = 38;
+const angAx1 = sx + angleArcR * Math.cos(startAngle);
+const angAy1 = sy + angleArcR * Math.sin(startAngle);
+const angAx2 = sx + angleArcR * Math.cos(endAngle);
+const angAy2 = sy + angleArcR * Math.sin(endAngle);
+el('path', {
+  d: `M${angAx1},${angAy1} A${angleArcR},${angleArcR} 0 0 1 ${angAx2},${angAy2}`,
+  fill: 'none',
+  stroke: '#C0392B',
+  'stroke-width': 1.2
+});
+
+// Central angle label "144°"
+addText(sx, sy - 54, '144°', { fill: '#C0392B', 'font-size': 13, 'font-weight': 500 });
+
+// Arc length label along curved edge
+const arcLabelAngle = -Math.PI / 2;
+const arcLabelR = sectorR + 18;
+addText(sx + arcLabelR * Math.cos(arcLabelAngle), sy + arcLabelR * Math.sin(arcLabelAngle), '호의 길이 = 8π', { fill: '#854F0B', 'font-size': 13, 'font-weight': 500 });
+
+// Arc length indicator (dashed curve outside sector)
+const arcIndR = sectorR + 7;
+const arcIndX1 = sx + arcIndR * Math.cos(startAngle + 0.06);
+const arcIndY1 = sy + arcIndR * Math.sin(startAngle + 0.06);
+const arcIndX2 = sx + arcIndR * Math.cos(endAngle - 0.06);
+const arcIndY2 = sy + arcIndR * Math.sin(endAngle - 0.06);
+el('path', {
+  d: `M${arcIndX1},${arcIndY1} A${arcIndR},${arcIndR} 0 ${largeArc} 1 ${arcIndX2},${arcIndY2}`,
+  fill: 'none',
+  stroke: '#854F0B',
+  'stroke-width': 1,
+  'stroke-dasharray': '4 3'
+});
+
+// Vertex dot + label
+el('circle', { cx: sx, cy: sy, r: 3, fill: '#444441' });
+addText(sx, sy + 16, 'O', { fill: '#444441', 'font-size': 13, 'font-weight': 500 });
+
+// "옆면 (부채꼴)" label
+addText(sx, sy + 80, '옆면 (부채꼴)', { fill: '#555', 'font-size': 12, 'font-weight': 400 });
+
+// ========== Base circle (right side) ==========
+const circleR = r * scale; // 68px
+const cx = 520;
+const cy = 235;
+
+el('circle', { cx, cy, r: circleR, fill: '#E6F1FB', stroke: '#444441', 'stroke-width': 1.5 });
+el('circle', { cx, cy, r: 3, fill: '#444441' });
+addText(cx, cy - 14, "O'", { fill: '#444441', 'font-size': 13, 'font-weight': 500 });
+
+// Radius line
+el('line', { x1: cx, y1: cy, x2: cx + circleR, y2: cy, stroke: '#185FA5', 'stroke-width': 1.5 });
+addText(cx + circleR / 2, cy - 12, 'r = 4', { fill: '#185FA5', 'font-size': 14, 'font-weight': 500 });
+
+// "밑면 (원)" label
+addText(cx, cy + circleR + 24, '밑면 (원)', { fill: '#555', 'font-size': 12, 'font-weight': 400 });
+addText(cx, cy + circleR + 44, '둘레 = 2πr = 8π', { fill: '#854F0B', 'font-size': 13, 'font-weight': 500 });
+
+// ========== Title ==========
+addText(340, 22, '원뿔의 전개도', { fill: '#222', 'font-size': 16, 'font-weight': 600 });
+addText(340, 44, '밑면의 반지름 r = 4,  모선의 길이 l = 10', { fill: '#666', 'font-size': 12, 'font-weight': 400 });
+
+// ========== Connection arrow ==========
+el('line', { x1: 345, y1: 195, x2: 435, y2: 195, stroke: '#999', 'stroke-width': 1, 'stroke-dasharray': '4 3' });
+el('path', {
+  d: 'M430,191 L438,195 L430,199',
+  fill: 'none',
+  stroke: '#999',
+  'stroke-width': 1,
+  'stroke-linecap': 'round',
+  'stroke-linejoin': 'round'
+});
+addText(390, 183, '호 = 둘레', { fill: '#999', 'font-size': 11, 'font-weight': 400 });
+
+// ========== Formula ==========
+const fby = 390;
+el('rect', { x: 100, y: fby - 14, width: 480, height: 28, rx: 4, fill: '#F8F8F6', stroke: '#DDD', 'stroke-width': 1 });
+addText(340, fby, '중심각 θ = (2πr / l) × (180°/π) = (8π / 10) × (180°/π) = 144°', { fill: '#444', 'font-size': 11, 'font-weight': 400 });
+</script>
+</svg>

@@ -1,0 +1,93 @@
+<svg id="vis" width="100%" viewBox="0 0 680 560" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 캡슐형 입체: 원뿔(위) + 반구(아래)
+// 반지름 r=3, 원뿔 높이=6, 반구 반지름=3
+// 총 높이 = 6 + 3 = 9
+// scale: 1단위 = 40px
+const sc = 40;
+const cx = 340; // 수평 중심
+const r = 3 * sc; // 반지름 = 120px
+
+// 밑면(공유 원) 중심 y좌표
+const baseY = 330;
+// 원뿔 꼭짓점 y좌표 (위로 6*sc)
+const apexY = baseY - 6 * sc; // 330 - 240 = 90
+// 반구 최하단 y좌표 (아래로 3*sc)
+const bottomY = baseY + 3 * sc; // 330 + 120 = 450
+
+// --- 반구 (아래쪽) ---
+// 타원 밑면 (공유 원을 타원으로 표현): rx=r, ry=r*0.3
+const ry = r * 0.3; // 36px
+// 반구는 반원 + 타원
+// 반구 외곽 반원 (아래로 볼록)
+svg.appendChild(el('path', {
+  d: `M ${cx - r},${baseY} A ${r},${r} 0 0 0 ${cx + r},${baseY}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+// 반구 밑면 타원 (공유 면)
+svg.appendChild(el('ellipse', {
+  cx: cx, cy: baseY, rx: r, ry: ry,
+  fill: '#EFF6FF', 'fill-opacity': '0.12', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-dasharray': '5 3'
+}));
+
+// --- 원뿔 (위쪽) ---
+// 원뿔 옆면 (두 개의 선: 꼭짓점 → 밑면 양쪽)
+svg.appendChild(el('line', { x1: cx, y1: apexY, x2: cx - r, y2: baseY, stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+svg.appendChild(el('line', { x1: cx, y1: apexY, x2: cx + r, y2: baseY, stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+// 원뿔 내부 채움
+svg.appendChild(el('polygon', {
+  points: `${cx},${apexY} ${cx - r},${baseY} ${cx + r},${baseY}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: 'none'
+}));
+// 밑면 타원 앞면 (실선)
+svg.appendChild(el('path', {
+  d: `M ${cx - r},${baseY} A ${r},${ry} 0 0 1 ${cx + r},${baseY}`,
+  fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// 꼭짓점 점
+svg.appendChild(el('circle', { cx: cx, cy: apexY, r: '4', fill: '#1D4ED8' }));
+
+// --- 치수 라벨 ---
+// 원뿔 높이(6): 왼쪽 점선
+svg.appendChild(el('line', { x1: cx - r - 30, y1: apexY, x2: cx - r - 30, y2: baseY, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+svg.appendChild(el('line', { x1: cx - r - 38, y1: apexY, x2: cx - r - 22, y2: apexY, stroke: '#94A3B8', 'stroke-width': '0.8' }));
+svg.appendChild(el('line', { x1: cx - r - 38, y1: baseY, x2: cx - r - 22, y2: baseY, stroke: '#94A3B8', 'stroke-width': '0.8' }));
+addText(cx - r - 52, (apexY + baseY) / 2, '6', { 'font-size': '13', 'font-weight': '500', fill: '#475569' });
+
+// 반지름(3): 수평 점선 (밑면)
+svg.appendChild(el('line', { x1: cx, y1: baseY, x2: cx + r, y2: baseY, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+addText(cx + r / 2, baseY - 14, '3', { 'font-size': '13', 'font-weight': '500', fill: '#475569' });
+
+// 총 높이(9): 오른쪽 점선
+svg.appendChild(el('line', { x1: cx + r + 30, y1: apexY, x2: cx + r + 30, y2: bottomY, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+svg.appendChild(el('line', { x1: cx + r + 22, y1: apexY, x2: cx + r + 38, y2: apexY, stroke: '#94A3B8', 'stroke-width': '0.8' }));
+svg.appendChild(el('line', { x1: cx + r + 22, y1: bottomY, x2: cx + r + 38, y2: bottomY, stroke: '#94A3B8', 'stroke-width': '0.8' }));
+addText(cx + r + 54, (apexY + bottomY) / 2, '9', { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+
+// 라벨 텍스트
+addText(cx + r + 80, (apexY + bottomY) / 2, '(총 높이)', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+addText(cx - r - 80, (apexY + baseY) / 2, '(원뿔 높이)', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+addText(cx + r / 2, baseY - 28, '(반지름)', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
+
+// 반구 반지름 표시
+svg.appendChild(el('line', { x1: cx, y1: baseY, x2: cx, y2: bottomY, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+addText(cx + 18, (baseY + bottomY) / 2, '3', { 'font-size': '13', 'font-weight': '500', fill: '#475569' });
+addText(cx + 50, (baseY + bottomY) / 2, '(반구 반지름)', { 'font-size': '11', fill: '#94A3B8' });
+</script>

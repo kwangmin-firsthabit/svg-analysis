@@ -1,0 +1,112 @@
+<div style="position:relative; height:480px; max-width:700px; margin:0 auto; padding:20px;">
+  <div style="text-align:center; margin-bottom:8px;">
+    <span style="font-family:sans-serif; font-size:15px; font-weight:bold; color:#333;">분기별 매출액 비교 (단위: 억 원)</span>
+  </div>
+  <div style="text-align:center; margin-bottom:12px; font-family:sans-serif; font-size:13px;">
+    <span style="display:inline-block; width:14px; height:14px; background:#4A90D9; border-radius:2px; vertical-align:middle; margin-right:4px;"></span>
+    <span style="vertical-align:middle; margin-right:16px; color:#555;">2022년</span>
+    <span style="display:inline-block; width:14px; height:14px; background:#E86B56; border-radius:2px; vertical-align:middle; margin-right:4px;"></span>
+    <span style="vertical-align:middle; color:#555;">2023년</span>
+  </div>
+  <canvas id="groupedBarChart"></canvas>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+(function() {
+  const ctx = document.getElementById('groupedBarChart').getContext('2d');
+
+  const data2022 = [120, 145, 132, 178];
+  const data2023 = [135, 162, 148, 195];
+
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['1분기', '2분기', '3분기', '4분기'],
+      datasets: [
+        {
+          label: '2022년',
+          data: data2022,
+          backgroundColor: '#4A90D9',
+          borderColor: '#3A7BC8',
+          borderWidth: 1,
+          borderRadius: 3,
+          barPercentage: 0.85,
+          categoryPercentage: 0.7
+        },
+        {
+          label: '2023년',
+          data: data2023,
+          backgroundColor: '#E86B56',
+          borderColor: '#D45A45',
+          borderWidth: 1,
+          borderRadius: 3,
+          barPercentage: 0.85,
+          categoryPercentage: 0.7
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: '분기',
+            font: { size: 13, weight: 'bold', family: 'sans-serif' },
+            color: '#555'
+          },
+          grid: { display: false },
+          ticks: {
+            font: { size: 12, family: 'sans-serif' },
+            color: '#444'
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: '매출액 (억 원)',
+            font: { size: 13, weight: 'bold', family: 'sans-serif' },
+            color: '#555'
+          },
+          beginAtZero: true,
+          max: 220,
+          ticks: {
+            stepSize: 40,
+            font: { size: 11, family: 'sans-serif' },
+            color: '#666'
+          },
+          grid: {
+            color: '#E5E5E5'
+          }
+        }
+      },
+      animation: {
+        onComplete: function() {
+          const chart = this;
+          const ctx = chart.ctx;
+          ctx.save();
+          ctx.font = 'bold 11px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'bottom';
+
+          chart.data.datasets.forEach(function(dataset, i) {
+            const meta = chart.getDatasetMeta(i);
+            meta.data.forEach(function(bar, index) {
+              const value = Math.round(dataset.data[index]);
+              ctx.fillStyle = '#333';
+              ctx.fillText(value, bar.x, bar.y - 4);
+            });
+          });
+          ctx.restore();
+        }
+      }
+    }
+  });
+})();
+</script>

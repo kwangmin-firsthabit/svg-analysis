@@ -1,0 +1,144 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+// y = 2^x exponential function passing through (0,1)
+const svg = document.getElementById('vis');
+const NS = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs, parent) {
+  const e = document.createElementNS(NS, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  (parent || svg).appendChild(e);
+  return e;
+}
+
+const ox = 300, oy = 400;
+const sx = 60, sy = 60;
+const xMin = -4, xMax = 5;
+const yMin = -1, yMax = 6;
+
+function px(x) { return ox + x * sx; }
+function py(y) { return oy - y * sy; }
+
+// defs for arrow marker
+const defs = el('defs', {});
+const marker = el('marker', {
+  id: 'arrow', viewBox: '0 0 10 10', refX: '10', refY: '5',
+  markerWidth: '8', markerHeight: '8', orient: 'auto-start-reverse'
+}, defs);
+el('path', { d: 'M0,0 L10,5 L0,10 Z', fill: '#333' }, marker);
+
+// grid lines
+for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+  if (x === 0) continue;
+  el('line', {
+    x1: px(x), y1: py(yMin), x2: px(x), y2: py(yMax),
+    stroke: '#e5e7eb', 'stroke-width': '1'
+  });
+}
+for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y++) {
+  if (y === 0) continue;
+  el('line', {
+    x1: px(xMin), y1: py(y), x2: px(xMax), y2: py(y),
+    stroke: '#e5e7eb', 'stroke-width': '1'
+  });
+}
+
+// x-axis
+el('line', {
+  x1: px(xMin) - 10, y1: py(0), x2: px(xMax) + 10, y2: py(0),
+  stroke: '#333', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)'
+});
+
+// y-axis
+el('line', {
+  x1: px(0), y1: py(yMin) + 10, x2: px(0), y2: py(yMax) - 10,
+  stroke: '#333', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)'
+});
+
+// x-axis ticks and labels
+for (let x = Math.ceil(xMin); x <= Math.floor(xMax); x++) {
+  if (x === 0) continue;
+  el('line', {
+    x1: px(x), y1: py(0) - 4, x2: px(x), y2: py(0) + 4,
+    stroke: '#333', 'stroke-width': '1.5'
+  });
+  el('text', {
+    x: px(x), y: py(0) + 20,
+    'text-anchor': 'middle', 'dominant-baseline': 'central',
+    'font-size': '12', 'font-weight': '400', fill: '#333'
+  }).textContent = x;
+}
+
+// y-axis ticks and labels
+for (let y = Math.ceil(yMin); y <= Math.floor(yMax); y++) {
+  if (y === 0) continue;
+  el('line', {
+    x1: px(0) - 4, y1: py(y), x2: px(0) + 4, y2: py(y),
+    stroke: '#333', 'stroke-width': '1.5'
+  });
+  el('text', {
+    x: px(0) - 14, y: py(y),
+    'text-anchor': 'middle', 'dominant-baseline': 'central',
+    'font-size': '12', 'font-weight': '400', fill: '#333'
+  }).textContent = y;
+}
+
+// axis labels
+el('text', {
+  x: px(xMax) + 20, y: py(0),
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  'font-size': '14', 'font-weight': '500', fill: '#333'
+}).textContent = 'x';
+
+el('text', {
+  x: px(0), y: py(yMax) - 20,
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  'font-size': '14', 'font-weight': '500', fill: '#333'
+}).textContent = 'y';
+
+// origin label
+el('text', {
+  x: px(0) - 14, y: py(0) + 16,
+  'text-anchor': 'middle', 'dominant-baseline': 'central',
+  'font-size': '12', 'font-weight': '400', fill: '#333'
+}).textContent = 'O';
+
+// y = 2^x curve
+const pts = [];
+const numPts = 200;
+const step = (xMax - xMin) / numPts;
+for (let i = 0; i <= numPts; i++) {
+  const x = xMin + i * step;
+  const y = Math.pow(2, x);
+  // clip to visible area
+  if (y > yMax + 0.5) continue;
+  if (y < yMin - 0.5) continue;
+  pts.push(`${Math.round(px(x) * 10) / 10},${Math.round(py(y) * 10) / 10}`);
+}
+
+el('polyline', {
+  points: pts.join(' '),
+  fill: 'none', stroke: '#2563eb', 'stroke-width': '2.5',
+  'stroke-linecap': 'round', 'stroke-linejoin': 'round'
+});
+
+// point (0, 1)
+el('circle', {
+  cx: px(0), cy: py(1), r: '5',
+  fill: '#2563eb', stroke: '#fff', 'stroke-width': '2'
+});
+
+// point label (0, 1)
+el('text', {
+  x: px(0) + 16, y: py(1) - 14,
+  'text-anchor': 'start', 'dominant-baseline': 'central',
+  'font-size': '14', 'font-weight': '500', fill: '#2563eb'
+}).textContent = '(0, 1)';
+
+// function label
+el('text', {
+  x: px(2.5) + 12, y: py(Math.pow(2, 2.5)) - 10,
+  'text-anchor': 'start', 'dominant-baseline': 'central',
+  'font-size': '14', 'font-weight': '500', fill: '#2563eb'
+}).textContent = 'y = 2\u02E3';
+</script>

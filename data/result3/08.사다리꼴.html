@@ -1,0 +1,83 @@
+<svg id="vis" width="100%" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 사다리꼴: AD∥BC, 높이 4
+// 배율: 높이 4 -> 40px/unit, 상변 AD = 100, 하변 BC = 200
+const scale = 40;
+const hpx = 4 * scale; // 160px 높이
+const topW = 100, botW = 200;
+
+// 중앙 배치
+const cx = 340;
+const botY = 300, topY = botY - hpx;
+const A = [cx - topW/2, topY];  // 왼위
+const D = [cx + topW/2, topY];  // 오른위
+const B = [cx - botW/2, botY];  // 왼아래
+const C = [cx + botW/2, botY];  // 오른아래
+
+// 도형 (ABCD 순서: A=왼위, B=왼아래, C=오른아래, D=오른위)
+svg.appendChild(el('polygon', {
+  points: A[0]+','+A[1]+' '+D[0]+','+D[1]+' '+C[0]+','+C[1]+' '+B[0]+','+B[1],
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 꼭짓점 점
+[A, B, C, D].forEach(([x, y]) => {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3.5', fill: '#1D4ED8' }));
+});
+
+// 꼭짓점 라벨
+addText(A[0] - 16, A[1] - 14, 'A');
+addText(D[0] + 16, D[1] - 14, 'D');
+addText(B[0] - 16, B[1] + 14, 'B');
+addText(C[0] + 16, C[1] + 14, 'C');
+
+// 평행 표시: AD (위), BC (아래)에 방향 화살표
+const pOff = 18;
+// AD 위에 화살표 (오른쪽 방향)
+svg.appendChild(el('line', {
+  x1: (A[0]+D[0])/2 - 18, y1: A[1] - pOff,
+  x2: (A[0]+D[0])/2 + 18, y2: A[1] - pOff,
+  stroke: '#94A3B8', 'stroke-width': '1', 'marker-end': 'url(#arrow)'
+}));
+// BC 아래에 화살표 (오른쪽 방향)
+svg.appendChild(el('line', {
+  x1: (B[0]+C[0])/2 - 18, y1: B[1] + pOff,
+  x2: (B[0]+C[0])/2 + 18, y2: B[1] + pOff,
+  stroke: '#94A3B8', 'stroke-width': '1', 'marker-end': 'url(#arrow)'
+}));
+
+// 높이 수선 (꼭짓점 A에서 밑변 BC로 점선)
+const footA = [A[0], B[1]]; // A의 x좌표에서 BC 위의 발
+svg.appendChild(el('line', {
+  x1: A[0], y1: A[1], x2: footA[0], y2: footA[1],
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+
+// 수선의 발 직각 기호
+const s = 9;
+svg.appendChild(el('path', {
+  d: 'M '+(footA[0]+s)+','+footA[1]+' L '+(footA[0]+s)+','+(footA[1]-s)+' L '+footA[0]+','+(footA[1]-s),
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.8'
+}));
+
+// 높이 라벨 (4)
+addText(A[0] - 18, (A[1]+B[1])/2, '4', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

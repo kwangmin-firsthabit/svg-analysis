@@ -1,0 +1,49 @@
+<svg id="vis" width="100%" viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="arrowL" viewBox="0 0 10 10" refX="2" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M8 1L2 5L8 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '13', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#374151', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const ox = 340, oy = 100, scale = 70;
+const xMin = -4.5, xMax = 3.5;
+const pxMin = ox + xMin * scale, pxMax = ox + xMax * scale;
+
+// 수직선
+svg.appendChild(el('line', { x1: pxMin - 10, y1: oy, x2: pxMax + 10, y2: oy, stroke: '#374151', 'stroke-width': '1.8', 'marker-end': 'url(#arrow)' }));
+
+// 눈금 -4 ~ 3
+for (let mx = -4; mx <= 3; mx++) {
+  const px = ox + mx * scale;
+  svg.appendChild(el('line', { x1: px, y1: oy - 6, x2: px, y2: oy + 6, stroke: '#374151', 'stroke-width': '1.2' }));
+  addText(px, oy + 22, String(mx));
+}
+
+const pxA = ox + (-2) * scale; // x ≤ -2 경계
+const pxB = ox + 1 * scale;    // x > 1 경계
+
+// 왼쪽 구간: x ≤ -2, 화살표 방향 왼쪽
+svg.appendChild(el('line', { x1: pxA, y1: oy, x2: pxMin - 8, y2: oy, stroke: '#2563EB', 'stroke-width': '4', 'stroke-linecap': 'round', 'marker-start': 'url(#arrowL)' }));
+// 오른쪽 구간: x > 1, 화살표 방향 오른쪽
+svg.appendChild(el('line', { x1: pxB, y1: oy, x2: pxMax + 8, y2: oy, stroke: '#2563EB', 'stroke-width': '4', 'stroke-linecap': 'round', 'marker-end': 'url(#arrow)' }));
+
+// 왼쪽 닫힌 점 (-2)
+svg.appendChild(el('circle', { cx: pxA, cy: oy, r: '7', fill: '#2563EB', stroke: '#2563EB', 'stroke-width': '2' }));
+// 오른쪽 열린 점 (1)
+svg.appendChild(el('circle', { cx: pxB, cy: oy, r: '7', fill: '#ffffff', stroke: '#2563EB', 'stroke-width': '2.5' }));
+
+// 레이블
+addText(340, 48, 'x ≤ −2  또는  x > 1', { 'font-size': '16', 'font-weight': '600', fill: '#1E3A8A' });
+addText(pxA, oy - 20, '−2', { 'font-size': '12', fill: '#2563EB', 'font-weight': '600' });
+addText(pxB, oy - 20, '1', { 'font-size': '12', fill: '#2563EB', 'font-weight': '600' });
+</script>

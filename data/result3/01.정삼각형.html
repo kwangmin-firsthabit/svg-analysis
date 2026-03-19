@@ -1,0 +1,118 @@
+<svg id="vis" width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 정삼각형: 변의 길이 6cm, 시각화 배율 적용
+const side = 220;
+const h = side * Math.sqrt(3) / 2;
+const cx = 340;
+const by = 340, bx = cx - side / 2;
+const cy2 = 340, cx2 = cx + side / 2;
+const ax = cx, ay = by - h;
+
+// A=(340, 149.5), B=(230, 340), C=(450, 340)
+const A = [ax, ay];
+const B = [bx, by];
+const C = [cx2, cy2];
+
+// 도형
+svg.appendChild(el('polygon', {
+  points: A[0]+','+A[1]+' '+B[0]+','+B[1]+' '+C[0]+','+C[1],
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 꼭짓점 점
+[A, B, C].forEach(([x, y]) => {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3.5', fill: '#1D4ED8' }));
+});
+
+// 꼭짓점 라벨
+addText(A[0], A[1] - 20, 'A');
+addText(B[0] - 20, B[1] + 18, 'B');
+addText(C[0] + 20, C[1] + 18, 'C');
+
+// 변 중점 - 길이 라벨 (6cm)
+const mid = (p1, p2) => [(p1[0]+p2[0])/2, (p1[1]+p2[1])/2];
+const mAB = mid(A, B);
+const mAC = mid(A, C);
+const mBC = mid(B, C);
+
+addText(mAB[0] - 18, mAB[1], '6', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+addText(mAC[0] + 18, mAC[1], '6', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+addText(mBC[0], mBC[1] + 18, '6', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 단선(|) 표시 - 각 변 중점
+function drawTickMark(p1, p2, offset) {
+  const mx = (p1[0]+p2[0])/2;
+  const my = (p1[1]+p2[1])/2;
+  const dx = p2[0]-p1[0], dy = p2[1]-p1[1];
+  const len = Math.sqrt(dx*dx+dy*dy);
+  const nx = -dy/len * offset, ny = dx/len * offset;
+  svg.appendChild(el('line', {
+    x1: mx+nx, y1: my+ny, x2: mx-nx, y2: my-ny,
+    stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linecap': 'round'
+  }));
+}
+
+drawTickMark(A, B, 7);
+drawTickMark(A, C, 7);
+drawTickMark(B, C, 7);
+
+// 60° 각도 호 표시
+function drawAngleArc(vx, vy, p1x, p1y, p2x, p2y, r) {
+  const a1 = Math.atan2(p1y - vy, p1x - vx);
+  const a2 = Math.atan2(p2y - vy, p2x - vx);
+  let start = a1, end = a2;
+  // 내부 각도 방향으로 sweep
+  let diff = end - start;
+  if (diff < 0) diff += 2 * Math.PI;
+  if (diff > Math.PI) { const tmp = start; start = end; end = tmp; }
+  const sx = vx + r * Math.cos(start);
+  const sy = vy + r * Math.sin(start);
+  const ex = vx + r * Math.cos(end);
+  const ey = vy + r * Math.sin(end);
+  let diff2 = end - start;
+  if (diff2 < 0) diff2 += 2*Math.PI;
+  const large = diff2 > Math.PI ? 1 : 0;
+  svg.appendChild(el('path', {
+    d: 'M '+sx+' '+sy+' A '+r+' '+r+' 0 '+large+' 1 '+ex+' '+ey,
+    fill: 'none', stroke: '#60A5FA', 'stroke-width': '1'
+  }));
+}
+
+drawAngleArc(A[0], A[1], B[0], B[1], C[0], C[1], 22);
+drawAngleArc(B[0], B[1], A[0], A[1], C[0], C[1], 22);
+drawAngleArc(C[0], C[1], A[0], A[1], B[0], B[1], 22);
+
+// 각도 숫자 라벨
+function angleLabel(vx, vy, p1x, p1y, p2x, p2y, r, label) {
+  const a1 = Math.atan2(p1y - vy, p1x - vx);
+  const a2 = Math.atan2(p2y - vy, p2x - vx);
+  let start = a1, end = a2;
+  let diff = end - start;
+  if (diff < 0) diff += 2 * Math.PI;
+  if (diff > Math.PI) { const tmp = start; start = end; end = tmp; }
+  const mid = (start + end) / 2;
+  const lx = vx + r * Math.cos(mid);
+  const ly = vy + r * Math.sin(mid);
+  addText(lx, ly, label, { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+}
+
+angleLabel(A[0], A[1], B[0], B[1], C[0], C[1], 38, '60°');
+angleLabel(B[0], B[1], A[0], A[1], C[0], C[1], 38, '60°');
+angleLabel(C[0], C[1], A[0], A[1], B[0], B[1], 38, '60°');
+</script>

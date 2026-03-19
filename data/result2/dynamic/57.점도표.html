@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>점도표</title>
+</head>
+<body>
+<svg id="vis" width="100%" viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function txt(x, y, s, attrs={}) {
+  const t = el('text', {x, y, 'font-size':'13', 'font-weight':'400', 'text-anchor':'middle', 'dominant-baseline':'central', fill:'#1E293B', ...attrs});
+  t.textContent = s;
+  svg.appendChild(t);
+}
+
+const data = [
+  { hours: 0, count: 3 },
+  { hours: 1, count: 7 },
+  { hours: 2, count: 8 },
+  { hours: 3, count: 4 },
+  { hours: 4, count: 2 },
+  { hours: 5, count: 1 }
+];
+
+txt(340, 28, '하루 독서 시간 점도표 (학생 25명)', {'font-size':'14','font-weight':'600'});
+
+const axisY = 260;
+const startX = 80;
+const endX = 620;
+const stepX = (endX - startX) / (data.length - 1 + 1);
+const xPositions = data.map((d, i) => startX + (i + 0.5) * stepX);
+
+svg.appendChild(el('line', {x1:startX - 20, y1:axisY, x2:endX + 20, y2:axisY, stroke:'#1E293B', 'stroke-width':'2'}));
+
+const r = 10;
+const gap = 2;
+
+data.forEach((d, i) => {
+  const cx = xPositions[i];
+
+  svg.appendChild(el('line', {x1:cx, y1:axisY-5, x2:cx, y2:axisY+5, stroke:'#1E293B', 'stroke-width':'1.5'}));
+  txt(cx, axisY + 20, String(d.hours), {'font-size':'13','fill':'#1E293B'});
+
+  for (let k = 0; k < d.count; k++) {
+    const cy = axisY - r - gap - k * (r * 2 + gap);
+    svg.appendChild(el('circle', {cx, cy, r, fill:'#3B82F6', 'fill-opacity':'0.3', stroke:'#1D4ED8', 'stroke-width':'1.5'}));
+  }
+
+  if (d.count > 0) {
+    const topCy = axisY - r - gap - (d.count - 1) * (r * 2 + gap);
+    txt(cx, topCy - r - 6, String(d.count), {'font-size':'11','font-weight':'500','fill':'#475569'});
+  }
+});
+
+txt(350, 298, '독서 시간 (시간)', {'font-size':'13','fill':'#475569'});
+</script>
+</body>
+</html>

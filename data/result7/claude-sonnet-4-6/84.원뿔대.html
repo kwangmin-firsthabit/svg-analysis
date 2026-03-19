@@ -1,0 +1,103 @@
+<svg id="vis" width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 원뿔대: 아랫면 r₁=6, 윗면 r₂=3, 높이 h=5
+const r1 = 6, r2 = 3, h = 5;
+const sc = 28; // 1단위 = 28px
+
+const cx = 340; // 중심 x
+const baseY = 340; // 아랫면 y
+const topY = baseY - h * sc; // 윗면 y = 340 - 140 = 200
+
+const r1Px = r1 * sc; // 168px
+const r2Px = r2 * sc; // 84px
+const eRy1 = Math.round(r1Px * 0.28); // 아랫면 타원 단축 ≈ 47
+const eRy2 = Math.round(r2Px * 0.28); // 윗면 타원 단축 ≈ 24
+
+// 옆면 (trapezoid 모양 사다리꼴 side surface)
+// 왼쪽 모선: (cx-r1Px, baseY) → (cx-r2Px, topY)
+// 오른쪽 모선: (cx+r1Px, baseY) → (cx+r2Px, topY)
+const sidePoints = [
+  [cx - r1Px, baseY],
+  [cx + r1Px, baseY],
+  [cx + r2Px, topY],
+  [cx - r2Px, topY],
+].map(p => p.join(',')).join(' ');
+svg.appendChild(el('polygon', {
+  points: sidePoints,
+  fill: '#FEF3C7', 'fill-opacity': '0.65', stroke: '#F59E0B', 'stroke-width': '2'
+}));
+
+// 아랫면 타원 (뒤 반원: 점선)
+svg.appendChild(el('ellipse', {
+  cx, cy: baseY, rx: r1Px, ry: eRy1,
+  fill: '#DBEAFE', 'fill-opacity': '0.5',
+  stroke: '#2563EB', 'stroke-width': '1.5', 'stroke-dasharray': '6 4'
+}));
+// 아랫면 앞 반원 (실선)
+const arcB = `M ${cx - r1Px},${baseY} A ${r1Px},${eRy1} 0 0 1 ${cx + r1Px},${baseY}`;
+svg.appendChild(el('path', { d: arcB, fill: 'none', stroke: '#2563EB', 'stroke-width': '2' }));
+
+// 윗면 타원 (뒤: 점선)
+svg.appendChild(el('ellipse', {
+  cx, cy: topY, rx: r2Px, ry: eRy2,
+  fill: '#D1FAE5', 'fill-opacity': '0.5',
+  stroke: '#16A34A', 'stroke-width': '1.5', 'stroke-dasharray': '6 4'
+}));
+// 윗면 앞 반원 (실선)
+const arcT = `M ${cx - r2Px},${topY} A ${r2Px},${eRy2} 0 0 1 ${cx + r2Px},${topY}`;
+svg.appendChild(el('path', { d: arcT, fill: 'none', stroke: '#16A34A', 'stroke-width': '2' }));
+
+// 중심점
+svg.appendChild(el('circle', { cx, cy: baseY, r: '3.5', fill: '#2563EB' }));
+svg.appendChild(el('circle', { cx, cy: topY, r: '3.5', fill: '#16A34A' }));
+addText(cx + 14, baseY + 14, 'O₁', { 'font-size': '13', 'font-weight': '600', fill: '#1D4ED8' });
+addText(cx + 14, topY - 14, 'O₂', { 'font-size': '13', 'font-weight': '600', fill: '#16A34A' });
+
+// 아랫면 반지름 화살표
+svg.appendChild(el('line', {
+  x1: cx, y1: baseY, x2: cx + r1Px, y2: baseY,
+  stroke: '#1D4ED8', 'stroke-width': '1.8'
+}));
+addText(cx + r1Px / 2, baseY - eRy1 - 10, 'r₁ = 6', { fill: '#1D4ED8', 'font-size': '13', 'font-weight': '600' });
+
+// 윗면 반지름 화살표
+svg.appendChild(el('line', {
+  x1: cx, y1: topY, x2: cx + r2Px, y2: topY,
+  stroke: '#16A34A', 'stroke-width': '1.8'
+}));
+addText(cx + r2Px / 2, topY - eRy2 - 10, 'r₂ = 3', { fill: '#16A34A', 'font-size': '13', 'font-weight': '600' });
+
+// 높이 표시 (오른쪽 바깥)
+const hx = cx + r1Px + 24;
+svg.appendChild(el('line', {
+  x1: hx, y1: topY, x2: hx, y2: baseY,
+  stroke: '#DC2626', 'stroke-width': '1.5'
+}));
+// 화살표 끝 작은 수평선
+svg.appendChild(el('line', { x1: hx - 5, y1: topY, x2: hx + 5, y2: topY, stroke: '#DC2626', 'stroke-width': '1.5' }));
+svg.appendChild(el('line', { x1: hx - 5, y1: baseY, x2: hx + 5, y2: baseY, stroke: '#DC2626', 'stroke-width': '1.5' }));
+addText(hx + 22, (topY + baseY) / 2, 'h = 5', { fill: '#DC2626', 'font-size': '13', 'font-weight': '600' });
+
+// 모선 길이: l = √(h² + (r₁-r₂)²) = √(25+9) = √34
+const slant = Math.sqrt(h * h + (r1 - r2) ** 2);
+addText(cx - r1Px / 2 - r2Px / 2 - 8, (topY + baseY) / 2, `l=√34≈${slant.toFixed(1)}`, {
+  fill: '#92400E', 'font-size': '11'
+});
+
+addText(340, 430, `원뿔대 (r₁=6, r₂=3, h=5)`, { 'font-size': '13', fill: '#1E293B', 'font-weight': '600' });
+</script>

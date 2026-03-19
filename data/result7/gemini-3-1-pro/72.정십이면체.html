@@ -1,0 +1,137 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '[label-primary]',
+      ...attrs,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 꼭짓점 좌표 생성 (황금비 이용)
+  const phi = (1 + Math.sqrt(5)) / 2;
+  const rawVertices = [];
+
+  // (±1, ±1, ±1)
+  for (let x of [-1, 1]) for (let y of [-1, 1]) for (let z of [-1, 1]) rawVertices.push([x, y, z]);
+  // (0, ±1/phi, ±phi)
+  for (let y of [-1 / phi, 1 / phi]) for (let z of [-phi, phi]) rawVertices.push([0, y, z]);
+  // (±1/phi, ±phi, 0)
+  for (let x of [-1 / phi, 1 / phi]) for (let y of [-phi, phi]) rawVertices.push([x, y, 0]);
+  // (±phi, 0, ±1/phi)
+  for (let x of [-phi, phi]) for (let z of [-1 / phi, 1 / phi]) rawVertices.push([x, 0, z]);
+
+  // 한 변의 길이를 4로 맞추기 위한 스케일링
+  // 표준 좌표에서 변의 길이 a = 2/phi 이므로, 4/(2/phi) = 2*phi를 곱함
+  const sideScale = 2 * phi;
+  const finalScale = 50; // 화면 표시용 스케일
+  const ox = 340,
+    oy = 220;
+
+  // 2. 3D 회전 및 투영 함수
+  function rotateAndProject(v, angleX, angleY) {
+    let [x, y, z] = v.map(c => c * sideScale);
+
+    // Y축 회전
+    let x1 = x * Math.cos(angleY) + z * Math.sin(angleY);
+    let z1 = -x * Math.sin(angleY) + z * Math.cos(angleY);
+
+    // X축 회전
+    let y2 = y * Math.cos(angleX) - z1 * Math.sin(angleX);
+    let z2 = y * Math.sin(angleX) + z1 * Math.cos(angleX);
+
+    return {
+      px: ox + x1 * finalScale * 0.4,
+      py: oy - y2 * finalScale * 0.4,
+      pz: z2, // 가시성 판단용
+    };
+  }
+
+  const angleX = -0.4,
+    angleY = 0.6;
+  const projected = rawVertices.map(v => rotateAndProject(v, angleX, angleY));
+
+  // 3. 모서리 연결 정보 생성 (거리가 일정한 점들 연결)
+  const edges = [];
+  const targetDistSq = Math.pow((2 / phi) * sideScale, 2);
+  for (let i = 0; i < rawVertices.length; i++) {
+    for (let j = i + 1; j < rawVertices.length; j++) {
+      const dx = (rawVertices[i][0] - rawVertices[j][0]) * sideScale;
+      const dy = (rawVertices[i][1] - rawVertices[j][1]) * sideScale;
+      const dz = (rawVertices[i][2] - rawVertices[j][2]) * sideScale;
+      const distSq = dx * dx + dy * dy + dz * dz;
+      if (Math.abs(distSq - 16) < 1) {
+        // 변의 길이 4 (4^2 = 16)
+        edges.push([i, j]);
+      }
+    }
+  }
+
+  // 4. 모서리 그리기
+  edges.forEach(([i, j]) => {
+    const p1 = projected[i];
+    const p2 = projected[j];
+    const avgZ = (p1.pz + p2.pz) / 2;
+
+    const isVisible = avgZ > -2; // 간단한 가시성 판단
+
+    svg.appendChild(
+      el('line', {
+        x1: p1.px,
+        y1: p1.py,
+        x2: p2.px,
+        y2: p2.py,
+        stroke: '[shape-stroke]',
+        'stroke-width': isVisible ? '1.5' : '1',
+        'stroke-dasharray': isVisible ? 'none' : '4 3',
+        opacity: isVisible ? '1' : '0.4',
+      })
+    );
+  });
+
+  // 5. 라벨링
+  addText(ox, 40, '정십이면체 (Regular Dodecahedron)', { 'font-size': '16' });
+  addText(ox, 400, '한 변의 길이 = 4', { fill: '[label-secondary]' });
+
+  // 한 변의 길이를 가리키는 화살표와 텍스트 (예시 모서리 하나 선택)
+  const e = edges[12];
+  const mp = { x: (projected[e[0]].px + projected[e[1]].px) / 2, y: (projected[e[0]].py + projected[e[1]].py) / 2 };
+  addText(mp.x + 20, mp.y - 10, '4', { 'font-size': '12', fill: '[curve-primary]' });
+</script>

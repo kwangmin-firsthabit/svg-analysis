@@ -1,0 +1,147 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+
+<div
+  id="math-header"
+  style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-bottom: 15px"
+>
+  <div id="vol-eq"></div>
+</div>
+
+<svg id="vis" width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  (function () {
+    const svg = document.getElementById('vis');
+    const ns = 'http://www.w3.org/2000/svg';
+
+    // 1. 수식 렌더링
+    // V = 1/3 * pi * h * (R^2 + Rr + r^2)
+    // V = 1/3 * pi * 6 * (5^2 + 5*2 + 2^2) = 2 * pi * (25 + 10 + 4) = 78pi
+    katex.render(
+      'V = \\frac{1}{3} \\pi h (R^2 + Rr + r^2) = 78\\pi \\approx 245.04',
+      document.getElementById('vol-eq')
+    );
+
+    const ox = 340,
+      oy = 400; // 밑면 중심
+    const scale = 45;
+    const R = 5 * scale;
+    const r = 2 * scale;
+    const h = 6 * scale;
+    const ry_ratio = 0.3; // 타원 높이 비율
+
+    function el(tag, attrs) {
+      const e = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      return e;
+    }
+
+    function addText(x, y, content, attrs = {}) {
+      const t = el('text', {
+        x,
+        y,
+        'text-anchor': 'middle',
+        'dominant-baseline': 'central',
+        'font-size': '14',
+        'font-weight': '500',
+        fill: '[label-primary]',
+        ...attrs,
+      });
+      t.textContent = content;
+      svg.appendChild(t);
+    }
+
+    // 2. 밑면 타원 (뒷면 점선, 앞면 실선)
+    svg.appendChild(
+      el('path', {
+        d: `M ${ox - R} ${oy} A ${R} ${R * ry_ratio} 0 0 1 ${ox + R} ${oy}`,
+        fill: 'none',
+        stroke: '[auxiliary-line]',
+        'stroke-width': '1',
+        'stroke-dasharray': '4 3',
+      })
+    );
+    svg.appendChild(
+      el('path', {
+        d: `M ${ox - R} ${oy} A ${R} ${R * ry_ratio} 0 0 0 ${ox + R} ${oy}`,
+        fill: '[shape-fill]',
+        'fill-opacity': '0.1',
+        stroke: '[shape-stroke]',
+        'stroke-width': '1.5',
+      })
+    );
+
+    // 3. 윗면 타원 (전체 실선)
+    svg.appendChild(
+      el('ellipse', {
+        cx: ox,
+        cy: oy - h,
+        rx: r,
+        ry: r * ry_ratio,
+        fill: '[shape-fill]',
+        'fill-opacity': '0.2',
+        stroke: '[shape-stroke]',
+        'stroke-width': '1.5',
+      })
+    );
+
+    // 4. 옆면 연결선
+    svg.appendChild(
+      el('line', { x1: ox - R, y1: oy, x2: ox - r, y2: oy - h, stroke: '[shape-stroke]', 'stroke-width': '1.5' })
+    );
+    svg.appendChild(
+      el('line', { x1: ox + R, y1: oy, x2: ox + r, y2: oy - h, stroke: '[shape-stroke]', 'stroke-width': '1.5' })
+    );
+
+    // 5. 치수 보조선 및 라벨
+    // 높이 표시
+    svg.appendChild(
+      el('line', {
+        x1: ox,
+        y1: oy,
+        x2: ox,
+        y2: oy - h,
+        stroke: '[auxiliary-line]',
+        'stroke-width': '1',
+        'stroke-dasharray': '4 3',
+      })
+    );
+    svg.appendChild(el('circle', { cx: ox, cy: oy, r: '2.5', fill: '[label-primary]' }));
+    svg.appendChild(el('circle', { cx: ox, cy: oy - h, r: '2.5', fill: '[label-primary]' }));
+    addText(ox - 20, oy - h / 2, 'h=6', { fill: '[label-secondary]', 'text-anchor': 'end' });
+
+    // 밑면 반지름
+    svg.appendChild(
+      el('line', { x1: ox, y1: oy, x2: ox + R, y2: oy, stroke: '[curve-primary]', 'stroke-width': '1.5' })
+    );
+    addText(ox + R / 2, oy + 15, 'R=5', { fill: '[curve-primary]', 'font-size': '12' });
+
+    // 윗면 반지름
+    svg.appendChild(
+      el('line', { x1: ox, y1: oy - h, x2: ox + r, y2: oy - h, stroke: '[curve-secondary]', 'stroke-width': '1.5' })
+    );
+    addText(ox + r / 2, oy - h - 15, 'r=2', { fill: '[curve-secondary]', 'font-size': '12' });
+  })();
+</script>

@@ -1,0 +1,166 @@
+<svg id="vis" width="100%" viewBox="0 0 760 220" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const C = {
+    axis: '#475569',
+    region: '#2563eb',
+    closed: '#2563eb',
+    openFill: '#ffffff',
+    text: '#0f172a',
+    sub: '#64748b',
+  };
+
+  function el(tag, attrs = {}) {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    return node;
+  }
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      fill: C.text,
+      'font-size': 14,
+      'font-weight': 500,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      ...attrs,
+    });
+    t.textContent = str;
+    return add(t);
+  }
+
+  const left = 70;
+  const right = 690;
+  const y = 130;
+  const minX = -5;
+  const maxX = 4;
+
+  function px(v) {
+    return left + ((v - minX) / (maxX - minX)) * (right - left);
+  }
+
+  // main axis
+  add(
+    el('line', {
+      x1: left,
+      y1: y,
+      x2: right,
+      y2: y,
+      stroke: C.axis,
+      'stroke-width': 1.8,
+      'marker-start': 'url(#arrow)',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+
+  // ticks and labels
+  for (let i = minX; i <= maxX; i++) {
+    const x = px(i);
+    add(
+      el('line', {
+        x1: x,
+        y1: y - 7,
+        x2: x,
+        y2: y + 7,
+        stroke: C.axis,
+        'stroke-width': 1,
+      })
+    );
+    text(x, y + 26, String(i), {
+      fill: C.sub,
+      'font-size': 12,
+      'font-weight': 400,
+    });
+  }
+
+  // region x <= -2
+  const a = px(-2);
+  add(
+    el('line', {
+      x1: left + 6,
+      y1: y,
+      x2: a,
+      y2: y,
+      stroke: C.region,
+      'stroke-width': 6,
+      'stroke-linecap': 'round',
+      'marker-start': 'url(#arrow)',
+    })
+  );
+  add(
+    el('circle', {
+      cx: a,
+      cy: y,
+      r: 6.5,
+      fill: C.closed,
+      stroke: C.closed,
+      'stroke-width': 2,
+    })
+  );
+
+  // region x > 1
+  const b = px(1);
+  add(
+    el('line', {
+      x1: b,
+      y1: y,
+      x2: right - 6,
+      y2: y,
+      stroke: C.region,
+      'stroke-width': 6,
+      'stroke-linecap': 'round',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  add(
+    el('circle', {
+      cx: b,
+      cy: y,
+      r: 6.5,
+      fill: C.openFill,
+      stroke: C.region,
+      'stroke-width': 2.5,
+    })
+  );
+
+  // labels
+  text(380, 48, 'x ≤ -2 또는 x > 1', {
+    'font-size': 22,
+    'font-weight': 700,
+  });
+  text(380, 76, '합집합: (-∞, -2] ∪ (1, ∞)', {
+    fill: C.sub,
+    'font-size': 13,
+    'font-weight': 400,
+  });
+
+  text(a, y - 24, '-2', {
+    fill: C.region,
+    'font-size': 13,
+  });
+  text(b, y - 24, '1', {
+    fill: C.region,
+    'font-size': 13,
+  });
+</script>

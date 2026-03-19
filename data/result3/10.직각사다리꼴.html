@@ -1,0 +1,71 @@
+<svg id="vis" width="100%" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 직각사다리꼴: 윗변 3, 아랫변 6, 높이 5, 한쪽에 직각 2곳
+// 배율: 40px/unit
+const scale = 40;
+const topLen = 3 * scale;  // 120px
+const botLen = 6 * scale;  // 240px
+const h = 5 * scale;       // 200px
+
+// 왼쪽에 직각이 있는 형태: A=왼위, B=왼아래, C=오른아래, D=오른위
+// A와 B는 같은 x 좌표 (수직), 직각 at A and B
+const startX = 340 - botLen/2; // 왼쪽 기준 x
+const A = [startX, 290 - h]; // 왼위 (직각)
+const B = [startX, 290];     // 왼아래 (직각)
+const C = [startX + botLen, 290]; // 오른아래
+const D = [startX + topLen, 290 - h]; // 오른위
+
+// 도형
+svg.appendChild(el('polygon', {
+  points: A[0]+','+A[1]+' '+D[0]+','+D[1]+' '+C[0]+','+C[1]+' '+B[0]+','+B[1],
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 꼭짓점 점
+[A, B, C, D].forEach(([x, y]) => {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3.5', fill: '#1D4ED8' }));
+});
+
+// 꼭짓점 라벨
+addText(A[0] - 16, A[1] - 14, 'A');
+addText(D[0] + 16, D[1] - 14, 'D');
+addText(B[0] - 16, B[1] + 14, 'B');
+addText(C[0] + 16, C[1] + 14, 'C');
+
+// 직각 기호: A(왼위)와 B(왼아래)
+const s = 10;
+// A: 오른쪽, 아래 방향
+svg.appendChild(el('path', {
+  d: 'M '+(A[0]+s)+','+A[1]+' L '+(A[0]+s)+','+(A[1]+s)+' L '+A[0]+','+(A[1]+s),
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.8'
+}));
+// B: 오른쪽, 위 방향
+svg.appendChild(el('path', {
+  d: 'M '+(B[0]+s)+','+B[1]+' L '+(B[0]+s)+','+(B[1]-s)+' L '+B[0]+','+(B[1]-s),
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.8'
+}));
+
+// 변 길이 라벨
+// AD = 3 (위 수평): 중간 위
+addText((A[0]+D[0])/2, A[1] - 16, '3', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+// BC = 6 (아래 수평): 중간 아래
+addText((B[0]+C[0])/2, B[1] + 16, '6', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+// AB = 5 (왼쪽 수직): 중간 왼쪽
+addText(A[0] - 18, (A[1]+B[1])/2, '5', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

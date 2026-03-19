@@ -1,0 +1,234 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const colors = {
+    axis: '#475569',
+    left: '#2563eb',
+    right: '#16a34a',
+    point: '#dc2626',
+    labelPrimary: '#0f172a',
+    labelSecondary: '#64748b',
+    guide: '#94a3b8',
+  };
+
+  const ox = 280;
+  const oy = 320;
+  const scaleX = 60;
+  const scaleY = 45;
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: colors.labelPrimary,
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  function px(x) {
+    return ox + x * scaleX;
+  }
+
+  function py(y) {
+    return oy - y * scaleY;
+  }
+
+  // axes
+  add(
+    el('line', {
+      x1: 50,
+      y1: oy,
+      x2: 640,
+      y2: oy,
+      stroke: colors.axis,
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  add(
+    el('line', {
+      x1: ox,
+      y1: 400,
+      x2: ox,
+      y2: 30,
+      stroke: colors.axis,
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+
+  add(text(633, oy - 14, 'x'));
+  add(text(ox + 14, 42, 'y'));
+  add(text(ox - 14, oy + 16, 'O', { 'font-size': '12', 'font-weight': '400', fill: colors.labelSecondary }));
+
+  // x ticks
+  for (let i = -3; i <= 5; i++) {
+    if (i === 0) continue;
+    const x = px(i);
+    add(el('line', { x1: x, y1: oy - 4, x2: x, y2: oy + 4, stroke: colors.axis, 'stroke-width': '0.8' }));
+    add(text(x, oy + 18, String(i), { 'font-size': '12', 'font-weight': '400', fill: colors.labelSecondary }));
+  }
+
+  // y ticks
+  for (let j = 1; j <= 5; j++) {
+    const y = py(j);
+    add(el('line', { x1: ox - 4, y1: y, x2: ox + 4, y2: y, stroke: colors.axis, 'stroke-width': '0.8' }));
+    add(
+      text(ox - 18, y, String(j), {
+        'font-size': '12',
+        'font-weight': '400',
+        fill: colors.labelSecondary,
+        'text-anchor': 'end',
+      })
+    );
+  }
+
+  // left branch: y = -x, x < 0
+  let leftPts = [];
+  for (let x = -3.6; x < 0; x += 0.02) {
+    const y = -x;
+    const sx = px(x);
+    const sy = py(y);
+    if (sx >= 50 && sx <= 640 && sy >= 20 && sy <= 400) {
+      leftPts.push(`${sx.toFixed(1)},${sy.toFixed(1)}`);
+    }
+  }
+  add(
+    el('polyline', {
+      points: leftPts.join(' '),
+      fill: 'none',
+      stroke: colors.left,
+      'stroke-width': '2.5',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // right branch: y = x^2, x >= 0
+  let rightPts = [];
+  for (let x = 0; x <= 2.5; x += 0.015) {
+    const y = x * x;
+    const sx = px(x);
+    const sy = py(y);
+    if (sx >= 50 && sx <= 640 && sy >= 20 && sy <= 400) {
+      rightPts.push(`${sx.toFixed(1)},${sy.toFixed(1)}`);
+    }
+  }
+  add(
+    el('polyline', {
+      points: rightPts.join(' '),
+      fill: 'none',
+      stroke: colors.right,
+      'stroke-width': '2.5',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // open circle at (0,0) for x<0 branch
+  add(
+    el('circle', {
+      cx: px(0),
+      cy: py(0),
+      r: '5.5',
+      fill: 'white',
+      stroke: colors.left,
+      'stroke-width': '2',
+    })
+  );
+
+  // closed circle at (0,0) for x>=0 branch
+  add(
+    el('circle', {
+      cx: px(0),
+      cy: py(0),
+      r: '3.6',
+      fill: colors.right,
+    })
+  );
+
+  // labels
+  add(
+    text(135, 110, 'y = -x  (x < 0)', {
+      fill: colors.left,
+      'text-anchor': 'start',
+    })
+  );
+  add(
+    text(430, 115, 'y = x²  (x ≥ 0)', {
+      fill: colors.right,
+      'text-anchor': 'start',
+    })
+  );
+
+  add(
+    text(px(0) + 18, py(0) - 16, '(0, 0)', {
+      'font-size': '12',
+      'font-weight': '400',
+      fill: colors.point,
+      'text-anchor': 'start',
+    })
+  );
+
+  // arrow hint on left branch
+  add(
+    el('path', {
+      d: `M ${px(-3.15)} ${py(3.15)} L ${px(-3.45)} ${py(3.45)}`,
+      fill: 'none',
+      stroke: colors.left,
+      'stroke-width': '2.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+
+  // arrow hint on right branch
+  add(
+    el('path', {
+      d: `M ${px(2.15)} ${py(2.15 * 2.15)} L ${px(2.38)} ${py(2.38 * 2.38)}`,
+      fill: 'none',
+      stroke: colors.right,
+      'stroke-width': '2.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+</script>

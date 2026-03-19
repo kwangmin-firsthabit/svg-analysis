@@ -1,0 +1,96 @@
+<svg id="vis" width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+function project(x, y, z) {
+  return {
+    px: Math.round(x + z * Math.cos(Math.PI / 6) * 0.5),
+    py: Math.round(y - z * Math.sin(Math.PI / 6) * 0.5)
+  };
+}
+
+const scale = 40;
+const r = 3 * scale;     // 120
+const hCone = 6 * scale; // 240
+const ry = Math.round(r * Math.sin(Math.PI / 6) * 0.5); // 30
+const cx = 340;
+const yShared = 290;     // 공유 밑면 y
+const yApex = yShared - hCone; // 50 (원뿔 꼭짓점)
+const yBottom = yShared + r;   // 410 (반구 바닥)
+
+// --- 반구 아랫면 타원 ---
+svg.appendChild(el('path', {
+  d: `M ${cx - r} ${yBottom} A ${r} ${ry} 0 0 0 ${cx + r} ${yBottom}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '5 4'
+}));
+svg.appendChild(el('path', {
+  d: `M ${cx - r} ${yBottom} A ${r} ${ry} 0 0 1 ${cx + r} ${yBottom}`,
+  fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// --- 반구 옆면 (하반구 실루엣) ---
+// 반구 왼쪽·오른쪽 윤곽선 (공유면에서 바닥 타원까지 곡선)
+svg.appendChild(el('path', {
+  d: `M ${cx - r} ${yShared} A ${r} ${r} 0 0 0 ${cx + r} ${yShared}`,
+  fill: '#3B82F6', 'fill-opacity': '0.12', stroke: 'none'
+}));
+svg.appendChild(el('path', {
+  d: `M ${cx - r} ${yBottom} Q ${cx - r - 40} ${(yShared + yBottom) / 2} ${cx - r} ${yShared}`,
+  fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+svg.appendChild(el('path', {
+  d: `M ${cx + r} ${yBottom} Q ${cx + r + 40} ${(yShared + yBottom) / 2} ${cx + r} ${yShared}`,
+  fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// --- 공유 밑면 타원 ---
+svg.appendChild(el('path', {
+  d: `M ${cx - r} ${yShared} A ${r} ${ry} 0 0 0 ${cx + r} ${yShared}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '5 4'
+}));
+svg.appendChild(el('path', {
+  d: `M ${cx - r} ${yShared} A ${r} ${ry} 0 0 1 ${cx + r} ${yShared}`,
+  fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// --- 원뿔 ---
+svg.appendChild(el('polygon', {
+  points: `${cx - r},${yShared} ${cx + r},${yShared} ${cx},${yApex}`,
+  fill: '#3B82F6', 'fill-opacity': '0.12', stroke: 'none'
+}));
+svg.appendChild(el('line', { x1: cx, y1: yApex, x2: cx - r, y2: yShared, stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+svg.appendChild(el('line', { x1: cx, y1: yApex, x2: cx + r, y2: yShared, stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+
+// --- 높이 보조선 ---
+svg.appendChild(el('line', {
+  x1: cx, y1: yApex, x2: cx, y2: yShared,
+  stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '4 3'
+}));
+svg.appendChild(el('line', {
+  x1: cx, y1: yShared, x2: cx, y2: yBottom,
+  stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '4 3'
+}));
+
+// --- 반지름 보조선 ---
+svg.appendChild(el('line', {
+  x1: cx, y1: yShared, x2: cx + r, y2: yShared,
+  stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '4 3'
+}));
+
+// --- 치수 라벨 ---
+addText(cx + r / 2, yShared - 14, '3');
+addText(cx + 16, (yApex + yShared) / 2, '6', { 'text-anchor': 'start' });
+addText(cx + 16, (yShared + yBottom) / 2, '3', { 'text-anchor': 'start' });
+</script>

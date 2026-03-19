@@ -1,0 +1,139 @@
+<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // 설정: 1단위당 25px 스케일링
+  const scale = 25;
+  const r = 4; // 밑면 반지름
+  const R = 10; // 모선 길이 (부채꼴 반지름)
+  const centralAngle = 144; // 중심각 (도)
+
+  // 배치 좌표
+  const cx = 340,
+    cy = 280; // 부채꼴의 꼭짓점 위치
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': '14',
+      'font-weight': '500',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: '[label-primary]',
+      ...attrs,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 옆면 (부채꼴) 그리기
+  // 부채꼴이 아래를 향하도록 대칭 배치 (중심각 144도를 반으로 나누어 -72도 ~ +72도)
+  const startDeg = 90 - centralAngle / 2;
+  const endDeg = 90 + centralAngle / 2;
+  const startRad = (startDeg * Math.PI) / 180;
+  const endRad = (endDeg * Math.PI) / 180;
+
+  const x1 = cx + R * scale * Math.cos(startRad);
+  const y1 = cy + R * scale * Math.sin(startRad);
+  const x2 = cx + R * scale * Math.cos(endRad);
+  const y2 = cy + R * scale * Math.sin(endRad);
+
+  const largeArc = centralAngle > 180 ? 1 : 0;
+  const sectorPath = `M ${cx} ${cy} L ${x1} ${y1} A ${R * scale} ${R * scale} 0 ${largeArc} 1 ${x2} ${y2} Z`;
+
+  svg.appendChild(
+    el('path', {
+      d: sectorPath,
+      fill: '[shape-fill]',
+      'fill-opacity': '0.1',
+      stroke: '[shape-stroke]',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // 2. 밑면 (원) 그리기
+  // 부채꼴 호의 중앙 지점에 접하도록 배치
+  const midDeg = 90;
+  const midRad = (midDeg * Math.PI) / 180;
+  const contactX = cx + R * scale * Math.cos(midRad);
+  const contactY = cy + R * scale * Math.sin(midRad);
+  const circleCenterX = contactX;
+  const circleCenterY = contactY + r * scale;
+
+  svg.appendChild(
+    el('circle', {
+      cx: circleCenterX,
+      cy: circleCenterY,
+      r: r * scale,
+      fill: '[shape-fill]',
+      'fill-opacity': '0.1',
+      stroke: '[shape-stroke]',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // 3. 치수 및 라벨링
+  // 부채꼴 반지름(모선) 표시
+  svg.appendChild(
+    el('line', {
+      x1: cx,
+      y1: cy,
+      x2: x1,
+      y2: y1,
+      stroke: '[auxiliary-line]',
+      'stroke-width': '1',
+      'stroke-dasharray': '4 2',
+    })
+  );
+  addText((cx + x1) / 2 - 25, (cy + y1) / 2 - 10, '모선=10', { 'font-size': '12' });
+
+  // 밑면 반지름 표시
+  svg.appendChild(
+    el('line', {
+      x1: circleCenterX,
+      y1: circleCenterY,
+      x2: circleCenterX + r * scale,
+      y2: circleCenterY,
+      stroke: '[auxiliary-line]',
+      'stroke-width': '1',
+      'stroke-dasharray': '4 2',
+    })
+  );
+  addText(circleCenterX + (r * scale) / 2, circleCenterY + 15, 'r=4', { 'font-size': '12' });
+
+  // 중심각 표시
+  addText(cx, cy + 30, '144°', { 'font-size': '13', fill: '[label-secondary]' });
+
+  // 텍스트 설명
+  addText(cx, cy + 150, '옆면 (부채꼴)');
+  addText(circleCenterX, circleCenterY + 10, '밑면');
+</script>

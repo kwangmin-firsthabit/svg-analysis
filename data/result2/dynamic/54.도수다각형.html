@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>도수다각형</title>
+</head>
+<body>
+<div style="position:relative;width:100%;height:360px;padding:20px 0;">
+  <div style="text-align:center;font-size:14px;font-weight:600;color:#1E293B;margin-bottom:8px;">통학 시간 도수다각형 (학생 40명)</div>
+  <div style="position:relative;width:100%;height:300px;">
+    <canvas id="chart1"></canvas>
+  </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+new Chart(document.getElementById('chart1'), {
+  type: 'line',
+  data: {
+    labels: ['-5', '5', '15', '25', '35', '45', '55'],
+    datasets: [{
+      label: '도수',
+      data: [0, 5, 12, 14, 7, 2, 0],
+      backgroundColor: 'rgba(59,130,246,0.15)',
+      borderColor: '#1D4ED8',
+      borderWidth: 2.5,
+      pointBackgroundColor: '#1D4ED8',
+      pointRadius: 5,
+      pointHoverRadius: 7,
+      fill: true,
+      tension: 0
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      title: { display: false }
+    },
+    scales: {
+      x: {
+        title: { display: true, text: '통학 시간(분) — 계급 중앙값', color: '#475569', font: { size: 13 } },
+        grid: { color: '#E2E8F0' },
+        ticks: { color: '#475569' }
+      },
+      y: {
+        beginAtZero: true,
+        title: { display: true, text: '도수(명)', color: '#475569', font: { size: 13 } },
+        ticks: { stepSize: 2, color: '#475569' },
+        grid: { color: '#E2E8F0' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

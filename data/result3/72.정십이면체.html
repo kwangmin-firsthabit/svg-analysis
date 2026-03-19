@@ -1,0 +1,120 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 제목
+txt(340, 36, '정십이면체 (한 변의 길이 = 4)', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+
+// 정십이면체 20개 꼭짓점 (황금비 φ 사용)
+const phi = (1 + Math.sqrt(5)) / 2;
+const a = 1; // 정규화된 변 길이
+
+// 정십이면체 꼭짓점 좌표 (20개)
+const raw = [
+  // ±1, ±1, ±1
+  [ 1, 1, 1], [ 1, 1,-1], [ 1,-1, 1], [ 1,-1,-1],
+  [-1, 1, 1], [-1, 1,-1], [-1,-1, 1], [-1,-1,-1],
+  // 0, ±1/φ, ±φ
+  [0, 1/phi, phi], [0, 1/phi,-phi], [0,-1/phi, phi], [0,-1/phi,-phi],
+  // ±1/φ, ±φ, 0
+  [1/phi, phi, 0], [1/phi,-phi, 0], [-1/phi, phi, 0], [-1/phi,-phi, 0],
+  // ±φ, 0, ±1/φ
+  [phi, 0, 1/phi], [phi, 0,-1/phi], [-phi, 0, 1/phi], [-phi, 0,-1/phi],
+];
+
+// 스케일 및 투영
+const sc = 65;
+const ox = 330, oy = 250;
+
+function proj(p) {
+  const angY = 0.3, angX = 0.25;
+  const x = p[0], y = p[1], z = p[2];
+  // Y축 회전
+  const x2 = x * Math.cos(angY) + z * Math.sin(angY);
+  const z2 = -x * Math.sin(angY) + z * Math.cos(angY);
+  // X축 회전
+  const y2 = y * Math.cos(angX) - z2 * Math.sin(angX);
+  const z3 = y * Math.sin(angX) + z2 * Math.cos(angX);
+  return {
+    px: ox + x2 * sc,
+    py: oy - y2 * sc,
+    z: z3
+  };
+}
+
+const v = raw.map(p => proj(p));
+
+// 정십이면체의 12개 정오각형 면 (꼭짓점 인덱스)
+const faces = [
+  [0,8,10,2,16],   // 앞-위
+  [0,16,17,1,12],  // 오른쪽-위
+  [0,12,14,4,8],   // 위
+  [5,14,12,1,9],   // 뒤-위
+  [5,9,11,7,19],   // 뒤
+  [5,19,18,4,14],  // 왼쪽-위
+  [6,10,8,4,18],   // 왼쪽-앞
+  [6,18,19,7,15],  // 왼쪽-아래
+  [6,15,13,2,10],  // 앞-아래
+  [3,13,15,7,11],  // 아래-뒤
+  [3,11,9,1,17],   // 오른쪽-아래
+  [3,17,16,2,13],  // 아래
+];
+
+// z 기준 정렬 (뒤쪽 면 먼저)
+const facesWithZ = faces.map(face => {
+  const avgZ = face.reduce((s, i) => s + v[i].z, 0) / face.length;
+  return { face, avgZ };
+}).sort((a, b) => a.avgZ - b.avgZ);
+
+// 면 그리기
+facesWithZ.forEach(({ face, avgZ }) => {
+  const isBack = avgZ < 0;
+  const pts = face.map(i => `${v[i].px},${v[i].py}`).join(' ');
+  svg.appendChild(el('polygon', {
+    points: pts,
+    fill: '#EFF6FF',
+    'fill-opacity': isBack ? '0.04' : '0.15',
+    stroke: '#1D4ED8',
+    'stroke-width': isBack ? '0.7' : '1.4',
+    'stroke-linejoin': 'round',
+    opacity: isBack ? '0.45' : '1'
+  }));
+});
+
+// 꼭짓점 (앞쪽만 점 표시)
+v.forEach((pt, i) => {
+  if (pt.z >= -0.2) {
+    svg.appendChild(el('circle', { cx: pt.px, cy: pt.py, r: '2.5', fill: '#1D4ED8' }));
+  }
+});
+
+// 오일러 공식 레이블 박스 (우측)
+const eulerX = 490, eulerY = 110;
+svg.appendChild(el('rect', { x: eulerX - 10, y: eulerY - 70, width: 160, height: 132, rx: '10', fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '0.8' }));
+txt(eulerX + 70, eulerY - 52, '정십이면체', { 'font-size': '13', 'font-weight': '500', fill: '#1D4ED8' });
+txt(eulerX + 70, eulerY - 28, 'V = 20', { 'font-size': '12', 'font-weight': '400', fill: '#1E293B' });
+txt(eulerX + 70, eulerY - 6, 'E = 30', { 'font-size': '12', 'font-weight': '400', fill: '#1E293B' });
+txt(eulerX + 70, eulerY + 16, 'F = 12', { 'font-size': '12', 'font-weight': '400', fill: '#1E293B' });
+svg.appendChild(el('line', { x1: eulerX - 10, y1: eulerY + 32, x2: eulerX + 150, y2: eulerY + 32, stroke: '#94A3B8', 'stroke-width': '0.8' }));
+txt(eulerX + 70, eulerY + 48, 'V−E+F = 2 ✓', { 'font-size': '12', 'font-weight': '500', fill: '#1D4ED8' });
+txt(eulerX + 70, eulerY + 60, '20−30+12 = 2', { 'font-size': '11', 'font-weight': '400', fill: '#475569' });
+
+// 하단 정보
+const infoY = 430;
+svg.appendChild(el('rect', { x: 130, y: infoY - 18, width: 420, height: 48, rx: '10', fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '0.8' }));
+txt(340, infoY, '각 면은 정오각형 (12면),  변의 길이 = 4', { 'font-size': '13', 'font-weight': '400', fill: '#1E293B' });
+txt(340, infoY + 22, '각 꼭짓점에서 3개의 정오각형이 만남', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

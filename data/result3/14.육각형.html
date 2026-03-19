@@ -1,0 +1,115 @@
+<svg id="vis" width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arr1" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M2 1L8 5L2 9" fill="none" stroke="#1D4ED8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 정육각형 ABCDEF: 서로 마주보는 세 쌍의 변이 각각 평행
+const cx = 340, cy = 230, r = 170;
+const n = 6;
+const labels = ['A', 'B', 'C', 'D', 'E', 'F'];
+
+// 꼭짓점 계산 (A를 오른쪽에서 시작, 반시계 방향)
+// A=오른쪽, B=우상, C=좌상, D=왼쪽, E=좌하, F=우하
+const verts = [];
+for (let i = 0; i < n; i++) {
+  const angle = (2 * Math.PI * i / n);
+  verts.push({ x: cx + r * Math.cos(angle), y: cy + r * Math.sin(angle) });
+}
+
+// 도형
+const pts_str = verts.map(v => Math.round(v.x) + ',' + Math.round(v.y)).join(' ');
+svg.appendChild(el('polygon', {
+  points: pts_str,
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 꼭짓점 점
+verts.forEach(v => {
+  svg.appendChild(el('circle', { cx: Math.round(v.x), cy: Math.round(v.y), r: '3.5', fill: '#1D4ED8' }));
+});
+
+// 꼭짓점 라벨
+const labelOffset = 22;
+verts.forEach((v, i) => {
+  const angle = (2 * Math.PI * i / n);
+  const lx = cx + (r + labelOffset) * Math.cos(angle);
+  const ly = cy + (r + labelOffset) * Math.sin(angle);
+  addText(Math.round(lx), Math.round(ly), labels[i]);
+});
+
+// 세 쌍의 평행 변에 방향 화살표 표시
+// 쌍 1: AB(i=0~1)와 DE(i=3~4) - 단일 화살표 →
+// 쌍 2: BC(i=1~2)와 EF(i=4~5) - 이중 화살표 →→
+// 쌍 3: CD(i=2~3)와 FA(i=5~0) - 삼중 화살표 →→→
+
+const pairColors = ['#1D4ED8', '#F59E0B', '#3B82F6'];
+const pairMarkers = [1, 2, 3];
+
+function drawTicksOnEdge(v1, v2, count, color) {
+  const mx = (v1.x + v2.x) / 2, my = (v1.y + v2.y) / 2;
+  const dx = v2.x - v1.x, dy = v2.y - v1.y;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  const ux = dx / len, uy = dy / len; // 단위 벡터 (변 방향)
+  const nx = -uy * 8, ny = ux * 8;   // 법선 방향
+
+  const spacing = 8;
+  const totalW = (count - 1) * spacing;
+  for (let k = 0; k < count; k++) {
+    const offset = k * spacing - totalW / 2;
+    const px = mx + ux * offset, py = my + uy * offset;
+
+    // 화살표 모양: 짧은 선으로 표현
+    svg.appendChild(el('line', {
+      x1: Math.round(px - ux * 5 + nx), y1: Math.round(py - uy * 5 + ny),
+      x2: Math.round(px + ux * 5 + nx), y2: Math.round(py + uy * 5 + ny),
+      stroke: color, 'stroke-width': '1.5'
+    }));
+    // 화살촉
+    svg.appendChild(el('path', {
+      d: `M ${Math.round(px + ux * 5 + nx)} ${Math.round(py + uy * 5 + ny)} L ${Math.round(px + ux * 5 - uy * 4 + nx)} ${Math.round(py + uy * 5 + ux * 4 + ny)} L ${Math.round(px + ux * 5 + uy * 4 + nx)} ${Math.round(py + uy * 5 - ux * 4 + ny)}`,
+      fill: color, stroke: 'none'
+    }));
+  }
+}
+
+// 쌍 1: AB(0-1)와 DE(3-4) - 단화살표
+drawTicksOnEdge(verts[0], verts[1], 1, pairColors[0]);
+drawTicksOnEdge(verts[3], verts[4], 1, pairColors[0]);
+
+// 쌍 2: BC(1-2)와 EF(4-5) - 이중화살표
+drawTicksOnEdge(verts[1], verts[2], 2, pairColors[1]);
+drawTicksOnEdge(verts[4], verts[5], 2, pairColors[1]);
+
+// 쌍 3: CD(2-3)와 FA(5-0) - 삼중화살표
+drawTicksOnEdge(verts[2], verts[3], 3, pairColors[2]);
+drawTicksOnEdge(verts[5], verts[0], 3, pairColors[2]);
+
+// 범례
+const legend = [
+  { label: '→ 첫 번째 쌍 (AB∥DE)', color: pairColors[0] },
+  { label: '→→ 두 번째 쌍 (BC∥EF)', color: pairColors[1] },
+  { label: '→→→ 세 번째 쌍 (CD∥FA)', color: pairColors[2] },
+];
+
+legend.forEach((item, i) => {
+  const ly = 400 + i * 22;
+  const t = el('text', { x: 340, y: ly, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '12', 'font-weight': '400', fill: item.color });
+  t.textContent = item.label;
+  svg.appendChild(t);
+});
+</script>

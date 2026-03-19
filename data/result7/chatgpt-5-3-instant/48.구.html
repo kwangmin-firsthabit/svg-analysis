@@ -1,0 +1,95 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#111',
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  // parameters
+  const cx = 340;
+  const cy = 220;
+  const r = 5;
+  const scale = 25;
+  const R = r * scale;
+
+  // outer sphere (circle projection)
+  svg.appendChild(
+    el('circle', {
+      cx: cx,
+      cy: cy,
+      r: R,
+      fill: '#3b82f6',
+      'fill-opacity': '0.15',
+      stroke: '#2563eb',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // equator (ellipse)
+  svg.appendChild(
+    el('ellipse', {
+      cx: cx,
+      cy: cy,
+      rx: R,
+      ry: R * 0.4,
+      fill: 'none',
+      stroke: '#2563eb',
+      'stroke-width': '1',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  // vertical diameter
+  svg.appendChild(
+    el('line', {
+      x1: cx,
+      y1: cy - R,
+      x2: cx,
+      y2: cy + R,
+      stroke: '#2563eb',
+      'stroke-width': '0.8',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  // center point
+  svg.appendChild(el('circle', { cx: cx, cy: cy, r: 3.5, fill: '#111' }));
+  svg.appendChild(text(cx, cy - 18, 'O', { 'font-size': '12', 'font-weight': '400' }));
+
+  // radius line
+  svg.appendChild(
+    el('line', {
+      x1: cx,
+      y1: cy,
+      x2: cx + R,
+      y2: cy,
+      stroke: '#dc2626',
+      'stroke-width': '1.5',
+    })
+  );
+
+  // radius label
+  svg.appendChild(text(cx + R / 2, cy - 12, '5', { 'font-size': '12', 'font-weight': '400' }));
+
+  // title
+  svg.appendChild(text(340, 40, '반지름 5인 구 (중심 O)', { 'font-size': '14', 'font-weight': '500' }));
+</script>

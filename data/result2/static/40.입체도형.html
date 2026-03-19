@@ -1,0 +1,37 @@
+<svg width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+  <!-- 원뿔 (위): 꼭짓점 cx=340 cy=50, 밑면 타원 cx=340 cy=290, rx=120 ry=30 -->
+  <!-- 반구 (아래): 밑면(공유) cx=340 cy=290, 바닥 cy=410 -->
+
+  <!-- 반구 아랫면 타원 (실선 전면 반원, 점선 후면 반원) -->
+  <path d="M 220 410 A 120 30 0 0 0 460 410" fill="none" stroke="#94A3B8" stroke-width="1" stroke-dasharray="5 4"/>
+  <path d="M 220 410 A 120 30 0 0 1 460 410" fill="none" stroke="#1D4ED8" stroke-width="1.5"/>
+
+  <!-- 반구 옆면 (구의 하반부 실루엣) -->
+  <!-- 반구: 중심 (340,290), 반지름 120, 아래쪽 반원 -->
+  <path d="M 220 290 A 120 120 0 0 0 460 290" fill="#3B82F6" fill-opacity="0.12" stroke="none"/>
+  <path d="M 220 410 Q 180 390 220 290" fill="none" stroke="#1D4ED8" stroke-width="1.5"/>
+  <path d="M 460 410 Q 500 390 460 290" fill="none" stroke="#1D4ED8" stroke-width="1.5"/>
+  <path d="M 220 290 A 120 120 0 0 0 460 290" fill="none" stroke="#1D4ED8" stroke-width="1.5"/>
+
+  <!-- 공유 밑면 타원 (원뿔 바닥 = 반구 위) -->
+  <path d="M 220 290 A 120 30 0 0 0 460 290" fill="none" stroke="#94A3B8" stroke-width="1" stroke-dasharray="5 4"/>
+  <path d="M 220 290 A 120 30 0 0 1 460 290" fill="none" stroke="#1D4ED8" stroke-width="1.5"/>
+
+  <!-- 원뿔 옆면 -->
+  <line x1="340" y1="50" x2="220" y2="290" stroke="#1D4ED8" stroke-width="1.5"/>
+  <line x1="340" y1="50" x2="460" y2="290" stroke="#1D4ED8" stroke-width="1.5"/>
+  <polygon points="220,290 460,290 340,50" fill="#3B82F6" fill-opacity="0.12" stroke="none"/>
+
+  <!-- 높이 보조선: 원뿔 -->
+  <line x1="340" y1="50" x2="340" y2="290" stroke="#94A3B8" stroke-width="1" stroke-dasharray="4 3"/>
+  <!-- 높이 보조선: 반구 -->
+  <line x1="340" y1="290" x2="340" y2="410" stroke="#94A3B8" stroke-width="1" stroke-dasharray="4 3"/>
+
+  <!-- 반지름 표시 -->
+  <line x1="340" y1="290" x2="460" y2="290" stroke="#94A3B8" stroke-width="1" stroke-dasharray="4 3"/>
+
+  <!-- 치수 라벨 -->
+  <text x="406" y="276" text-anchor="middle" dominant-baseline="central" font-size="12" font-weight="400" fill="#475569">3</text>
+  <text x="355" y="170" text-anchor="start" dominant-baseline="central" font-size="12" font-weight="400" fill="#475569">6</text>
+  <text x="355" y="350" text-anchor="start" dominant-baseline="central" font-size="12" font-weight="400" fill="#475569">3</text>
+</svg>

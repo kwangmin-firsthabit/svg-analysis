@@ -1,0 +1,213 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const colors = {
+    axis: '#4b5563',
+    curve: '#2563eb',
+    point: '#dc2626',
+    labelPrimary: '#111827',
+    labelSecondary: '#6b7280',
+    guide: '#9ca3af',
+  };
+
+  const ox = 260;
+  const oy = 340;
+  const scaleX = 70;
+  const scaleY = 35;
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '12',
+      'font-weight': '400',
+      fill: colors.labelSecondary,
+      ...attrs,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+    return t;
+  }
+
+  function px(x) {
+    return ox + x * scaleX;
+  }
+
+  function py(y) {
+    return oy - y * scaleY;
+  }
+
+  svg.appendChild(
+    el('line', {
+      x1: 60,
+      y1: oy,
+      x2: 640,
+      y2: oy,
+      stroke: colors.axis,
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: 390,
+      x2: ox,
+      y2: 30,
+      stroke: colors.axis,
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+
+  addText(634, oy - 16, 'x', {
+    'font-size': '14',
+    'font-weight': '500',
+    fill: colors.labelPrimary,
+  });
+
+  addText(ox + 16, 42, 'y', {
+    'font-size': '14',
+    'font-weight': '500',
+    fill: colors.labelPrimary,
+  });
+
+  addText(ox - 14, oy + 14, 'O');
+
+  for (let i = -2; i <= 5; i++) {
+    if (i === 0) continue;
+    const x = px(i);
+    if (x < 60 || x > 620) continue;
+    svg.appendChild(
+      el('line', {
+        x1: x,
+        y1: oy - 4,
+        x2: x,
+        y2: oy + 4,
+        stroke: colors.axis,
+        'stroke-width': '0.8',
+      })
+    );
+    addText(x, oy + 18, String(i));
+  }
+
+  for (let j = 1; j <= 8; j++) {
+    const y = py(j);
+    if (y < 30 || y > 390) continue;
+    svg.appendChild(
+      el('line', {
+        x1: ox - 4,
+        y1: y,
+        x2: ox + 4,
+        y2: y,
+        stroke: colors.axis,
+        'stroke-width': '0.8',
+      })
+    );
+    addText(ox - 18, y, String(j), {
+      'text-anchor': 'end',
+    });
+  }
+
+  let points = '';
+  for (let x = -2.8; x <= 3.2; x += 0.02) {
+    const y = Math.pow(2, x);
+    const sx = px(x);
+    const sy = py(y);
+    if (sx >= 60 && sx <= 640 && sy >= 30 && sy <= 390) {
+      points += `${Math.round(sx * 10) / 10},${Math.round(sy * 10) / 10} `;
+    }
+  }
+
+  svg.appendChild(
+    el('polyline', {
+      points: points.trim(),
+      fill: 'none',
+      stroke: colors.curve,
+      'stroke-width': '2.5',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  const p0x = px(0);
+  const p0y = py(1);
+
+  svg.appendChild(
+    el('line', {
+      x1: p0x,
+      y1: oy,
+      x2: p0x,
+      y2: p0y,
+      stroke: colors.guide,
+      'stroke-width': '0.8',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: p0y,
+      x2: p0x,
+      y2: p0y,
+      stroke: colors.guide,
+      'stroke-width': '0.8',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  svg.appendChild(
+    el('circle', {
+      cx: p0x,
+      cy: p0y,
+      r: '4.5',
+      fill: colors.point,
+    })
+  );
+
+  addText(p0x + 34, p0y - 16, '(0, 1)', {
+    'font-size': '14',
+    'font-weight': '500',
+    fill: colors.point,
+    'text-anchor': 'start',
+  });
+
+  addText(470, 92, 'y = 2^x', {
+    'font-size': '14',
+    'font-weight': '500',
+    fill: colors.curve,
+  });
+</script>

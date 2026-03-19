@@ -1,0 +1,280 @@
+<svg id="vis" width="100%" viewBox="0 0 860 560" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const C = {
+    frontFill: '#dbeafe',
+    backFill: '#dcfce7',
+    sideFill1: '#fef3c7',
+    sideFill2: '#fee2e2',
+    sideFill3: '#ede9fe',
+    edge: '#0f172a',
+    hidden: '#94a3b8',
+    text: '#0f172a',
+    sub: '#64748b',
+    accent: '#2563eb',
+    height: '#dc2626',
+  };
+
+  function el(tag, attrs = {}) {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    return node;
+  }
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      fill: C.text,
+      'font-size': 14,
+      'font-weight': 500,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      ...attrs,
+    });
+    t.textContent = str;
+    return add(t);
+  }
+  function polygon(points, attrs = {}) {
+    return add(
+      el('polygon', {
+        points: points.map(p => `${p.x},${p.y}`).join(' '),
+        ...attrs,
+      })
+    );
+  }
+  function line(P, Q, attrs = {}) {
+    return add(
+      el('line', {
+        x1: P.x,
+        y1: P.y,
+        x2: Q.x,
+        y2: Q.y,
+        ...attrs,
+      })
+    );
+  }
+  function circle(P, r, attrs = {}) {
+    return add(el('circle', { cx: P.x, cy: P.y, r, ...attrs }));
+  }
+  function mid(P, Q) {
+    return { x: (P.x + Q.x) / 2, y: (P.y + Q.y) / 2 };
+  }
+
+  // Front base: equilateral triangle with side length 4
+  const A = { x: 220, y: 360 };
+  const B = { x: 420, y: 360 };
+  const Cc = { x: 320, y: 186.8 }; // 200 * sqrt(3)/2 above AB
+
+  // Prism direction (height 6)
+  const v = { x: 230, y: -90 };
+  const D = { x: A.x + v.x, y: A.y + v.y };
+  const E = { x: B.x + v.x, y: B.y + v.y };
+  const F = { x: Cc.x + v.x, y: Cc.y + v.y };
+
+  // background
+  add(el('rect', { x: 0, y: 0, width: 860, height: 560, fill: 'white' }));
+
+  // faces behind/front ordering
+  polygon([Cc, B, E, F], {
+    fill: C.sideFill1,
+    stroke: C.edge,
+    'stroke-width': 2.3,
+    'stroke-linejoin': 'round',
+  });
+  polygon([A, Cc, F, D], {
+    fill: C.sideFill2,
+    stroke: C.edge,
+    'stroke-width': 2.3,
+    'stroke-linejoin': 'round',
+  });
+  polygon([A, B, E, D], {
+    fill: C.sideFill3,
+    stroke: C.edge,
+    'stroke-width': 2.3,
+    'stroke-linejoin': 'round',
+  });
+  polygon([D, E, F], {
+    fill: C.backFill,
+    stroke: C.edge,
+    'stroke-width': 2.5,
+    'stroke-linejoin': 'round',
+  });
+  polygon([A, B, Cc], {
+    fill: C.frontFill,
+    stroke: C.edge,
+    'stroke-width': 3,
+    'stroke-linejoin': 'round',
+  });
+
+  // hidden hint lines on back/base alignment
+  for (const [P, Q] of [
+    [D, A],
+    [E, B],
+    [F, Cc],
+  ]) {
+    line(P, Q, {
+      stroke: C.hidden,
+      'stroke-width': 1.2,
+      'stroke-dasharray': '6 5',
+    });
+  }
+  // redraw visible lateral edges strongly
+  for (const [P, Q] of [
+    [A, D],
+    [B, E],
+    [Cc, F],
+    [D, E],
+    [E, F],
+    [F, D],
+    [A, B],
+    [B, Cc],
+    [Cc, A],
+  ]) {
+    line(P, Q, {
+      stroke: C.edge,
+      'stroke-width': (P === A && Q === B) || (P === B && Q === Cc) || (P === Cc && Q === A) ? 3 : 2.5,
+      'stroke-linecap': 'round',
+    });
+  }
+
+  // vertices
+  for (const P of [A, B, Cc, D, E, F]) {
+    circle(P, 4.2, { fill: C.edge });
+  }
+
+  // labels
+  text(A.x - 16, A.y + 18, 'A', { 'font-size': 13 });
+  text(B.x + 16, B.y + 18, 'B', { 'font-size': 13 });
+  text(Cc.x, Cc.y - 18, 'C', { 'font-size': 13 });
+  text(D.x - 16, D.y - 8, 'D', { 'font-size': 13 });
+  text(E.x + 16, E.y - 8, 'E', { 'font-size': 13 });
+  text(F.x, F.y - 18, 'F', { 'font-size': 13 });
+
+  // base side labels (all 4)
+  text((A.x + B.x) / 2, A.y + 24, '4', {
+    fill: C.accent,
+    'font-size': 16,
+    'font-weight': 700,
+  });
+  text((A.x + Cc.x) / 2 - 18, (A.y + Cc.y) / 2, '4', {
+    fill: C.accent,
+    'font-size': 16,
+    'font-weight': 700,
+  });
+  text((B.x + Cc.x) / 2 + 18, (B.y + Cc.y) / 2, '4', {
+    fill: C.accent,
+    'font-size': 16,
+    'font-weight': 700,
+  });
+
+  // prism height label
+  const mAD = mid(A, D);
+  line(A, D, {
+    stroke: C.height,
+    'stroke-width': 3.2,
+  });
+  text(mAD.x - 18, mAD.y - 8, '6', {
+    fill: C.height,
+    'font-size': 18,
+    'font-weight': 700,
+  });
+
+  // face labels
+  text(320, 305, '밑면 ABC', {
+    fill: C.accent,
+    'font-size': 14,
+    'font-weight': 700,
+  });
+  text(548, 202, '윗면 DEF', {
+    fill: '#15803d',
+    'font-size': 14,
+    'font-weight': 700,
+  });
+  text(428, 418, '옆면', {
+    fill: '#6d28d9',
+    'font-size': 13,
+  });
+
+  // title and notes
+  text(690, 82, '삼각기둥 ABC-DEF', {
+    'font-size': 24,
+    'font-weight': 700,
+  });
+  text(690, 116, '밑면은 한 변의 길이 4인 정삼각형', {
+    'font-size': 14,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(690, 146, '두 밑면은 서로 평행하고 합동', {
+    'font-size': 14,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(690, 176, '옆모서리 AD = BE = CF = 6', {
+    'font-size': 14,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(690, 206, '높이 6인 직기둥 형태로 표현', {
+    'font-size': 14,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+
+  // guide arrows
+  line(
+    { x: 610, y: 150 },
+    { x: 500, y: 188 },
+    {
+      stroke: C.sub,
+      'stroke-width': 1.4,
+      'marker-end': 'url(#arrow)',
+    }
+  );
+  line(
+    { x: 615, y: 180 },
+    { x: 306, y: 325 },
+    {
+      stroke: C.sub,
+      'stroke-width': 1.4,
+      'marker-end': 'url(#arrow)',
+    }
+  );
+  line(
+    { x: 610, y: 206 },
+    { x: mAD.x - 4, y: mAD.y - 4 },
+    {
+      stroke: C.sub,
+      'stroke-width': 1.4,
+      'marker-end': 'url(#arrow)',
+    }
+  );
+</script>

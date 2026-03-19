@@ -1,0 +1,81 @@
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+function triangle(pts, fill, stroke) {
+  svg.appendChild(el('polygon', { points: pts.map(p => p.join(',')).join(' '), fill, 'fill-opacity': '0.15', stroke, 'stroke-width': '1.8' }));
+}
+
+// 정사면체 전개도: 한 변 a=6, scale s
+// 정삼각형 높이: h = a*(√3/2)
+const a = 6, sc = 50;
+const h = a * Math.sqrt(3) / 2 * sc; // 픽셀 높이 ≈ 259.8
+
+// 배치: 중앙 삼각형 1개 + 아래 3개
+// 중앙 삼각형: 꼭짓점 위, 바닥 좌우
+const cx = 340, topY = 80;
+
+// 삼각형 1 (중앙, 꼭짓점 위)
+const T1 = [
+  [cx, topY],
+  [cx - a * sc / 2, topY + h],
+  [cx + a * sc / 2, topY + h],
+];
+
+// 삼각형 2 (아래 중앙, 꼭짓점 아래)
+const T2 = [
+  [cx - a * sc / 2, topY + h],
+  [cx + a * sc / 2, topY + h],
+  [cx, topY + 2 * h],
+];
+
+// 삼각형 3 (아래 왼쪽, T2 왼쪽 변에 붙음)
+// T2의 왼쪽 변: (cx-a*sc/2, topY+h) ~ (cx, topY+2h)
+// 이 변의 바깥쪽 삼각형:
+const T3 = [
+  [cx - a * sc / 2, topY + h],
+  [cx, topY + 2 * h],
+  [cx - a * sc, topY + 2 * h],
+];
+
+// 삼각형 4 (아래 오른쪽, T2 오른쪽 변에 붙음)
+const T4 = [
+  [cx + a * sc / 2, topY + h],
+  [cx, topY + 2 * h],
+  [cx + a * sc, topY + 2 * h],
+];
+
+const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'];
+[T1, T2, T3, T4].forEach((tri, i) => {
+  triangle(tri, colors[i], colors[i]);
+});
+
+// 변 길이 라벨
+// 각 삼각형의 중앙에 면 번호
+[[T1, '①'], [T2, '②'], [T3, '③'], [T4, '④']].forEach(([tri, label]) => {
+  const mx = tri.reduce((s, p) => s + p[0], 0) / 3;
+  const my = tri.reduce((s, p) => s + p[1], 0) / 3;
+  addText(mx, my, label, { 'font-size': '16', 'font-weight': '700', fill: '#1E293B' });
+});
+
+// a=6 레이블 (T1 밑변 위)
+addText(cx, topY + h + 16, '6', { fill: '#334155', 'font-size': '13' });
+// T1 왼쪽 변
+addText(cx - a * sc / 4 - 14, topY + h / 2, '6', { fill: '#334155', 'font-size': '13' });
+// T1 오른쪽 변
+addText(cx + a * sc / 4 + 14, topY + h / 2, '6', { fill: '#334155', 'font-size': '13' });
+
+addText(340, 420, '한 변의 길이 6인 정사면체 전개도 (4면)', { 'font-size': '13', fill: '#374151', 'font-weight': '500' });
+</script>

@@ -1,0 +1,123 @@
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 제목
+txt(340, 36, '정육면체 (한 변의 길이 = 5)', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+
+// 정육면체 3D → 2D 투영
+const s = 5;  // 변의 길이 (단위)
+const sc = 40; // 픽셀당 단위
+const ox = 310, oy = 280;
+
+// 비스듬 투영: z축 방향으로 45도
+function proj(x, y, z) {
+  return {
+    px: ox + (x + z * Math.cos(Math.PI / 4) * 0.5) * sc,
+    py: oy - (y + z * Math.sin(Math.PI / 4) * 0.5) * sc
+  };
+}
+
+// 꼭짓점 3D 좌표 (변 길이 s=5, 단위계 사용)
+// 아래 4개: A-D, 위 4개: E-H
+// 아래: z=0, 위: z=s
+const v = [
+  proj(0, 0, 0), // 0: A
+  proj(s, 0, 0), // 1: B
+  proj(s, s, 0), // 2: C
+  proj(0, s, 0), // 3: D
+  proj(0, 0, s), // 4: E
+  proj(s, 0, s), // 5: F
+  proj(s, s, s), // 6: G
+  proj(0, s, s), // 7: H
+];
+
+const labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
+const offsets = [
+  [-14, 10], [14, 10], [16, 10], [-16, 10],
+  [-14, -10], [14, -10], [16, -10], [-16, -10]
+];
+
+// 가려진 모서리 (점선): A-B, B-C, A-D, B-F → 뒤쪽 면
+// 앞쪽에서 보이지 않는 면: AB(0-1), BC(1-2), AD(0-3), BF(1-5)
+const hiddenEdges = [[0,1],[1,2],[0,3],[1,5]];
+hiddenEdges.forEach(([i,j]) => {
+  svg.appendChild(el('line', {
+    x1: v[i].px, y1: v[i].py, x2: v[j].px, y2: v[j].py,
+    stroke: '#1D4ED8', 'stroke-width': '1', 'stroke-dasharray': '5 4', opacity: '0.45'
+  }));
+});
+
+// 면 채우기 (뒤쪽 면 먼저)
+// 뒤쪽 면: ABFE, ABCD, 오른쪽 BCGF
+svg.appendChild(el('polygon', {
+  points: `${v[0].px},${v[0].py} ${v[1].px},${v[1].py} ${v[2].px},${v[2].py} ${v[3].px},${v[3].py}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.06', stroke: 'none'
+}));
+
+// 앞쪽 면 (보이는 3면): 왼쪽 ADHE, 앞쪽 아래DCGH, 위쪽 EFGH
+// 왼쪽 면 ADHE
+svg.appendChild(el('polygon', {
+  points: `${v[0].px},${v[0].py} ${v[3].px},${v[3].py} ${v[7].px},${v[7].py} ${v[4].px},${v[4].py}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.12', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+// 앞쪽 면 DCGH
+svg.appendChild(el('polygon', {
+  points: `${v[3].px},${v[3].py} ${v[2].px},${v[2].py} ${v[6].px},${v[6].py} ${v[7].px},${v[7].py}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.10', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+// 위쪽 면 EFGH
+svg.appendChild(el('polygon', {
+  points: `${v[4].px},${v[4].py} ${v[5].px},${v[5].py} ${v[6].px},${v[6].py} ${v[7].px},${v[7].py}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.18', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 보이는 모서리 (실선): CF, CG, FG (오른쪽 면 및 나머지)
+const visibleEdges = [[2,6],[5,6],[3,7],[4,7],[4,5],[2,3]];
+// 이미 면에서 그렸으므로 추가 모서리 처리
+// 오른쪽 면 BCGF
+svg.appendChild(el('polygon', {
+  points: `${v[1].px},${v[1].py} ${v[2].px},${v[2].py} ${v[6].px},${v[6].py} ${v[5].px},${v[5].py}`,
+  fill: '#EFF6FF', 'fill-opacity': '0.08', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 공간 대각선 A(0) → G(6) 점선
+svg.appendChild(el('line', {
+  x1: v[0].px, y1: v[0].py, x2: v[6].px, y2: v[6].py,
+  stroke: '#F59E0B', 'stroke-width': '1.5', 'stroke-dasharray': '6 4'
+}));
+
+// 대각선 라벨
+const diagMidX = (v[0].px + v[6].px) / 2 - 30;
+const diagMidY = (v[0].py + v[6].py) / 2;
+txt(diagMidX - 10, diagMidY, '5√3≈8.7', { 'font-size': '12', 'font-weight': '400', fill: '#F59E0B' });
+
+// 꼭짓점 점과 라벨
+v.forEach((pt, i) => {
+  svg.appendChild(el('circle', { cx: pt.px, cy: pt.py, r: '3.5', fill: '#1D4ED8' }));
+  txt(pt.px + offsets[i][0], pt.py + offsets[i][1], labels[i], { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+});
+
+// 변 길이 라벨 (하단 DC 중점)
+const midDC = { x: (v[3].px + v[2].px) / 2, y: (v[3].py + v[2].py) / 2 + 14 };
+txt(midDC.x, midDC.y, '5', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 정보 박스
+const infoY = 390;
+svg.appendChild(el('rect', { x: 160, y: infoY - 18, width: 360, height: 50, rx: '10', fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '0.8' }));
+txt(340, infoY, '꼭짓점(V)=8,  모서리(E)=12,  면(F)=6', { 'font-size': '13', 'font-weight': '400', fill: '#1E293B' });
+txt(340, infoY + 22, '공간 대각선 = √(5²+5²+5²) = 5√3 ≈ 8.7', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

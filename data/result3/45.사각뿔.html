@@ -1,0 +1,111 @@
+<svg id="vis" width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 비스듬한 투영: 사각뿔 A-BCDE
+// 밑면: 한 변의 길이 6인 정사각형, 높이 4
+// scale: 1단위 = 40px
+const scale = 40;
+const cx = 340, cy = 280;
+
+// 밑면 꼭짓점 (BCDE) - 사각형의 투영
+// B: 왼쪽앞, C: 오른쪽앞, D: 오른쪽뒤, E: 왼쪽뒤
+// 사각형 3D: 앞면 y=0, 뒤면 y=6, x: -3 ~ 3, z=0
+// 비스듬한 투영 (cabinet projection)
+function project(x3, y3, z3) {
+  const ang = Math.PI / 6;
+  const depth = 0.5;
+  return {
+    px: cx + x3 * scale + z3 * Math.cos(ang) * scale * depth,
+    py: cy - y3 * scale + z3 * Math.sin(ang) * scale * depth
+  };
+}
+
+// 3D 좌표 (x: 좌우, y: 위아래, z: 앞뒤)
+// 밑면 꼭짓점
+const B3 = { x: -3, y: 0, z: 3 };  // 왼쪽앞
+const C3 = { x:  3, y: 0, z: 3 };  // 오른쪽앞
+const D3 = { x:  3, y: 0, z: -3 }; // 오른쪽뒤
+const E3 = { x: -3, y: 0, z: -3 }; // 왼쪽뒤
+const A3 = { x:  0, y: 4, z: 0 };  // 꼭짓점
+
+const B = project(B3.x, B3.y, B3.z);
+const C = project(C3.x, C3.y, C3.z);
+const D = project(D3.x, D3.y, D3.z);
+const E = project(E3.x, E3.y, E3.z);
+const A = project(A3.x, A3.y, A3.z);
+
+// 밑면 중심
+const M3 = { x: 0, y: 0, z: 0 };
+const M = project(M3.x, M3.y, M3.z);
+
+// 꼭짓점A에서 밑면으로 수선의 발 (밑면 중심)
+const H3 = { x: 0, y: 0, z: 0 };
+const H = project(H3.x, H3.y, H3.z);
+
+// 밑면 대각선 (점선): B-D, E-C
+svg.appendChild(el('line', { x1: B.px, y1: B.py, x2: D.px, y2: D.py, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '5 4' }));
+svg.appendChild(el('line', { x1: E.px, y1: E.py, x2: C.px, y2: C.py, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '5 4' }));
+
+// 높이 점선 (A에서 밑면 중심 M까지)
+svg.appendChild(el('line', { x1: A.px, y1: A.py, x2: M.px, y2: M.py, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '5 4' }));
+
+// 밑면 뒤쪽 모서리 (가려진 - 점선)
+svg.appendChild(el('line', { x1: E.px, y1: E.py, x2: D.px, y2: D.py, stroke: '#1D4ED8', 'stroke-width': '1', 'stroke-dasharray': '5 4', opacity: '0.5' }));
+svg.appendChild(el('line', { x1: E.px, y1: E.py, x2: B.px, y2: B.py, stroke: '#1D4ED8', 'stroke-width': '1', 'stroke-dasharray': '5 4', opacity: '0.5' }));
+
+// 옆면 (가려진 모서리)
+svg.appendChild(el('line', { x1: A.px, y1: A.py, x2: E.px, y2: E.py, stroke: '#1D4ED8', 'stroke-width': '1', 'stroke-dasharray': '5 4', opacity: '0.5' }));
+
+// 밑면 앞쪽 모서리 (보이는)
+svg.appendChild(el('line', { x1: B.px, y1: B.py, x2: C.px, y2: C.py, stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+svg.appendChild(el('line', { x1: C.px, y1: C.py, x2: D.px, y2: D.py, stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+
+// 옆면 모서리 (보이는)
+svg.appendChild(el('line', { x1: A.px, y1: A.py, x2: B.px, y2: B.py, stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+svg.appendChild(el('line', { x1: A.px, y1: A.py, x2: C.px, y2: C.py, stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+svg.appendChild(el('line', { x1: A.px, y1: A.py, x2: D.px, y2: D.py, stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+
+// 꼭짓점 점
+[A, B, C, D, E].forEach(p => {
+  svg.appendChild(el('circle', { cx: p.px, cy: p.py, r: '3.5', fill: '#1D4ED8' }));
+});
+
+// 밑면 중심 M 점
+svg.appendChild(el('circle', { cx: M.px, cy: M.py, r: '2.5', fill: '#94A3B8' }));
+
+// 직각 표시 (M에서)
+const s = 8;
+svg.appendChild(el('path', {
+  d: `M ${M.px + s},${M.py} L ${M.px + s},${M.py - s} L ${M.px},${M.py - s}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.8'
+}));
+
+// 꼭짓점 라벨
+txt(A.px, A.py - 18, 'A');
+txt(B.px - 16, B.py + 14, 'B');
+txt(C.px + 16, C.py + 14, 'C');
+txt(D.px + 16, D.py + 8, 'D');
+txt(E.px - 16, E.py + 8, 'E');
+
+// 높이 라벨 h=4
+txt((A.px + M.px) / 2 + 24, (A.py + M.py) / 2, 'h=4', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 밑면 변 길이 라벨
+txt((B.px + C.px) / 2, (B.py + C.py) / 2 + 18, '6', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

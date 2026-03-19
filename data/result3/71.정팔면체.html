@@ -1,0 +1,124 @@
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 제목
+txt(340, 36, '정팔면체 (한 변의 길이 = 6)', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+
+// 정팔면체 꼭짓점 (한 변 a=6): 6개 꼭짓점
+// 좌표: (±r, 0, 0), (0, ±r, 0), (0, 0, ±r) where r = a/√2
+const a = 6;
+const r3d = a / Math.sqrt(2); // ≈ 4.243
+
+// 3D 꼭짓점
+const verts3d = [
+  { x: r3d, y: 0, z: 0 },   // 0: 오른쪽
+  { x: -r3d, y: 0, z: 0 },  // 1: 왼쪽
+  { x: 0, y: r3d, z: 0 },   // 2: 앞
+  { x: 0, y: -r3d, z: 0 },  // 3: 뒤
+  { x: 0, y: 0, z: r3d },   // 4: 위 (T)
+  { x: 0, y: 0, z: -r3d },  // 5: 아래 (B)
+];
+
+const sc = 42;
+const ox = 340, oy = 250;
+
+function proj(p) {
+  return {
+    px: ox + (p.x + p.y * Math.cos(Math.PI * 5 / 6) * 0.55) * sc,
+    py: oy - (p.z + p.y * Math.sin(Math.PI / 6) * 0.55) * sc
+  };
+}
+
+const v = verts3d.map(proj);
+
+// 정팔면체의 12개 모서리 (인접한 꼭짓점 쌍)
+// 4: 위, 5: 아래, 0-3: 적도
+const edges = [
+  [4,0],[4,1],[4,2],[4,3],  // 위 → 적도
+  [5,0],[5,1],[5,2],[5,3],  // 아래 → 적도
+  [0,2],[2,1],[1,3],[3,0],  // 적도 순환
+];
+
+// 가려진 모서리 (뒤쪽): 1-3, 5-1, 5-3, 4-3, 4-1 중 일부
+// 간략히: 뒤쪽(y < 0 방향)의 꼭짓점 1(왼쪽),3(뒤)를 포함하는 일부를 점선으로
+const hiddenEdges = new Set(['4,1','4,3','5,1','5,3','1,3']);
+function edgeKey(i, j) { return Math.min(i,j)+','+Math.max(i,j); }
+
+// 면 그리기 (8개 삼각형)
+// 위쪽 4개: 0-4-2, 2-4-1, 1-4-3, 3-4-0
+// 아래쪽 4개: 0-5-2, 2-5-1, 1-5-3, 3-5-0
+const faces = [
+  [4,0,2],[4,2,1],[4,1,3],[4,3,0],
+  [5,0,2],[5,2,1],[5,1,3],[5,3,0],
+];
+
+// 뒤쪽 면 먼저 (흐리게)
+const backFaces = [[4,1,3],[4,3,0],[5,1,3],[5,3,0]];
+backFaces.forEach(([a,b,c]) => {
+  svg.appendChild(el('polygon', {
+    points: `${v[a].px},${v[a].py} ${v[b].px},${v[b].py} ${v[c].px},${v[c].py}`,
+    fill: '#EFF6FF', 'fill-opacity': '0.06', stroke: '#1D4ED8', 'stroke-width': '0.8', 'stroke-linejoin': 'round', opacity: '0.5'
+  }));
+});
+
+// 앞쪽 면
+const frontFaces = [[4,0,2],[4,2,1],[5,0,2],[5,2,1]];
+frontFaces.forEach(([a,b,c]) => {
+  svg.appendChild(el('polygon', {
+    points: `${v[a].px},${v[a].py} ${v[b].px},${v[b].py} ${v[c].px},${v[c].py}`,
+    fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+  }));
+});
+
+// 가려진 모서리 (점선)
+edges.forEach(([i, j]) => {
+  if (hiddenEdges.has(edgeKey(i,j))) {
+    svg.appendChild(el('line', {
+      x1: v[i].px, y1: v[i].py, x2: v[j].px, y2: v[j].py,
+      stroke: '#1D4ED8', 'stroke-width': '1', 'stroke-dasharray': '5 4', opacity: '0.4'
+    }));
+  }
+});
+
+// 꼭짓점 라벨
+const vLabels = ['A', 'B', 'C', 'D', 'T', 'E'];
+const vOffsets = [[16,-4],[-16,-4],[0,-14],[0,14],[0,-14],[0,14]];
+v.forEach((pt, i) => {
+  svg.appendChild(el('circle', { cx: pt.px, cy: pt.py, r: '3.5', fill: '#1D4ED8' }));
+  txt(pt.px + vOffsets[i][0], pt.py + vOffsets[i][1], vLabels[i], { 'font-size': '13', 'font-weight': '500', fill: '#1E293B' });
+});
+
+// 변 길이 라벨 (앞쪽 0-2 중점)
+const midAC = { x: (v[0].px + v[2].px) / 2 + 12, y: (v[0].py + v[2].py) / 2 };
+txt(midAC.x, midAC.y, '6', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// 오일러 공식 레이블 박스 (상단 우측)
+const eulerX = 490, eulerY = 100;
+svg.appendChild(el('rect', { x: eulerX - 10, y: eulerY - 60, width: 150, height: 112, rx: '10', fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '0.8' }));
+txt(eulerX + 65, eulerY - 42, '정팔면체', { 'font-size': '13', 'font-weight': '500', fill: '#1D4ED8' });
+txt(eulerX + 65, eulerY - 18, 'V = 6', { 'font-size': '12', 'font-weight': '400', fill: '#1E293B' });
+txt(eulerX + 65, eulerY + 4, 'E = 12', { 'font-size': '12', 'font-weight': '400', fill: '#1E293B' });
+txt(eulerX + 65, eulerY + 26, 'F = 8', { 'font-size': '12', 'font-weight': '400', fill: '#1E293B' });
+svg.appendChild(el('line', { x1: eulerX - 10, y1: eulerY + 40, x2: eulerX + 140, y2: eulerY + 40, stroke: '#94A3B8', 'stroke-width': '0.8' }));
+txt(eulerX + 65, eulerY + 52, 'V−E+F = 2 ✓', { 'font-size': '12', 'font-weight': '500', fill: '#1D4ED8' });
+
+// 하단 정보
+const infoY = 400;
+svg.appendChild(el('rect', { x: 180, y: infoY - 18, width: 320, height: 44, rx: '10', fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '0.8' }));
+txt(340, infoY, '6 − 12 + 8 = 2   (오일러 공식 성립)', { 'font-size': '13', 'font-weight': '400', fill: '#1D4ED8' });
+txt(340, infoY + 20, '각 면은 정삼각형, 각 꼭짓점에서 4개 면 만남', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

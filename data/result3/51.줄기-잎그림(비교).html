@@ -1,233 +1,132 @@
-<svg id="vis" width="100%" viewBox="0 0 680 320" xmlns="http://www.w3.org/2000/svg">
-<defs>
-  <line id="divider" x1="0" y1="0" x2="0" y2="0"/>
-</defs>
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
 </svg>
 <script>
 const svg = document.getElementById('vis');
 const ns = 'http://www.w3.org/2000/svg';
+
 function el(tag, attrs) {
   const e = document.createElementNS(ns, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
   return e;
 }
 
-const W = 680;
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '13', 'font-weight': '400', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 남학생: 152, 158, 161, 163, 165, 167, 168, 170, 172, 175
+// 여학생: 148, 151, 153, 155, 157, 159, 162, 164, 165, 168
+const male = [152, 158, 161, 163, 165, 167, 168, 170, 172, 175];
+const female = [148, 151, 153, 155, 157, 159, 162, 164, 165, 168];
+
+// 남학생 중앙값: 10개 → 5번째와 6번째 평균 = (165+167)/2 = 166
+// 여학생 중앙값: 10개 → 5번째와 6번째 평균 = (157+159)/2 = 158
+
+// 줄기 구성
+const allData = [...male, ...female];
+const minStem = Math.min(...allData.map(d => Math.floor(d / 10)));
+const maxStem = Math.max(...allData.map(d => Math.floor(d / 10)));
+
+const maleStems = {};
+const femaleStems = {};
+
+male.forEach(d => {
+  const s = Math.floor(d / 10);
+  if (!maleStems[s]) maleStems[s] = [];
+  maleStems[s].push(d % 10);
+});
+female.forEach(d => {
+  const s = Math.floor(d / 10);
+  if (!femaleStems[s]) femaleStems[s] = [];
+  femaleStems[s].push(d % 10);
+});
+
+const stemKeys = [];
+for (let s = minStem; s <= maxStem; s++) stemKeys.push(s);
+
+// 레이아웃
 const stemX = 340;
-const stemColW = 50;
-const rowH = 40;
-const headerY = 50;
-const firstRowY = 100;
+const rowH = 42;
+const startY = 90;
+const leafSpacing = 20;
+const maxLeaves = 6;
 
-const stems = [14, 15, 16, 17];
+// 제목
+txt(340, 35, '키(cm) 비교 줄기-잎 그림', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
 
-const boysLeaves = {
-  14: [8],
-  15: [2, 5, 7, 9],
-  16: [1, 3, 5, 7, 8],
-  17: [0, 2, 4, 5, 8]
-};
+// 헤더
+txt(stemX - 120, startY - 22, '남학생 (잎)', { 'font-size': '12', 'font-weight': '500', fill: '#3B82F6' });
+txt(stemX, startY - 22, '줄기', { 'font-size': '12', 'font-weight': '500', fill: '#1D4ED8' });
+txt(stemX + 120, startY - 22, '잎 (여학생)', { 'font-size': '12', 'font-weight': '500', fill: '#F59E0B' });
 
-const girlsLeaves = {
-  14: [4, 7, 9],
-  15: [1, 3, 4, 6, 8],
-  16: [0, 2, 4, 5, 7, 9],
-  17: [2]
-};
+// 구분선 두 개 (줄기 양쪽)
+const lineTop = startY - 30;
+const lineBottom = startY + stemKeys.length * rowH + 10;
+svg.appendChild(el('line', { x1: stemX - 30, y1: lineTop, x2: stemX - 30, y2: lineBottom, stroke: '#1D4ED8', 'stroke-width': '1.2' }));
+svg.appendChild(el('line', { x1: stemX + 30, y1: lineTop, x2: stemX + 30, y2: lineBottom, stroke: '#1D4ED8', 'stroke-width': '1.2' }));
 
-const boysMedian = 165;
-const girlsMedian = 160;
+// 각 줄기 행
+stemKeys.forEach((stem, i) => {
+  const rowY = startY + i * rowH + rowH / 2;
+  const mLeaves = (maleStems[stem] || []).slice().sort((a, b) => b - a); // 남: 오른쪽에서 왼쪽으로 (역순)
+  const fLeaves = (femaleStems[stem] || []).slice().sort((a, b) => a - b); // 여: 왼쪽에서 오른쪽
 
-// background
-svg.appendChild(el('rect', { x: 0, y: 0, width: W, height: 320, fill: '#F8FAFC' }));
+  // 줄기 강조 배경
+  const isMaleMed = (stem === 16); // 남학생 중앙값 166 → 줄기 16
+  const isFemaleMed = (stem === 15); // 여학생 중앙값 158 → 줄기 15
+  if (isMaleMed || isFemaleMed) {
+    const bgColor = isMaleMed ? '#EFF6FF' : '#FFFBEB';
+    svg.appendChild(el('rect', {
+      x: stemX - 290, y: rowY - rowH / 2 + 2,
+      width: 580, height: rowH - 4,
+      fill: bgColor, rx: '4', opacity: '0.7'
+    }));
+  }
 
-// title
-const title = el('text', {
-  x: Math.round(W / 2), y: 25,
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central',
-  fill: '#1E293B',
-  'font-size': '15',
-  'font-weight': '600',
-  'font-family': 'sans-serif'
-});
-title.textContent = '키(cm) 줄기-잎 그림 비교';
-svg.appendChild(title);
+  // 줄기 숫자
+  txt(stemX, rowY, String(stem * 10).substring(0, 2), { 'font-size': '13', 'font-weight': '500', fill: '#1D4ED8' });
 
-// header background
-svg.appendChild(el('rect', { x: 20, y: 35, width: Math.round(W / 2 - stemColW / 2 - 20), height: 30, rx: 4, fill: '#DBEAFE' }));
-svg.appendChild(el('rect', { x: Math.round(W / 2 - stemColW / 2), y: 35, width: stemColW, height: 30, rx: 4, fill: '#E2E8F0' }));
-svg.appendChild(el('rect', { x: Math.round(W / 2 + stemColW / 2), y: 35, width: Math.round(W / 2 - stemColW / 2 - 20), height: 30, rx: 4, fill: '#FEE2E2' }));
-
-// header labels
-const hdrBoys = el('text', {
-  x: Math.round((20 + (W / 2 - stemColW / 2)) / 2), y: headerY,
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central',
-  fill: '#1D4ED8',
-  'font-size': '14',
-  'font-weight': '600',
-  'font-family': 'sans-serif'
-});
-hdrBoys.textContent = '남학생';
-svg.appendChild(hdrBoys);
-
-const hdrStem = el('text', {
-  x: stemX, y: headerY,
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central',
-  fill: '#1E293B',
-  'font-size': '14',
-  'font-weight': '600',
-  'font-family': 'sans-serif'
-});
-hdrStem.textContent = '줄기';
-svg.appendChild(hdrStem);
-
-const hdrGirls = el('text', {
-  x: Math.round((W / 2 + stemColW / 2 + W - 20) / 2), y: headerY,
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central',
-  fill: '#DC2626',
-  'font-size': '14',
-  'font-weight': '600',
-  'font-family': 'sans-serif'
-});
-hdrGirls.textContent = '여학생';
-svg.appendChild(hdrGirls);
-
-const leafSpacing = 18;
-
-stems.forEach((stem, i) => {
-  const rowY = firstRowY + i * rowH;
-  const rowBg = i % 2 === 0 ? '#FFFFFF' : '#F1F5F9';
-
-  // row background
-  svg.appendChild(el('rect', { x: 20, y: Math.round(rowY - rowH / 2), width: W - 40, height: rowH, fill: rowBg }));
-
-  // stem box
-  svg.appendChild(el('rect', {
-    x: Math.round(stemX - stemColW / 2), y: Math.round(rowY - rowH / 2),
-    width: stemColW, height: rowH,
-    fill: '#E2E8F0', stroke: '#CBD5E1', 'stroke-width': '1'
-  }));
-
-  // stem number
-  const stemText = el('text', {
-    x: stemX, y: rowY,
-    'text-anchor': 'middle',
-    'dominant-baseline': 'central',
-    fill: '#1E293B',
-    'font-size': '14',
-    'font-weight': '600',
-    'font-family': 'sans-serif'
+  // 남학생 잎 (줄기 왼쪽, 오른쪽 끝 기준으로 배치)
+  mLeaves.forEach((leaf, li) => {
+    const lx = stemX - 44 - li * leafSpacing;
+    const isMedLeaf = (stem === 16 && (leaf === 5 || leaf === 7));
+    txt(lx, rowY, String(leaf), { 'font-size': '13', 'font-weight': isMedLeaf ? '500' : '400', fill: isMedLeaf ? '#3B82F6' : '#1E293B' });
   });
-  stemText.textContent = String(stem);
-  svg.appendChild(stemText);
 
-  // boys leaves (right to left from stem)
-  const boys = boysLeaves[stem] || [];
-  // boys are displayed right-to-left (largest index nearest stem)
-  for (let j = 0; j < boys.length; j++) {
-    const lx = Math.round(stemX - stemColW / 2 - 10 - j * leafSpacing);
-    const lt = el('text', {
-      x: lx, y: rowY,
-      'text-anchor': 'middle',
-      'dominant-baseline': 'central',
-      fill: '#1D4ED8',
-      'font-size': '14',
-      'font-family': 'sans-serif'
-    });
-    lt.textContent = String(boys[boys.length - 1 - j]);
-    svg.appendChild(lt);
-  }
-
-  // girls leaves (left to right from stem)
-  const girls = girlsLeaves[stem] || [];
-  for (let j = 0; j < girls.length; j++) {
-    const lx = Math.round(stemX + stemColW / 2 + 10 + j * leafSpacing);
-    const lt = el('text', {
-      x: lx, y: rowY,
-      'text-anchor': 'middle',
-      'dominant-baseline': 'central',
-      fill: '#DC2626',
-      'font-size': '14',
-      'font-family': 'sans-serif'
-    });
-    lt.textContent = String(girls[j]);
-    svg.appendChild(lt);
-  }
+  // 여학생 잎 (줄기 오른쪽)
+  fLeaves.forEach((leaf, li) => {
+    const lx = stemX + 44 + li * leafSpacing;
+    const isMedLeaf = (stem === 15 && (leaf === 7 || leaf === 9));
+    txt(lx, rowY, String(leaf), { 'font-size': '13', 'font-weight': isMedLeaf ? '500' : '400', fill: isMedLeaf ? '#F59E0B' : '#1E293B' });
+  });
 });
 
-// dividing lines
-const tableTop = Math.round(firstRowY - rowH / 2);
-const tableBottom = Math.round(firstRowY + stems.length * rowH - rowH / 2);
+// 중앙값 표시 (남학생 166: 16 줄기에 5와 7 사이)
+const maleMedIdx = stemKeys.indexOf(16);
+const maleMedY = startY + maleMedIdx * rowH + rowH / 2;
+// 남학생 16 줄기: 161,163,165,167,168 → 잎: 1,3,5,7,8 (역순: 8,7,5,3,1)
+// 5번째(165)와 6번째(167) = 인덱스2(5)와 인덱스3(7) → 166
+const m5x = stemX - 44 - 2 * leafSpacing; // 잎 5 위치
+const m7x = stemX - 44 - 1 * leafSpacing; // 잎 7 위치
+const maleMedX = (m5x + m7x) / 2;
 
-svg.appendChild(el('line', {
-  x1: Math.round(stemX - stemColW / 2), y1: tableTop,
-  x2: Math.round(stemX - stemColW / 2), y2: tableBottom,
-  stroke: '#94A3B8', 'stroke-width': '1'
-}));
-svg.appendChild(el('line', {
-  x1: Math.round(stemX + stemColW / 2), y1: tableTop,
-  x2: Math.round(stemX + stemColW / 2), y2: tableBottom,
-  stroke: '#94A3B8', 'stroke-width': '1'
-}));
+txt(maleMedX - 50, maleMedY + 55, '중앙값=166', { 'font-size': '11', 'font-weight': '500', fill: '#3B82F6' });
+svg.appendChild(el('line', { x1: maleMedX - 30, y1: maleMedY + 45, x2: maleMedX, y2: maleMedY + 10, stroke: '#3B82F6', 'stroke-width': '1', 'stroke-dasharray': '3 2' }));
 
-// outer border
-svg.appendChild(el('rect', {
-  x: 20, y: tableTop, width: W - 40, height: tableBottom - tableTop,
-  fill: 'none', stroke: '#CBD5E1', 'stroke-width': '1.5', rx: '2'
-}));
+// 여학생 중앙값 158: 15 줄기에 7과 9 사이
+const femaleMedIdx = stemKeys.indexOf(15);
+const femaleMedY = startY + femaleMedIdx * rowH + rowH / 2;
+// 여학생 15 줄기: 151,153,155,157,159 → 잎: 1,3,5,7,9
+// 5번째(157)와 6번째(159) = 인덱스3(7)와 인덱스4(9)
+const f7x = stemX + 44 + 3 * leafSpacing;
+const f9x = stemX + 44 + 4 * leafSpacing;
+const femaleMedX = (f7x + f9x) / 2;
 
-// header bottom line
-svg.appendChild(el('line', {
-  x1: 20, y1: 65, x2: W - 20, y2: 65,
-  stroke: '#CBD5E1', 'stroke-width': '1'
-}));
+txt(femaleMedX + 55, femaleMedY + 55, '중앙값=158', { 'font-size': '11', 'font-weight': '500', fill: '#F59E0B' });
+svg.appendChild(el('line', { x1: femaleMedX + 30, y1: femaleMedY + 45, x2: femaleMedX, y2: femaleMedY + 10, stroke: '#F59E0B', 'stroke-width': '1', 'stroke-dasharray': '3 2' }));
 
-// median section
-const medY = tableBottom + 35;
-
-svg.appendChild(el('rect', { x: 20, y: tableBottom + 15, width: W - 40, height: 40, rx: 6, fill: '#F1F5F9', stroke: '#E2E8F0', 'stroke-width': '1' }));
-
-const medTitle = el('text', {
-  x: stemX, y: medY,
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central',
-  fill: '#475569',
-  'font-size': '13',
-  'font-weight': '500',
-  'font-family': 'sans-serif'
-});
-medTitle.textContent = '중앙값';
-svg.appendChild(medTitle);
-
-const medBoys = el('text', {
-  x: Math.round(stemX - 120), y: medY,
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central',
-  fill: '#1D4ED8',
-  'font-size': '13',
-  'font-weight': '600',
-  'font-family': 'sans-serif'
-});
-medBoys.textContent = `남학생: ${boysMedian} cm`;
-svg.appendChild(medBoys);
-
-const medGirls = el('text', {
-  x: Math.round(stemX + 120), y: medY,
-  'text-anchor': 'middle',
-  'dominant-baseline': 'central',
-  fill: '#DC2626',
-  'font-size': '13',
-  'font-weight': '600',
-  'font-family': 'sans-serif'
-});
-medGirls.textContent = `여학생: ${girlsMedian} cm`;
-svg.appendChild(medGirls);
-
-// highlight median rows
-// boys median 165 → stem 16, leaf 5 (index in boysLeaves[16]: [1,3,5,7,8] → index 2, displayed reversed)
-// girls median 160 → stem 16, leaf 0 (index 0)
+// 단위
+txt(340, startY + stemKeys.length * rowH + 30, '(단위: cm)', { 'font-size': '11', 'font-weight': '400', fill: '#94A3B8' });
 </script>

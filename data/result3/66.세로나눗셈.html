@@ -1,0 +1,119 @@
+<svg id="vis" width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 제목
+txt(340, 36, '847 ÷ 7 세로 나눗셈', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+
+// 레이아웃 기준점
+const left = 200;
+const colW = 44;
+// 열 위치: 몫 자리 3개
+const qCols = [left + colW * 0, left + colW * 1, left + colW * 2]; // 몫 위치 (1, 2, 1)
+const dCols = [left + colW * 0, left + colW * 1, left + colW * 2]; // 피제수 자리
+
+// 피제수 847 위치 (행)
+const rowDividend = 110;  // 피제수
+const rowQ = 75;          // 몫
+const rowLine1 = 128;     // 피제수 윗선
+const lineX = left - 44;  // 제수 왼쪽
+
+// 제수 표시
+txt(lineX + 10, rowDividend, '7', { 'font-size': '16', 'font-weight': '500', fill: '#1E293B' });
+
+// ㄱ자 기호 (제수 오른쪽, 피제수 위)
+// 세로선
+svg.appendChild(el('line', { x1: left - 8, y1: rowQ - 20, x2: left - 8, y2: rowDividend + 20, stroke: '#1E293B', 'stroke-width': '1.5' }));
+// 가로선 (피제수 위)
+svg.appendChild(el('line', { x1: left - 8, y1: rowQ - 20, x2: left + colW * 3 + 10, y2: rowQ - 20, stroke: '#1E293B', 'stroke-width': '1.5' }));
+
+// 피제수: 8 4 7
+txt(dCols[0], rowDividend, '8', { 'font-size': '16', 'font-weight': '500', fill: '#1E293B' });
+txt(dCols[1], rowDividend, '4', { 'font-size': '16', 'font-weight': '500', fill: '#1E293B' });
+txt(dCols[2], rowDividend, '7', { 'font-size': '16', 'font-weight': '500', fill: '#1E293B' });
+
+// 몫: 1 2 1
+txt(qCols[0], rowQ, '1', { 'font-size': '16', 'font-weight': '500', fill: '#1D4ED8' });
+txt(qCols[1], rowQ, '2', { 'font-size': '16', 'font-weight': '500', fill: '#1D4ED8' });
+txt(qCols[2], rowQ, '1', { 'font-size': '16', 'font-weight': '500', fill: '#1D4ED8' });
+
+// 몫 레이블
+txt(left + colW * 3 + 60, rowQ, '← 몫', { 'font-size': '12', 'font-weight': '400', fill: '#475569', 'text-anchor': 'start' });
+
+// 단계 1: 8 ÷ 7 = 1, 1×7=7
+const row1Num = 150;   // 7 (빼는 수)
+const row1Line = 167;  // 가로선
+const row1Rem = 183;   // 나머지 1
+
+svg.appendChild(el('line', { x1: left - 10, y1: row1Line, x2: left + colW + 10, y2: row1Line, stroke: '#1E293B', 'stroke-width': '1.2' }));
+txt(dCols[0], row1Num, '7', { 'font-size': '16', 'font-weight': '400', fill: '#1E293B' });
+txt(dCols[0], row1Rem, '1', { 'font-size': '16', 'font-weight': '400', fill: '#1E293B' });
+
+// 단계1 계산 강조: 1×7=7
+svg.appendChild(el('rect', { x: left + colW * 3 + 30, y: row1Num - 16, width: 90, height: 26, rx: '6', fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '0.8' }));
+txt(left + colW * 3 + 75, row1Num, '1 × 7 = 7', { 'font-size': '12', 'font-weight': '400', fill: '#1D4ED8' });
+
+// 단계 2: 14 ÷ 7 = 2, 2×7=14
+// 14는 1(내려온 것)과 4를 합친 것
+const row2Start = row1Rem;
+const row2Digits1 = 200;   // 14 (새 피제수)
+const row2Num = 230;       // 14 (빼는 수)
+const row2Line = 248;
+const row2Rem = 264;       // 나머지 0
+
+// 내려온 4
+txt(dCols[1], row2Digits1, '4', { 'font-size': '16', 'font-weight': '400', fill: '#64748B' });
+// 14 표시 (1과 4)
+// 이미 1이 row1Rem에 있음, 이제 14로 표현
+txt(dCols[1], row2Num, '4', { 'font-size': '16', 'font-weight': '400', fill: '#1E293B' });
+txt(dCols[0], row2Num, '1', { 'font-size': '16', 'font-weight': '400', fill: '#1E293B' });
+
+svg.appendChild(el('line', { x1: left - 10, y1: row2Line, x2: left + colW * 2 + 10, y2: row2Line, stroke: '#1E293B', 'stroke-width': '1.2' }));
+txt(dCols[1], row2Rem, '0', { 'font-size': '16', 'font-weight': '400', fill: '#1E293B' });
+
+// 단계2 계산 강조: 2×7=14
+svg.appendChild(el('rect', { x: left + colW * 3 + 30, y: row2Num - 16, width: 90, height: 26, rx: '6', fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '0.8' }));
+txt(left + colW * 3 + 75, row2Num, '2 × 7 = 14', { 'font-size': '12', 'font-weight': '400', fill: '#1D4ED8' });
+
+// 단계 3: 07 ÷ 7 = 1, 1×7=7
+const row3Digits = 280;
+const row3Num = 308;
+const row3Line = 326;
+const row3Rem = 342;
+
+txt(dCols[2], row3Digits, '7', { 'font-size': '16', 'font-weight': '400', fill: '#64748B' });
+txt(dCols[2], row3Num, '7', { 'font-size': '16', 'font-weight': '400', fill: '#1E293B' });
+txt(dCols[1], row3Num, '0', { 'font-size': '16', 'font-weight': '400', fill: '#1E293B' });
+
+svg.appendChild(el('line', { x1: left - 10, y1: row3Line, x2: left + colW * 3 + 10, y2: row3Line, stroke: '#1E293B', 'stroke-width': '1.2' }));
+txt(dCols[2], row3Rem, '0', { 'font-size': '16', 'font-weight': '500', fill: '#1D4ED8' });
+
+// 단계3 계산 강조: 1×7=7
+svg.appendChild(el('rect', { x: left + colW * 3 + 30, y: row3Num - 16, width: 90, height: 26, rx: '6', fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '0.8' }));
+txt(left + colW * 3 + 75, row3Num, '1 × 7 = 7', { 'font-size': '12', 'font-weight': '400', fill: '#1D4ED8' });
+
+// 나머지 0 강조
+svg.appendChild(el('rect', { x: left + colW * 3 + 30, y: row3Rem - 14, width: 90, height: 24, rx: '6', fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '0.8' }));
+txt(left + colW * 3 + 75, row3Rem, '나머지 0', { 'font-size': '12', 'font-weight': '400', fill: '#1D4ED8' });
+
+// 최종 결과 박스
+const resultY = 390;
+svg.appendChild(el('rect', { x: 190, y: resultY - 22, width: 300, height: 44, rx: '10', fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '1' }));
+txt(340, resultY, '847 ÷ 7 = 121  …  나머지 0', { 'font-size': '14', 'font-weight': '500', fill: '#1D4ED8' });
+
+// 검산 안내
+txt(340, resultY + 52, '검산: 7 × 121 = 847', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

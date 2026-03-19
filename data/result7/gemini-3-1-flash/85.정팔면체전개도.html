@@ -1,0 +1,97 @@
+<svg id="vis" width="100%" viewBox="0 0 680 350" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // 설정: 한 변 6, 스케일 1단위당 50px
+  const s = 6;
+  const scale = 50;
+  const sidePx = s * scale; // 300px
+  const hPx = (sidePx * Math.sqrt(3)) / 2; // 정삼각형 높이 약 259.8px
+
+  // 전개도 시작점 (중앙 배치를 위해 조정)
+  const startX = 40;
+  const startY = 50;
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': '14',
+      'font-weight': '500',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: '[label-primary]',
+      ...attrs,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 삼각형 정점들을 계산하여 폴리곤 그리기
+  function drawTri(p1, p2, p3, type) {
+    const pts = `${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`;
+    svg.appendChild(
+      el('polygon', {
+        points: pts,
+        fill: '[shape-fill]',
+        'fill-opacity': type === 'top' ? '0.15' : '0.1',
+        stroke: '[shape-stroke]',
+        'stroke-width': '1.5',
+        'stroke-linejoin': 'round',
+      })
+    );
+  }
+
+  // 8개의 삼각형 배치 (위 4개, 아래 4개)
+  const unit = sidePx / 2;
+
+  for (let i = 0; i < 4; i++) {
+    // 윗줄 삼각형 (정립)
+    const t1 = { x: startX + i * sidePx, y: startY + hPx };
+    const t2 = { x: startX + (i + 1) * sidePx, y: startY + hPx };
+    const t3 = { x: startX + unit + i * sidePx, y: startY };
+    drawTri(t1, t2, t3, 'top');
+
+    // 아랫줄 삼각형 (역립)
+    const b1 = { x: startX + unit + i * sidePx, y: startY };
+    const b2 = { x: startX + unit + (i + 1) * sidePx, y: startY };
+    const b3 = { x: startX + (i + 1) * sidePx, y: startY + hPx };
+    drawTri(b1, b2, b3, 'bottom');
+  }
+
+  // 주요 변의 길이 라벨 (6)
+  addText(startX + unit, startY + hPx + 20, '6', { fill: '[label-secondary]' });
+  addText(startX + unit / 2 - 15, startY + hPx / 2, '6', { fill: '[label-secondary]' });
+
+  // 접는 선 및 구성 설명
+  addText(340, startY + hPx + 60, '정팔면체 전개도 (한 변의 길이 6)', { 'font-weight': '600' });
+</script>

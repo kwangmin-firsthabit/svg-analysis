@@ -1,0 +1,119 @@
+<svg id="vis" width="100%" viewBox="0 0 680 540" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // 설정: 정사면체 한 변 s=6, 스케일 1단위당 45px
+  const s = 6;
+  const scale = 45;
+  const sidePx = s * scale; // 270px (작은 삼각형 한 변)
+  const hPx = (sidePx * Math.sqrt(3)) / 2; // 약 233.8px (작은 삼각형 높이)
+
+  // 전개도 전체(큰 정삼각형)의 꼭짓점 좌표 (중앙 배치)
+  const tx = 340,
+    ty = 40; // 상단 꼭짓점
+  const lx = tx - sidePx,
+    ly = ty + 2 * hPx; // 좌측 하단 꼭짓점
+  const rx = tx + sidePx,
+    ry = ty + 2 * hPx; // 우측 하단 꼭짓점
+
+  // 내부 접점(접는 선의 꼭짓점)
+  const mtl = { x: (tx + lx) / 2, y: (ty + ly) / 2 }; // 상단-좌측 중간
+  const mtr = { x: (tx + rx) / 2, y: (ty + ry) / 2 }; // 상단-우측 중간
+  const mbot = { x: (lx + rx) / 2, y: ly }; // 하단 중간
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': '14',
+      'font-weight': '500',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: '[label-primary]',
+      ...attrs,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 외곽선 그리기 (큰 정삼각형)
+  svg.appendChild(
+    el('polygon', {
+      points: `${tx},${ty} ${lx},${ly} ${rx},${ry}`,
+      fill: '[shape-fill]',
+      'fill-opacity': '0.1',
+      stroke: '[shape-stroke]',
+      'stroke-width': '1.5',
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // 2. 접는 선(점선) 그리기
+  const foldLines = [
+    [mtl.x, mtl.y, mtr.x, mtr.y],
+    [mtr.x, mtr.y, mbot.x, mbot.y],
+    [mbot.x, mbot.y, mtl.x, mtl.y],
+  ];
+
+  foldLines.forEach(f => {
+    svg.appendChild(
+      el('line', {
+        x1: f[0],
+        y1: f[1],
+        x2: f[2],
+        y2: f[3],
+        stroke: '[auxiliary-line]',
+        'stroke-width': '1.2',
+        'stroke-dasharray': '5 4',
+      })
+    );
+  });
+
+  // 3. 수치 라벨 (변의 길이 6)
+  // 외곽 변들
+  addText((tx + mtl.x) / 2 - 15, (ty + mtl.y) / 2, '6');
+  addText((mtl.x + lx) / 2 - 15, (mtl.y + ly) / 2, '6');
+  addText((lx + mbot.x) / 2, ly + 15, '6');
+  addText((mbot.x + rx) / 2, ry + 15, '6');
+  addText((rx + mtr.x) / 2 + 15, (ry + mtr.y) / 2, '6');
+  addText((mtr.x + tx) / 2 + 15, (mtr.y + ty) / 2, '6');
+
+  // 내부 접는 선 중 하나에 표시
+  addText((mtl.x + mtr.x) / 2, (mtl.y + mtr.y) / 2 - 15, '6', { fill: '[label-secondary]', 'font-size': '12' });
+
+  // 4. 면 설명 라벨
+  const center = { x: tx, y: (mtl.y + ly) / 2 + 20 };
+  addText(tx, mtl.y - 40, '옆면');
+  addText(lx + 70, ly - 40, '옆면');
+  addText(rx - 70, ry - 40, '옆면');
+  addText(tx, ly - 40, '밑면', { 'font-weight': '600' });
+</script>

@@ -1,179 +1,96 @@
-<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
-<defs>
-  <marker id="arrBlue" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-    <path d="M0,0 L0,6 L6,3 Z" fill="#1D4ED8"/>
-  </marker>
-  <marker id="arrGray" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
-    <path d="M0,0 L0,6 L6,3 Z" fill="#94A3B8"/>
-  </marker>
-</defs>
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
 </svg>
 <script>
 const svg = document.getElementById('vis');
 const ns = 'http://www.w3.org/2000/svg';
+
 function el(tag, attrs) {
   const e = document.createElementNS(ns, tag);
   for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
   return e;
 }
 
-// scale: 20px per unit
-// sector: radius R=10 -> 200px, center angle 144 deg
-// circle: radius r=4 -> 80px
-// Layout: sector on left, circle on right
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  return t;
+}
 
-const scale = 20;
-const sectorR = 200; // 10 * scale
-const circleR = 80;  // 4 * scale
+// 원뿔: 밑면 반지름 r=4, 모선 l=10
+const r = 4, l = 10;
+// 중심각: θ = (r/l) × 360 = (4/10) × 360 = 144°
+const centralAngle = (r / l) * 360; // 144°
+const centralRad = centralAngle * Math.PI / 180;
 
-// Sector center at (220, 280)
-const scx = 220, scy = 300;
-// 144 deg sector, symmetric about downward direction (270 deg from positive x-axis)
-// Actually let's orient it nicely: open upward, so center angle bisector pointing up
-// bisector at -90deg (pointing up), half-angle = 72deg
-// left ray at -90-72 = -162 deg, right ray at -90+72 = -18 deg
-const halfAngle = 72 * Math.PI / 180;
-const bisector = -Math.PI / 2; // pointing up
-const a1 = bisector - halfAngle; // left ray angle
-const a2 = bisector + halfAngle; // right ray angle
+// 부채꼴 그리기: 모선 픽셀 = 180px
+const lPx = 180;
+const cx = 340, cy = 230;
 
-const sx1 = Math.round(scx + sectorR * Math.cos(a1));
-const sy1 = Math.round(scy + sectorR * Math.sin(a1));
-const sx2 = Math.round(scx + sectorR * Math.cos(a2));
-const sy2 = Math.round(scy + sectorR * Math.sin(a2));
+// 부채꼴: 중심각 144° = 2.513 rad, 대칭 배치
+// 시작각: -(144/2) = -72° = -1.257 rad (위쪽 중앙 기준)
+// SVG에서 위쪽이 -90° = -π/2
+const startAngle = -Math.PI / 2 - centralRad / 2;
+const endAngle = -Math.PI / 2 + centralRad / 2;
 
-// Arc path (large-arc-flag=1 since 144>180? No, 144<180 so flag=0)
-const sectorPath = `M ${scx},${scy} L ${sx1},${sy1} A ${sectorR},${sectorR} 0 0,1 ${sx2},${sy2} Z`;
+const sx = cx + lPx * Math.cos(startAngle);
+const sy = cy + lPx * Math.sin(startAngle);
+const ex = cx + lPx * Math.cos(endAngle);
+const ey = cy + lPx * Math.sin(endAngle);
+
+const largeArc = centralAngle > 180 ? 1 : 0;
+
+// 부채꼴 경로
 svg.appendChild(el('path', {
-  d: sectorPath,
-  fill: '#3B82F6', 'fill-opacity': '0.12',
-  stroke: '#1D4ED8', 'stroke-width': '1.5'
+  d: `M ${cx} ${cy} L ${sx.toFixed(1)} ${sy.toFixed(1)} A ${lPx} ${lPx} 0 ${largeArc} 1 ${ex.toFixed(1)} ${ey.toFixed(1)} Z`,
+  fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
 }));
 
-// Arc only (for label positioning)
-// Sector label: "옆면 넓이 = 40π"
-const labelAngle = bisector; // straight up from center
-const labelR = sectorR * 0.55;
-const lx = Math.round(scx + labelR * Math.cos(labelAngle));
-const ly = Math.round(scy + labelR * Math.sin(labelAngle));
-svg.appendChild(el('text', {
-  x: lx, y: ly - 12,
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#1E293B', 'font-size': '14', 'font-weight': '500'
-})).textContent = '옆면 넓이';
-svg.appendChild(el('text', {
-  x: lx, y: ly + 12,
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#1E293B', 'font-size': '14', 'font-weight': '500'
-})).textContent = '= 40π';
+// 모선 라벨 (l=10)
+const midAngle = startAngle + centralRad * 0.25;
+const lLabelX = cx + (lPx / 2 + 16) * Math.cos(midAngle);
+const lLabelY = cy + (lPx / 2 + 16) * Math.sin(midAngle);
+txt(lLabelX, lLabelY, 'l = 10', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
 
-// Radius lines are already part of the path; add radius label along right ray
-const midR = sectorR * 0.5;
-const rmx = Math.round(scx + midR * Math.cos(a2));
-const rmy = Math.round(scy + midR * Math.sin(a2));
-svg.appendChild(el('text', {
-  x: rmx + 14, y: rmy,
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#475569', 'font-size': '12', 'font-weight': '400'
-})).textContent = '10';
+const midAngle2 = endAngle - centralRad * 0.25;
+const lLabelX2 = cx + (lPx / 2 + 16) * Math.cos(midAngle2);
+const lLabelY2 = cy + (lPx / 2 + 16) * Math.sin(midAngle2);
+txt(lLabelX2, lLabelY2, 'l = 10', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
 
-// Center angle arc indicator
-const arcIndicatorR = 36;
-const angleArcPath = `M ${Math.round(scx + arcIndicatorR * Math.cos(a1))},${Math.round(scy + arcIndicatorR * Math.sin(a1))} A ${arcIndicatorR},${arcIndicatorR} 0 0,1 ${Math.round(scx + arcIndicatorR * Math.cos(a2))},${Math.round(scy + arcIndicatorR * Math.sin(a2))}`;
+// 호의 길이 라벨 (8π ≈ 25.13)
+// 호 중점
+const midArc = (startAngle + endAngle) / 2;
+const arcLabelX = cx + (lPx + 22) * Math.cos(midArc);
+const arcLabelY = cy + (lPx + 22) * Math.sin(midArc);
+txt(arcLabelX, arcLabelY, '호의 길이 = 8π', { 'font-size': '12', 'font-weight': '400', fill: '#3B82F6' });
+
+// 중심각 호 표시
+const arcR = 36;
+const asX = cx + arcR * Math.cos(startAngle);
+const asY = cy + arcR * Math.sin(startAngle);
+const aeX = cx + arcR * Math.cos(endAngle);
+const aeY = cy + arcR * Math.sin(endAngle);
 svg.appendChild(el('path', {
-  d: angleArcPath,
-  fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.2'
+  d: `M ${asX.toFixed(1)} ${asY.toFixed(1)} A ${arcR} ${arcR} 0 ${largeArc} 1 ${aeX.toFixed(1)} ${aeY.toFixed(1)}`,
+  fill: 'none', stroke: '#60A5FA', 'stroke-width': '1'
 }));
-// Angle label
-svg.appendChild(el('text', {
-  x: scx, y: Math.round(scy - arcIndicatorR - 10),
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#1D4ED8', 'font-size': '13', 'font-weight': '500'
-})).textContent = '144°';
+txt(cx, cy - arcR - 14, '144°', { 'font-size': '12', 'font-weight': '400', fill: '#60A5FA' });
 
-// Circle on the right side
-const ccx = 530, ccy = 300;
-svg.appendChild(el('circle', {
-  cx: ccx, cy: ccy, r: circleR,
-  fill: '#3B82F6', 'fill-opacity': '0.12',
-  stroke: '#1D4ED8', 'stroke-width': '1.5'
-}));
+// 중심점
+svg.appendChild(el('circle', { cx, cy, r: '3', fill: '#1D4ED8' }));
 
-// Circle radius line
-svg.appendChild(el('line', {
-  x1: ccx, y1: ccy, x2: ccx + circleR, y2: ccy,
-  stroke: '#94A3B8', 'stroke-width': '1.2'
-}));
-svg.appendChild(el('text', {
-  x: Math.round(ccx + circleR / 2), y: ccy - 10,
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#475569', 'font-size': '12', 'font-weight': '400'
-})).textContent = '4';
+// 밑면 원 (아래)
+const circleR = 52; // r=4 → 4/10 × 180 = 72px (실제 밑면 원주 = 부채꼴 호 길이)
+// 시각적으로 원을 표현
+const circleCX = cx;
+const circleCY = cy + lPx + circleR + 30;
+svg.appendChild(el('circle', { cx: circleCX, cy: circleCY, r: circleR, fill: '#EFF6FF', 'fill-opacity': '0.15', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+svg.appendChild(el('line', { x1: circleCX, y1: circleCY, x2: circleCX + circleR, y2: circleCY, stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3' }));
+txt(circleCX + circleR / 2, circleCY - 14, 'r = 4', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+txt(circleCX, circleCY + circleR + 16, '밑면 (원)', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
 
-// Circle label
-svg.appendChild(el('text', {
-  x: ccx, y: ccy - 14,
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#1E293B', 'font-size': '14', 'font-weight': '500'
-})).textContent = '밑면';
-svg.appendChild(el('text', {
-  x: ccx, y: ccy + 14,
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#1E293B', 'font-size': '14', 'font-weight': '500'
-})).textContent = '넓이 = 16π';
+// 제목
+txt(340, 30, '원뿔 전개도  (r = 4, 모선 l = 10)', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
 
-// Title
-svg.appendChild(el('text', {
-  x: 340, y: 30,
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#1E293B', 'font-size': '16', 'font-weight': '500'
-})).textContent = '원뿔의 전개도';
-
-// Section labels
-svg.appendChild(el('text', {
-  x: scx, y: 80,
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#475569', 'font-size': '13', 'font-weight': '400'
-})).textContent = '옆면 (부채꼴)';
-
-svg.appendChild(el('text', {
-  x: ccx, y: 80,
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#475569', 'font-size': '13', 'font-weight': '400'
-})).textContent = '밑면 (원)';
-
-// Summary lines
-const summaries = [
-  '모선 l = 10,  밑면 반지름 r = 4',
-  '부채꼴 중심각 = 360° × (r / l) = 360° × (4/10) = 144°',
-  '옆면 넓이 = π × l × r = π × 10 × 4 = 40π',
-];
-summaries.forEach((line, i) => {
-  svg.appendChild(el('text', {
-    x: 340, y: 440 + i * 24,
-    'text-anchor': 'middle', 'dominant-baseline': 'central',
-    fill: '#475569', 'font-size': '12', 'font-weight': '400'
-  })).textContent = line;
-});
-
-// Auxiliary: mark center dot of sector
-svg.appendChild(el('circle', {
-  cx: scx, cy: scy, r: '3',
-  fill: '#1D4ED8'
-}));
-
-// Auxiliary: mark center dot of circle
-svg.appendChild(el('circle', {
-  cx: ccx, cy: ccy, r: '3',
-  fill: '#1D4ED8'
-}));
-
-// Left radius label
-const lrmx = Math.round(scx + midR * Math.cos(a1));
-const lrmy = Math.round(scy + midR * Math.sin(a1));
-svg.appendChild(el('text', {
-  x: lrmx - 16, y: lrmy,
-  'text-anchor': 'middle', 'dominant-baseline': 'central',
-  fill: '#475569', 'font-size': '12', 'font-weight': '400'
-})).textContent = '10';
+const maxY = circleCY + circleR + 30;
+svg.setAttribute('viewBox', '0 0 680 ' + Math.round(maxY));
 </script>

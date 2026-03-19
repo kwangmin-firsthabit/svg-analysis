@@ -1,0 +1,69 @@
+<svg id="vis" width="100%" viewBox="0 0 680 560" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+function project(x, y, z) {
+  return {
+    px: Math.round(x + z * Math.cos(Math.PI / 6) * 0.5),
+    py: Math.round(y - z * Math.sin(Math.PI / 6) * 0.5)
+  };
+}
+
+const scale = 50;
+const r = 5 * scale;     // 250
+const cx = 340, cy = 280;
+const ry = Math.round(r * Math.sin(Math.PI / 6) * 0.5); // 62
+
+// 구 실루엣 원
+svg.appendChild(el('circle', {
+  cx, cy, r,
+  fill: '#3B82F6', 'fill-opacity': '0.12',
+  stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// 적도선 타원 뒤쪽 반원 (점선)
+svg.appendChild(el('path', {
+  d: `M ${cx - r} ${cy} A ${r} ${ry} 0 0 0 ${cx + r} ${cy}`,
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '5 4'
+}));
+// 적도선 타원 앞쪽 반원 (실선)
+svg.appendChild(el('path', {
+  d: `M ${cx - r} ${cy} A ${r} ${ry} 0 0 1 ${cx + r} ${cy}`,
+  fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// 중심 O
+svg.appendChild(el('circle', { cx, cy, r: 3, fill: '#1E293B' }));
+
+// 반지름 선분 (중심 → 우상 방향)
+const rx2 = cx + Math.round(r * Math.cos(Math.PI / 6));
+const ry2 = cy - Math.round(r * Math.sin(Math.PI / 6));
+svg.appendChild(el('line', {
+  x1: cx, y1: cy, x2: rx2, y2: ry2,
+  stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '4 3'
+}));
+
+// 라벨
+function addLabel(x, y, text, anchor = 'middle') {
+  const t = el('text', {
+    x, y, 'font-size': '14', 'font-weight': '500',
+    'text-anchor': anchor, 'dominant-baseline': 'central', fill: '#1E293B'
+  });
+  t.textContent = text;
+  svg.appendChild(t);
+}
+addLabel(cx - 16, cy, 'O', 'end');
+addText((cx + rx2) / 2 + 8, (cy + ry2) / 2 - 10, '5');
+</script>

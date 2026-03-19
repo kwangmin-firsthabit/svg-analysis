@@ -1,0 +1,67 @@
+<svg id="vis" width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+<defs></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 밑면 반지름 r=4, 모선 l=10
+// 부채꼴 중심각: θ = (r/l)*360° = (4/10)*360° = 144°
+const r = 4, l = 10;
+const theta = (r / l) * 2 * Math.PI; // 144° in radians = 2.513...
+const thetaDeg = (r / l) * 360; // 144°
+
+const sc = 28; // scale: 1단위=28px
+const lPx = l * sc; // 모선 픽셀=280
+
+// 부채꼴 배치 (왼쪽)
+const sx = 200, sy = 240;
+const startAngle = -(Math.PI / 2 + theta / 2); // 위쪽 중앙부터
+const endAngle = startAngle + theta;
+
+const x1 = sx + lPx * Math.cos(startAngle);
+const y1 = sy + lPx * Math.sin(startAngle);
+const x2 = sx + lPx * Math.cos(endAngle);
+const y2 = sy + lPx * Math.sin(endAngle);
+
+const largeArc = theta > Math.PI ? 1 : 0;
+const arcPath = `M ${sx},${sy} L ${Math.round(x1)},${Math.round(y1)} A ${lPx},${lPx} 0 ${largeArc} 1 ${Math.round(x2)},${Math.round(y2)} Z`;
+svg.appendChild(el('path', { d: arcPath, fill: '#FEF3C7', 'fill-opacity': '0.7', stroke: '#F59E0B', 'stroke-width': '1.8' }));
+
+// 부채꼴 중심 점
+svg.appendChild(el('circle', { cx: sx, cy: sy, r: '3.5', fill: '#F59E0B' }));
+addText(sx - 14, sy, 'O', { fill: '#92400E', 'font-size': '13', 'font-weight': '600' });
+
+// 모선 라벨
+addText(sx + lPx / 2 * Math.cos(startAngle - 0.1) - 14, sy + lPx / 2 * Math.sin(startAngle - 0.1) - 4, 'l=10', { fill: '#92400E', 'font-size': '12' });
+
+// 중심각 라벨
+const midAngle = startAngle + theta / 2;
+const arcR2 = 50;
+const arcPath2 = `M ${sx + arcR2 * Math.cos(startAngle)},${sy + arcR2 * Math.sin(startAngle)} A ${arcR2},${arcR2} 0 ${largeArc} 1 ${sx + arcR2 * Math.cos(endAngle)},${sy + arcR2 * Math.sin(endAngle)}`;
+svg.appendChild(el('path', { d: arcPath2, fill: 'none', stroke: '#F59E0B', 'stroke-width': '1.2' }));
+addText(sx + 70 * Math.cos(midAngle), sy + 70 * Math.sin(midAngle), `${thetaDeg}°`, { fill: '#B45309', 'font-size': '12' });
+
+// 밑면 원 (오른쪽)
+const circX = 530, circY = 240;
+const rPx = r * sc;
+svg.appendChild(el('circle', { cx: circX, cy: circY, r: rPx, fill: '#DBEAFE', 'fill-opacity': '0.6', stroke: '#2563EB', 'stroke-width': '1.8' }));
+svg.appendChild(el('circle', { cx: circX, cy: circY, r: '3', fill: '#2563EB' }));
+addText(circX, circY - rPx - 14, 'r = 4', { fill: '#1D4ED8', 'font-size': '13' });
+
+// 호의 길이 = 밑면 둘레 라벨
+const arcLen = 2 * Math.PI * r;
+addText(sx, sy + lPx + 36, `호의 길이 = 2πr = 8π ≈ ${arcLen.toFixed(1)}`, { fill: '#92400E', 'font-size': '11' });
+
+addText(340, 430, '원뿔 전개도 (r=4, 모선=10, 중심각=144°)', { 'font-size': '13', fill: '#1E293B', 'font-weight': '600' });
+</script>

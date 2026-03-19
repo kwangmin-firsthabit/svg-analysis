@@ -1,0 +1,114 @@
+<svg id="vis" width="100%" viewBox="0 0 680 150" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // 원점은 중앙(340), y축 높이는 100, 스케일은 1단위당 60px
+  const ox = 340,
+    oy = 100,
+    scale = 60;
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function text(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      'font-size': '14',
+      'font-weight': '500',
+      fill: '#1e293b',
+      ...attrs,
+    });
+    t.textContent = content;
+    return t;
+  }
+
+  // 1. 수직선 그리기 (양방향 화살표)
+  svg.appendChild(
+    el('line', {
+      x1: 50,
+      y1: oy,
+      x2: 630,
+      y2: oy,
+      stroke: '#334155',
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+      'marker-start': 'url(#arrow)',
+    })
+  );
+
+  // 2. 눈금 및 숫자 라벨 (-4부터 4까지)
+  for (let i = -4; i <= 4; i++) {
+    const px = ox + i * scale;
+    svg.appendChild(el('line', { x1: px, y1: oy - 5, x2: px, y2: oy + 5, stroke: '#334155', 'stroke-width': '0.8' }));
+    svg.appendChild(text(px, oy + 25, String(i), { 'font-size': '12', fill: '#64748b' }));
+  }
+
+  // 3. 부등식 영역 표시
+  const x1 = ox - 2 * scale; // x = -2
+  const x2 = ox + 1 * scale; // x = 1
+  const yLevel = oy - 40;
+
+  // x <= -2 영역 (왼쪽 화살표)
+  svg.appendChild(el('line', { x1: x1, y1: oy, x2: x1, y2: yLevel, stroke: '#2563eb', 'stroke-width': '1.5' }));
+  svg.appendChild(
+    el('line', {
+      x1: x1,
+      y1: yLevel,
+      x2: 70,
+      y2: yLevel,
+      stroke: '#2563eb',
+      'stroke-width': '2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  svg.appendChild(el('circle', { cx: x1, cy: oy, r: '4.5', fill: '#2563eb' })); // 닫힌 점
+
+  // x > 1 영역 (오른쪽 화살표)
+  svg.appendChild(el('line', { x1: x2, y1: oy, x2: x2, y2: yLevel, stroke: '#ef4444', 'stroke-width': '1.5' }));
+  svg.appendChild(
+    el('line', {
+      x1: x2,
+      y1: yLevel,
+      x2: 610,
+      y2: yLevel,
+      stroke: '#ef4444',
+      'stroke-width': '2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  svg.appendChild(
+    el('circle', { cx: x2, cy: oy, r: '4.5', fill: '#ffffff', stroke: '#ef4444', 'stroke-width': '1.5' })
+  ); // 열린 점
+
+  // 부등식 라벨
+  svg.appendChild(text(x1 - 30, yLevel - 20, 'x ≤ -2', { 'text-anchor': 'end', fill: '#2563eb' }));
+  svg.appendChild(text(x2 + 30, yLevel - 20, 'x > 1', { 'text-anchor': 'start', fill: '#ef4444' }));
+</script>

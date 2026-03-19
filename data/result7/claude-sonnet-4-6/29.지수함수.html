@@ -1,0 +1,66 @@
+<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const ox = 200, oy = 440, scale = 60;
+
+// 축
+svg.appendChild(el('line', { x1: 30, y1: oy, x2: 650, y2: oy, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('line', { x1: ox, y1: 490, x2: ox, y2: 20, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' }));
+addText(660, oy, 'x', { 'font-size': '13', fill: '#374151' });
+addText(ox, 10, 'y', { 'font-size': '13', fill: '#374151' });
+
+// y=2^x 곡선
+const pts = [];
+for (let px = 40; px <= 640; px += 2) {
+  const mx = (px - ox) / scale;
+  const my = Math.pow(2, mx);
+  const py = oy - my * scale;
+  if (py >= 20 && py <= 470) pts.push(`${px},${Math.round(py)}`);
+}
+svg.appendChild(el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#2563EB', 'stroke-width': '2.2', 'stroke-linejoin': 'round' }));
+
+// x 눈금: -3 ~ 6
+for (let mx = -3; mx <= 6; mx++) {
+  if (mx === 0) continue;
+  const px = ox + mx * scale;
+  if (px < 30 || px > 640) continue;
+  svg.appendChild(el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: '#374151', 'stroke-width': '1' }));
+  addText(px, oy + 16, String(mx));
+}
+
+// y 눈금: 1, 2, 4, 8
+for (const my of [1, 2, 4, 8]) {
+  const py = oy - my * scale;
+  if (py < 20) continue;
+  svg.appendChild(el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: '#374151', 'stroke-width': '1' }));
+  addText(ox - 16, py, String(my));
+}
+
+// 원점
+addText(ox - 12, oy + 16, 'O');
+
+// (0,1) 점 강조
+svg.appendChild(el('circle', { cx: ox, cy: oy - scale, r: '4', fill: '#2563EB' }));
+addText(ox + 28, oy - scale, '(0, 1)', { fill: '#1D4ED8' });
+
+// 함수 레이블
+addText(580, oy - 5 * scale, 'y = 2ˣ', { 'font-size': '14', fill: '#2563EB', 'font-style': 'italic', 'font-weight': '600' });
+
+// 점근선 y=0
+svg.appendChild(el('line', { x1: 30, y1: oy, x2: ox - 4, y2: oy, stroke: '#94A3B8', 'stroke-dasharray': '5 3', 'stroke-width': '1' }));
+addText(90, oy - 14, 'y = 0', { 'font-size': '11', fill: '#64748B' });
+</script>

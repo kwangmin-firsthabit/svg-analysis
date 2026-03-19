@@ -1,0 +1,97 @@
+<svg id="vis" width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function txt(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': '14', 'font-weight': '500', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 제목
+txt(340, 36, '84와 60의 최대공약수 (ㄴ자 공약수 방식)', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
+
+// 레이아웃
+// 각 단계: 공약수 | 피제수1 | 피제수2
+// 3단계: 2, 2, 3
+const startX = 160;
+const colDivW = 52;  // 공약수 열 너비
+const colNumW = 72;  // 숫자 열 너비
+const rowH = 64;
+const startY = 100;
+
+const steps = [
+  { div: '2', n1: '84', n2: '60', r1: '42', r2: '30' },
+  { div: '2', n1: '42', n2: '30', r1: '21', r2: '15' },
+  { div: '3', n1: '21', n2: '15', r1: '7',  r2: '5'  },
+];
+
+const divColors = ['#1D4ED8', '#F59E0B', '#3B82F6'];
+
+steps.forEach((step, i) => {
+  const y = startY + i * rowH;
+  const x0 = startX;             // 공약수 x 중심
+  const x1 = startX + colDivW + colNumW * 0.5 + 10;  // 첫 번째 수
+  const x2 = startX + colDivW + colNumW * 1.5 + 20;  // 두 번째 수
+
+  // ㄴ자 선 (왼쪽 세로 + 아래 가로)
+  // 세로선
+  svg.appendChild(el('line', { x1: x0 + colDivW / 2 + 4, y1: y - rowH / 2 + 8, x2: x0 + colDivW / 2 + 4, y2: y + rowH / 2 - 8, stroke: '#1E293B', 'stroke-width': '1.5' }));
+  // 가로선 (피제수 위)
+  svg.appendChild(el('line', { x1: x0 + colDivW / 2 + 4, y1: y - rowH / 2 + 8, x2: x2 + colNumW / 2 - 10, y2: y - rowH / 2 + 8, stroke: '#1E293B', 'stroke-width': '1.5' }));
+
+  // 공약수 강조 배경
+  svg.appendChild(el('rect', { x: x0 - 18, y: y - 16, width: 36, height: 32, rx: '6', fill: '#EFF6FF', stroke: divColors[i], 'stroke-width': '1.2' }));
+  txt(x0, y, step.div, { 'font-size': '16', 'font-weight': '500', fill: divColors[i] });
+
+  // 피제수
+  txt(x1, y, step.n1, { 'font-size': '15', 'font-weight': '400', fill: '#1E293B' });
+  txt(x2, y, step.n2, { 'font-size': '15', 'font-weight': '400', fill: '#1E293B' });
+});
+
+// 마지막 ㄴ자 아래 가로선
+const lastY = startY + steps.length * rowH - rowH / 2 + 8;
+const x0last = startX;
+const x1last = startX + colDivW + colNumW * 0.5 + 10;
+const x2last = startX + colDivW + colNumW * 1.5 + 20;
+
+// 마지막 몫 행
+const finalY = startY + steps.length * rowH;
+const x1f = startX + colDivW + colNumW * 0.5 + 10;
+const x2f = startX + colDivW + colNumW * 1.5 + 20;
+
+// 마지막 ㄴ자 왼쪽 세로선
+svg.appendChild(el('line', { x1: x0last + colDivW / 2 + 4, y1: startY + (steps.length - 1) * rowH + rowH / 2 - 8, x2: x0last + colDivW / 2 + 4, y2: finalY - 10, stroke: '#1E293B', 'stroke-width': '1.5' }));
+// 마지막 ㄴ자 가로선
+svg.appendChild(el('line', { x1: x0last + colDivW / 2 + 4, y1: finalY - 10, x2: x2last + colNumW / 2 - 10, y2: finalY - 10, stroke: '#1E293B', 'stroke-width': '1.5' }));
+
+// 최종 몫: 7, 5
+txt(x1f, finalY + 10, '7', { 'font-size': '15', 'font-weight': '400', fill: '#475569' });
+txt(x2f, finalY + 10, '5', { 'font-size': '15', 'font-weight': '400', fill: '#475569' });
+txt(x1f - 30, finalY + 10, '몫:', { 'font-size': '12', 'font-weight': '400', fill: '#475569', 'text-anchor': 'end' });
+
+// 공약수 목록 표시
+const gcdLabelY = finalY + 70;
+txt(340, gcdLabelY - 18, '공약수 곱하기: 2 × 2 × 3 = 12', { 'font-size': '13', 'font-weight': '400', fill: '#475569' });
+
+// GCD 결과 강조 박스
+svg.appendChild(el('rect', { x: 215, y: gcdLabelY + 14, width: 250, height: 44, rx: '10', fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '1.2' }));
+txt(340, gcdLabelY + 36, 'GCD(84, 60) = 12', { 'font-size': '16', 'font-weight': '500', fill: '#1D4ED8' });
+
+// 우측 공약수 목록 레이블
+const labelX = startX + colDivW + colNumW * 2 + 80;
+txt(labelX + 50, startY, '공약수', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+const divColors2 = ['#1D4ED8', '#F59E0B', '#3B82F6'];
+steps.forEach((step, i) => {
+  const y = startY + i * rowH;
+  svg.appendChild(el('circle', { cx: labelX + 50, cy: y + 20, r: '12', fill: '#EFF6FF', stroke: divColors2[i], 'stroke-width': '1' }));
+  txt(labelX + 50, y + 20, step.div, { 'font-size': '13', 'font-weight': '500', fill: divColors2[i] });
+});
+</script>

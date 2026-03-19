@@ -1,0 +1,246 @@
+<svg id="vis" width="100%" viewBox="0 0 860 540" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title {
+        font: 700 24px sans-serif;
+        fill: #0f172a;
+      }
+      .subtitle {
+        font: 400 13px sans-serif;
+        fill: #64748b;
+      }
+      .head {
+        font: 700 15px sans-serif;
+        fill: #0f172a;
+      }
+      .cell {
+        font: 500 15px sans-serif;
+        fill: #0f172a;
+      }
+      .small {
+        font: 400 13px sans-serif;
+        fill: #64748b;
+      }
+    </style>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const C = {
+    line: '#334155',
+    grid: '#94a3b8',
+    headFill: '#e2e8f0',
+    bodyFill: '#f8fafc',
+    tally: '#2563eb',
+    text: '#0f172a',
+    sub: '#64748b',
+    accent: '#dc2626',
+  };
+
+  function el(tag, attrs = {}) {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    return node;
+  }
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+  function text(x, y, str, cls, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      class: cls,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      ...attrs,
+    });
+    t.textContent = str;
+    return add(t);
+  }
+  function line(x1, y1, x2, y2, attrs = {}) {
+    return add(el('line', { x1, y1, x2, y2, ...attrs }));
+  }
+  function rect(x, y, w, h, attrs = {}) {
+    return add(el('rect', { x, y, width: w, height: h, ...attrs }));
+  }
+
+  // data: total 30 students
+  const rows = [
+    { season: '봄', freq: 7, color: '#f59e0b' },
+    { season: '여름', freq: 9, color: '#06b6d4' },
+    { season: '가을', freq: 8, color: '#ea580c' },
+    { season: '겨울', freq: 6, color: '#3b82f6' },
+  ];
+
+  const total = rows.reduce((s, r) => s + r.freq, 0);
+
+  // layout
+  const x = 110,
+    y = 110;
+  const col1 = 150,
+    col2 = 420,
+    col3 = 120;
+  const rowH = 72;
+  const tableW = col1 + col2 + col3;
+  const tableH = rowH * (rows.length + 2);
+
+  // background
+  rect(0, 0, 860, 540, { fill: 'white' });
+
+  // title
+  text(430, 52, '좋아하는 계절 조사 도수분포표', 'title');
+  text(430, 80, '학생 30명의 응답을 탈리마크(정자 표시)로 기록', 'subtitle');
+
+  // outer table
+  rect(x, y, tableW, tableH, {
+    fill: C.bodyFill,
+    stroke: C.line,
+    'stroke-width': 2.2,
+    rx: 8,
+  });
+
+  // header row
+  rect(x, y, tableW, rowH, {
+    fill: C.headFill,
+    stroke: 'none',
+  });
+
+  // total row fill
+  rect(x, y + rowH * (rows.length + 1), tableW, rowH, {
+    fill: '#eef2ff',
+    stroke: 'none',
+  });
+
+  // vertical lines
+  line(x + col1, y, x + col1, y + tableH, { stroke: C.grid, 'stroke-width': 1.6 });
+  line(x + col1 + col2, y, x + col1 + col2, y + tableH, { stroke: C.grid, 'stroke-width': 1.6 });
+
+  // horizontal lines
+  for (let i = 1; i <= rows.length + 1; i++) {
+    line(x, y + rowH * i, x + tableW, y + rowH * i, {
+      stroke: C.grid,
+      'stroke-width': 1.4,
+    });
+  }
+
+  // headers
+  text(x + col1 / 2, y + rowH / 2, '계절', 'head');
+  text(x + col1 + col2 / 2, y + rowH / 2, '탈리마크(정자 표시)', 'head');
+  text(x + col1 + col2 + col3 / 2, y + rowH / 2, '도수', 'head');
+
+  // draw tally marks
+  function drawTallyGroup(startX, centerY, count, color) {
+    const spacing = 12;
+    const h = 28;
+    const y1 = centerY - h / 2;
+    const y2 = centerY + h / 2;
+
+    if (count <= 4) {
+      for (let i = 0; i < count; i++) {
+        line(startX + i * spacing, y1, startX + i * spacing, y2, {
+          stroke: color,
+          'stroke-width': 3.2,
+          'stroke-linecap': 'round',
+        });
+      }
+      return startX + Math.max(0, count - 1) * spacing;
+    }
+
+    // 5-stroke tally
+    for (let i = 0; i < 4; i++) {
+      line(startX + i * spacing, y1, startX + i * spacing, y2, {
+        stroke: color,
+        'stroke-width': 3.2,
+        'stroke-linecap': 'round',
+      });
+    }
+    line(startX - 4, y2 - 2, startX + 3 * spacing + 4, y1 + 2, {
+      stroke: color,
+      'stroke-width': 3.2,
+      'stroke-linecap': 'round',
+    });
+    return startX + 3 * spacing;
+  }
+
+  function drawTallies(startX, centerY, value, color) {
+    let gx = startX;
+    const groupsOfFive = Math.floor(value / 5);
+    const rem = value % 5;
+
+    for (let i = 0; i < groupsOfFive; i++) {
+      drawTallyGroup(gx, centerY, 5, color);
+      gx += 70;
+    }
+    if (rem > 0) {
+      drawTallyGroup(gx, centerY, rem, color);
+    }
+  }
+
+  // rows
+  rows.forEach((r, i) => {
+    const cy = y + rowH * (i + 1) + rowH / 2;
+
+    // season name
+    text(x + col1 / 2, cy, r.season, 'cell');
+
+    // small colored dot
+    add(
+      el('circle', {
+        cx: x + 24,
+        cy,
+        r: 6,
+        fill: r.color,
+      })
+    );
+
+    // tally marks
+    drawTallies(x + col1 + 34, cy, r.freq, r.color);
+
+    // frequency
+    text(x + col1 + col2 + col3 / 2, cy, String(r.freq), 'cell', {
+      fill: r.color,
+      'font-weight': 700,
+    });
+  });
+
+  // total row
+  const totalY = y + rowH * (rows.length + 1) + rowH / 2;
+  text(x + col1 / 2, totalY, '합계', 'head', { fill: C.accent });
+  text(x + col1 + col2 / 2, totalY, '전체 학생 수', 'cell', { fill: C.sub });
+  text(x + col1 + col2 + col3 / 2, totalY, String(total), 'head', { fill: C.accent });
+
+  // note box
+  rect(610, 132, 180, 120, {
+    fill: '#fff7ed',
+    stroke: '#fdba74',
+    'stroke-width': 1.5,
+    rx: 12,
+  });
+  text(700, 158, '탈리마크 읽는 법', 'head', { fill: '#c2410c' });
+  text(700, 188, '|||| 는 4명', 'cell', { fill: C.sub });
+  text(700, 214, '||||/ 는 5명', 'cell', { fill: C.sub });
+  text(700, 240, '5명씩 묶어 세면 편리함', 'small', { fill: C.sub });
+
+  // sample tally illustration
+  const sx = 645,
+    sy = 213;
+  for (let i = 0; i < 4; i++) {
+    line(sx + i * 11, sy - 16, sx + i * 11, sy + 10, {
+      stroke: '#c2410c',
+      'stroke-width': 2.8,
+      'stroke-linecap': 'round',
+    });
+  }
+  line(sx - 4, sy + 8, sx + 37, sy - 14, {
+    stroke: '#c2410c',
+    'stroke-width': 2.8,
+    'stroke-linecap': 'round',
+  });
+
+  // footer note
+  text(430, 500, '예시 분포: 봄 7명, 여름 9명, 가을 8명, 겨울 6명', 'subtitle');
+</script>

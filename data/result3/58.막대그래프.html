@@ -1,0 +1,86 @@
+<div style="position: relative; width: 100%; height: 420px;">
+  <canvas id="rainChart"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const months = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+const rainfall = [32, 44, 65, 82, 95, 138, 287, 312, 148, 55, 48, 21];
+const total = rainfall.reduce((a, b) => a + b, 0);
+
+const datalabelPlugin = {
+  id: 'datalabels',
+  afterDatasetsDraw(chart) {
+    const ctx = chart.ctx;
+    const meta = chart.getDatasetMeta(0);
+    meta.data.forEach((bar, i) => {
+      const val = rainfall[i];
+      ctx.save();
+      ctx.font = '400 11px sans-serif';
+      ctx.fillStyle = '#1E293B';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillText(val, bar.x, bar.y - 3);
+      ctx.restore();
+    });
+
+    const totalLabel = '연간 합계: ' + total.toLocaleString() + 'mm';
+    ctx.save();
+    ctx.font = '500 13px sans-serif';
+    ctx.fillStyle = '#1D4ED8';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'top';
+    ctx.fillText(totalLabel, chart.width - 16, 8);
+    ctx.restore();
+  }
+};
+
+new Chart(document.getElementById('rainChart'), {
+  type: 'bar',
+  data: {
+    labels: months,
+    datasets: [{
+      label: '강수량(mm)',
+      data: rainfall,
+      backgroundColor: rainfall.map(v => v >= 200 ? '#1D4ED8' : '#93C5FD'),
+      borderColor: rainfall.map(v => v >= 200 ? '#1E40AF' : '#3B82F6'),
+      borderWidth: 1,
+      borderRadius: 2
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        callbacks: {
+          label: ctx => ctx.parsed.y + 'mm'
+        }
+      }
+    },
+    scales: {
+      x: {
+        ticks: {
+          autoSkip: false,
+          maxRotation: 0,
+          font: { size: 12 },
+          color: '#475569'
+        },
+        grid: { display: false }
+      },
+      y: {
+        min: 0,
+        max: 360,
+        title: { display: true, text: '강수량 (mm)', font: { size: 12 }, color: '#475569' },
+        ticks: {
+          stepSize: 60,
+          font: { size: 11 },
+          color: '#475569'
+        },
+        grid: { color: '#E2E8F0' }
+      }
+    }
+  },
+  plugins: [datalabelPlugin]
+});
+</script>

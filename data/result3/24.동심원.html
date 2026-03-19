@@ -1,0 +1,70 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const cx = 340, cy = 210;
+const scale = 42; // 픽셀/단위
+const r1 = 3 * scale; // 반지름 3 → 126px
+const r2 = 5 * scale; // 반지름 5 → 210px
+
+// 환형 영역 (도넛 모양): 큰 원 - 작은 원
+// SVG clip path 대신 두 원의 차이를 evenodd fillRule로 표현
+const annulus = el('path', {
+  d: `M ${cx + r2} ${cy} A ${r2} ${r2} 0 1 0 ${cx - r2} ${cy} A ${r2} ${r2} 0 1 0 ${cx + r2} ${cy} Z M ${cx + r1} ${cy} A ${r1} ${r1} 0 1 1 ${cx - r1} ${cy} A ${r1} ${r1} 0 1 1 ${cx + r1} ${cy} Z`,
+  fill: '#EFF6FF', 'fill-opacity': '0.6', 'fill-rule': 'evenodd', stroke: 'none'
+});
+svg.appendChild(annulus);
+
+// 큰 원 (r=5)
+svg.appendChild(el('circle', { cx, cy, r: r2, fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+
+// 작은 원 (r=3)
+svg.appendChild(el('circle', { cx, cy, r: r1, fill: 'none', stroke: '#1D4ED8', 'stroke-width': '1.5' }));
+
+// 중심 O
+svg.appendChild(el('circle', { cx, cy, r: '3.5', fill: '#1D4ED8' }));
+addText(cx - 14, cy + 14, 'O');
+
+// r=3 반지름 선 (왼쪽 상단 방향)
+const angle1 = -Math.PI / 4; // 45° 위쪽
+const r1ex = cx + r1 * Math.cos(angle1);
+const r1ey = cy + r1 * Math.sin(angle1);
+svg.appendChild(el('line', {
+  x1: cx, y1: cy, x2: r1ex.toFixed(2), y2: r1ey.toFixed(2),
+  stroke: '#1D4ED8', 'stroke-width': '1'
+}));
+
+// r=5 반지름 선 (오른쪽 상단 방향)
+const angle2 = -Math.PI / 6; // 30° 위쪽
+const r2ex = cx + r2 * Math.cos(angle2);
+const r2ey = cy + r2 * Math.sin(angle2);
+svg.appendChild(el('line', {
+  x1: cx, y1: cy, x2: r2ex.toFixed(2), y2: r2ey.toFixed(2),
+  stroke: '#1D4ED8', 'stroke-width': '1'
+}));
+
+// r=3 라벨 (선 중간)
+const r1mx = (cx + r1ex) / 2;
+const r1my = (cy + r1ey) / 2;
+addText(r1mx - 14, r1my - 8, 'r=3', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+
+// r=5 라벨 (선 중간)
+const r2mx = (cx + r2ex) / 2;
+const r2my = (cy + r2ey) / 2;
+addText(r2mx + 18, r2my - 8, 'r=5', { 'font-size': '12', 'font-weight': '400', fill: '#475569' });
+</script>

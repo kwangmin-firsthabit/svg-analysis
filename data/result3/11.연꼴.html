@@ -1,0 +1,111 @@
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '14', 'font-weight': '500', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#1E293B', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 연꼴(Kite): AB=AD=4, CB=CD=7
+// A가 위(꼭짓점), C가 아래(꼭짓점), B와 D가 좌우
+// 긴 대각선 AC는 짧은 대각선 BD를 수직이등분
+// 대각선 비율: AB=4, CB=7 -> 시각화 scale 30px/unit
+const s1 = 4 * 30; // AB=AD=120px
+const s2 = 7 * 30; // CB=CD=210px
+
+// 긴 대각선(AC)을 수직으로: 위 A, 아래 C
+// 짧은 대각선(BD): 수평 교점 O
+// AB^2 = (BD/2)^2 + AO^2 -> AO = sqrt(AB^2 - (BD/2)^2)
+// CB^2 = (BD/2)^2 + CO^2 -> CO = sqrt(CB^2 - (BD/2)^2)
+// BD = 짧은 대각선: 임의로 설정하면 나머지 자동 결정
+// bd_half: 임의 설정. AB=120, bd_half <= 120
+const bdHalf = 80;
+const AO = Math.sqrt(s1*s1 - bdHalf*bdHalf); // sqrt(14400 - 6400) = sqrt(8000) = 89.44
+const CO = Math.sqrt(s2*s2 - bdHalf*bdHalf); // sqrt(44100 - 6400) = sqrt(37700) = 194.16
+
+const cx = 340, oy = 200; // 교점 O
+const A = [cx, oy - AO];
+const C = [cx, oy + CO];
+const B = [cx - bdHalf, oy];
+const D = [cx + bdHalf, oy];
+
+// 도형
+svg.appendChild(el('polygon', {
+  points: A[0]+','+A[1]+' '+B[0]+','+B[1]+' '+C[0]+','+C[1]+' '+D[0]+','+D[1],
+  fill: '#EFF6FF', 'fill-opacity': '0.15',
+  stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linejoin': 'round'
+}));
+
+// 꼭짓점 점
+[A, B, C, D].forEach(([x, y]) => {
+  svg.appendChild(el('circle', { cx: x, cy: y, r: '3.5', fill: '#1D4ED8' }));
+});
+
+// 꼭짓점 라벨
+addText(A[0], A[1] - 18, 'A');
+addText(B[0] - 18, B[1], 'B');
+addText(C[0], C[1] + 18, 'C');
+addText(D[0] + 18, D[1], 'D');
+
+// 단선(|): AB, AD (짧은 변, 4)
+function drawSingleTick(p1, p2) {
+  const mx = (p1[0]+p2[0])/2;
+  const my = (p1[1]+p2[1])/2;
+  const dx = p2[0]-p1[0], dy = p2[1]-p1[1];
+  const len = Math.sqrt(dx*dx+dy*dy);
+  const nx = -dy/len * 8, ny = dx/len * 8;
+  svg.appendChild(el('line', {
+    x1: mx+nx, y1: my+ny, x2: mx-nx, y2: my-ny,
+    stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linecap': 'round'
+  }));
+}
+
+// 이선(||): CB, CD (긴 변, 7)
+function drawDoubleTick(p1, p2) {
+  const mx = (p1[0]+p2[0])/2;
+  const my = (p1[1]+p2[1])/2;
+  const dx = p2[0]-p1[0], dy = p2[1]-p1[1];
+  const len = Math.sqrt(dx*dx+dy*dy);
+  const nx = -dy/len * 8, ny = dx/len * 8;
+  const tx = dx/len * 4, ty = dy/len * 4;
+  svg.appendChild(el('line', {
+    x1: mx+nx-tx, y1: my+ny-ty, x2: mx-nx-tx, y2: my-ny-ty,
+    stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linecap': 'round'
+  }));
+  svg.appendChild(el('line', {
+    x1: mx+nx+tx, y1: my+ny+ty, x2: mx-nx+tx, y2: my-ny+ty,
+    stroke: '#1D4ED8', 'stroke-width': '1.5', 'stroke-linecap': 'round'
+  }));
+}
+
+drawSingleTick(A, B);
+drawSingleTick(A, D);
+drawDoubleTick(C, B);
+drawDoubleTick(C, D);
+
+// 두 대각선 (점선)
+svg.appendChild(el('line', {
+  x1: A[0], y1: A[1], x2: C[0], y2: C[1],
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+svg.appendChild(el('line', {
+  x1: B[0], y1: B[1], x2: D[0], y2: D[1],
+  stroke: '#94A3B8', 'stroke-width': '0.8', 'stroke-dasharray': '4 3'
+}));
+
+// 교점 직각 기호 (긴 대각선이 짧은 대각선 수직이등분)
+const sq = 9;
+svg.appendChild(el('path', {
+  d: 'M '+(cx+sq)+','+oy+' L '+(cx+sq)+','+(oy-sq)+' L '+cx+','+(oy-sq),
+  fill: 'none', stroke: '#94A3B8', 'stroke-width': '0.8'
+}));
+</script>

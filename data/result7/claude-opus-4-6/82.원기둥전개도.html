@@ -1,0 +1,138 @@
+<svg id="vis" width="100%" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 원기둥 전개도: r=3, h=8
+const r = 3;
+const h = 8;
+const circumference = 2 * Math.PI * r; // ≈ 18.85
+
+// 스케일: 실제 단위를 픽셀로
+const scale = 25;
+const rPx = r * scale; // 75
+const hPx = h * scale; // 200
+const wPx = circumference * scale; // ≈ 471.24
+
+const cx = 340;
+
+// 직사각형 (옆면) 중앙 배치
+const rectX = cx - wPx / 2;
+const rectY = 200;
+const rectW = wPx;
+const rectH = hPx;
+
+// 직사각형 (옆면)
+svg.appendChild(el('rect', {
+  x: rectX, y: rectY, width: rectW, height: rectH,
+  fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// 윗면 원 — 직사각형 위에 배치
+const topCircleCy = rectY - rPx - 20;
+svg.appendChild(el('circle', {
+  cx: cx, cy: topCircleCy, r: rPx,
+  fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// 아랫면 원 — 직사각형 아래에 배치
+const bottomCircleCy = rectY + rectH + rPx + 20;
+svg.appendChild(el('circle', {
+  cx: cx, cy: bottomCircleCy, r: rPx,
+  fill: '#EFF6FF', stroke: '#1D4ED8', 'stroke-width': '1.5'
+}));
+
+// 윗면 원 → 직사각형 연결 점선
+svg.appendChild(el('line', {
+  x1: cx - rPx, y1: topCircleCy + rPx, x2: cx - rPx, y2: rectY,
+  stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '5 4'
+}));
+svg.appendChild(el('line', {
+  x1: cx + rPx, y1: topCircleCy + rPx, x2: cx + rPx, y2: rectY,
+  stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '5 4'
+}));
+
+// 아랫면 원 → 직사각형 연결 점선
+svg.appendChild(el('line', {
+  x1: cx - rPx, y1: rectY + rectH, x2: cx - rPx, y2: bottomCircleCy - rPx,
+  stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '5 4'
+}));
+svg.appendChild(el('line', {
+  x1: cx + rPx, y1: rectY + rectH, x2: cx + rPx, y2: bottomCircleCy - rPx,
+  stroke: '#94A3B8', 'stroke-width': '1', 'stroke-dasharray': '5 4'
+}));
+
+// 윗면 원 중심점
+svg.appendChild(el('circle', {
+  cx: cx, cy: topCircleCy, r: 2, fill: '#1D4ED8'
+}));
+
+// 아랫면 원 중심점
+svg.appendChild(el('circle', {
+  cx: cx, cy: bottomCircleCy, r: 2, fill: '#1D4ED8'
+}));
+
+// 윗면 반지름 선
+svg.appendChild(el('line', {
+  x1: cx, y1: topCircleCy, x2: cx + rPx, y2: topCircleCy,
+  stroke: '#DC2626', 'stroke-width': '1.2', 'stroke-dasharray': '4 3'
+}));
+
+// 아랫면 반지름 선
+svg.appendChild(el('line', {
+  x1: cx, y1: bottomCircleCy, x2: cx + rPx, y2: bottomCircleCy,
+  stroke: '#DC2626', 'stroke-width': '1.2', 'stroke-dasharray': '4 3'
+}));
+
+// 치수 표기: 윗면 반지름 "r = 3"
+addText(cx + rPx / 2, topCircleCy - 12, 'r = 3', { 'font-size': '14', 'font-weight': '500', fill: '#DC2626' });
+
+// 치수 표기: 아랫면 반지름 "r = 3"
+addText(cx + rPx / 2, bottomCircleCy - 12, 'r = 3', { 'font-size': '14', 'font-weight': '500', fill: '#DC2626' });
+
+// 치수 표기: 직사각형 가로 "2πr ≈ 18.85"
+// 상단 양방향 화살표
+const dimTopY = rectY - 8;
+svg.appendChild(el('line', {
+  x1: rectX, y1: dimTopY, x2: rectX + rectW, y2: dimTopY,
+  stroke: '#374151', 'stroke-width': '1', 'marker-start': 'url(#arrow)', 'marker-end': 'url(#arrow)'
+}));
+addText(cx, dimTopY - 12, '2\u03C0r \u2248 18.85', { 'font-size': '14', 'font-weight': '500', fill: '#374151' });
+
+// 치수 표기: 직사각형 세로 "h = 8"
+// 오른쪽 양방향 화살표
+const dimRightX = rectX + rectW + 12;
+svg.appendChild(el('line', {
+  x1: dimRightX, y1: rectY, x2: dimRightX, y2: rectY + rectH,
+  stroke: '#374151', 'stroke-width': '1', 'marker-start': 'url(#arrow)', 'marker-end': 'url(#arrow)'
+}));
+addText(dimRightX + 24, rectY + rectH / 2, 'h = 8', { 'font-size': '14', 'font-weight': '500', fill: '#374151' });
+
+// 직사각형 꼭짓점 표시 (작은 원)
+[rectX, rectX + rectW].forEach(px => {
+  [rectY, rectY + rectH].forEach(py => {
+    svg.appendChild(el('circle', { cx: px, cy: py, r: 2.5, fill: '#1D4ED8' }));
+  });
+});
+
+// 라벨: 윗면
+addText(cx, topCircleCy + rPx + 10, '\uC717\uBA74', { 'font-size': '12', fill: '#6B7280' });
+
+// 라벨: 옆면
+addText(cx, rectY + rectH / 2, '\uC606\uBA74', { 'font-size': '14', 'font-weight': '500', fill: '#1D4ED8' });
+
+// 라벨: 아랫면
+addText(cx, bottomCircleCy - rPx - 10, '\uC544\uB7AB\uBA74', { 'font-size': '12', fill: '#6B7280' });
+</script>

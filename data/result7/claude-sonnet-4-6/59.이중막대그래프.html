@@ -1,0 +1,67 @@
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const data2022 = [120, 145, 132, 178];
+const data2023 = [135, 162, 148, 195];
+const quarters = ['1분기', '2분기', '3분기', '4분기'];
+const maxVal = 210;
+
+const left = 80, bottom = 380, right = 620, top = 60;
+const chartW = right - left, chartH = bottom - top;
+const groupW = chartW / 4;
+const barW = groupW * 0.3;
+const gap = groupW * 0.06;
+const scaleY = chartH / maxVal;
+
+// 축
+svg.appendChild(el('line', { x1: left, y1: bottom, x2: right + 10, y2: bottom, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('line', { x1: left, y1: bottom, x2: left, y2: top - 20, stroke: '#374151', 'stroke-width': '1.5', 'marker-end': 'url(#arrow)' }));
+addText(left, top - 30, '(억 원)', { 'font-size': '11', fill: '#374151' });
+
+// y 눈금
+for (let v = 0; v <= 200; v += 50) {
+  const py = bottom - v * scaleY;
+  svg.appendChild(el('line', { x1: left - 5, y1: py, x2: left, y2: py, stroke: '#374151', 'stroke-width': '1' }));
+  svg.appendChild(el('line', { x1: left, y1: py, x2: right, y2: py, stroke: '#E2E8F0', 'stroke-width': '0.8' }));
+  addText(left - 20, py, String(v));
+}
+
+// 막대
+data2022.forEach((v, i) => {
+  const gx = left + i * groupW + groupW / 2;
+  const x1 = gx - barW - gap / 2;
+  const x2 = gx + gap / 2;
+  const h1 = v * scaleY, h2 = data2023[i] * scaleY;
+
+  svg.appendChild(el('rect', { x: x1, y: bottom - h1, width: barW, height: h1, fill: '#3B82F6', 'fill-opacity': '0.8', rx: '2' }));
+  svg.appendChild(el('rect', { x: x2, y: bottom - h2, width: barW, height: h2, fill: '#F97316', 'fill-opacity': '0.8', rx: '2' }));
+
+  addText(x1 + barW / 2, bottom - h1 - 10, String(v), { fill: '#1D4ED8', 'font-size': '11', 'font-weight': '600' });
+  addText(x2 + barW / 2, bottom - h2 - 10, String(data2023[i]), { fill: '#C2410C', 'font-size': '11', 'font-weight': '600' });
+
+  addText(gx, bottom + 18, quarters[i]);
+});
+
+// 범례
+const lx = right - 140, ly = top + 10;
+svg.appendChild(el('rect', { x: lx, y: ly, width: 14, height: 14, fill: '#3B82F6', 'fill-opacity': '0.8', rx: '2' }));
+addText(lx + 40, ly + 7, '2022년', { 'text-anchor': 'start', fill: '#1E293B', 'font-size': '12' });
+svg.appendChild(el('rect', { x: lx, y: ly + 22, width: 14, height: 14, fill: '#F97316', 'fill-opacity': '0.8', rx: '2' }));
+addText(lx + 40, ly + 29, '2023년', { 'text-anchor': 'start', fill: '#1E293B', 'font-size': '12' });
+
+addText(340, 30, '분기별 매출액 비교 (억 원)', { 'font-size': '15', fill: '#0F172A', 'font-weight': '700' });
+</script>

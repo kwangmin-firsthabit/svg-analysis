@@ -1,0 +1,243 @@
+<svg id="vis" width="100%" viewBox="0 0 680 700" xmlns="http://www.w3.org/2000/svg"></svg>
+<script>
+(function() {
+  const svg = document.getElementById('vis');
+  const NS = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(NS, tag);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    svg.appendChild(e);
+    return e;
+  }
+
+  function addText(x, y, text, opts) {
+    const o = opts || {};
+    el('text', {
+      x: x, y: y,
+      'text-anchor': o.anchor || 'middle',
+      'dominant-baseline': 'central',
+      'font-family': 'system-ui, sans-serif',
+      'font-size': o.size || 14,
+      'font-weight': o.weight || 500,
+      fill: o.fill || '#2C2C2A'
+    }).textContent = text;
+  }
+
+  const cx = 340, cy = 340;
+
+  // Dodecahedron Schlegel diagram:
+  // 4 concentric pentagons: outer(A), mid-outer(B), mid-inner(C), inner(D)
+  // 20 vertices = 4 x 5
+  // 30 edges, 12 pentagonal faces
+  //
+  // Outer pentagon A: rotation 0 (top vertex up)
+  // Ring B: rotation 36 degrees
+  // Ring C: rotation 0 degrees
+  // Inner pentagon D: rotation 36 degrees
+  //
+  // Edges:
+  //   A pentagon: A[i]-A[i+1]  (5 edges)
+  //   A-B spokes: A[i]-B[i]    (5 edges)
+  //   B-B cross:  B[i]-B[i+2]  (5 edges, pentagram pattern)
+  //   B-C spokes: B[i]-C[i]    (5 edges)
+  //   C-C cross:  C[i]-C[i+2]  (5 edges, pentagram pattern)
+  //   C-D spokes: C[i]-D[i]    (5 edges)
+  //   D pentagon:  D[i]-D[i+1]  (5 edges) -- but that's 35
+  //
+  // Actually the standard Schlegel connectivity:
+  // A[i]-A[i+1]: 5 outer edges
+  // A[i]-B[i]: 5 radial edges
+  // B[i]-B[i+1]: NO - instead B connects in pentagram B[i]-B[(i+2)%5]: 5 edges
+  // B[i]-C[i]: 5 radial edges
+  // C[i]-C[(i+2)%5]: 5 pentagram edges
+  // C[i]-D[i]: 5 radial edges
+  // D[i]-D[i+1]: 5 inner edges
+  // Total: 5+5+5+5+5+5+5 = 35 -- too many
+  //
+  // Correct: 30 edges for dodecahedron
+  // Standard Schlegel:
+  // A[i]-A[(i+1)%5]: 5
+  // A[i]-B[i]: 5
+  // B[i]-B[(i+2)%5]: 5 (pentagram)
+  // B[i]-C[i]: 5
+  // C[i]-C[(i+2)%5]: 5 (pentagram)
+  // D[i]-D[(i+1)%5]: 5
+  // Total so far: 30, but no C-D connection!
+  // Need C[i]-D[i]: 5 more = 35
+  //
+  // Let me use the correct known Schlegel diagram structure.
+  // 20 vertices, 30 edges:
+  // Outer A: 5 vertices, rotation -90 (top up)
+  // Ring B: 5 vertices, rotated 36 from A
+  // Ring C: 5 vertices, same rotation as A
+  // Inner D: 5 vertices, rotated 36 from A
+  //
+  // Edges (30 total):
+  // A[i]-A[(i+1)%5]: 5
+  // A[i]-B[i]: 5
+  // B[i]-C[(i+2)%5] and B[i]-C[(i+3)%5]: that's 10 but...
+  //
+  // Let me just use the known adjacency directly.
+  // Vertices labeled 0-19:
+  // A = [0,1,2,3,4] outer
+  // B = [5,6,7,8,9] mid-outer
+  // C = [10,11,12,13,14] mid-inner
+  // D = [15,16,17,18,19] inner
+
+  function pentagonPts(centerX, centerY, radius, rotDeg) {
+    const pts = [];
+    const rot = rotDeg * Math.PI / 180;
+    for (let i = 0; i < 5; i++) {
+      const angle = rot + (2 * Math.PI * i / 5) - Math.PI / 2;
+      pts.push({ x: centerX + radius * Math.cos(angle), y: centerY + radius * Math.sin(angle) });
+    }
+    return pts;
+  }
+
+  const A = pentagonPts(cx, cy, 280, 0);
+  const B = pentagonPts(cx, cy, 175, 36);
+  const C = pentagonPts(cx, cy, 100, 0);
+  const D = pentagonPts(cx, cy, 45, 36);
+
+  // Known correct Schlegel diagram edges for dodecahedron:
+  // Outer: A[i]-A[(i+1)%5]
+  // Spokes outer: A[i]-B[i]
+  // Mid connections: B[i]-C[i], B[i]-C[(i+4)%5]  (each B connects to two C's)
+  // Spokes inner: C[i]-D[i]
+  // Inner: D[i]-D[(i+1)%5]
+  // Count: 5+5+5+5+5+5 = 30 ✓
+
+  const edges = [];
+  for (let i = 0; i < 5; i++) {
+    const j = (i + 1) % 5;
+    const k = (i + 4) % 5;
+    edges.push([A, i, A, j]);      // outer pentagon
+    edges.push([A, i, B, i]);      // outer spokes
+    edges.push([B, i, C, i]);      // B-C connection 1
+    edges.push([B, i, C, k]);      // B-C connection 2
+    edges.push([C, i, D, i]);      // inner spokes
+    edges.push([D, i, D, j]);      // inner pentagon
+  }
+
+  // 12 faces of the Schlegel diagram:
+  // Face 1 (outer/back): A[0]-A[1]-A[2]-A[3]-A[4] (the outside region)
+  // Faces 2-6: between A and B
+  //   Face 2+i: A[i], A[(i+1)%5], B[(i+1)%5], C[i], B[i]
+  // Faces 7-11: between B/C and D
+  //   Face 7+i: C[i], B[(i+1)%5], C[(i+1)%5], D[(i+1)%5], D[i]
+  //   Hmm, need to work out the actual faces.
+
+  // Let me determine faces from the edge structure.
+  // With edges: A[i]-A[j], A[i]-B[i], B[i]-C[i], B[i]-C[(i-1)%5], C[i]-D[i], D[i]-D[j]
+  //
+  // Face between A[i], A[i+1], B[i+1], ..., B[i]:
+  //   A[i]-A[i+1] edge, A[i+1]-B[i+1] edge,
+  //   B[i+1] connects to C[i+1] and C[i]
+  //   B[i] connects to C[i] and C[i-1]
+  //   So face is: A[i], A[i+1], B[i+1], C[i], B[i] (pentagon!) ✓
+  //
+  // Face around inner:
+  //   B[i]-C[i], B[i]-C[i-1], C[i]-D[i], C[i-1]-D[i-1], D[i-1]-D[i]
+  //   Face: B[i], C[i], D[i], D[i-1], C[i-1] (pentagon!) ✓
+  //
+  // Face 12 (inner): D[0]-D[1]-D[2]-D[3]-D[4] ✓
+  //
+  // Count: 1 + 5 + 5 + 1 = 12 ✓
+
+  const faceColors = [
+    '#DBEAFE', '#FEF3C7', '#D1FAE5', '#FCE7F3', '#EDE9FE',
+    '#CFFAFE', '#FEF9C3', '#E0E7FF', '#FFE4E6', '#ECFCCB',
+    '#CCFBF1', '#F5F5F4'
+  ];
+
+  function ptsStr(arr) {
+    return arr.map(function(p) { return p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
+  }
+
+  function centroid(pts) {
+    let sx = 0, sy = 0;
+    pts.forEach(function(p) { sx += p.x; sy += p.y; });
+    return { x: sx / pts.length, y: sy / pts.length };
+  }
+
+  // Draw face fills
+  // Face 1: outer pentagon background
+  el('polygon', { points: ptsStr(A), fill: faceColors[0], stroke: 'none' });
+
+  // Faces 2-6: A[i], A[i+1], B[i+1], C[i], B[i]
+  for (let i = 0; i < 5; i++) {
+    const j = (i + 1) % 5;
+    const face = [A[i], A[j], B[j], C[i], B[i]];
+    el('polygon', { points: ptsStr(face), fill: faceColors[1 + i], stroke: 'none' });
+  }
+
+  // Faces 7-11: B[i], C[i], D[i], D[i-1], C[i-1]
+  for (let i = 0; i < 5; i++) {
+    const k = (i + 4) % 5;
+    const face = [B[i], C[i], D[i], D[k], C[k]];
+    el('polygon', { points: ptsStr(face), fill: faceColors[6 + i], stroke: 'none' });
+  }
+
+  // Face 12: inner pentagon
+  el('polygon', { points: ptsStr(D), fill: faceColors[11], stroke: 'none' });
+
+  // Draw edges
+  edges.forEach(function(e) {
+    const p1 = e[0][e[1]], p2 = e[2][e[3]];
+    el('line', {
+      x1: p1.x.toFixed(1), y1: p1.y.toFixed(1),
+      x2: p2.x.toFixed(1), y2: p2.y.toFixed(1),
+      stroke: '#2C2C2A', 'stroke-width': 1.4, 'stroke-linejoin': 'round'
+    });
+  });
+
+  // Draw vertices
+  [A, B, C, D].forEach(function(ring) {
+    ring.forEach(function(p) {
+      el('circle', { cx: p.x.toFixed(1), cy: p.y.toFixed(1), r: 3, fill: '#2C2C2A' });
+    });
+  });
+
+  // Face labels
+  // Face 1: outer - place between top of outer and top of ring B
+  addText(cx, (A[0].y + B[4].y) / 2 - 15, '1', { size: 14, weight: 500, fill: '#555' });
+
+  // Faces 2-6
+  for (let i = 0; i < 5; i++) {
+    const j = (i + 1) % 5;
+    const c = centroid([A[i], A[j], B[j], C[i], B[i]]);
+    addText(c.x, c.y, String(2 + i), { size: 13, weight: 500, fill: '#444' });
+  }
+
+  // Faces 7-11
+  for (let i = 0; i < 5; i++) {
+    const k = (i + 4) % 5;
+    const c = centroid([B[i], C[i], D[i], D[k], C[k]]);
+    addText(c.x, c.y, String(7 + i), { size: 13, weight: 500, fill: '#444' });
+  }
+
+  // Face 12
+  addText(cx, cy, '12', { size: 12, weight: 500, fill: '#444' });
+
+  // Title
+  addText(cx, 28, '정십이면체 (Schlegel Diagram)', { size: 14, weight: 500 });
+
+  // Side length label on top-right outer edge
+  const si = 0, sj = 1;
+  const mx = (A[si].x + A[sj].x) / 2;
+  const my = (A[si].y + A[sj].y) / 2;
+  const dx = A[sj].x - A[si].x;
+  const dy = A[sj].y - A[si].y;
+  const len = Math.sqrt(dx * dx + dy * dy);
+  const offx = -dy / len * 18;
+  const offy = dx / len * 18;
+  addText(mx + offx, my + offy, 'a = 4', { size: 12, weight: 400, fill: '#5F5E5A' });
+
+  // Info
+  addText(cx, cy + 280 + 42, '면: 12 (정오각형)  |  꼭짓점: 20  |  모서리: 30  |  한 변의 길이: 4', { size: 12, weight: 400, fill: '#5F5E5A' });
+
+  const maxY = cy + 280 + 70;
+  svg.setAttribute('viewBox', '0 0 680 ' + maxY);
+})();
+</script>

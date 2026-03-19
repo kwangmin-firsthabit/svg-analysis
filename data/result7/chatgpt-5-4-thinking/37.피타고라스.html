@@ -1,0 +1,214 @@
+<svg id="vis" width="100%" viewBox="0 0 760 520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      ></path>
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const C = {
+    triStroke: '#0f172a',
+    triFill: '#f8fafc',
+    sq3: '#dbeafe',
+    sq4: '#dcfce7',
+    sq5: '#fef3c7',
+    sqStroke3: '#2563eb',
+    sqStroke4: '#16a34a',
+    sqStroke5: '#d97706',
+    text: '#0f172a',
+    sub: '#64748b',
+    right: '#dc2626',
+  };
+
+  function el(tag, attrs = {}) {
+    const node = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, v);
+    return node;
+  }
+  function add(node) {
+    svg.appendChild(node);
+    return node;
+  }
+  function text(x, y, str, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      fill: C.text,
+      'font-size': 14,
+      'font-weight': 500,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      ...attrs,
+    });
+    t.textContent = str;
+    return add(t);
+  }
+
+  // Right triangle with legs 4 and 3 (scale 60)
+  const A = { x: 180, y: 380 }; // right angle
+  const B = { x: 420, y: 380 }; // AB = 4
+  const Cc = { x: 180, y: 200 }; // AC = 3
+
+  // Squares built externally
+  // on AB (outside below)
+  const D = { x: 420, y: 620 };
+  const E = { x: 180, y: 620 };
+
+  // on AC (outside left)
+  const F = { x: 0, y: 200 };
+  const G = { x: 0, y: 380 };
+
+  // on BC (outside opposite side of triangle)
+  const H = { x: 555, y: 560 }; // C + (180,180)
+  const I = { x: 315, y: 560 }; // B + (180,180)
+
+  // background
+  add(el('rect', { x: 0, y: 0, width: 760, height: 520, fill: 'white' }));
+
+  // 5-square first so it stays behind
+  add(
+    el('polygon', {
+      points: `${Cc.x},${Cc.y} ${B.x},${B.y} ${H.x},${H.y} ${I.x},${I.y}`,
+      fill: C.sq5,
+      stroke: C.sqStroke5,
+      'stroke-width': 2.5,
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // 4-square
+  add(
+    el('polygon', {
+      points: `${A.x},${A.y} ${B.x},${B.y} ${D.x},${D.y} ${E.x},${E.y}`,
+      fill: C.sq4,
+      stroke: C.sqStroke4,
+      'stroke-width': 2.5,
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // 3-square
+  add(
+    el('polygon', {
+      points: `${A.x},${A.y} ${Cc.x},${Cc.y} ${F.x},${F.y} ${G.x},${G.y}`,
+      fill: C.sq3,
+      stroke: C.sqStroke3,
+      'stroke-width': 2.5,
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // triangle
+  add(
+    el('polygon', {
+      points: `${A.x},${A.y} ${B.x},${B.y} ${Cc.x},${Cc.y}`,
+      fill: C.triFill,
+      stroke: C.triStroke,
+      'stroke-width': 3,
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // vertices
+  for (const P of [A, B, Cc]) {
+    add(el('circle', { cx: P.x, cy: P.y, r: 4.2, fill: C.triStroke }));
+  }
+
+  // right-angle mark
+  add(
+    el('path', {
+      d: `M ${A.x + 26} ${A.y} L ${A.x + 26} ${A.y - 26} L ${A.x} ${A.y - 26}`,
+      fill: 'none',
+      stroke: C.right,
+      'stroke-width': 2.2,
+    })
+  );
+
+  // side labels
+  text((A.x + B.x) / 2, A.y - 18, '4', { 'font-size': 16, fill: C.sqStroke4 });
+  text(A.x - 18, (A.y + Cc.y) / 2, '3', { 'font-size': 16, fill: C.sqStroke3, 'text-anchor': 'end' });
+  text((B.x + Cc.x) / 2 + 14, (B.y + Cc.y) / 2 - 18, '5', { 'font-size': 16, fill: C.sqStroke5 });
+
+  // square labels
+  text(300, 465, '한 변의 길이 4인 정사각형', {
+    'font-size': 13,
+    fill: C.sqStroke4,
+  });
+  text(78, 290, '한 변의 길이 3인 정사각형', {
+    'font-size': 13,
+    fill: C.sqStroke3,
+  });
+  text(472, 382, '한 변의 길이 5인 정사각형', {
+    'font-size': 13,
+    fill: C.sqStroke5,
+  });
+
+  // vertex labels
+  text(A.x - 16, A.y + 18, 'A', { 'font-size': 13 });
+  text(B.x + 16, B.y + 4, 'B', { 'font-size': 13 });
+  text(Cc.x - 16, Cc.y - 8, 'C', { 'font-size': 13 });
+
+  // title
+  text(560, 76, '직각삼각형의 세 변 위의 정사각형', {
+    'font-size': 20,
+    'font-weight': 700,
+  });
+  text(560, 108, '직각을 낀 두 변의 길이 3, 4  →  빗변의 길이 5', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+  text(560, 132, '세 정사각형이 모두 삼각형 바깥쪽에 붙어 있음', {
+    'font-size': 13,
+    'font-weight': 400,
+    fill: C.sub,
+  });
+
+  // small pointers
+  add(
+    el('line', {
+      x1: 500,
+      y1: 148,
+      x2: 452,
+      y2: 210,
+      stroke: C.sub,
+      'stroke-width': 1.5,
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  add(
+    el('line', {
+      x1: 510,
+      y1: 148,
+      x2: 335,
+      y2: 438,
+      stroke: C.sub,
+      'stroke-width': 1.5,
+      'marker-end': 'url(#arrow)',
+    })
+  );
+
+  // crop-safe outline accents for visibility
+  add(el('line', { x1: A.x, y1: A.y, x2: B.x, y2: B.y, stroke: C.triStroke, 'stroke-width': 3 }));
+  add(el('line', { x1: A.x, y1: A.y, x2: Cc.x, y2: Cc.y, stroke: C.triStroke, 'stroke-width': 3 }));
+  add(el('line', { x1: Cc.x, y1: Cc.y, x2: B.x, y2: B.y, stroke: C.triStroke, 'stroke-width': 3 }));
+</script>

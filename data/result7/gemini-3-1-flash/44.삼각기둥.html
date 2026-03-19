@@ -1,0 +1,126 @@
+<svg id="vis" width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // 설정: 한 변 4, 높이 6 (1단위당 40px 스케일링)
+  const a = 4;
+  const h = 6;
+  const scale = 40;
+
+  // 투영 함수 (비스듬한 투영)
+  function project(x, y, z) {
+    // x: 가로, y: 세로(높이), z: 깊이
+    return {
+      px: 340 + x * scale + z * scale * Math.cos(Math.PI / 6) * 0.5,
+      py: 380 - y * scale + z * scale * Math.sin(Math.PI / 6) * 0.5,
+    };
+  }
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, attrs = {}) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': '14',
+      'font-weight': '500',
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: '[label-primary]',
+      ...attrs,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 꼭짓점 좌표 계산 (밑면 정삼각형 ABC, 윗면 DEF)
+  // 밑면 중심 근처를 기준으로 좌표 설정
+  const h_tri = (a * Math.sqrt(3)) / 2;
+  const A = project(-a / 2, 0, h_tri / 2);
+  const B = project(a / 2, 0, h_tri / 2);
+  const C = project(0, 0, -h_tri / 2);
+
+  const D = project(-a / 2, h, h_tri / 2);
+  const E = project(a / 2, h, h_tri / 2);
+  const F = project(0, h, -h_tri / 2);
+
+  // 1. 면 채우기 (가시성 고려)
+  const faces = [
+    { pts: [D, E, B, A], fill: '[shape-fill]', op: 0.1 }, // 앞쪽 옆면
+    { pts: [E, F, C, B], fill: '[shape-fill]', op: 0.05 }, // 오른쪽 옆면
+    { pts: [D, E, F], fill: '[shape-fill]', op: 0.2 }, // 윗면
+  ];
+
+  faces.forEach(f => {
+    const pStr = f.pts.map(p => `${p.px},${p.py}`).join(' ');
+    svg.appendChild(el('polygon', { points: pStr, fill: f.fill, 'fill-opacity': f.op }));
+  });
+
+  // 2. 모서리 그리기
+  const edges = [
+    { p1: A, p2: B, style: 'solid' },
+    { p1: B, p2: E, style: 'solid' },
+    { p1: E, p2: D, style: 'solid' },
+    { p1: D, p2: A, style: 'solid' },
+    { p1: B, p2: C, style: 'solid' },
+    { p1: C, p2: F, style: 'solid' },
+    { p1: F, p2: E, style: 'solid' },
+    { p1: A, p2: C, style: 'dashed' },
+    { p1: D, p2: F, style: 'solid' }, // AC는 가려진 모서리
+  ];
+
+  edges.forEach(e => {
+    const attrs = {
+      x1: e.p1.px,
+      y1: e.p1.py,
+      x2: e.p2.px,
+      y2: e.p2.py,
+      stroke: '[shape-stroke]',
+      'stroke-width': '1.5',
+    };
+    if (e.style === 'dashed') {
+      attrs['stroke-dasharray'] = '5 4';
+      attrs['stroke-width'] = '1';
+      attrs['opacity'] = '0.5';
+    }
+    svg.appendChild(el('line', attrs));
+  });
+
+  // 3. 라벨링
+  addText(A.px - 15, A.py + 10, 'A');
+  addText(B.px + 15, B.py + 10, 'B');
+  addText(C.px, C.py - 15, 'C');
+  addText(D.px - 15, D.py - 10, 'D');
+  addText(E.px + 15, E.py - 10, 'E');
+  addText(F.px, F.py - 15, 'F');
+
+  // 치수 표시
+  addText((A.px + B.px) / 2, A.py + 20, '4', { fill: '[label-secondary]' });
+  addText(B.px + 25, (B.py + E.py) / 2, 'h = 6', { fill: '[label-secondary]', 'text-anchor': 'start' });
+</script>

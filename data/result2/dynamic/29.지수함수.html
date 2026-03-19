@@ -1,0 +1,62 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+function addText(x, y, content, attrs = {}) {
+  const t = el('text', { x, y, 'font-size': '12', 'font-weight': '400', 'text-anchor': 'middle', 'dominant-baseline': 'central', fill: '#475569', ...attrs });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+const ox = 200, oy = 400, scaleX = 25, scaleY = 30;
+
+svg.appendChild(el('line', { x1: 40, y1: oy, x2: 640, y2: oy, stroke: '#374151', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+svg.appendChild(el('line', { x1: ox, y1: 480, x2: ox, y2: 20, stroke: '#374151', 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' }));
+
+addText(648, oy, 'x', { 'font-size': '13', fill: '#374151' });
+addText(ox, 8, 'y', { 'font-size': '13', fill: '#374151' });
+addText(ox + 12, oy + 16, 'O', { 'text-anchor': 'start' });
+
+for (let i = -3; i <= 4; i++) {
+  if (i === 0) continue;
+  const px = ox + i * scaleX;
+  svg.appendChild(el('line', { x1: px, y1: oy - 5, x2: px, y2: oy + 5, stroke: '#374151', 'stroke-width': '1' }));
+  addText(px, oy + 16, String(i));
+}
+
+const yTicks = [1, 2, 4, 8];
+for (const v of yTicks) {
+  const py = oy - v * scaleY;
+  svg.appendChild(el('line', { x1: ox - 5, y1: py, x2: ox + 5, y2: py, stroke: '#374151', 'stroke-width': '1' }));
+  addText(ox - 12, py, String(v), { 'text-anchor': 'end' });
+}
+
+const pts = [];
+for (let ix = -3.5; ix <= 3.55; ix += 0.05) {
+  const iy = Math.pow(2, ix);
+  const px = Math.round(ox + ix * scaleX);
+  const py = Math.round(oy - iy * scaleY);
+  if (py >= 25 && py <= 475) pts.push(`${px},${py}`);
+}
+svg.appendChild(el('polyline', { points: pts.join(' '), fill: 'none', stroke: '#2563EB', 'stroke-width': '2', 'stroke-linejoin': 'round' }));
+
+const keyPts = [
+  { mx: 0, my: 1, label: '(0, 1)', dx: 20, dy: -10 },
+  { mx: 1, my: 2, label: '(1, 2)', dx: 22, dy: -10 },
+  { mx: 2, my: 4, label: '(2, 4)', dx: 22, dy: -10 },
+];
+for (const { mx, my, label, dx, dy } of keyPts) {
+  const px = ox + mx * scaleX, py = oy - my * scaleY;
+  svg.appendChild(el('circle', { cx: px, cy: py, r: '4', fill: '#2563EB' }));
+  addText(px + dx, py + dy, label, { 'font-size': '11', fill: '#2563EB', 'text-anchor': 'start' });
+}
+
+addText(430, 70, 'y = 2ˣ', { 'font-size': '13', 'font-style': 'italic', fill: '#2563EB' });
+</script>
