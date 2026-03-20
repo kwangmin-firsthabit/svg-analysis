@@ -1,0 +1,224 @@
+<svg id="vis" width="100%" viewBox="0 0 680 460" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color, anchor) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': anchor || 'middle',
+      'dominant-baseline': 'central',
+      fill: color,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 좌표 변환 설정
+  const ox = 340;  // 원점 x (픽셀)
+  const oy = 280;  // 원점 y (픽셀)
+  const scale = 70; // 단위당 픽셀
+
+  function toSvgX(mx) { return ox + mx * scale; }
+  function toSvgY(my) { return oy - my * scale; }
+
+  // 수학적 계산
+  // y = -x^2 + 4
+  // x절편: x = ±2
+  // 최적 t = 2/sqrt(3), 높이 h = 8/3
+  const t = 2 / Math.sqrt(3);        // ≈ 1.1547
+  const rectH = 8 / 3;              // ≈ 2.6667
+  const maxArea = 2 * t * rectH;    // = 32/(3*sqrt(3)) ≈ 6.158
+
+  // 1. 영역 채움 (포물선과 x축 사이)
+  // 포물선 아래 영역
+  const fillPoints = [];
+  for (let px = toSvgX(-2); px <= toSvgX(2); px += 1) {
+    const mx = (px - ox) / scale;
+    const my = -mx * mx + 4;
+    const py = toSvgY(my);
+    fillPoints.push(`${px},${py}`);
+  }
+  fillPoints.push(`${toSvgX(2)},${toSvgY(0)}`);
+  fillPoints.push(`${toSvgX(-2)},${toSvgY(0)}`);
+
+  svg.appendChild(el('polygon', {
+    points: fillPoints.join(' '),
+    fill: '#3b82f6',
+    'fill-opacity': '0.08',
+    stroke: 'none',
+  }));
+
+  // 2. 직사각형 채움
+  const rx1 = toSvgX(-t);
+  const ry1 = toSvgY(rectH);
+  const rWidth = toSvgX(t) - toSvgX(-t);
+  const rHeight = toSvgY(0) - toSvgY(rectH);
+
+  svg.appendChild(el('rect', {
+    x: rx1,
+    y: ry1,
+    width: rWidth,
+    height: rHeight,
+    fill: '#f59e0b',
+    'fill-opacity': '0.25',
+    stroke: 'none',
+  }));
+
+  // 3. 좌표축
+  svg.appendChild(el('line', {
+    x1: 60, y1: oy, x2: 620, y2: oy,
+    stroke: '#374151', 'stroke-width': '1.2',
+    'marker-end': 'url(#arrow)',
+  }));
+  svg.appendChild(el('line', {
+    x1: ox, y1: 420, x2: ox, y2: 40,
+    stroke: '#374151', 'stroke-width': '1.2',
+    'marker-end': 'url(#arrow)',
+  }));
+
+  // 4. 눈금
+  for (let i = -4; i <= 4; i++) {
+    if (i === 0) continue;
+    const px = toSvgX(i);
+    svg.appendChild(el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: '#374151', 'stroke-width': '0.8' }));
+    addText(px, oy + 16, String(i), '12', '400', '#374151');
+  }
+  for (let j = -3; j <= 5; j++) {
+    if (j === 0) continue;
+    const py = toSvgY(j);
+    if (py < 45 || py > 415) continue;
+    svg.appendChild(el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: '#374151', 'stroke-width': '0.8' }));
+    addText(ox - 16, py, String(j), '12', '400', '#374151', 'middle');
+  }
+
+  // 5. 포물선 곡선
+  const curvePoints = [];
+  for (let px = 60; px <= 620; px += 1) {
+    const mx = (px - ox) / scale;
+    const my = -mx * mx + 4;
+    const py = toSvgY(my);
+    if (py >= 40 && py <= 420) {
+      curvePoints.push(`${px},${Math.round(py * 10) / 10}`);
+    }
+  }
+  svg.appendChild(el('polyline', {
+    points: curvePoints.join(' '),
+    fill: 'none',
+    stroke: '#2563eb',
+    'stroke-width': '2',
+    'stroke-linecap': 'round',
+    'stroke-linejoin': 'round',
+  }));
+
+  // 6. 직사각형 테두리
+  svg.appendChild(el('rect', {
+    x: rx1,
+    y: ry1,
+    width: rWidth,
+    height: rHeight,
+    fill: 'none',
+    stroke: '#d97706',
+    'stroke-width': '1.8',
+  }));
+
+  // 7. 특수점: 직사각형 꼭짓점 (포물선과 만나는 점)
+  const pts = [
+    { mx: -t, my: rectH },
+    { mx: t, my: rectH },
+  ];
+  for (const p of pts) {
+    svg.appendChild(el('circle', {
+      cx: toSvgX(p.mx),
+      cy: toSvgY(p.my),
+      r: '4',
+      fill: '#d97706',
+      stroke: 'none',
+    }));
+  }
+
+  // x축 위의 두 꼭짓점
+  const basePts = [
+    { mx: -t, my: 0 },
+    { mx: t, my: 0 },
+  ];
+  for (const p of basePts) {
+    svg.appendChild(el('circle', {
+      cx: toSvgX(p.mx),
+      cy: toSvgY(p.my),
+      r: '4',
+      fill: '#d97706',
+      stroke: 'none',
+    }));
+  }
+
+  // x절편 표시 (포물선)
+  for (const xv of [-2, 2]) {
+    svg.appendChild(el('circle', {
+      cx: toSvgX(xv),
+      cy: toSvgY(0),
+      r: '3.5',
+      fill: '#2563eb',
+      stroke: 'none',
+    }));
+  }
+
+  // 꼭짓점 (0, 4)
+  svg.appendChild(el('circle', {
+    cx: toSvgX(0),
+    cy: toSvgY(4),
+    r: '3.5',
+    fill: '#2563eb',
+    stroke: 'none',
+  }));
+
+  // 8. 라벨
+  // 축 라벨
+  addText(628, oy + 2, 'x', '14', '500', '#374151');
+  addText(ox + 2, 32, 'y', '14', '500', '#374151', 'start');
+  addText(ox - 14, oy + 16, 'O', '14', '500', '#374151');
+
+  // x절편 라벨
+  addText(toSvgX(-2), oy + 16, '-2', '12', '400', '#374151');
+  addText(toSvgX(2), oy + 16, '2', '12', '400', '#374151');
+
+  // 꼭짓점 라벨 (0, 4)
+  addText(toSvgX(0) + 18, toSvgY(4), '(0, 4)', '12', '400', '#374151', 'start');
+
+  // 직사각형 꼭짓점 x좌표 라벨 (t = 2/sqrt(3) = 2sqrt(3)/3)
+  addText(toSvgX(-t), oy + 16, '-2\u221a3/3', '12', '400', '#b45309');
+  addText(toSvgX(t), oy + 16, '2\u221a3/3', '12', '400', '#b45309');
+
+  // 직사각형 높이 라벨 (8/3)
+  addText(toSvgX(t) + 28, toSvgY(rectH / 2), '8/3', '12', '400', '#b45309', 'start');
+
+  // 함수식 라벨 (곡선 왼쪽 위 근처)
+  addText(toSvgX(-2.4), toSvgY(1.2), 'y = -x\u00b2 + 4', '14', '500', '#2563eb');
+
+  // 9. 보조 dashed 선 (직사각형 높이 표시)
+  const dashY = toSvgY(rectH);
+  svg.appendChild(el('line', {
+    x1: toSvgX(t),
+    y1: dashY,
+    x2: toSvgX(t) + 20,
+    y2: dashY,
+    stroke: '#b45309',
+    'stroke-width': '0.8',
+    'stroke-dasharray': '4 3',
+  }));
+</script>

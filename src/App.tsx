@@ -1,8 +1,8 @@
 import { useState, useRef, useCallback } from 'react';
 import SvgRenderPanel from './components/SvgRenderPanel';
-import { resultPairsByTab, result7Items, result7SystemPrompt, systemPromptByTabVariant, result6R1DynamicPrompt, result6R2StaticPrompt, type RenderableResultTab, type ResultTab } from './data/catalog';
+import { resultPairsByTab, result7Items, result7SystemPrompt, result8Items, result8SystemPrompt, systemPromptByTabVariant, result6R1DynamicPrompt, result6R2StaticPrompt, type RenderableResultTab, type ResultTab } from './data/catalog';
 
-const tabs: ResultTab[] = ['result1', 'result2', 'result3', 'result4', 'result5', 'result6', 'result7'];
+const tabs: ResultTab[] = ['result1', 'result2', 'result3', 'result4', 'result5', 'result6', 'result7', 'result8'];
 
 // 탭 설명은 여기에서 직접 수정하세요.
 const defaultTabDescriptions: Record<ResultTab, string> = {
@@ -14,6 +14,7 @@ const defaultTabDescriptions: Record<ResultTab, string> = {
   result5: 'SVG 코드 파라미터 수정 비교 — 원본 코드(좌) vs 수정 코드(우) (result2/dynamic 기반)',
   result6: '4가지 방식 전체 비교 — r1/static | r1/dynamic | r2/static(v3) | r2/dynamic(v4) (83개 주제)',
   result7: '모델별 비교 — Opus 4.6 / Sonnet 4.6 / Gemini 3.1 Pro / Gemini 3.1 Flash / GPT 5.4 Thinking / GPT 5.3 Instant (동일 시스템 프롬프트 v4 / 20개 주제)',
+  result8: '일관성 테스트 — 동일 프롬프트 3회 반복 생성 비교 (시스템 프롬프트 v5 / 5개 주제)',
 };
 
 function isRenderableResultTab(tab: ResultTab): tab is RenderableResultTab {
@@ -22,6 +23,10 @@ function isRenderableResultTab(tab: ResultTab): tab is RenderableResultTab {
 
 function isResult7Tab(tab: ResultTab): boolean {
   return tab === 'result7';
+}
+
+function isResult8Tab(tab: ResultTab): boolean {
+  return tab === 'result8';
 }
 
 function TabPlaceholder({ tab }: { tab: ResultTab }) {
@@ -47,6 +52,7 @@ export default function App() {
   const isResult5 = activeTab === 'result5';
   const isResult6 = activeTab === 'result6';
   const isResult7 = isResult7Tab(activeTab);
+  const isResult8 = isResult8Tab(activeTab);
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
@@ -71,7 +77,7 @@ export default function App() {
       </header>
 
       {/* 탭 설명 헤더 */}
-      <div className={(isResult7 || isResult6) ? 'px-4 pt-6' : 'mx-auto w-full max-w-[1600px] px-4 pt-6'}>
+      <div className={(isResult7 || isResult6 || isResult8) ? 'px-4 pt-6' : 'mx-auto w-full max-w-[1600px] px-4 pt-6'}>
         <header className="mb-4 rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm">
           <h1 className="text-lg font-semibold">{activeTab}</h1>
           <p className="mt-2 text-sm text-slate-600">{defaultTabDescriptions[activeTab]}</p>
@@ -83,6 +89,10 @@ export default function App() {
             <p className="mt-2 text-sm text-slate-600">
               주제 {result7Items.length}개 / 모델 6개 / 렌더 패널 {result7Items.length * 6}개
             </p>
+          ) : isResult8 ? (
+            <p className="mt-2 text-sm text-slate-600">
+              주제 {result8Items.length}개 / 반복 3회 / 렌더 패널 {result8Items.length * 3}개
+            </p>
           ) : (
             <p className="mt-2 text-sm text-slate-600">준비중 탭입니다.</p>
           )}
@@ -90,7 +100,7 @@ export default function App() {
       </div>
 
       {renderableTab ? (
-        <main className={isResult6 ? 'w-full px-4 pb-6' : 'mx-auto w-full max-w-[1600px] px-4 pb-6'}>
+        <main className={(isResult6 || isResult8) ? 'w-full px-4 pb-6' : 'mx-auto w-full max-w-[1600px] px-4 pb-6'}>
           <section>
             <div className="space-y-6">
               {resultPairsByTab[renderableTab].map(pair => (
@@ -232,6 +242,49 @@ export default function App() {
                       </article>
                     )
                   ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </main>
+      ) : isResult8 ? (
+        <main className="w-full pb-6">
+          <div className="sticky top-[61px] z-10 border-b border-slate-300 bg-slate-100">
+            <div className="flex min-w-max gap-2 px-4 py-2">
+              {[1, 2, 3].map(run => (
+                <div key={run} className="w-[560px] shrink-0 rounded-lg bg-slate-800 px-3 py-2 text-center text-sm font-semibold text-white">
+                  Run {run}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <div className="min-w-max space-y-3 px-4 py-3">
+              {result8Items.map(item => (
+                <div key={item.baseName}>
+                  <p className="mb-1 text-xs font-semibold text-slate-700">{item.baseName}</p>
+                  <div className="flex items-start gap-2">
+                    {item.runs.map(r => (
+                      r.html ? (
+                        <div key={r.run} className="w-[560px] shrink-0">
+                          <SvgRenderPanel
+                            fileName={`${item.baseName}_${r.run}.html`}
+                            variantLabel={`Run ${r.run}`}
+                            htmlSource={r.html}
+                            userPrompt={item.userPrompt}
+                            systemPrompt={result8SystemPrompt}
+                            iframeClassName="h-[420px]"
+                          />
+                        </div>
+                      ) : (
+                        <article key={r.run} className="w-[560px] shrink-0 overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm">
+                          <div className="flex h-[420px] items-center justify-center bg-slate-50 text-sm text-slate-400">
+                            데이터 없음
+                          </div>
+                        </article>
+                      )
+                    ))}
                   </div>
                 </div>
               ))}

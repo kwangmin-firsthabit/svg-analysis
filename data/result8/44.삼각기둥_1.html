@@ -1,0 +1,192 @@
+<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: color,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // ── 수학적 파라미터 ──────────────────────────────
+  // 밑면: 한 변 4인 정삼각형 (xz 평면)
+  // 높이: 6 (y 방향)
+  // 꼭짓점 명칭: 밑면 A,B,C / 윗면 D(A위),E(B위),F(C위)
+  const side = 4;
+  const h3   = side * Math.sqrt(3) / 2; // ≈ 3.4641
+
+  // ── 사투영 파라미터 ──────────────────────────────
+  // px = centerX + (x - x0) * scale + z * cos(30°) * zf * scale
+  // py = centerY - y * scale          - z * sin(30°) * zf * scale
+  const scale  = 65;
+  const zf     = 0.5;
+  const angle  = Math.PI / 6; // 30°
+  const cosA   = Math.cos(angle) * zf; // ≈ 0.4330
+  const sinA   = Math.sin(angle) * zf; // = 0.25
+
+  // 정삼각형 중심을 x0=2, z0=h3/3에 맞춰 x 기준점 설정
+  // A(0,0,0), B(4,0,0), C(2,0,h3)
+  // x 기준: (0+4+2)/3 = 2 → 이미 center
+  // z 기준: h3/3 ≈ 1.155 → z0 = h3/3 으로 중심 잡기
+
+  const x0 = 2;      // x 무게중심
+  const z0 = h3 / 3; // z 무게중심 ≈ 1.155
+  const centerX = 340;
+  // centerY=500: py_max(밑면 A,B) = 500, py_min(윗면 F) ≈ 53.7 ≥ 40 ✓
+  const centerY = 500;
+
+  function project(x, y, z) {
+    return {
+      px: centerX + (x - x0) * scale + (z - z0) * cosA * scale,
+      py: centerY - y * scale          - (z - z0) * sinA * scale,
+    };
+  }
+
+  // ── 꼭짓점 3D → 2D ────────────────────────────────
+  const A = project(0,      0, 0);
+  const B = project(side,   0, 0);
+  const C = project(side/2, 0, h3);
+  const D = project(0,      6, 0);
+  const E = project(side,   6, 0);
+  const F = project(side/2, 6, h3);
+
+  // ── 색상 ─────────────────────────────────────────
+  const stroke    = '#2B5CE6';
+  const fillFront = 'rgba(147, 196, 253, 0.22)';
+  const fillBack  = 'rgba(147, 196, 253, 0.10)';
+  const dashArr   = '5 4';
+  const labelCol  = '#1e293b';
+
+  // ── 그리기 순서: 뒷면 → 앞면 (Z-order) ───────────────
+
+  // 1. 숨겨진 모서리 C-A (밑면의 뒷변, 점선)
+  svg.appendChild(el('line', {
+    x1: C.px.toFixed(1), y1: C.py.toFixed(1),
+    x2: A.px.toFixed(1), y2: A.py.toFixed(1),
+    stroke: stroke,
+    'stroke-width': '0.8',
+    'stroke-dasharray': dashArr,
+    'stroke-opacity': '0.5',
+  }));
+
+  // 2. 뒤쪽 면 (CADF - 왼쪽 뒷면)
+  {
+    const pts = [C, A, D, F];
+    const points = pts.map(p => `${p.px.toFixed(1)},${p.py.toFixed(1)}`).join(' ');
+    svg.appendChild(el('polygon', {
+      points,
+      fill: fillBack,
+      stroke: stroke,
+      'stroke-width': '0.8',
+      'stroke-dasharray': dashArr,
+      'stroke-opacity': '0.45',
+    }));
+  }
+
+  // 3. 앞쪽 면들
+
+  // 밑면 ABC
+  {
+    const pts = [A, B, C];
+    const points = pts.map(p => `${p.px.toFixed(1)},${p.py.toFixed(1)}`).join(' ');
+    svg.appendChild(el('polygon', {
+      points,
+      fill: fillFront,
+      stroke: stroke,
+      'stroke-width': '1.5',
+      'stroke-linejoin': 'round',
+    }));
+  }
+
+  // 앞면 ABED
+  {
+    const pts = [A, B, E, D];
+    const points = pts.map(p => `${p.px.toFixed(1)},${p.py.toFixed(1)}`).join(' ');
+    svg.appendChild(el('polygon', {
+      points,
+      fill: fillFront,
+      stroke: stroke,
+      'stroke-width': '1.5',
+      'stroke-linejoin': 'round',
+    }));
+  }
+
+  // 오른쪽 면 BCFE
+  {
+    const pts = [B, C, F, E];
+    const points = pts.map(p => `${p.px.toFixed(1)},${p.py.toFixed(1)}`).join(' ');
+    svg.appendChild(el('polygon', {
+      points,
+      fill: fillFront,
+      stroke: stroke,
+      'stroke-width': '1.5',
+      'stroke-linejoin': 'round',
+    }));
+  }
+
+  // 윗면 DEF
+  {
+    const pts = [D, E, F];
+    const points = pts.map(p => `${p.px.toFixed(1)},${p.py.toFixed(1)}`).join(' ');
+    svg.appendChild(el('polygon', {
+      points,
+      fill: fillFront,
+      stroke: stroke,
+      'stroke-width': '1.5',
+      'stroke-linejoin': 'round',
+    }));
+  }
+
+  // 4. 꼭짓점 점
+  const allVerts = [
+    { p: A }, { p: B }, { p: C },
+    { p: D }, { p: E }, { p: F },
+  ];
+  for (const v of allVerts) {
+    svg.appendChild(el('circle', {
+      cx: v.p.px.toFixed(1),
+      cy: v.p.py.toFixed(1),
+      r: '3.5',
+      fill: stroke,
+    }));
+  }
+
+  // 5. 꼭짓점 라벨
+  // 각 꼭짓점 위치에서 도형 외부 방향으로 오프셋
+  const labels = [
+    { p: A, name: 'A', dx: -15, dy:  10 },
+    { p: B, name: 'B', dx:  15, dy:  10 },
+    { p: C, name: 'C', dx:  15, dy:   8 },
+    { p: D, name: 'D', dx: -16, dy: -10 },
+    { p: E, name: 'E', dx:  16, dy: -10 },
+    { p: F, name: 'F', dx:  16, dy: -10 },
+  ];
+
+  for (const v of labels) {
+    addText(
+      (v.p.px + v.dx).toFixed(1),
+      (v.p.py + v.dy).toFixed(1),
+      v.name,
+      '14',
+      '500',
+      labelCol
+    );
+  }
+</script>

@@ -1,0 +1,187 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color, anchor) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': anchor || 'middle',
+      'dominant-baseline': 'central',
+      fill: color,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 수학적 계산
+  // 반지름 R = 8, 현의 길이 c = 8
+  // 반현 = 4, sin(θ/2) = 4/8 = 0.5 → θ/2 = π/6 → θ = π/3 (60°)
+  // 중심에서 현까지 거리 h = √(R² - (c/2)²) = √(64 - 16) = √48 = 4√3
+
+  const R = 8;          // 수학 반지름
+  const c = 8;          // 현의 길이
+  const halfC = c / 2;  // 4
+  const h = Math.sqrt(R * R - halfC * halfC); // 4√3 ≈ 6.928
+
+  // SVG 스케일 설정 (등축 스케일)
+  // 안전 영역: x=40~640, y=40~460
+  // 원 전체를 표시하기 위해 적절한 scale 설정
+  const scale = 28;     // 1 수학 단위 = 28px
+
+  // SVG 원 중심 위치: 활꼴이 아래쪽에 있도록 배치
+  // 원 중심을 위쪽에 배치하여 아래쪽 활꼴이 잘 보이도록
+  const cx = 340;
+  const cy = 180;
+
+  // 현의 양 끝점 (수학 좌표 기준, 현이 아래에 있음)
+  // 중심각 60°, A = (-4, -4√3), B = (4, -4√3)
+  const mathAx = -halfC;
+  const mathAy = -h;
+  const mathBx = halfC;
+  const mathBy = -h;
+
+  // SVG 좌표 변환 (y축 반전)
+  const svgAx = cx + mathAx * scale;
+  const svgAy = cy - mathAy * scale; // cy - (-h)*scale = cy + h*scale
+  const svgBx = cx + mathBx * scale;
+  const svgBy = cy - mathBy * scale;
+  const svgCx = cx;
+  const svgCy = cy;
+
+  // A의 각도: atan2(mathAy, mathAx) = atan2(-h, -halfC) → SVG 각도
+  // SVG에서 y축이 반전되므로 수학 각도 그대로 사용하면 안 됨
+  // SVG 좌표계에서의 각도 계산
+  const angleA_svg = Math.atan2(svgAy - svgCy, svgAx - svgCx); // SVG 좌표계
+  const angleB_svg = Math.atan2(svgBy - svgCy, svgBx - svgCx); // SVG 좌표계
+
+  // 활꼴 영역 path (호 + 현)
+  // 작은 호: A에서 B까지 (아래쪽, 시계 방향 sweep=1, 큰 호 아님 large=0)
+  const arcStartX = svgAx;
+  const arcStartY = svgAy;
+  const arcEndX = svgBx;
+  const arcEndY = svgBy;
+  const svgR = R * scale;
+
+  // 활꼴 채움 (호 + 현으로 닫힌 영역)
+  // A → 호 → B → 현 → A (닫힘)
+  const segPath = el('path', {
+    d: `M${arcStartX} ${arcStartY} A${svgR} ${svgR} 0 0 1 ${arcEndX} ${arcEndY} Z`,
+    fill: '#a8d8f0',
+    'fill-opacity': '0.35',
+    stroke: 'none',
+  });
+  svg.appendChild(segPath);
+
+  // 원 (전체 원, 활꼴의 기반이 되는 원)
+  const circle = el('circle', {
+    cx: svgCx,
+    cy: svgCy,
+    r: svgR,
+    fill: 'none',
+    stroke: '#aaaaaa',
+    'stroke-width': '1',
+    'stroke-dasharray': '5 4',
+    opacity: '0.5',
+  });
+  svg.appendChild(circle);
+
+  // 활꼴의 호 (진한 선)
+  const arcPath = el('path', {
+    d: `M${arcStartX} ${arcStartY} A${svgR} ${svgR} 0 0 1 ${arcEndX} ${arcEndY}`,
+    fill: 'none',
+    stroke: '#2563eb',
+    'stroke-width': '1.5',
+    'stroke-linecap': 'round',
+  });
+  svg.appendChild(arcPath);
+
+  // 현 (chord)
+  const chord = el('line', {
+    x1: svgAx,
+    y1: svgAy,
+    x2: svgBx,
+    y2: svgBy,
+    stroke: '#2563eb',
+    'stroke-width': '1.5',
+    'stroke-linecap': 'round',
+  });
+  svg.appendChild(chord);
+
+  // 반지름 선분 (중심 → A)
+  const radiusLineA = el('line', {
+    x1: svgCx,
+    y1: svgCy,
+    x2: svgAx,
+    y2: svgAy,
+    stroke: '#dc2626',
+    'stroke-width': '1.2',
+    'stroke-linecap': 'round',
+  });
+  svg.appendChild(radiusLineA);
+
+  // 원의 중심점
+  const centerDot = el('circle', {
+    cx: svgCx,
+    cy: svgCy,
+    r: '3.5',
+    fill: '#374151',
+  });
+  svg.appendChild(centerDot);
+
+  // 현의 양 끝점
+  const dotA = el('circle', {
+    cx: svgAx,
+    cy: svgAy,
+    r: '3.5',
+    fill: '#2563eb',
+  });
+  svg.appendChild(dotA);
+
+  const dotB = el('circle', {
+    cx: svgBx,
+    cy: svgBy,
+    r: '3.5',
+    fill: '#2563eb',
+  });
+  svg.appendChild(dotB);
+
+  // 중심점 라벨 "O"
+  addText(svgCx - 14, svgCy, 'O', '14', '500', '#374151', 'middle');
+
+  // 반지름 라벨 "8" - 중심과 A의 중점 근처
+  const radLabelX = (svgCx + svgAx) / 2;
+  const radLabelY = (svgCy + svgAy) / 2;
+  // 선분에서 약간 오른쪽으로 오프셋
+  const dxR = svgAx - svgCx;
+  const dyR = svgAy - svgCy;
+  const lenR = Math.sqrt(dxR * dxR + dyR * dyR);
+  const perpRx = -dyR / lenR;
+  const perpRy = dxR / lenR;
+  addText(
+    Math.round(radLabelX + perpRx * 14),
+    Math.round(radLabelY + perpRy * 14),
+    '8',
+    '14',
+    '500',
+    '#dc2626',
+    'middle'
+  );
+
+  // 현 길이 라벨 "8" - 현의 중점 아래쪽
+  const chordMidX = (svgAx + svgBx) / 2;
+  const chordMidY = (svgAy + svgBy) / 2;
+  addText(chordMidX, chordMidY + 18, '8', '14', '500', '#2563eb', 'middle');
+
+</script>

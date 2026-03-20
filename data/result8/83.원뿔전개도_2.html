@@ -1,0 +1,120 @@
+<svg id="vis" width="100%" viewBox="0 0 680 540" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color, anchor) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': anchor || 'middle',
+      'dominant-baseline': 'central',
+      fill: color,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 수학적 계산
+  // 밑면 반지름 r = 4, 모선 길이 l = 10
+  // 부채꼴 중심각 θ = 2πr / l = 2π×4 / 10 = 4π/5 rad = 144°
+  const r = 4;
+  const l = 10;
+  const sectorAngle = 2 * Math.PI * r / l; // 4π/5 ≈ 2.5133 rad
+
+  // 스케일: 부채꼴 반지름 = l×scale = 10×24 = 240px
+  // 부채꼴 가로 폭: 2 × 240 × sin(72°) ≈ 456px (안전 영역 600px 내 ✓)
+  // 전체 세로: 55(상단여백) + 240(부채꼴) + 32(간격) + 192(원 지름) + 20(하단여백) = 539px
+  const scale = 24;
+  const sectorRadius = l * scale; // 240px
+  const circleRadius = r * scale; // 96px
+
+  // === 부채꼴(옆면) ===
+  // 중심을 위쪽에 배치, 호가 아래로 펼쳐지는 형태
+  const cx = 340;
+  const cy = 55;
+
+  // 부채꼴 대칭 배치: 중심각을 π/2(아래 방향) 기준으로 좌우 대칭
+  const startAngle = Math.PI / 2 - sectorAngle / 2; // 약 18°
+  const endAngle = Math.PI / 2 + sectorAngle / 2;   // 약 162°
+
+  const sRx = cx + sectorRadius * Math.cos(startAngle);
+  const sRy = cy + sectorRadius * Math.sin(startAngle);
+  const eRx = cx + sectorRadius * Math.cos(endAngle);
+  const eRy = cy + sectorRadius * Math.sin(endAngle);
+
+  // 중심각 144° < 180° → large-arc-flag = 0, sweep-flag = 1 (시계방향)
+  const largeArc = sectorAngle > Math.PI ? 1 : 0;
+
+  svg.appendChild(el('path', {
+    d: `M${cx} ${cy} L${sRx.toFixed(2)} ${sRy.toFixed(2)} A${sectorRadius} ${sectorRadius} 0 ${largeArc} 1 ${eRx.toFixed(2)} ${eRy.toFixed(2)} Z`,
+    fill: '#dbeafe',
+    stroke: '#1d4ed8',
+    'stroke-width': '1.5',
+    'stroke-linejoin': 'round',
+  }));
+
+  // === 밑면 원 ===
+  // 부채꼴 호 최하단: cy + sectorRadius = 55 + 240 = 295
+  const arcBottomY = cy + sectorRadius;
+  const gap = 32;
+  const circleCx = cx;
+  const circleCy = arcBottomY + gap + circleRadius; // 295 + 32 + 96 = 423
+
+  svg.appendChild(el('circle', {
+    cx: circleCx,
+    cy: circleCy,
+    r: circleRadius,
+    fill: '#dbeafe',
+    stroke: '#1d4ed8',
+    'stroke-width': '1.5',
+  }));
+
+  // === 모선 길이 라벨 (l = 10) ===
+  // 왼쪽 반지름 선분 위에 라벨 배치 (endAngle: 162°)
+  const midLx = cx + (sectorRadius / 2) * Math.cos(endAngle);
+  const midLy = cy + (sectorRadius / 2) * Math.sin(endAngle);
+  // 선분에 수직 방향 (왼쪽 바깥쪽)
+  const perpLx = -Math.sin(endAngle);
+  const perpLy = Math.cos(endAngle);
+  addText(
+    (midLx + perpLx * 16).toFixed(1),
+    (midLy + perpLy * 16).toFixed(1),
+    '10', '14', '500', '#1e3a8a'
+  );
+
+  // === 밑면 반지름 라벨 (r = 4) ===
+  // 보조 점선: 원 중심 → 오른쪽 끝 (반지름 표시)
+  svg.appendChild(el('line', {
+    x1: circleCx,
+    y1: circleCy,
+    x2: circleCx + circleRadius,
+    y2: circleCy,
+    stroke: '#1d4ed8',
+    'stroke-width': '0.8',
+    'stroke-dasharray': '4 3',
+  }));
+  addText(
+    circleCx + circleRadius / 2,
+    circleCy - 14,
+    '4', '14', '500', '#1e3a8a'
+  );
+
+  // 좌표 검증:
+  // 부채꼴 왼쪽 끝 x: 340 + 240×cos(162°) ≈ 340 - 228.4 = 111.6 > 40 ✓
+  // 부채꼴 오른쪽 끝 x: 340 + 240×cos(18°) ≈ 340 + 228.4 = 568.4 < 640 ✓
+  // 밑면 원 최하단 y: 423 + 96 = 519 < 540 - 20 = 520 ✓ (하단 여백 확인)
+  // viewBox 높이 = 519 + 20 = 539 → 540으로 설정 ✓
+  // bbox 가로 중심: (111.6 + 568.4) / 2 = 340 = viewBox 중앙 ✓
+  // bbox 가로: 568.4 - 111.6 = 456.8px ≥ 360 ✓
+  // bbox 세로: 519 - 55 = 464px ≥ 280 ✓
+</script>

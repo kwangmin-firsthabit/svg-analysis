@@ -1,0 +1,195 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+  <defs></defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color, anchor) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': anchor || 'middle',
+      'dominant-baseline': 'central',
+      fill: color,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 수학적 계산
+  // 원뿔: 밑면 반지름 r = 4, 모선 길이 l = 10
+  // 전개도 구성:
+  //   - 옆면(부채꼴): 반지름 = l = 10, 호 길이 = 2πr = 8π
+  //   - 중심각 = 호 길이 / 반지름 = 8π / 10 = 4π/5 rad = 144°
+  //   - 밑면(원): 반지름 = r = 4
+
+  const r = 4;    // 밑면 반지름
+  const l = 10;   // 모선 길이 (부채꼴 반지름)
+  const sectorAngle = (2 * Math.PI * r) / l; // 4π/5 ≈ 2.5133 rad = 144°
+
+  // SVG 스케일: 모선 길이 10 → 화면에서 220px
+  const scale = 22; // 1 단위 = 22px
+
+  // 부채꼴 중심을 SVG 중앙 상단에 배치
+  const cx = 340;
+  const cy = 80;
+
+  // 부채꼴: 중심각 144°, 대칭으로 배치 (위쪽을 기준)
+  // 시작각: 아래 방향을 기준으로 대칭 배치
+  // 부채꼴이 아래쪽을 향하도록 중심각을 아래쪽 방향으로 펼침
+  // 중심에서 아래쪽 방향이 90°(π/2), 좌우 대칭으로 sectorAngle/2 펼침
+  const halfAngle = sectorAngle / 2;
+  const startAngle = Math.PI / 2 - halfAngle; // 아래 방향 기준에서 좌측
+  const endAngle = Math.PI / 2 + halfAngle;   // 아래 방향 기준에서 우측
+
+  const sectorR = l * scale; // 부채꼴 반지름 = 10 * 22 = 220px
+
+  // 부채꼴 꼭짓점 (중심)
+  const apexX = cx;
+  const apexY = cy;
+
+  // 부채꼴 호의 시작점과 끝점
+  const arcStartX = apexX + sectorR * Math.cos(startAngle);
+  const arcStartY = apexY + sectorR * Math.sin(startAngle);
+  const arcEndX = apexX + sectorR * Math.cos(endAngle);
+  const arcEndY = apexY + sectorR * Math.sin(endAngle);
+
+  // 부채꼴 호의 중점 (라벨 배치용)
+  const arcMidAngle = Math.PI / 2; // 정 아래 방향
+  const arcMidX = apexX + sectorR * Math.cos(arcMidAngle);
+  const arcMidY = apexY + sectorR * Math.sin(arcMidAngle);
+
+  // 부채꼴 그리기 (실선 외곽선, 점선 접합 변 없음 — 외곽선만 실선)
+  // 부채꼴의 두 반지름선과 호
+  // 중심각 = 144° < 180°이므로 large-arc-flag = 0
+  const largeArc = sectorAngle > Math.PI ? 1 : 0;
+
+  // 부채꼴 면 채우기
+  const sectorPath = `M${apexX} ${apexY} L${arcStartX.toFixed(2)} ${arcStartY.toFixed(2)} A${sectorR} ${sectorR} 0 ${largeArc} 1 ${arcEndX.toFixed(2)} ${arcEndY.toFixed(2)} Z`;
+
+  svg.appendChild(el('path', {
+    d: sectorPath,
+    fill: '#e8f4fd',
+    stroke: '#2563eb',
+    'stroke-width': '1.5',
+    'fill-opacity': '0.5',
+  }));
+
+  // 밑면 원 배치
+  // 밑면 원을 부채꼴 호의 중점 아래에 맞닿게 배치
+  // 접합 지점: 호의 중점 (arcMidX, arcMidY)
+  // 밑면 원의 반지름 = r * scale = 4 * 22 = 88px
+  const baseR = r * scale; // 88px
+  const baseCX = arcMidX;
+  const baseCY = arcMidY + baseR; // 호의 최하단 점에 원이 접하도록
+
+  // 밑면 원 그리기
+  svg.appendChild(el('circle', {
+    cx: baseCX.toFixed(2),
+    cy: baseCY.toFixed(2),
+    r: baseR,
+    fill: '#fef3e8',
+    stroke: '#2563eb',
+    'stroke-width': '1.5',
+    'fill-opacity': '0.5',
+  }));
+
+  // 접합 변: 밑면 원과 부채꼴 호가 맞닿는 부분은 점선으로 표시
+  // 접합점: arcMidX, arcMidY (호의 최하단) ~ 밑면 원의 상단 (baseCX, arcMidY)
+  // 실제로 이 전개도에서 접합 변은 호 위의 호 길이와 원의 원주가 일치하는 부분
+  // 시각적으로 접합선: 부채꼴 호의 한 점에 원이 맞닿아 있음을 점선으로 표시
+  // 호의 최하단 점에서 원의 중심까지 점선
+  svg.appendChild(el('line', {
+    x1: arcMidX.toFixed(2),
+    y1: arcMidY.toFixed(2),
+    x2: baseCX.toFixed(2),
+    y2: baseCY.toFixed(2),
+    stroke: '#94a3b8',
+    'stroke-width': '0.8',
+    'stroke-dasharray': '4 3',
+  }));
+
+  // 라벨: 모선 길이 = 10 (부채꼴의 왼쪽 반지름선 중점)
+  const lLabelX = (apexX + arcStartX) / 2;
+  const lLabelY = (apexY + arcStartY) / 2;
+  // 라벨을 선에서 약간 왼쪽으로 오프셋
+  const lAngle = Math.atan2(arcStartY - apexY, arcStartX - apexX);
+  const lOffX = lLabelX + Math.cos(lAngle + Math.PI / 2) * 14;
+  const lOffY = lLabelY + Math.sin(lAngle + Math.PI / 2) * 14;
+  addText(lOffX.toFixed(1), lOffY.toFixed(1), '10', '14', '500', '#1e293b');
+
+  // 오른쪽 반지름선 라벨도 추가
+  const lLabelRX = (apexX + arcEndX) / 2;
+  const lLabelRY = (apexY + arcEndY) / 2;
+  const lAngleR = Math.atan2(arcEndY - apexY, arcEndX - apexX);
+  const lOffRX = lLabelRX + Math.cos(lAngleR - Math.PI / 2) * 14;
+  const lOffRY = lLabelRY + Math.sin(lAngleR - Math.PI / 2) * 14;
+  addText(lOffRX.toFixed(1), lOffRY.toFixed(1), '10', '14', '500', '#1e293b');
+
+  // 라벨: 밑면 원 반지름 = 4
+  // 원의 중심에서 오른쪽으로 반지름 선분 그리고 라벨
+  svg.appendChild(el('line', {
+    x1: baseCX.toFixed(2),
+    y1: baseCY.toFixed(2),
+    x2: (baseCX + baseR).toFixed(2),
+    y2: baseCY.toFixed(2),
+    stroke: '#64748b',
+    'stroke-width': '0.8',
+    'stroke-dasharray': '4 3',
+  }));
+  addText((baseCX + baseR / 2).toFixed(1), (baseCY - 12).toFixed(1), '4', '14', '500', '#1e293b');
+
+  // 부채꼴 중심각 라벨: 144°
+  // 호를 작은 반지름으로 그려서 각도 표시
+  const angleArcR = 40;
+  const angleArcStartX = apexX + angleArcR * Math.cos(startAngle);
+  const angleArcStartY = apexY + angleArcR * Math.sin(startAngle);
+  const angleArcEndX = apexX + angleArcR * Math.cos(endAngle);
+  const angleArcEndY = apexY + angleArcR * Math.sin(endAngle);
+
+  svg.appendChild(el('path', {
+    d: `M${angleArcStartX.toFixed(2)} ${angleArcStartY.toFixed(2)} A${angleArcR} ${angleArcR} 0 ${largeArc} 1 ${angleArcEndX.toFixed(2)} ${angleArcEndY.toFixed(2)}`,
+    fill: 'none',
+    stroke: '#f59e0b',
+    'stroke-width': '1',
+  }));
+
+  // 중심각 라벨 위치: 각도 호 중점
+  const angleLabelX = apexX + (angleArcR + 20) * Math.cos(arcMidAngle);
+  const angleLabelY = apexY + (angleArcR + 20) * Math.sin(arcMidAngle);
+  addText(angleLabelX.toFixed(1), angleLabelY.toFixed(1), '144°', '12', '400', '#b45309');
+
+  // 꼭짓점 점 (부채꼴 중심)
+  svg.appendChild(el('circle', {
+    cx: apexX,
+    cy: apexY,
+    r: '3.5',
+    fill: '#2563eb',
+  }));
+
+  // 밑면 원 중심 점
+  svg.appendChild(el('circle', {
+    cx: baseCX.toFixed(2),
+    cy: baseCY.toFixed(2),
+    r: '3.5',
+    fill: '#2563eb',
+  }));
+
+  // 부채꼴 라벨: 옆면
+  const sectorLabelX = apexX;
+  const sectorLabelY = apexY + sectorR * 0.45;
+  addText(sectorLabelX.toFixed(1), sectorLabelY.toFixed(1), '옆면', '14', '500', '#1e3a5f');
+
+  // 밑면 라벨
+  addText(baseCX.toFixed(1), baseCY.toFixed(1), '밑면', '14', '500', '#7c3a00');
+
+</script>

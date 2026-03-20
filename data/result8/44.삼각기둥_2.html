@@ -1,0 +1,216 @@
+<svg id="vis" width="100%" viewBox="0 0 680 520" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color, anchor) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': anchor || 'middle',
+      'dominant-baseline': 'central',
+      fill: color,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 3D 투영 함수 (비스듬한 투영)
+  function project(x, y, z) {
+    const angle = Math.PI / 6; // 30도
+    const depth = 0.55;
+    return {
+      px: x + z * Math.cos(angle) * depth,
+      py: y - z * Math.sin(angle) * depth,
+    };
+  }
+
+  // 밑면 정삼각형: 한 변의 길이 4
+  // 수학 좌표계에서 정삼각형 꼭짓점 계산
+  // A: 왼쪽 아래, B: 오른쪽 아래, C: 위쪽
+  const side = 4;
+  const triH = side * Math.sqrt(3) / 2; // 정삼각형 높이 ≈ 3.464
+  const prismH = 6; // 기둥 높이
+
+  // 스케일 설정 (픽셀 변환)
+  const scale = 62;
+
+  // 밑면 꼭짓점 3D 좌표 (math 좌표계, y는 위쪽이 양수)
+  // 정삼각형을 xz 평면에 배치
+  const A3d = { x: -side / 2, y: 0, z: 0 };
+  const B3d = { x:  side / 2, y: 0, z: 0 };
+  const C3d = { x: 0,         y: 0, z: triH };
+
+  // 윗면 꼭짓점 (y축 방향으로 prismH 올라감)
+  const D3d = { x: -side / 2, y: prismH, z: 0 };
+  const E3d = { x:  side / 2, y: prismH, z: 0 };
+  const F3d = { x: 0,         y: prismH, z: triH };
+
+  // SVG 중심점
+  const cx = 340;
+  const cy = 300;
+
+  // 3D → 2D 투영 (y축이 SVG에서 위로 가도록 반전 포함)
+  function toSvg(p3d) {
+    const proj = project(p3d.x * scale, -p3d.y * scale, p3d.z * scale);
+    return {
+      x: cx + proj.px,
+      y: cy + proj.py,
+    };
+  }
+
+  const A = toSvg(A3d);
+  const B = toSvg(B3d);
+  const C = toSvg(C3d);
+  const D = toSvg(D3d);
+  const E = toSvg(E3d);
+  const F = toSvg(F3d);
+
+  // 가시성 판별을 위한 법선 계산
+  function cross3d(u, w) {
+    return {
+      x: u.y * w.z - u.z * w.y,
+      y: u.z * w.x - u.x * w.z,
+      z: u.x * w.y - u.y * w.x,
+    };
+  }
+
+  function faceNormal(v0, v1, v2) {
+    const u = { x: v1.x - v0.x, y: v1.y - v0.y, z: v1.z - v0.z };
+    const w = { x: v2.x - v0.x, y: v2.y - v0.y, z: v2.z - v0.z };
+    return cross3d(u, w);
+  }
+
+  // 시선 벡터 (화면 앞쪽)
+  const viewDir = { x: 0, y: 0, z: -1 };
+
+  function isFrontFace(v0, v1, v2) {
+    const n = faceNormal(v0, v1, v2);
+    return (n.x * viewDir.x + n.y * viewDir.y + n.z * viewDir.z) <= 0;
+  }
+
+  // 각 면의 가시성 판별
+  // 밑면 ABC (y=0, 아래): 법선이 -y 방향
+  const bottomVisible = isFrontFace(A3d, B3d, C3d);
+  // 윗면 DEF (y=6, 위): 법선이 +y 방향
+  const topVisible = isFrontFace(D3d, E3d, F3d);
+  // 앞면 ABE-D (z=0 평면)
+  const frontFaceVisible = isFrontFace(A3d, B3d, E3d);
+  // 왼쪽 옆면 ADF-C
+  const leftFaceVisible = isFrontFace(A3d, D3d, F3d);
+  // 오른쪽 옆면 BCF-E
+  const rightFaceVisible = isFrontFace(B3d, C3d, F3d);
+
+  // 색상 정의
+  const strokeColor = '#1e3a5f';
+  const fillColor = '#d4e8f7';
+  const hiddenColor = '#7aabcc';
+  const labelColor = '#1e3a5f';
+  const dashArray = '5 4';
+
+  // 그리기 순서: 뒷면 먼저 (점선), 앞면 나중 (실선)
+
+  // 각 모서리의 가시성 판단
+  // 모서리가 가시적인지: 인접한 두 면 중 하나라도 앞면이면 실선
+  // 밑면 모서리
+  const edgeAB_vis = frontFaceVisible || bottomVisible;
+  const edgeBC_vis = rightFaceVisible || bottomVisible;
+  const edgeCA_vis = leftFaceVisible || bottomVisible;
+  // 윗면 모서리
+  const edgeDE_vis = frontFaceVisible || topVisible;
+  const edgeEF_vis = rightFaceVisible || topVisible;
+  const edgeFD_vis = leftFaceVisible || topVisible;
+  // 수직 모서리
+  const edgeAD_vis = frontFaceVisible || leftFaceVisible;
+  const edgeBE_vis = frontFaceVisible || rightFaceVisible;
+  const edgeCF_vis = leftFaceVisible || rightFaceVisible;
+
+  function drawEdge(p1, p2, visible) {
+    svg.appendChild(el('line', {
+      x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y,
+      stroke: visible ? strokeColor : hiddenColor,
+      'stroke-width': visible ? '1.5' : '1',
+      'stroke-dasharray': visible ? 'none' : dashArray,
+      'stroke-linecap': 'round',
+      opacity: visible ? '1' : '0.55',
+    }));
+  }
+
+  // 면 채우기 (앞면만)
+  function drawFace(pts, visible) {
+    if (!visible) return;
+    const d = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' ') + ' Z';
+    svg.appendChild(el('path', {
+      d,
+      fill: fillColor,
+      'fill-opacity': '0.35',
+      stroke: 'none',
+    }));
+  }
+
+  // 1. 면 채우기 (배경)
+  drawFace([A, B, E, D], frontFaceVisible);
+  drawFace([A, C, F, D], leftFaceVisible);
+  drawFace([B, C, F, E], rightFaceVisible);
+  drawFace([A, B, C], bottomVisible);
+  drawFace([D, E, F], topVisible);
+
+  // 2. 숨겨진 모서리 (점선)
+  drawEdge(A, B, edgeAB_vis);
+  drawEdge(B, C, edgeBC_vis);
+  drawEdge(C, A, edgeCA_vis);
+  drawEdge(D, E, edgeDE_vis);
+  drawEdge(E, F, edgeEF_vis);
+  drawEdge(F, D, edgeFD_vis);
+  drawEdge(A, D, edgeAD_vis);
+  drawEdge(B, E, edgeBE_vis);
+  drawEdge(C, F, edgeCF_vis);
+
+  // 3. 꼭짓점 점 표시
+  const vertexColor = '#1e3a5f';
+  const vertexR = '3.5';
+  [
+    { p: A, name: 'A' },
+    { p: B, name: 'B' },
+    { p: C, name: 'C' },
+    { p: D, name: 'D' },
+    { p: E, name: 'E' },
+    { p: F, name: 'F' },
+  ].forEach(({ p }) => {
+    svg.appendChild(el('circle', {
+      cx: p.x.toFixed(1),
+      cy: p.y.toFixed(1),
+      r: vertexR,
+      fill: vertexColor,
+    }));
+  });
+
+  // 4. 꼭짓점 라벨
+  const offset = 16;
+  // A: 왼쪽 아래
+  addText(A.x - offset, A.y + 6, 'A', '14', '500', labelColor, 'end');
+  // B: 오른쪽 아래
+  addText(B.x + offset, B.y + 6, 'B', '14', '500', labelColor, 'start');
+  // C: 앞쪽 아래 (z축 방향, 화면상 아래쪽)
+  addText(C.x + 4, C.y + offset, 'C', '14', '500', labelColor, 'middle');
+  // D: 왼쪽 위
+  addText(D.x - offset, D.y - 4, 'D', '14', '500', labelColor, 'end');
+  // E: 오른쪽 위
+  addText(E.x + offset, E.y - 4, 'E', '14', '500', labelColor, 'start');
+  // F: 앞쪽 위
+  addText(F.x + 4, F.y - offset, 'F', '14', '500', labelColor, 'middle');
+</script>

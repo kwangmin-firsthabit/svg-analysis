@@ -1,13 +1,14 @@
 import dynamicSystemPrompt from '../../docs/prompts/system/prompt.dynamic.md?raw';
 import result2DynamicSystemPrompt from '../../docs/prompts/system/math-visualization-system-prompt-v4.md?raw';
 import result2StaticSystemPrompt from '../../docs/prompts/system/math-visualization-system-prompt-v3.md?raw';
+import result8SystemPromptRaw from '../../docs/prompts/system/math-visualization-system-prompt-v5.md?raw';
 import staticSystemPrompt from '../../docs/prompts/system/prompt.static.md?raw';
 import userPromptsRaw from './user-prompts.json?raw';
 import result3UserPromptsRaw from './user-prompts-result3.json?raw';
 import changeDescriptionsRaw from './change-descriptions-result5.json?raw';
 
 export type Variant = 'static' | 'dynamic' | 'original' | 'modified' | 'v1' | 'v3' | 'v4' | 'before' | 'after';
-export type ResultTab = 'result1' | 'result2' | 'result3' | 'result4' | 'result5' | 'result6' | 'result7';
+export type ResultTab = 'result1' | 'result2' | 'result3' | 'result4' | 'result5' | 'result6' | 'result7' | 'result8';
 export type RenderableResultTab = 'result1' | 'result2' | 'result3' | 'result4' | 'result5' | 'result6';
 
 export interface Result7ModelItem {
@@ -263,6 +264,48 @@ function buildResult7Items(): Result7Item[] {
 }
 
 export const result7Items: Result7Item[] = buildResult7Items();
+
+export const result8SystemPrompt: string = result8SystemPromptRaw;
+
+const RESULT8_FILES = [
+  '22.활꼴',
+  '39.함수와내접하는도형',
+  '44.삼각기둥',
+  '83.원뿔전개도',
+  '84.원뿔대',
+];
+const RESULT8_RUNS = 3;
+
+export interface Result8RunItem {
+  run: number;
+  html: string;
+}
+
+export interface Result8Item {
+  baseName: string;
+  userPrompt: string;
+  runs: Result8RunItem[];
+}
+
+const result8Modules = import.meta.glob('../../data/result8/*.html', {
+  eager: true,
+  import: 'default',
+  query: '?raw',
+}) as Record<string, string>;
+
+function buildResult8Items(): Result8Item[] {
+  const fileMap = toFileMap(result8Modules);
+  return RESULT8_FILES.map(baseName => ({
+    baseName,
+    userPrompt: userPromptMap[`${baseName}.html`] ?? '프롬프트 없음',
+    runs: Array.from({ length: RESULT8_RUNS }, (_, i) => ({
+      run: i + 1,
+      html: fileMap[`${baseName}_${i + 1}.html`] ?? '',
+    })),
+  }));
+}
+
+export const result8Items: Result8Item[] = buildResult8Items();
 
 export const resultPairsByTab: Record<RenderableResultTab, PairItem[]> = {
   result1: buildPairs(result1StaticModules, result1DynamicModules),

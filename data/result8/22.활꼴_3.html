@@ -1,0 +1,116 @@
+<svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color) {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': 'middle',
+      'dominant-baseline': 'central',
+      fill: color,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 수학 계산
+  // r = 8, 현 길이 c = 8, 중심각 = 60°
+  // 현의 절반 = 4, 중심에서 현까지 거리 d = 4√3 ≈ 6.928
+  const r = 8;
+  const scale = 20; // 1단위 = 20px
+
+  // SVG 좌표계: O 중심
+  const cx = 340;
+  const cy = 190;
+
+  // 현의 두 끝점 (수학 좌표: 현이 아래쪽, y = -4√3)
+  // A: (-4, -4√3), B: (4, -4√3)
+  const d = 4 * Math.sqrt(3); // ≈ 6.928
+
+  // SVG 좌표 변환: svg_y = cy - math_y * scale
+  const Ax = cx + (-4) * scale;       // 260
+  const Ay = cy - (-d) * scale;       // 190 + 4√3 * 20 = 190 + 138.56 ≈ 328.56
+  const Bx = cx + 4 * scale;          // 420
+  const By = Ay;                       // 동일 y
+
+  // ─── 1. 활꼴 면 (호 + 현으로 둘러싸인 영역) ───
+  // A에서 B까지 아래쪽 작은 호(60°), large-arc-flag=0, sweep-flag=1(시계방향)
+  const arcR = r * scale; // 160
+  const chordFillPath = `M${Ax} ${Ay} A${arcR} ${arcR} 0 0 1 ${Bx} ${By} Z`;
+  svg.appendChild(el('path', {
+    d: chordFillPath,
+    fill: '#4A90D9',
+    'fill-opacity': '0.18',
+    stroke: 'none',
+  }));
+
+  // ─── 2. 호 (활꼴의 호) ───
+  const arcPath = `M${Ax} ${Ay} A${arcR} ${arcR} 0 0 1 ${Bx} ${By}`;
+  svg.appendChild(el('path', {
+    d: arcPath,
+    fill: 'none',
+    stroke: '#2563EB',
+    'stroke-width': '1.5',
+  }));
+
+  // ─── 3. 현 ───
+  svg.appendChild(el('line', {
+    x1: Ax, y1: Ay,
+    x2: Bx, y2: By,
+    stroke: '#2563EB',
+    'stroke-width': '1.5',
+  }));
+
+  // ─── 4. 반지름 선 (O → B) ───
+  svg.appendChild(el('line', {
+    x1: cx, y1: cy,
+    x2: Bx, y2: By,
+    stroke: '#374151',
+    'stroke-width': '1',
+  }));
+
+  // ─── 5. 원의 중심점 O ───
+  svg.appendChild(el('circle', {
+    cx: cx, cy: cy,
+    r: '3.5',
+    fill: '#374151',
+  }));
+
+  // ─── 6. 현의 끝점 A, B ───
+  svg.appendChild(el('circle', {
+    cx: Ax, cy: Ay,
+    r: '3.5',
+    fill: '#2563EB',
+  }));
+  svg.appendChild(el('circle', {
+    cx: Bx, cy: By,
+    r: '3.5',
+    fill: '#2563EB',
+  }));
+
+  // ─── 7. 라벨 ───
+
+  // O 라벨 (중심 위쪽)
+  addText(cx - 14, cy, 'O', '14', '500', '#374151');
+
+  // 현 길이 라벨 "8" (현 위쪽 중간, 현 위에서 12px)
+  const chordMidX = (Ax + Bx) / 2; // 340
+  const chordMidY = Ay - 14;        // 현 위 14px
+  addText(chordMidX, chordMidY, '8', '14', '500', '#2563EB');
+
+  // 반지름 라벨 "8" (O→B 선 중간, 선 오른쪽)
+  const rMidX = (cx + Bx) / 2 + 10; // 오른쪽으로 10px
+  const rMidY = (cy + By) / 2;
+  addText(rMidX, rMidY, '8', '14', '500', '#374151');
+</script>

@@ -1,159 +1,162 @@
 <!doctype html>
 <html>
   <body>
-    <!--
-  박스플롯(수평): A반 vs B반 수학 점수
-  A반: 최솟값42, Q1=58, 중앙값71, Q3=84, 최댓값98, 이상치28
-  B반: 최솟값50, Q1=65, 중앙값75, Q3=88, 최댓값100
-
-  레이아웃:
-    viewBox: 0 0 480 260
-    x축 범위: 20~100점, 스케일=4px/점
-    x원점: x=60(점수0 위치)
-    px(점수) = 60 + 점수*4
-
-  A반 y중심: 90, B반 y중심: 170
-  박스 높이: 40px
-
-  좌표 계산:
-    이상치28:  px=60+28*4=172
-    A최솟값42: px=60+42*4=228
-    A Q1=58:   px=60+58*4=292
-    A중앙=71:  px=60+71*4=344
-    A Q3=84:   px=60+84*4=396
-    A최댓값98: px=60+98*4=452
-
-    B최솟값50: px=60+50*4=260
-    B Q1=65:   px=60+65*4=320
-    B중앙=75:  px=60+75*4=360
-    B Q3=88:   px=60+88*4=412
-    B최댓값100: px=60+100*4=460
-
-  x축 눈금: 20,30,40,50,60,70,80,90,100
-    px=60+점수*4
--->
-    <svg id="vis" width="100%" viewBox="0 0 680 340" xmlns="http://www.w3.org/2000/svg">
+    <style>
+      #vis {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        user-select: none;
+      }
+    </style>
+    <svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L0,6 L8,3 z" fill="#475569" />
-        </marker>
-        <marker id="arrowL" markerWidth="8" markerHeight="8" refX="2" refY="3" orient="auto">
-          <path d="M8,0 L8,6 L0,3 z" fill="#475569" />
+        <marker
+          id="arrow"
+          viewBox="0 0 10 10"
+          refX="8"
+          refY="5"
+          markerWidth="6"
+          markerHeight="6"
+          orient="auto-start-reverse"
+        >
+          <path
+            d="M2 1L8 5L2 9"
+            fill="none"
+            stroke="context-stroke"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </marker>
       </defs>
     </svg>
     <script>
       const svg = document.getElementById('vis');
       const ns = 'http://www.w3.org/2000/svg';
+
       function el(tag, attrs) {
         const e = document.createElementNS(ns, tag);
         for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
         return e;
       }
-      function addText(x, y, content, attrs = {}) {
+
+      function addText(x, y, content, size, weight, color, anchor = 'middle') {
         const t = el('text', {
           x,
           y,
-          'font-size': '12',
-          'font-weight': '400',
-          'text-anchor': 'middle',
+          'font-size': size,
+          'font-weight': weight,
+          'text-anchor': anchor,
           'dominant-baseline': 'central',
-          fill: '#475569',
-          ...attrs,
+          fill: color,
         });
         t.textContent = content;
         svg.appendChild(t);
+        return t;
       }
 
-      svg.appendChild(el('rect', { width: '680', height: '340', fill: '#F8FAFC' }));
-      addText(340, 36, 'x² - 5x + 4 ≤ 0 의 이차 부등식', { 'font-size': '18', 'font-weight': '600', fill: '#1E293B' });
+      // 1. 수학적 좌표 계산 (세 변 6, 8, 10인 직각삼각형)
+      // vertices: B(0,0), C(8,0), A(0,6)
+      const scale = 50;
+      const ox = 180; // 중앙 배치를 위한 오프셋
+      const oy = 400;
 
-      const originX = 180;
-      const axisY = 200;
-      const unit = 80;
-      const scaleY = 18;
+      const P_B = { x: ox, y: oy };
+      const P_C = { x: ox + 8 * scale, y: oy };
+      const P_A = { x: ox, y: oy - 6 * scale };
 
-      function fx(x) {
-        return x * x - 5 * x + 4;
+      // 내심(Incenter) 계산: 반지름 2이므로 (2, 2)
+      const I = { x: ox + 2 * scale, y: oy - 2 * scale };
+      const r = 2 * scale;
+
+      // 2. 배경 및 보조 요소 (Z-order 1)
+      // 직각 표시
+      function drawRightAngle(vertex, p1, p2, size) {
+        const d1 = { x: p1.x - vertex.x, y: p1.y - vertex.y };
+        const d2 = { x: p2.x - vertex.x, y: p2.y - vertex.y };
+        const l1 = Math.sqrt(d1.x * d1.x + d1.y * d1.y);
+        const l2 = Math.sqrt(d2.x * d2.x + d2.y * d2.y);
+        const u1 = { x: d1.x / l1, y: d1.y / l1 };
+        const u2 = { x: d2.x / l2, y: d2.y / l2 };
+        const c1 = { x: vertex.x + u1.x * size, y: vertex.y + u1.y * size };
+        const c2 = { x: c1.x + u2.x * size, y: c1.y + u2.y * size };
+        const c3 = { x: vertex.x + u2.x * size, y: vertex.y + u2.y * size };
+        svg.appendChild(
+          el('path', {
+            d: `M${c1.x} ${c1.y} L${c2.x} ${c2.y} L${c3.x} ${c3.y}`,
+            fill: 'none',
+            stroke: '#95a5a6',
+            'stroke-width': '1',
+          })
+        );
       }
-      function px(x) {
-        return Math.round(originX + x * unit);
-      }
-      function py(y) {
-        return Math.round(axisY - y * scaleY);
-      }
+      drawRightAngle(P_B, P_C, P_A, 15);
 
-      const xStart = -1;
-      const xEnd = 7;
-
+      // 3. 주요 도형 렌더링 (Z-order 2)
+      // 삼각형 채우기 및 외곽선
       svg.appendChild(
-        el('line', {
-          x1: 60,
-          y1: axisY,
-          x2: 620,
-          y2: axisY,
-          stroke: '#475569',
+        el('polygon', {
+          points: `${P_A.x},${P_A.y} ${P_B.x},${P_B.y} ${P_C.x},${P_C.y}`,
+          fill: 'rgba(52, 152, 219, 0.05)',
+          stroke: '#2c3e50',
           'stroke-width': '1.5',
-          'marker-start': 'url(#arrowL)',
-          'marker-end': 'url(#arrow)',
+          'stroke-linejoin': 'round',
         })
       );
 
-      const ticks = [-1, 0, 1, 2, 3, 4, 5, 6];
-      ticks.forEach(n => {
-        const x = px(n);
-        if (x >= 70 && x <= 610) {
-          svg.appendChild(
-            el('line', { x1: x, y1: axisY - 8, x2: x, y2: axisY + 8, stroke: '#475569', 'stroke-width': '1.5' })
-          );
-          addText(x, axisY + 22, String(n), { 'font-size': '13', fill: '#475569' });
-        }
+      // 내접원
+      svg.appendChild(
+        el('circle', {
+          cx: I.x,
+          cy: I.y,
+          r: r,
+          fill: 'none',
+          stroke: '#e67e22',
+          'stroke-width': '1.5',
+        })
+      );
+
+      // 반지름 표시 보조선 (내심에서 아래쪽 접점까지)
+      svg.appendChild(
+        el('line', {
+          x1: I.x,
+          y1: I.y,
+          x2: I.x,
+          y2: oy,
+          stroke: '#95a5a6',
+          'stroke-width': '0.8',
+          'stroke-dasharray': '4 3',
+        })
+      );
+
+      // 4. 점 표시 (Z-order 3)
+      const points = [
+        { p: P_A, label: 'A' },
+        { p: P_B, label: 'B' },
+        { p: P_C, label: 'C' },
+        { p: I, label: 'O' },
+      ];
+      points.forEach(pt => {
+        svg.appendChild(el('circle', { cx: pt.p.x, cy: pt.p.y, r: 3.5, fill: '#2c3e50' }));
       });
 
-      const steps = 200;
-      const dx = (xEnd - xStart) / steps;
+      // 5. 라벨 및 수치 (Z-order 4)
+      // 꼭짓점 라벨
+      addText(P_A.x - 12, P_A.y - 12, 'A', 14, 500, '#2c3e50');
+      addText(P_B.x - 12, P_B.y + 12, 'B', 14, 500, '#2c3e50');
+      addText(P_C.x + 12, P_C.y + 12, 'C', 14, 500, '#2c3e50');
+      addText(I.x + 10, I.y - 10, 'O', 14, 500, '#e67e22', 'start');
 
-      let fillPath = `M ${px(1)},${axisY}`;
-      for (let i = 0; i <= steps; i++) {
-        const x = xStart + dx * i;
-        if (x >= 1 && x <= 4) {
-          fillPath += ` L ${px(x)},${py(fx(x))}`;
-        }
-      }
-      fillPath += ` L ${px(4)},${axisY} Z`;
-      svg.appendChild(el('path', { d: fillPath, fill: '#3B82F6', 'fill-opacity': '0.18', stroke: 'none' }));
+      // 변의 길이 라벨
+      addText(ox - 15, (oy + P_A.y) / 2, '6', 14, 400, '#2c3e50', 'end'); // 높이
+      addText((ox + P_C.x) / 2, oy + 20, '8', 14, 400, '#2c3e50'); // 밑변
+      addText((ox + P_C.x) / 2 + 15, (oy + P_A.y) / 2 - 15, '10', 14, 400, '#2c3e50', 'start'); // 빗변
 
-      let curvePath = `M ${px(xStart)},${py(fx(xStart))}`;
-      for (let i = 1; i <= steps; i++) {
-        const x = xStart + dx * i;
-        curvePath += ` L ${px(x)},${py(fx(x))}`;
-      }
-      svg.appendChild(el('path', { d: curvePath, fill: 'none', stroke: '#1D4ED8', 'stroke-width': '2' }));
+      // 반지름 라벨
+      addText(I.x + 8, (I.y + oy) / 2, 'r=2', 12, 400, '#e67e22', 'start');
 
-      const lo = 1,
-        hi = 4;
-      const loPx = px(lo),
-        hiPx = px(hi);
-
-      svg.appendChild(
-        el('line', {
-          x1: loPx,
-          y1: axisY,
-          x2: hiPx,
-          y2: axisY,
-          stroke: '#1D4ED8',
-          'stroke-width': '3',
-        })
-      );
-      svg.appendChild(el('circle', { cx: loPx, cy: axisY, r: '6', fill: '#1D4ED8' }));
-      svg.appendChild(el('circle', { cx: hiPx, cy: axisY, r: '6', fill: '#1D4ED8' }));
-
-      addText(loPx, axisY - 28, 'x=1', { 'font-size': '12', 'font-weight': '500', fill: '#1D4ED8' });
-      addText(hiPx, axisY - 28, 'x=4', { 'font-size': '12', 'font-weight': '500', fill: '#1D4ED8' });
-
-      addText(340, 270, '해: 1 ≤ x ≤ 4', { 'font-size': '14', 'font-weight': '500', fill: '#1E293B' });
-      addText(340, 295, 'x² - 5x + 4 = (x - 1)(x - 4) ≤ 0', { 'font-size': '13', fill: '#475569' });
-      addText(340, 318, '포물선이 x축 아래(또는 위에)인 구간: 1 ≤ x ≤ 4', { 'font-size': '13', fill: '#475569' });
+      // ViewBox 높이 업데이트
+      const maxY = oy + 40;
+      svg.setAttribute('viewBox', `0 0 680 ${maxY}`);
     </script>
   </body>
 </html>

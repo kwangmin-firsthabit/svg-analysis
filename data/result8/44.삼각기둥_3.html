@@ -1,0 +1,199 @@
+<svg id="vis" width="100%" viewBox="0 0 680 492" xmlns="http://www.w3.org/2000/svg">
+</svg>
+<script>
+const svg = document.getElementById('vis');
+const ns = 'http://www.w3.org/2000/svg';
+
+function el(tag, attrs) {
+  const e = document.createElementNS(ns, tag);
+  for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  return e;
+}
+
+function addText(x, y, content, size, weight, color) {
+  const t = el('text', {
+    x,
+    y,
+    'font-size': size,
+    'font-weight': weight,
+    'text-anchor': 'middle',
+    'dominant-baseline': 'central',
+    fill: color,
+  });
+  t.textContent = content;
+  svg.appendChild(t);
+}
+
+// 비스듬한 평행 투영 (사각 등각 투영)
+function project(x, y, z) {
+  const angle = Math.PI / 4;
+  const oblique = 0.5;
+  return {
+    px: x + z * Math.cos(angle) * oblique,
+    py: -y + z * Math.sin(angle) * oblique,
+  };
+}
+
+// 스케일 및 원점 (계산 결과: scale=71.62, ox=120.81, oy=280)
+const scale = 71.62;
+const ox = 120.81;
+const oy = 280;
+
+const sqr3 = Math.sqrt(3);
+
+// 삼각기둥 꼭짓점 수학 좌표
+// 밑면 정삼각형 ABC (변 길이 4, z=0)
+// 윗면 DEF (z=6)
+const math3d = {
+  A: { x: 0, y: 0,        z: 0 },
+  B: { x: 4, y: 0,        z: 0 },
+  C: { x: 2, y: 2 * sqr3, z: 0 },
+  D: { x: 0, y: 0,        z: 6 },
+  E: { x: 4, y: 0,        z: 6 },
+  F: { x: 2, y: 2 * sqr3, z: 6 },
+};
+
+// SVG 좌표로 변환
+const pts = {};
+for (const [name, p] of Object.entries(math3d)) {
+  const proj = project(p.x, p.y, p.z);
+  pts[name] = {
+    x: ox + proj.px * scale,
+    y: oy + proj.py * scale,
+  };
+}
+
+// 법선 벡터 계산 (수학 3D 좌표 기반)
+function faceNormal(v0, v1, v2) {
+  const u = { x: v1.x - v0.x, y: v1.y - v0.y, z: v1.z - v0.z };
+  const w = { x: v2.x - v0.x, y: v2.y - v0.y, z: v2.z - v0.z };
+  return {
+    x: u.y * w.z - u.z * w.y,
+    y: u.z * w.x - u.x * w.z,
+    z: u.x * w.y - u.y * w.x,
+  };
+}
+
+function isFrontFace(normal, viewDir) {
+  return normal.x * viewDir.x + normal.y * viewDir.y + normal.z * viewDir.z <= 0;
+}
+
+const viewDir = { x: 0, y: 0, z: -1 };
+
+const m = math3d;
+// 각 면의 법선 벡터 (꼭짓점 순서가 앞면 기준 반시계)
+const nBottom = faceNormal(m.A, m.C, m.B);  // 밑면 (법선 -z)
+const nTop    = faceNormal(m.D, m.E, m.F);  // 윗면 (법선 +z)
+const nFront  = faceNormal(m.A, m.B, m.E);  // 앞면 (법선 -y)
+const nRight  = faceNormal(m.B, m.C, m.F);  // 오른쪽 면
+const nLeft   = faceNormal(m.C, m.A, m.D);  // 왼쪽 면
+
+const frontBottom = isFrontFace(nBottom, viewDir);
+const frontTop    = isFrontFace(nTop,    viewDir);
+const frontFront  = isFrontFace(nFront,  viewDir);
+const frontRight  = isFrontFace(nRight,  viewDir);
+const frontLeft   = isFrontFace(nLeft,   viewDir);
+
+// 모서리: 인접 두 면 중 하나라도 앞면이면 실선
+const edges = [
+  // 밑면 삼각형 모서리
+  { p1: 'A', p2: 'B', vis: frontBottom || frontFront },
+  { p1: 'B', p2: 'C', vis: frontBottom || frontRight },
+  { p1: 'C', p2: 'A', vis: frontBottom || frontLeft  },
+  // 윗면 삼각형 모서리
+  { p1: 'D', p2: 'E', vis: frontTop    || frontFront },
+  { p1: 'E', p2: 'F', vis: frontTop    || frontRight },
+  { p1: 'F', p2: 'D', vis: frontTop    || frontLeft  },
+  // 옆면 세로 모서리
+  { p1: 'A', p2: 'D', vis: frontFront  || frontLeft  },
+  { p1: 'B', p2: 'E', vis: frontFront  || frontRight },
+  { p1: 'C', p2: 'F', vis: frontRight  || frontLeft  },
+];
+
+// 1. 뒷면 모서리 (점선)
+for (const edge of edges) {
+  if (!edge.vis) {
+    const p1 = pts[edge.p1];
+    const p2 = pts[edge.p2];
+    svg.appendChild(el('line', {
+      x1: p1.x, y1: p1.y,
+      x2: p2.x, y2: p2.y,
+      stroke: '#8faac8',
+      'stroke-width': '1.5',
+      'stroke-dasharray': '5 4',
+    }));
+  }
+}
+
+// 2. 앞면 채움 (반투명)
+const faceDefs = [
+  { verts: ['A', 'B', 'C'], front: frontBottom },
+  { verts: ['D', 'E', 'F'], front: frontTop    },
+  { verts: ['A', 'B', 'E', 'D'], front: frontFront },
+  { verts: ['B', 'C', 'F', 'E'], front: frontRight },
+  { verts: ['C', 'A', 'D', 'F'], front: frontLeft  },
+];
+
+for (const face of faceDefs) {
+  if (face.front) {
+    const pointsStr = face.verts.map(v => `${pts[v].x},${pts[v].y}`).join(' ');
+    svg.appendChild(el('polygon', {
+      points: pointsStr,
+      fill: '#4a7fc1',
+      'fill-opacity': '0.10',
+      stroke: 'none',
+    }));
+  }
+}
+
+// 3. 앞면 모서리 (실선)
+for (const edge of edges) {
+  if (edge.vis) {
+    const p1 = pts[edge.p1];
+    const p2 = pts[edge.p2];
+    svg.appendChild(el('line', {
+      x1: p1.x, y1: p1.y,
+      x2: p2.x, y2: p2.y,
+      stroke: '#1e3a5f',
+      'stroke-width': '1.5',
+    }));
+  }
+}
+
+// 4. 꼭짓점 점
+for (const [, p] of Object.entries(pts)) {
+  svg.appendChild(el('circle', {
+    cx: p.x, cy: p.y, r: '3.5',
+    fill: '#1e3a5f',
+  }));
+}
+
+// 5. 꼭짓점 라벨
+// 각 꼭짓점의 SVG 위치에 맞는 오프셋 설정
+// A(120.8, 280.0) → 왼쪽 아래
+// B(407.3, 280.0) → 오른쪽 아래
+// C(264.0, 31.9)  → 위 (밑면 정삼각형 꼭짓점 중 위)
+// D(272.7, 431.9) → 왼쪽 아래 (윗면이 투영상 아래)
+// E(559.2, 431.9) → 오른쪽 아래
+// F(416.0, 183.8) → 오른쪽 위
+const labelOffsets = {
+  A: { dx: -16, dy:   4 },
+  B: { dx:  16, dy:   4 },
+  C: { dx:   0, dy: -16 },
+  D: { dx: -16, dy:  14 },
+  E: { dx:  16, dy:  14 },
+  F: { dx:  18, dy:  -8 },
+};
+
+for (const [name, offset] of Object.entries(labelOffsets)) {
+  const p = pts[name];
+  addText(
+    p.x + offset.dx,
+    p.y + offset.dy,
+    name,
+    '14',
+    '500',
+    '#1e3a5f'
+  );
+}
+</script>
