@@ -1,0 +1,193 @@
+<svg width="420" height="420" viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    y = (1/2)x - 3
+    x절편: x=6, y절편: y=-3
+    함수의 중심점 근사: x=3, y=-1.5 → 이 점을 화면 중앙(210,210)에
+
+    중심점 (3, -1.5) → 화면 (210, 210)
+    1단위 = 35px
+
+    원점 위치:
+    x: 210 - 3*35 = 210 - 105 = 105
+    y: 210 + (-1.5)*(-35) = 210 - 1.5*35 = 210 - 52.5 → 
+    원점 = (105, 262.5) ≈ (105, 263)
+
+    검증:
+    x절편(6,0): (105+6*35, 263) = (315, 263) ✓
+    y절편(0,-3): (105, 263+3*35) = (105, 368) ✓
+    중심(3,-1.5): (105+105, 263+52.5) = (210, 315.5) → 중앙 아님
+
+    함수 중앙을 화면 중앙으로:
+    화면 중앙 = (210, 210)
+    x범위: 0~420 → x좌표 0~420
+    y범위: 0~420 → y좌표 0~420
+
+    화면 끝점:
+    x=0(좌): y=(1/2)*x_data-3
+    x_data에 해당하는 화면x=0: x_data=(0-ox)/scale
+    화면y=0: y_data=(oy-0)/scale
+    화면y=420: y_data=(oy-420)/scale
+
+    scale=35, 원점=(ox,oy)
+    함수가 화면 중앙을 지나도록:
+    화면 중앙(210,210)이 함수 위의 점:
+    y_data = (oy-210)/35
+    x_data = (210-ox)/35
+    y_data = (1/2)*x_data - 3
+    (oy-210)/35 = (1/2)*(210-ox)/35 - 3
+    oy-210 = (1/2)*(210-ox) - 105
+    oy = 105 + (1/2)*(210-ox) - 105 + 210
+    oy = 210 + (210-ox)/2
+    → 자유도 1, ox를 정해야 함
+
+    x축과 y축이 모두 화면 안에 보이도록:
+    ox = 120 → oy = 210 + (210-120)/2 = 210+45 = 255
+
+    검증:
+    원점=(120,255), scale=35
+    x절편(6,0): (120+210, 255)=(330,255) ✓ 화면 안
+    y절편(0,-3): (120, 255+105)=(120,360) ✓ 화면 안
+    중앙점: x_data=(210-120)/35=90/35≈2.57, y_data=(255-210)/35=45/35≈1.29
+    y=(1/2)*2.57-3=1.285-3=-1.715 ≈ -1.29? 
+    다시: y_data=(oy-screen_y)/scale → y가 위가 양수이므로
+    y_data = (oy - screen_y)/scale = (255-210)/35 = 45/35 ≈ 1.286 → 아님
+    
+    SVG y축: 위가 작은값. 수학 y = (screen_oy - screen_y)/scale
+    함수점 screen_y = oy - y_data*scale = oy - ((1/2)*x_data-3)*scale
+    screen_x = ox + x_data*scale
+
+    화면 중앙(210,210):
+    x_data=(210-ox)/scale=(210-120)/35=90/35≈2.57
+    y_data_screen=(255-210)/35=45/35≈1.286 (수학y값)
+    함수y=(1/2)*2.57-3=-1.714 ≠ 1.286
+
+    수정: oy를 함수에 맞게 설정
+    screen_y_mid = oy - y_func(x_mid)*scale
+    210 = oy - ((1/2)*((210-ox)/scale)-3)*scale
+    210 = oy - (1/2)*(210-ox) + 3*scale
+    210 = oy - 105 + (1/2)*ox + 3*35
+    210 = oy - 105 + 0.5*ox + 105
+    210 = oy + 0.5*ox
+    oy = 210 - 0.5*ox
+
+    ox=120: oy=210-60=150
+    원점=(120,150), scale=35
+
+    x절편(6,0): (120+210,150)=(330,150) → y축 위쪽, 함수가 중앙 아래에 많이 걸림
+    y절편(0,-3): (120, 150+105)=(120,255) ✓
+
+    화면 끝 직선:
+    screen_x=0: x_data=(0-120)/35=-120/35≈-3.43, y=0.5*(-3.43)-3=-4.71
+    screen_y=150-(-4.71)*35=150+164.9=314.9 → (0,315)
+    screen_x=420: x_data=300/35≈8.57, y=0.5*8.57-3=1.286
+    screen_y=150-1.286*35=150-45=105 → (420,105)
+
+    이 두 점을 이으면 화면 전체를 가로지름 ✓
+    중앙점 (210,210) 확인:
+    x_data=90/35=2.571, y=0.5*2.571-3=-1.714
+    screen_y=150-(-1.714)*35=150+60=210 ✓ 정확히 화면 중앙 통과
+
+    축 범위:
+    x축(y=0): screen_y=150 → 화면 상단 근처
+    y축(x=0): screen_x=120
+
+    표시 눈금 범위:
+    x: ox=120, scale=35 → x=-3~8 (screen 15~400)
+    y: oy=150, scale=35 → y=-7~4 (screen 290~10)
+
+    눈금 정수값:
+    x: -3,-2,-1,1,2,3,4,5,6,7,8
+    y: -6,-5,-4,-3,-2,-1,1,2,3,4
+  -->
+
+  <!-- 격자 -->
+  <!-- 수직선 x=-3~8 -->
+  <line x1="15" y1="10" x2="15" y2="400" stroke="#efefef" stroke-width="0.8" />
+  <line x1="50" y1="10" x2="50" y2="400" stroke="#efefef" stroke-width="0.8" />
+  <line x1="85" y1="10" x2="85" y2="400" stroke="#efefef" stroke-width="0.8" />
+  <line x1="155" y1="10" x2="155" y2="400" stroke="#efefef" stroke-width="0.8" />
+  <line x1="190" y1="10" x2="190" y2="400" stroke="#efefef" stroke-width="0.8" />
+  <line x1="225" y1="10" x2="225" y2="400" stroke="#efefef" stroke-width="0.8" />
+  <line x1="260" y1="10" x2="260" y2="400" stroke="#efefef" stroke-width="0.8" />
+  <line x1="295" y1="10" x2="295" y2="400" stroke="#efefef" stroke-width="0.8" />
+  <line x1="330" y1="10" x2="330" y2="400" stroke="#efefef" stroke-width="0.8" />
+  <line x1="365" y1="10" x2="365" y2="400" stroke="#efefef" stroke-width="0.8" />
+  <line x1="400" y1="10" x2="400" y2="400" stroke="#efefef" stroke-width="0.8" />
+  <!-- 수평선 y=-6~4 -->
+  <line x1="10" y1="360" x2="410" y2="360" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="325" x2="410" y2="325" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="290" x2="410" y2="290" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="255" x2="410" y2="255" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="220" x2="410" y2="220" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="185" x2="410" y2="185" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="115" x2="410" y2="115" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="80" x2="410" y2="80" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="45" x2="410" y2="45" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="10" x2="410" y2="10" stroke="#efefef" stroke-width="0.8" />
+
+  <!-- x축 (y=0, screen_y=150) -->
+  <line x1="10" y1="150" x2="412" y2="150" stroke="#333" stroke-width="1.5" />
+  <polygon points="412,150 404,146 404,154" fill="#333" />
+  <text x="415" y="154" font-size="14" fill="#333">x</text>
+
+  <!-- y축 (x=0, screen_x=120) -->
+  <line x1="120" y1="410" x2="120" y2="8" stroke="#333" stroke-width="1.5" />
+  <polygon points="120,8 116,16 124,16" fill="#333" />
+  <text x="124" y="14" font-size="14" fill="#333">y</text>
+
+  <!-- x축 눈금 레이블 -->
+  <line x1="15" y1="146" x2="15" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="15" y="166" text-anchor="middle" font-size="12" fill="#555">-3</text>
+  <line x1="50" y1="146" x2="50" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="50" y="166" text-anchor="middle" font-size="12" fill="#555">-2</text>
+  <line x1="85" y1="146" x2="85" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="85" y="166" text-anchor="middle" font-size="12" fill="#555">-1</text>
+  <line x1="155" y1="146" x2="155" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="155" y="166" text-anchor="middle" font-size="12" fill="#555">1</text>
+  <line x1="190" y1="146" x2="190" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="190" y="166" text-anchor="middle" font-size="12" fill="#555">2</text>
+  <line x1="225" y1="146" x2="225" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="225" y="166" text-anchor="middle" font-size="12" fill="#555">3</text>
+  <line x1="260" y1="146" x2="260" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="260" y="166" text-anchor="middle" font-size="12" fill="#555">4</text>
+  <line x1="295" y1="146" x2="295" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="295" y="166" text-anchor="middle" font-size="12" fill="#555">5</text>
+  <line x1="330" y1="146" x2="330" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="330" y="166" text-anchor="middle" font-size="12" fill="#555">6</text>
+  <line x1="365" y1="146" x2="365" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="365" y="166" text-anchor="middle" font-size="12" fill="#555">7</text>
+  <line x1="400" y1="146" x2="400" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="400" y="166" text-anchor="middle" font-size="12" fill="#555">8</text>
+
+  <!-- y축 눈금 레이블 -->
+  <line x1="116" y1="360" x2="124" y2="360" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="364" text-anchor="end" font-size="12" fill="#555">-6</text>
+  <line x1="116" y1="325" x2="124" y2="325" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="329" text-anchor="end" font-size="12" fill="#555">-5</text>
+  <line x1="116" y1="290" x2="124" y2="290" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="294" text-anchor="end" font-size="12" fill="#555">-4</text>
+  <line x1="116" y1="255" x2="124" y2="255" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="259" text-anchor="end" font-size="12" fill="#555">-3</text>
+  <line x1="116" y1="220" x2="124" y2="220" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="224" text-anchor="end" font-size="12" fill="#555">-2</text>
+  <line x1="116" y1="185" x2="124" y2="185" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="189" text-anchor="end" font-size="12" fill="#555">-1</text>
+  <line x1="116" y1="115" x2="124" y2="115" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="119" text-anchor="end" font-size="12" fill="#555">1</text>
+  <line x1="116" y1="80" x2="124" y2="80" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="84" text-anchor="end" font-size="12" fill="#555">2</text>
+  <line x1="116" y1="45" x2="124" y2="45" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="49" text-anchor="end" font-size="12" fill="#555">3</text>
+
+  <!-- 원점 O -->
+  <text x="108" y="164" text-anchor="end" font-size="12" fill="#555">O</text>
+
+  <!-- 함수 그래프: (0,315)~(420,105) -->
+  <line x1="0" y1="315" x2="420" y2="105" stroke="#e05555" stroke-width="2.2" stroke-linecap="round" />
+
+  <!-- x절편 점 (6,0) → screen(330,150) -->
+  <circle cx="330" cy="150" r="3.5" fill="#e05555" />
+
+  <!-- y절편 점 (0,-3) → screen(120,255) -->
+  <circle cx="120" cy="255" r="3.5" fill="#e05555" />
+</svg>

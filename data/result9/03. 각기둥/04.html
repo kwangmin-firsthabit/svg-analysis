@@ -1,0 +1,99 @@
+<svg width="520" height="420" viewBox="0 0 520 420" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    1cm = 22px
+    9cm=198px, 6cm=132px, 11cm=242px
+
+    직각삼각형 위아래 배치 (위에서 내려다보는 형태)
+    위면 삼각형과 아래면 삼각형이 수직으로 쌓임
+    약간의 투영으로 입체감 표현
+
+    등각투영:
+    오른쪽: (1, 0.25)
+    깊이(앞): (0, 1)
+    위: (0, -1)
+
+    아래면 삼각형 꼭짓점 (아래에 위치):
+    직각: A_bot = (160, 320)
+    9cm 오른쪽: B_bot = (160+198, 320) = (358, 320)
+    6cm 위(투영): C_bot = (160, 320-132) = (160, 188)
+
+    위면: 아래면에서 수직으로 11cm=242px 위
+    수직이동: (0, -242)
+    A_top = (160, 78)
+    B_top = (358, 78)
+    C_top = (160, 78-132) ... 위면도 같은 삼각형 형태
+
+    → 위아래 삼각형이 수직 기둥으로 연결되는 형태
+    투영 적용: 약간 기울여서 입체감
+
+    투영벡터(깊이): (-30, 20) → 위면이 뒤로 살짝 물러남
+    아래면:
+    A_b=(200, 340), B_b=(398, 340), C_b=(200, 208)
+    위면 = 아래면 + (-30, -220):
+    A_t=(170, 120), B_t=(368, 120), C_t=(170, -12) → 위로 벗어남
+
+    재조정: 1cm=18px
+    9cm=162px, 6cm=108px, 11cm=198px
+    투영: 위면은 아래면에서 (0, -198) 이동 + 약간 기울기(-20, 0)
+
+    아래면:
+    A_b=(180, 360), B_b=(342, 360), C_b=(180, 252)
+    위면 = 아래면 + (-20, -198):
+    A_t=(160, 162), B_t=(322, 162), C_t=(160, 54)
+
+    전체범위: x=160~342, y=54~360 → OK
+
+    보이는 면:
+    - 위면 삼각형: A_t, B_t, C_t
+    - 왼쪽 수직면: A_b, C_b, C_t, A_t
+    - 앞쪽 수직면(9cm): A_b, B_b, B_t, A_t
+    - 오른쪽 빗면: B_b, C_b, C_t, B_t
+
+    아랫면 빗변(C_b→B_b)은 점선
+    아랫면 나머지(A_b→B_b, A_b→C_b)는 실선
+
+    직각 표시: A_b(180,360)
+    B방향 단위=(1,0), C방향=(0,-1)
+  -->
+
+  <!-- 옆면 채우기 -->
+  <!-- 앞쪽(9cm): A_b,B_b,B_t,A_t -->
+  <polygon points="180,360 342,360 322,162 160,162" fill="#e8e8e8" stroke="none" />
+  <!-- 왼쪽(6cm): A_b,C_b,C_t,A_t -->
+  <polygon points="180,360 180,252 160,54 160,162" fill="#f0f0f0" stroke="none" />
+  <!-- 오른쪽 빗면: B_b,C_b,C_t,B_t -->
+  <polygon points="342,360 180,252 160,54 322,162" fill="#dcdcdc" stroke="none" />
+  <!-- 위면 삼각형: A_t,B_t,C_t -->
+  <polygon points="160,162 322,162 160,54" fill="#ececec" stroke="none" />
+
+  <!-- 아랫면 보이는 모서리 실선 -->
+  <line x1="180" y1="360" x2="342" y2="360" stroke="#444" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="180" y1="360" x2="180" y2="252" stroke="#444" stroke-width="1.6" stroke-linecap="round" />
+
+  <!-- 아랫면 빗변 점선 -->
+  <line x1="342" y1="360" x2="180" y2="252" stroke="#444" stroke-width="1.4" stroke-dasharray="5 4" />
+
+  <!-- 기둥 옆 모서리 -->
+  <line x1="180" y1="360" x2="160" y2="162" stroke="#444" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="342" y1="360" x2="322" y2="162" stroke="#444" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="180" y1="252" x2="160" y2="54" stroke="#444" stroke-width="1.6" stroke-linecap="round" />
+
+  <!-- 위면 삼각형 모서리 -->
+  <line x1="160" y1="162" x2="322" y2="162" stroke="#444" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="160" y1="162" x2="160" y2="54" stroke="#444" stroke-width="1.6" stroke-linecap="round" />
+  <line x1="322" y1="162" x2="160" y2="54" stroke="#444" stroke-width="1.6" stroke-linecap="round" />
+
+  <!-- 직각 표시 (아래면 A_b) -->
+  <polyline points="192,360 192,348 180,348" fill="none" stroke="#444" stroke-width="1.2" />
+
+  <!-- 직각 표시 (위면 A_t) -->
+  <polyline points="172,162 172,150 160,150" fill="none" stroke="#444" stroke-width="1.2" />
+
+  <!-- 치수 레이블 -->
+  <!-- 9cm: 아래면 수평변 아래 -->
+  <text x="261" y="378" text-anchor="middle" font-size="13" fill="#333">9 cm</text>
+  <!-- 6cm: 아래면 수직변 왼쪽 -->
+  <text x="164" y="312" text-anchor="end" font-size="13" fill="#333">6 cm</text>
+  <!-- 11cm: 기둥 왼쪽 모서리 옆 -->
+  <text x="144" y="268" text-anchor="end" font-size="13" fill="#333">11 cm</text>
+</svg>

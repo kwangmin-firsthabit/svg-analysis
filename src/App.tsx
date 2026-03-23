@@ -1,8 +1,9 @@
 import { useState, useRef, useCallback } from 'react';
 import SvgRenderPanel from './components/SvgRenderPanel';
-import { resultPairsByTab, result7Items, result7SystemPrompt, result8Items, result8SystemPrompt, systemPromptByTabVariant, result6R1DynamicPrompt, result6R2StaticPrompt, type RenderableResultTab, type ResultTab } from './data/catalog';
+import Result9Tab from './components/Result9Tab';
+import { resultPairsByTab, result7Items, result7SystemPrompt, result8Items, result8SystemPrompt, result9Categories, systemPromptByTabVariant, result6R1DynamicPrompt, result6R2StaticPrompt, type RenderableResultTab, type ResultTab } from './data/catalog';
 
-const tabs: ResultTab[] = ['result1', 'result2', 'result3', 'result4', 'result5', 'result6', 'result7', 'result8'];
+const tabs: ResultTab[] = ['result1', 'result2', 'result3', 'result4', 'result5', 'result6', 'result7', 'result8', 'result9'];
 
 // 탭 설명은 여기에서 직접 수정하세요.
 const defaultTabDescriptions: Record<ResultTab, string> = {
@@ -15,6 +16,7 @@ const defaultTabDescriptions: Record<ResultTab, string> = {
   result6: '4가지 방식 전체 비교 — r1/static | r1/dynamic | r2/static(v3) | r2/dynamic(v4) (83개 주제)',
   result7: '모델별 비교 — Opus 4.6 / Sonnet 4.6 / Gemini 3.1 Pro / Gemini 3.1 Flash / GPT 5.4 Thinking / GPT 5.3 Instant (동일 시스템 프롬프트 v4 / 20개 주제)',
   result8: '일관성 테스트 — 동일 프롬프트 3회 반복 생성 비교 (시스템 프롬프트 v5 / 5개 주제)',
+  result9: '프롬프트 반복 개선 추적 — 카테고리별 유저 프롬프트 진화 과정 비교 (10개 카테고리)',
 };
 
 function isRenderableResultTab(tab: ResultTab): tab is RenderableResultTab {
@@ -27,6 +29,10 @@ function isResult7Tab(tab: ResultTab): boolean {
 
 function isResult8Tab(tab: ResultTab): boolean {
   return tab === 'result8';
+}
+
+function isResult9Tab(tab: ResultTab): boolean {
+  return tab === 'result9';
 }
 
 function TabPlaceholder({ tab }: { tab: ResultTab }) {
@@ -53,6 +59,7 @@ export default function App() {
   const isResult6 = activeTab === 'result6';
   const isResult7 = isResult7Tab(activeTab);
   const isResult8 = isResult8Tab(activeTab);
+  const isResult9 = isResult9Tab(activeTab);
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
@@ -77,7 +84,7 @@ export default function App() {
       </header>
 
       {/* 탭 설명 헤더 */}
-      <div className={(isResult7 || isResult6 || isResult8) ? 'px-4 pt-6' : 'mx-auto w-full max-w-[1600px] px-4 pt-6'}>
+      <div className={(isResult7 || isResult6 || isResult8 || isResult9) ? 'px-4 pt-6' : 'mx-auto w-full max-w-[1600px] px-4 pt-6'}>
         <header className="mb-4 rounded-xl border border-slate-300 bg-white px-4 py-3 shadow-sm">
           <h1 className="text-lg font-semibold">{activeTab}</h1>
           <p className="mt-2 text-sm text-slate-600">{defaultTabDescriptions[activeTab]}</p>
@@ -92,6 +99,10 @@ export default function App() {
           ) : isResult8 ? (
             <p className="mt-2 text-sm text-slate-600">
               주제 {result8Items.length}개 / 반복 3회 / 렌더 패널 {result8Items.length * 3}개
+            </p>
+          ) : isResult9 ? (
+            <p className="mt-2 text-sm text-slate-600">
+              카테고리 {result9Categories.length}개 / 총 항목 {result9Categories.reduce((acc, c) => acc + c.items.length, 0)}개
             </p>
           ) : (
             <p className="mt-2 text-sm text-slate-600">준비중 탭입니다.</p>
@@ -283,6 +294,8 @@ export default function App() {
             </div>
           </div>
         </main>
+      ) : isResult9 ? (
+        <Result9Tab categories={result9Categories} />
       ) : (
         <main className="mx-auto w-full max-w-[1600px] px-4 pb-6">
           <TabPlaceholder tab={activeTab} />

@@ -1,0 +1,69 @@
+<svg width="500" height="440" viewBox="0 0 500 440" xmlns="http://www.w3.org/2000/svg">
+  <!-- 삼각형 세 변 -->
+  <line x1="250" y1="40" x2="70" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+  <line x1="250" y1="40" x2="430" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+  <line x1="70" y1="340" x2="430" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="250" y="22" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">A</text>
+  <text x="46" y="345" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">B</text>
+  <text x="454" y="345" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">C</text>
+
+  <!--
+    AB: A(250,40) ~ B(70,340), 호는 두 꼭짓점을 그대로 잇되 바깥쪽으로 볼록
+    방향벡터: (-180,300), 길이=360
+    단위벡터: (-0.5, 0.833)
+    법선(바깥 왼쪽): (-0.833, -0.5)
+    호: A(250,40)에서 B(70,340)으로, 바깥(왼쪽)으로 볼록
+    r=800, sweep=0
+    sagitta = 800 - sqrt(800²-180²) = 800 - sqrt(640000-32400) ≈ 800-779.5 = 20.5
+    호 중앙점: AB 중점 + 법선*20.5
+      mid = (160, 190)
+      arc_mid = (160+(-0.833)*20.5, 190+(-0.5)*20.5) = (143, 179.8)
+    숫자: arc_mid + 법선*15 = (143+(-0.833)*15, 179.8+(-0.5)*15) = (130.5, 172.3)
+  -->
+  <path
+    d="M 250,40 A 800,800 0 0,0 70,340"
+    fill="none"
+    stroke="#888"
+    stroke-width="1.2"
+    stroke-dasharray="3 4"
+    stroke-linecap="round"
+  />
+  <text x="118" y="172" text-anchor="middle" font-size="13" fill="#444">5 cm</text>
+
+  <!--
+    AC: A(250,40) ~ C(430,340), 오른쪽으로 볼록
+    법선(바깥 오른쪽): (0.833, -0.5)
+    r=800, sweep=1
+    arc_mid = (340+0.833*20.5, 190+(-0.5)*20.5) = (357.1, 179.8)
+    숫자: (357.1+0.833*15, 179.8+(-0.5)*15) = (369.6, 172.3)
+  -->
+  <path
+    d="M 250,40 A 800,800 0 0,1 430,340"
+    fill="none"
+    stroke="#888"
+    stroke-width="1.2"
+    stroke-dasharray="3 4"
+    stroke-linecap="round"
+  />
+  <text x="382" y="172" text-anchor="middle" font-size="13" fill="#444">5 cm</text>
+
+  <!--
+    BC: B(70,340) ~ C(430,340), 아래로 볼록
+    법선(아래): (0,1)
+    r=800, sweep=1
+    d=360, sagitta≈20.5
+    arc_mid = (250, 340+20.5) = (250, 360.5)
+    숫자: (250, 360.5+15) = (250, 375.5)
+  -->
+  <path
+    d="M 70,340 A 800,800 0 0,1 430,340"
+    fill="none"
+    stroke="#888"
+    stroke-width="1.2"
+    stroke-dasharray="3 4"
+    stroke-linecap="round"
+  />
+  <text x="250" y="390" text-anchor="middle" font-size="13" fill="#444">6 cm</text>
+</svg>

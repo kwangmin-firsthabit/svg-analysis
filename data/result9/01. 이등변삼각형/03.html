@@ -1,0 +1,66 @@
+<svg width="500" height="380" viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg">
+  <!-- 삼각형 세 변 -->
+  <line x1="250" y1="40" x2="70" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+  <line x1="250" y1="40" x2="430" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+  <line x1="70" y1="340" x2="430" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="250" y="22" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">A</text>
+  <text x="46" y="345" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">B</text>
+  <text x="454" y="345" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">C</text>
+
+  <!--
+    AB 중점: (160, 190), 방향벡터: (-180, 300) → 길이=360 → 단위: (-0.5, 0.833)
+    법선(바깥쪽, 왼쪽): (-0.833, -0.5)
+    간격 18px 띄운 점곡선 시작/끝: 변의 양 끝에서 각각 15px 안쪽
+    시작: (250,40) + 15*(−0.5, 0.833) + 18*(−0.833,−0.5) = (250−7.5−15, 40+12.5−9) = (227.5, 43.5)
+    끝:   (70,340) + 15*(0.5,−0.833) + 18*(−0.833,−0.5) = (70+7.5−15, 340−12.5−9) = (62.5, 318.5)
+    중점 레이블: (160,190) + 28*(−0.833,−0.5) = (136.7, 176)
+  -->
+  <line
+    x1="227.5"
+    y1="43.5"
+    x2="62.5"
+    y2="318.5"
+    stroke="#888"
+    stroke-width="1"
+    stroke-dasharray="2 4"
+    stroke-linecap="round"
+  />
+  <text x="125" y="178" text-anchor="middle" font-size="13" fill="#444">5 cm</text>
+
+  <!--
+    AC 중점: (340, 190), 방향벡터: (180, 300) → 단위: (0.5, 0.833)
+    법선(바깥쪽, 오른쪽): (0.833, −0.5)
+    시작: (250,40) + 15*(0.5,0.833) + 18*(0.833,−0.5) = (250+7.5+15, 40+12.5−9) = (272.5, 43.5)
+    끝:   (430,340) + 15*(−0.5,−0.833) + 18*(0.833,−0.5) = (430−7.5+15, 340−12.5−9) = (437.5, 318.5)
+    중점 레이블: (340,190) + 28*(0.833,−0.5) = (363.3, 176)
+  -->
+  <line
+    x1="272.5"
+    y1="43.5"
+    x2="437.5"
+    y2="318.5"
+    stroke="#888"
+    stroke-width="1"
+    stroke-dasharray="2 4"
+    stroke-linecap="round"
+  />
+  <text x="375" y="178" text-anchor="middle" font-size="13" fill="#444">5 cm</text>
+
+  <!--
+    BC: y=340, 간격 22px 아래
+    시작: x=70+15=85, 끝: x=430−15=415, y=340+22=362
+  -->
+  <line
+    x1="85"
+    y1="362"
+    x2="415"
+    y2="362"
+    stroke="#888"
+    stroke-width="1"
+    stroke-dasharray="2 4"
+    stroke-linecap="round"
+  />
+  <text x="250" y="376" text-anchor="middle" font-size="13" fill="#444">6 cm</text>
+</svg>

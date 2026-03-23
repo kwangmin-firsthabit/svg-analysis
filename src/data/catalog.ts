@@ -3,13 +3,26 @@ import result2DynamicSystemPrompt from '../../docs/prompts/system/math-visualiza
 import result2StaticSystemPrompt from '../../docs/prompts/system/math-visualization-system-prompt-v3.md?raw';
 import result8SystemPromptRaw from '../../docs/prompts/system/math-visualization-system-prompt-v5.md?raw';
 import staticSystemPrompt from '../../docs/prompts/system/prompt.static.md?raw';
+import result9UserPromptsRaw from '../../docs/prompts/user/prompt.user1.md?raw';
 import userPromptsRaw from './user-prompts.json?raw';
 import result3UserPromptsRaw from './user-prompts-result3.json?raw';
 import changeDescriptionsRaw from './change-descriptions-result5.json?raw';
 
 export type Variant = 'static' | 'dynamic' | 'original' | 'modified' | 'v1' | 'v3' | 'v4' | 'before' | 'after';
-export type ResultTab = 'result1' | 'result2' | 'result3' | 'result4' | 'result5' | 'result6' | 'result7' | 'result8';
+export type ResultTab = 'result1' | 'result2' | 'result3' | 'result4' | 'result5' | 'result6' | 'result7' | 'result8' | 'result9';
 export type RenderableResultTab = 'result1' | 'result2' | 'result3' | 'result4' | 'result5' | 'result6';
+
+export interface Result9CategoryItem {
+  index: number;
+  html: string;
+  userPrompt: string;
+  prevUserPrompt: string | undefined;
+}
+
+export interface Result9Category {
+  dirName: string;
+  items: Result9CategoryItem[];
+}
 
 export interface Result7ModelItem {
   name: string;
@@ -315,3 +328,69 @@ export const resultPairsByTab: Record<RenderableResultTab, PairItem[]> = {
   result5: buildResult5Pairs(),
   result6: buildResult6Pairs(),
 };
+
+// ─── result9 ────────────────────────────────────────────────────────────────
+
+const result9Modules = import.meta.glob('../../data/result9/*/*.html', {
+  eager: true,
+  import: 'default',
+  query: '?raw',
+}) as Record<string, string>;
+
+function parseResult9Prompts(raw: string): string[][] {
+  return raw
+    .split(/^---$/m)
+    .map(section =>
+      section
+        .split('\n')
+        .flatMap(line => {
+          const m = line.match(/^\d+\.\s+(.+)$/);
+          return m && m[1] ? [m[1].trim()] : [];
+        })
+    )
+    .filter(prompts => prompts.length > 0);
+}
+
+function buildResult9Categories(): Result9Category[] {
+  const promptsByCategoryIndex = parseResult9Prompts(result9UserPromptsRaw);
+
+  const categoryMap: Record<string, Record<string, string>> = {};
+  for (const [path, html] of Object.entries(result9Modules)) {
+    const segments = path.split('/');
+    const fileName = segments[segments.length - 1] ?? '';
+    const dirName = segments[segments.length - 2] ?? '';
+    if (!categoryMap[dirName]) categoryMap[dirName] = {};
+    categoryMap[dirName][fileName] = html;
+  }
+
+  const sortedDirs = Object.keys(categoryMap).sort(sortByKoreanNumericOrder);
+
+  return sortedDirs.map((dirName, categoryIdx) => {
+    const fileMap = categoryMap[dirName]!;
+    const categoryPrompts = promptsByCategoryIndex[categoryIdx] ?? [];
+
+    const sortedFiles = Object.keys(fileMap).sort((a, b) => {
+      const numA = parseInt(a.replace('.html', ''), 10);
+      const numB = parseInt(b.replace('.html', ''), 10);
+      return numA - numB;
+    });
+
+    const items: Result9CategoryItem[] = [];
+    for (const fileName of sortedFiles) {
+      const html = fileMap[fileName] ?? '';
+      if (html.trim().length === 0) continue;
+
+      const fileIndex = parseInt(fileName.replace('.html', ''), 10);
+      items.push({
+        index: fileIndex,
+        html,
+        userPrompt: categoryPrompts[fileIndex - 1] ?? '',
+        prevUserPrompt: fileIndex >= 2 ? (categoryPrompts[fileIndex - 2] ?? undefined) : undefined,
+      });
+    }
+
+    return { dirName, items };
+  });
+}
+
+export const result9Categories: Result9Category[] = buildResult9Categories();

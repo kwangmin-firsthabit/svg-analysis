@@ -1,0 +1,47 @@
+<svg width="200" height="180" viewBox="0 0 200 180" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    서양식 세로 나눗셈:
+
+         8
+      ------
+    5 ) 42
+        40
+      ------
+         2
+
+    좌표 설계:
+    나누는 수(5) x=52, y=90
+    피제수(42) x=110, y=90
+    ㄱ자 괄호:
+      수직선: x=60, y=30~95
+      수평선: x=60~125, y=30
+    몫(8): x=110, y=55
+
+    중간(40): x=110, y=125
+    가로선: x=65~125, y=135
+    나머지(2): x=110, y=162
+  -->
+
+  <!-- 몫 (8) -->
+  <text x="112" y="55" text-anchor="end" font-size="30" font-family="serif" fill="#333">8</text>
+
+  <!-- ㄱ자 괄호 수직선 -->
+  <line x1="60" y1="28" x2="60" y2="95" stroke="#333" stroke-width="2" />
+  <!-- ㄱ자 괄호 수평선 -->
+  <line x1="60" y1="28" x2="130" y2="28" stroke="#333" stroke-width="2" />
+
+  <!-- 나누는 수 (5) -->
+  <text x="54" y="90" text-anchor="end" font-size="30" font-family="serif" fill="#333">5</text>
+
+  <!-- 피제수 (42) -->
+  <text x="120" y="90" text-anchor="end" font-size="30" font-family="serif" fill="#333">42</text>
+
+  <!-- 중간 계산 (40) -->
+  <text x="120" y="128" text-anchor="end" font-size="30" font-family="serif" fill="#333">40</text>
+
+  <!-- 가로선 -->
+  <line x1="65" y1="138" x2="125" y2="138" stroke="#333" stroke-width="1.8" />
+
+  <!-- 나머지 (2) -->
+  <text x="120" y="166" text-anchor="end" font-size="30" font-family="serif" fill="#333">2</text>
+</svg>

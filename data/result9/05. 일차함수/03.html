@@ -1,0 +1,108 @@
+<svg width="420" height="420" viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    y = (1/2)x - 3
+    함수가 화면 중앙(210,210)을 지나도록 원점 설정
+    scale = 35px/단위
+
+    screen_y = oy - y*scale
+    screen_x = ox + x*scale
+
+    화면 중앙(210,210)이 함수 위:
+    210 = oy + 0.5*ox (앞서 계산)
+    ox=120, oy=150
+
+    원점=(120,150), scale=35
+
+    화면 끝 직선:
+    screen_x=0: x=（0-120)/35=-3.43, y=0.5*(-3.43)-3=-4.71
+      screen_y=150-(-4.71)*35=315 → (0,315)
+    screen_x=420: x=300/35=8.57, y=0.5*8.57-3=1.286
+      screen_y=150-1.286*35=105 → (420,105)
+
+    x축(y=0): screen_y=150
+    y축(x=0): screen_x=120
+
+    눈금 범위 (2의 배수):
+    x: screen_x = 120+x*35
+      x=-4: 120-140=-20 → 화면밖
+      x=-2: 120-70=50 ✓
+      x=0: 120
+      x=2: 190
+      x=4: 260
+      x=6: 330
+      x=8: 400 ✓
+
+    y: screen_y = 150-y*35
+      y=4: 150-140=10 ✓
+      y=2: 150-70=80 ✓
+      y=0: 150 (x축)
+      y=-2: 150+70=220 ✓
+      y=-4: 150+140=290 ✓
+      y=-6: 150+210=360 ✓
+      y=-8: 150+280=430 → 화면밖
+
+    격자: x=-2,0,2,4,6,8 / y=4,2,0,-2,-4,-6
+  -->
+
+  <!-- 격자 수직선 -->
+  <line x1="50" y1="10" x2="50" y2="410" stroke="#efefef" stroke-width="0.8" />
+  <line x1="120" y1="10" x2="120" y2="410" stroke="#efefef" stroke-width="0.8" />
+  <line x1="190" y1="10" x2="190" y2="410" stroke="#efefef" stroke-width="0.8" />
+  <line x1="260" y1="10" x2="260" y2="410" stroke="#efefef" stroke-width="0.8" />
+  <line x1="330" y1="10" x2="330" y2="410" stroke="#efefef" stroke-width="0.8" />
+  <line x1="400" y1="10" x2="400" y2="410" stroke="#efefef" stroke-width="0.8" />
+
+  <!-- 격자 수평선 -->
+  <line x1="10" y1="10" x2="410" y2="10" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="80" x2="410" y2="80" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="150" x2="410" y2="150" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="220" x2="410" y2="220" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="290" x2="410" y2="290" stroke="#efefef" stroke-width="0.8" />
+  <line x1="10" y1="360" x2="410" y2="360" stroke="#efefef" stroke-width="0.8" />
+
+  <!-- x축 -->
+  <line x1="10" y1="150" x2="412" y2="150" stroke="#333" stroke-width="1.5" />
+  <polygon points="412,150 404,146 404,154" fill="#333" />
+  <text x="415" y="154" font-size="14" fill="#333">x</text>
+
+  <!-- y축 -->
+  <line x1="120" y1="410" x2="120" y2="8" stroke="#333" stroke-width="1.5" />
+  <polygon points="120,8 116,16 124,16" fill="#333" />
+  <text x="124" y="14" font-size="14" fill="#333">y</text>
+
+  <!-- x축 눈금 (2의 배수) -->
+  <line x1="50" y1="146" x2="50" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="50" y="166" text-anchor="middle" font-size="13" fill="#555">-2</text>
+  <line x1="190" y1="146" x2="190" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="190" y="166" text-anchor="middle" font-size="13" fill="#555">2</text>
+  <line x1="260" y1="146" x2="260" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="260" y="166" text-anchor="middle" font-size="13" fill="#555">4</text>
+  <line x1="330" y1="146" x2="330" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="330" y="166" text-anchor="middle" font-size="13" fill="#555">6</text>
+  <line x1="400" y1="146" x2="400" y2="154" stroke="#333" stroke-width="1.2" />
+  <text x="400" y="166" text-anchor="middle" font-size="13" fill="#555">8</text>
+
+  <!-- y축 눈금 (2의 배수) -->
+  <line x1="116" y1="10" x2="124" y2="10" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="14" text-anchor="end" font-size="13" fill="#555">4</text>
+  <line x1="116" y1="80" x2="124" y2="80" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="84" text-anchor="end" font-size="13" fill="#555">2</text>
+  <line x1="116" y1="220" x2="124" y2="220" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="224" text-anchor="end" font-size="13" fill="#555">-2</text>
+  <line x1="116" y1="290" x2="124" y2="290" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="294" text-anchor="end" font-size="13" fill="#555">-4</text>
+  <line x1="116" y1="360" x2="124" y2="360" stroke="#333" stroke-width="1.2" />
+  <text x="108" y="364" text-anchor="end" font-size="13" fill="#555">-6</text>
+
+  <!-- 원점 O -->
+  <text x="108" y="164" text-anchor="end" font-size="13" fill="#555">O</text>
+
+  <!-- 함수 그래프: (0,315)~(420,105) -->
+  <line x1="0" y1="315" x2="420" y2="105" stroke="#e05555" stroke-width="2.2" stroke-linecap="round" />
+
+  <!-- x절편 점 (6,0) → screen(330,150) -->
+  <circle cx="330" cy="150" r="3.5" fill="#e05555" />
+
+  <!-- y절편 점 (0,-3) → screen(120,255) -->
+  <circle cx="120" cy="255" r="3.5" fill="#e05555" />
+</svg>

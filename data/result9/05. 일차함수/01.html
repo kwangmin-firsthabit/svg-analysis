@@ -1,0 +1,186 @@
+<svg width="420" height="420" viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    좌표계 중심 = (210, 210)
+    1단위 = 40px
+
+    x축: y=210, x=20~400
+    y축: x=210, y=20~400
+
+    눈금 범위: x=-4~4, y=-4~4 (40px 간격)
+
+    y = (1/2)x - 3
+    x절편: 0 = (1/2)x-3 → x=6 → 화면: (210+6*40, 210) = (450, 210) → 범위 밖
+    범위 조정: 1단위=35px, 범위 x=-5~7, y=-5~5
+
+    중심 = (210, 210), 1단위=35px
+
+    x절편: x=6 → (210+6*35, 210) = (210+210, 210) = (420, 210) → 경계
+    y절편: y=-3 → (210, 210+3*35) = (210, 315)
+
+    표시 범위: x=-5~6, y=-5~4
+    그래프 두 끝점:
+    x=-2: y=(1/2)*(-2)-3=-4 → (-2,-4) → (210-70, 210+140)=(140,350)
+    x=6:  y=(1/2)*6-3=0   → (6,0)   → (210+210, 210)=(420,210) → 경계
+
+    중심을 왼쪽으로 이동: (180, 210)
+    1단위=35px
+
+    x절편: x=6 → (180+210, 210)=(390,210) ✓
+    y절편: y=-3 → (180, 210+105)=(180,315)
+
+    그래프 끝점:
+    x=-2: y=-4 → (180-70, 210+140)=(110,350)
+    x=7:  y=0.5 → (180+245, 210-17.5)=(425,192.5) → 약간 밖
+
+    x=-1: y=-3.5 → (180-35, 210+122.5)=(145,332.5)
+    x=6:  y=0    → (390,210) = x절편
+
+    화면 범위에 맞게: x=-3~7
+    x=-3: y=-4.5 → (180-105, 210+157.5)=(75,367.5)
+    x=7:  y=0.5  → (180+245, 210-17.5)=(425,192.5)
+
+    viewBox 조정: x=-10~430, 사용 420px
+    중심=(190,210), 1단위=33px
+
+    x절편: x=6 → (190+198,210)=(388,210) ✓
+    y절편: y=-3 → (190,210+99)=(190,309)
+
+    그래프:
+    x=-4: y=-5 → (190-132,210+165)=(58,375)
+    x=7:  y=0.5 → (190+231,210-16.5)=(421,193.5) → 범위밖
+
+    x=6.5: y=0.25 → (190+214.5,210-8.25)=(404.5,201.75)
+
+    최종:
+    중심=(190,210), 1단위=33px
+    x범위: -4~6.5 (눈금은 -4~6)
+    y범위: -5~4
+
+    축 끝점:
+    x축: (190-4*33, 210)=(58,210) ~ (190+7*33,210)=(421,210) → (58,210)~(410,210)
+    y축: (190, 210-5*33)=(190,45) ~ (190,210+5*33)=(190,375)
+
+    그래프 끝점:
+    x=-4: y=-5 → (58, 375)
+    x=6:  y=0  → (388, 210) = x절편
+
+    눈금 표시: x=-4~6(정수), y=-4~4(정수)
+    원점 제외
+  -->
+
+  <!-- 격자 (옅은 선) -->
+  <!-- 수직 격자 -->
+  <line x1="58" y1="45" x2="58" y2="375" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="91" y1="45" x2="91" y2="375" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="124" y1="45" x2="124" y2="375" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="157" y1="45" x2="157" y2="375" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="223" y1="45" x2="223" y2="375" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="256" y1="45" x2="256" y2="375" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="289" y1="45" x2="289" y2="375" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="322" y1="45" x2="322" y2="375" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="355" y1="45" x2="355" y2="375" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="388" y1="45" x2="388" y2="375" stroke="#e8e8e8" stroke-width="0.8" />
+  <!-- 수평 격자 -->
+  <line x1="58" y1="45" x2="410" y2="45" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="58" y1="78" x2="410" y2="78" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="58" y1="111" x2="410" y2="111" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="58" y1="144" x2="410" y2="144" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="58" y1="177" x2="410" y2="177" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="58" y1="243" x2="410" y2="243" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="58" y1="276" x2="410" y2="276" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="58" y1="309" x2="410" y2="309" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="58" y1="342" x2="410" y2="342" stroke="#e8e8e8" stroke-width="0.8" />
+  <line x1="58" y1="375" x2="410" y2="375" stroke="#e8e8e8" stroke-width="0.8" />
+
+  <!-- x축 -->
+  <line x1="50" y1="210" x2="415" y2="210" stroke="#333" stroke-width="1.5" />
+  <!-- x축 화살표 -->
+  <polygon points="415,210 407,206 407,214" fill="#333" />
+  <!-- x축 레이블 -->
+  <text x="418" y="214" font-size="14" fill="#333">x</text>
+
+  <!-- y축 -->
+  <line x1="190" y1="390" x2="190" y2="38" stroke="#333" stroke-width="1.5" />
+  <!-- y축 화살표 -->
+  <polygon points="190,38 186,46 194,46" fill="#333" />
+  <!-- y축 레이블 -->
+  <text x="194" y="34" font-size="14" fill="#333">y</text>
+
+  <!-- x축 눈금 및 레이블 -->
+  <!-- x=-4 -->
+  <line x1="58" y1="206" x2="58" y2="214" stroke="#333" stroke-width="1.2" />
+  <text x="58" y="226" text-anchor="middle" font-size="12" fill="#555">-4</text>
+  <!-- x=-3 -->
+  <line x1="91" y1="206" x2="91" y2="214" stroke="#333" stroke-width="1.2" />
+  <text x="91" y="226" text-anchor="middle" font-size="12" fill="#555">-3</text>
+  <!-- x=-2 -->
+  <line x1="124" y1="206" x2="124" y2="214" stroke="#333" stroke-width="1.2" />
+  <text x="124" y="226" text-anchor="middle" font-size="12" fill="#555">-2</text>
+  <!-- x=-1 -->
+  <line x1="157" y1="206" x2="157" y2="214" stroke="#333" stroke-width="1.2" />
+  <text x="157" y="226" text-anchor="middle" font-size="12" fill="#555">-1</text>
+  <!-- x=1 -->
+  <line x1="223" y1="206" x2="223" y2="214" stroke="#333" stroke-width="1.2" />
+  <text x="223" y="226" text-anchor="middle" font-size="12" fill="#555">1</text>
+  <!-- x=2 -->
+  <line x1="256" y1="206" x2="256" y2="214" stroke="#333" stroke-width="1.2" />
+  <text x="256" y="226" text-anchor="middle" font-size="12" fill="#555">2</text>
+  <!-- x=3 -->
+  <line x1="289" y1="206" x2="289" y2="214" stroke="#333" stroke-width="1.2" />
+  <text x="289" y="226" text-anchor="middle" font-size="12" fill="#555">3</text>
+  <!-- x=4 -->
+  <line x1="322" y1="206" x2="322" y2="214" stroke="#333" stroke-width="1.2" />
+  <text x="322" y="226" text-anchor="middle" font-size="12" fill="#555">4</text>
+  <!-- x=5 -->
+  <line x1="355" y1="206" x2="355" y2="214" stroke="#333" stroke-width="1.2" />
+  <text x="355" y="226" text-anchor="middle" font-size="12" fill="#555">5</text>
+  <!-- x=6 -->
+  <line x1="388" y1="206" x2="388" y2="214" stroke="#333" stroke-width="1.2" />
+  <text x="388" y="226" text-anchor="middle" font-size="12" fill="#555">6</text>
+
+  <!-- y축 눈금 및 레이블 -->
+  <!-- y=4 -->
+  <line x1="186" y1="78" x2="194" y2="78" stroke="#333" stroke-width="1.2" />
+  <text x="178" y="82" text-anchor="end" font-size="12" fill="#555">4</text>
+  <!-- y=3 -->
+  <line x1="186" y1="111" x2="194" y2="111" stroke="#333" stroke-width="1.2" />
+  <text x="178" y="115" text-anchor="end" font-size="12" fill="#555">3</text>
+  <!-- y=2 -->
+  <line x1="186" y1="144" x2="194" y2="144" stroke="#333" stroke-width="1.2" />
+  <text x="178" y="148" text-anchor="end" font-size="12" fill="#555">2</text>
+  <!-- y=1 -->
+  <line x1="186" y1="177" x2="194" y2="177" stroke="#333" stroke-width="1.2" />
+  <text x="178" y="181" text-anchor="end" font-size="12" fill="#555">1</text>
+  <!-- y=-1 -->
+  <line x1="186" y1="243" x2="194" y2="243" stroke="#333" stroke-width="1.2" />
+  <text x="178" y="247" text-anchor="end" font-size="12" fill="#555">-1</text>
+  <!-- y=-2 -->
+  <line x1="186" y1="276" x2="194" y2="276" stroke="#333" stroke-width="1.2" />
+  <text x="178" y="280" text-anchor="end" font-size="12" fill="#555">-2</text>
+  <!-- y=-3 -->
+  <line x1="186" y1="309" x2="194" y2="309" stroke="#333" stroke-width="1.2" />
+  <text x="178" y="313" text-anchor="end" font-size="12" fill="#555">-3</text>
+  <!-- y=-4 -->
+  <line x1="186" y1="342" x2="194" y2="342" stroke="#333" stroke-width="1.2" />
+  <text x="178" y="346" text-anchor="end" font-size="12" fill="#555">-4</text>
+
+  <!-- 원점 O -->
+  <text x="176" y="226" text-anchor="end" font-size="12" fill="#555">O</text>
+
+  <!--
+    그래프 직선:
+    x=-4: y=-5 → (58, 375)
+    x=6:  y=0  → (388, 210)
+    x절편 (6,0): (388,210)
+    y절편 (0,-3): (190,309)
+  -->
+
+  <!-- 그래프 직선 -->
+  <line x1="58" y1="375" x2="388" y2="210" stroke="#e05555" stroke-width="2.2" stroke-linecap="round" />
+
+  <!-- x절편 점 (6,0) -->
+  <circle cx="388" cy="210" r="3.5" fill="#e05555" />
+
+  <!-- y절편 점 (0,-3) -->
+  <circle cx="190" cy="309" r="3.5" fill="#e05555" />
+</svg>

@@ -1,0 +1,83 @@
+<svg width="500" height="420" viewBox="0 0 500 420" xmlns="http://www.w3.org/2000/svg">
+  <!-- 삼각형 세 변 -->
+  <line x1="250" y1="40" x2="70" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+  <line x1="250" y1="40" x2="430" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+  <line x1="70" y1="340" x2="430" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="250" y="22" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">A</text>
+  <text x="46" y="345" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">B</text>
+  <text x="454" y="345" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">C</text>
+
+  <!--
+    AB 길이 = 360px (5cm 기준)
+    B(70,340)를 중심으로 반지름 360px 호: A(250,40) 방향 호
+    호의 각도 범위: A 방향 각도 = atan2(40-340, 250-70) = atan2(-300,180) ≈ -59°
+    호를 변 바깥쪽으로 약간 표시: B 기준 반지름 40px 짧은 호
+    실제로는 변 길이를 나타내는 호이므로,
+    꼭짓점 B에서 BA 방향, 꼭짓점 C에서 CA 방향으로 호를 그림
+
+    B(70,340) 중심, r=55
+    BA 방향: atan2(40-340, 250-70) = atan2(-300,180) ≈ -59.0° → -59°
+    BC 방향: 0° (오른쪽)
+    호: BC방향(0°)에서 BA방향(-59°)으로, 바깥쪽
+    start: (70+55, 340) = (125, 340)
+    end:   (70+55*cos(-59°), 340+55*sin(-59°)) = (70+28.3, 340-47.1) = (98.3, 292.9)
+    → sweep-flag=0 (반시계)
+  -->
+  <path
+    d="M 125,340 A 55,55 0 0,0 98.3,292.9"
+    fill="none"
+    stroke="#666"
+    stroke-width="1.2"
+    stroke-dasharray="3 4"
+    stroke-linecap="round"
+  />
+  <text x="90" y="380" text-anchor="middle" font-size="13" fill="#444">5</text>
+
+  <!--
+    C(430,340) 중심, r=55
+    CA 방향: atan2(40-340, 250-430) = atan2(-300,-180) ≈ -120.96° → -121°
+    CB 방향: 180°
+    호: CA방향(-121°)에서 CB방향(180°)으로
+    start: (430+55*cos(-121°), 340+55*sin(-121°)) = (430-28.3, 340-47.1) = (401.7, 292.9)
+    end:   (430+55*cos(180°), 340) = (375, 340)
+    → sweep-flag=0 (반시계)
+  -->
+  <path
+    d="M 401.7,292.9 A 55,55 0 0,0 375,340"
+    fill="none"
+    stroke="#666"
+    stroke-width="1.2"
+    stroke-dasharray="3 4"
+    stroke-linecap="round"
+  />
+  <text x="410" y="380" text-anchor="middle" font-size="13" fill="#444">5</text>
+
+  <!--
+    밑변 BC = 360px (6cm 기준)
+    B(70,340) 중심, r=55: BC 방향(0°) 아래로 호
+    C(430,340) 중심, r=55: CB 방향(180°) 아래로 호
+    두 호를 아래쪽으로 그려 BC 길이 표시
+
+    B 기준 아래쪽 호: -30°에서 30°
+    start: (70+55*cos(-30°), 340+55*sin(-30°)) = (117.6, 312.5)
+    end:   (70+55*cos(30°),  340+55*sin(30°))  = (117.6, 367.5)
+
+    C 기준 아래쪽 호: 150°에서 210°
+    start: (430+55*cos(150°), 340+55*sin(150°)) = (382.4, 367.5) ... 
+    
+    → 대신 BC 전체를 하나의 호로: 중점(250,340) 기준 반지름 180px 반원 아래로
+    start: B(70,340), end: C(430,340)
+    r=180, 아래로 볼록한 호 (sweep=1)
+  -->
+  <path
+    d="M 70,340 A 180,180 0 0,1 430,340"
+    fill="none"
+    stroke="#666"
+    stroke-width="1.2"
+    stroke-dasharray="3 4"
+    stroke-linecap="round"
+  />
+  <text x="250" y="408" text-anchor="middle" font-size="13" fill="#444">6</text>
+</svg>

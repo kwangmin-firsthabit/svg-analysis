@@ -1,0 +1,47 @@
+<svg width="180" height="190" viewBox="0 0 180 190" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Long division: 42 ÷ 5 = 8 나머지 2
+
+         8
+       -----
+    5 ) 42
+        40
+       -----
+         2
+
+    좌표:
+    오른쪽 정렬 기준 x=140
+    나누는 수(5): x=44, y=90
+    수직선: x=55, y=55~95
+    수평선(몫 아래): x=55~145, y=60
+    몫(8): x=140, y=55
+    피제수(42): x=140, y=90
+    중간값(40): x=140, y=128
+    가로선: x=65~145, y=138
+    나머지(2): x=140, y=168
+  -->
+
+  <!-- 몫 (8) -->
+  <text x="140" y="55" text-anchor="end" font-size="30" font-family="serif" fill="#333">8</text>
+
+  <!-- 몫-피제수 분리 수평선 -->
+  <line x1="55" y1="62" x2="148" y2="62" stroke="#333" stroke-width="1.8" />
+
+  <!-- 수직선 (왼쪽 구분선) -->
+  <line x1="55" y1="62" x2="55" y2="98" stroke="#333" stroke-width="1.8" />
+
+  <!-- 나누는 수 (5) -->
+  <text x="48" y="92" text-anchor="end" font-size="30" font-family="serif" fill="#333">5</text>
+
+  <!-- 피제수 (42) -->
+  <text x="140" y="92" text-anchor="end" font-size="30" font-family="serif" fill="#333">42</text>
+
+  <!-- 중간 계산 (40) -->
+  <text x="140" y="130" text-anchor="end" font-size="30" font-family="serif" fill="#333">40</text>
+
+  <!-- 가로선 -->
+  <line x1="65" y1="140" x2="148" y2="140" stroke="#333" stroke-width="1.8" />
+
+  <!-- 나머지 (2) -->
+  <text x="140" y="170" text-anchor="end" font-size="30" font-family="serif" fill="#333">2</text>
+</svg>

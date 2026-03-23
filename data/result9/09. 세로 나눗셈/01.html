@@ -1,0 +1,48 @@
+<svg width="220" height="200" viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    세로 나눗셈: 42 ÷ 5 = 8 ... 2
+    
+    형식:
+        8
+      -----
+    5 ) 42
+       40
+      -----
+        2
+
+    위치 설정:
+    나누는 수(5): x=40, y=80
+    닫힘 기호: x=55~120
+    피제수(42): x=80~110, y=80
+    몫(8): x=105, y=50
+    빼는 수(40): x=80~110, y=115
+    나머지(2): x=105, y=155
+  -->
+
+  <!-- 몫 -->
+  <text x="105" y="52" text-anchor="end" font-size="28" font-family="serif" fill="#333">8</text>
+
+  <!-- 나눗셈 기호 (ㄱ자 모양) -->
+  <!-- 수직선 -->
+  <line x1="52" y1="30" x2="52" y2="90" stroke="#333" stroke-width="2" />
+  <!-- 수평선 (피제수 위) -->
+  <line x1="52" y1="30" x2="130" y2="30" stroke="#333" stroke-width="2" />
+
+  <!-- 나누는 수 -->
+  <text x="44" y="82" text-anchor="end" font-size="28" font-family="serif" fill="#333">5</text>
+
+  <!-- 피제수 -->
+  <text x="120" y="82" text-anchor="end" font-size="28" font-family="serif" fill="#333">42</text>
+
+  <!-- 몫×제수 = 40 -->
+  <text x="120" y="122" text-anchor="end" font-size="28" font-family="serif" fill="#333">40</text>
+
+  <!-- 빼기 기호 -->
+  <text x="58" y="122" text-anchor="start" font-size="28" font-family="serif" fill="#333">−</text>
+
+  <!-- 가로선 -->
+  <line x1="62" y1="132" x2="130" y2="132" stroke="#333" stroke-width="1.8" />
+
+  <!-- 나머지 -->
+  <text x="120" y="168" text-anchor="end" font-size="28" font-family="serif" fill="#333">2</text>
+</svg>

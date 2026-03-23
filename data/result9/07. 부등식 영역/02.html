@@ -1,0 +1,51 @@
+<svg width="420" height="120" viewBox="0 0 420 120" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    수직선: y=80
+    1단위=40px, x=3 → screen_x=210
+    원점: 210-3*40=90
+
+    꺾은선 범위 표시:
+    x<3 영역을 위쪽으로 꺾은선과 함께 채움
+    꺾은선: 왼쪽 끝(30,80) → 위로 올라가며 x=3(210,80)으로 수렴
+    채우기 영역: 꺾은선 아래 ~ 수직선 위
+  -->
+
+  <!-- 범위 채우기: 꺾은선 + 수직선으로 닫힌 영역 -->
+  <polygon points="30,80 210,80 210,28 30,28" fill="#fce8e8" stroke="none" />
+
+  <!-- 꺾은선 (위쪽 경계): 왼쪽에서 x=3으로 수렴하는 화살표 모양 -->
+  <!-- 수평 상단선 -->
+  <line x1="30" y1="28" x2="200" y2="28" stroke="#e05555" stroke-width="2" stroke-linecap="round" />
+  <!-- 꺾임: 오른쪽 끝에서 x=3 수직선 방향으로 내려옴 -->
+  <line x1="200" y1="28" x2="210" y2="80" stroke="#e05555" stroke-width="2" stroke-linecap="round" />
+  <!-- 꺾은선 왼쪽 화살표 -->
+  <polygon points="30,28 40,23 40,33" fill="#e05555" />
+
+  <!-- 수직선 -->
+  <line x1="30" y1="80" x2="392" y2="80" stroke="#333" stroke-width="1.8" />
+  <polygon points="392,80 383,75 383,85" fill="#333" />
+  <polygon points="30,80 39,75 39,85" fill="#333" />
+
+  <!-- 눈금 및 레이블 -->
+  <line x1="50" y1="74" x2="50" y2="86" stroke="#333" stroke-width="1.4" />
+  <text x="50" y="100" text-anchor="middle" font-size="13" fill="#333">-1</text>
+  <line x1="90" y1="74" x2="90" y2="86" stroke="#333" stroke-width="1.4" />
+  <text x="90" y="100" text-anchor="middle" font-size="13" fill="#333">0</text>
+  <line x1="130" y1="74" x2="130" y2="86" stroke="#333" stroke-width="1.4" />
+  <text x="130" y="100" text-anchor="middle" font-size="13" fill="#333">1</text>
+  <line x1="170" y1="74" x2="170" y2="86" stroke="#333" stroke-width="1.4" />
+  <text x="170" y="100" text-anchor="middle" font-size="13" fill="#333">2</text>
+  <line x1="210" y1="74" x2="210" y2="86" stroke="#333" stroke-width="1.4" />
+  <text x="210" y="100" text-anchor="middle" font-size="13" fill="#333">3</text>
+  <line x1="250" y1="74" x2="250" y2="86" stroke="#333" stroke-width="1.4" />
+  <text x="250" y="100" text-anchor="middle" font-size="13" fill="#333">4</text>
+  <line x1="290" y1="74" x2="290" y2="86" stroke="#333" stroke-width="1.4" />
+  <text x="290" y="100" text-anchor="middle" font-size="13" fill="#333">5</text>
+  <line x1="330" y1="74" x2="330" y2="86" stroke="#333" stroke-width="1.4" />
+  <text x="330" y="100" text-anchor="middle" font-size="13" fill="#333">6</text>
+  <line x1="370" y1="74" x2="370" y2="86" stroke="#333" stroke-width="1.4" />
+  <text x="370" y="100" text-anchor="middle" font-size="13" fill="#333">7</text>
+
+  <!-- x=3 열린 원 -->
+  <circle cx="210" cy="80" r="6" fill="white" stroke="#e05555" stroke-width="2.2" />
+</svg>

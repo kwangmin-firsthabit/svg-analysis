@@ -1,0 +1,151 @@
+<svg width="500" height="500" viewBox="-4 -1 8 9" xmlns="http://www.w3.org/2000/svg">
+  <!--
+  ================================================================
+  좌표계 설계
+  ================================================================
+  수학 좌표: x∈[-4,4], y∈[-1,8]
+  viewBox:   "-4 -1 8 9"
+  반전 그룹: transform="scale(1,-1) translate(0,-7)"
+    → 수학 y=k  일 때  svg_y = 7 - k
+
+  주요 점:
+    원점    (0, 0) → svg (0, 7)
+    꼭짓점  (-1,6) → svg (-1, 1)
+    y절편   (0, 5) → svg (0, 2)
+
+  ================================================================
+  Quadratic Bezier 설계  M P0  Q P1  P2
+  ================================================================
+  포물선 y=-(x+1)²+6 은 2차 베지어 한 구간으로 정확히 표현 가능.
+
+  B(t) = (1-t)²P0 + 2t(1-t)P1 + t²P2
+
+  조건 1 — 꼭짓점(-1,6)이 t=½에서 통과:
+    x(½) = ¼x0 + ½x1 + ¼x2 = -1  →  x0+x2 = -2  (x1=-1로 고정)
+    y(½) = ¼y0 + ½y1 + ¼y2 = 6
+
+  조건 2 — 대칭: x0 = -1-d, x2 = -1+d
+    y0 = y2 = -((-1-d+1)²)+6 = -d²+6  (포물선 위 점)
+    y(½) = ¼(-d²+6) + ½y1 + ¼(-d²+6) = 6
+          ½(-d²+6) + ½y1 = 6
+          y1 = 6 + d²          ← 제어점 y 결정
+
+  d=2 선택: P0=(-3,2), P1=(-1,10), P2=(1,2)
+
+  검증 1 — 꼭짓점(-1,6) t=½:
+    x = ¼(-3) + ½(-1) + ¼(1) = -¾ - ½ + ¼ = -1   ✓
+    y = ¼(2)  + ½(10) + ¼(2) = ½ + 5 + ½  =  6   ✓
+
+  검증 2 — y절편(0,5):
+    x(t)=0 풀기:
+      (1-t)²(-3) + 2t(1-t)(-1) + t²(1) = 0
+      -3+6t-3t² - 2t+2t² + t² = 0
+      -3 + 4t + 0·t² = 0
+      t = ¾
+    y(¾):
+      = (¼)²(2) + 2(¾)(¼)(10) + (¾)²(2)
+      = (1/16)(2) + (6/16)(10) + (9/16)(2)
+      = 2/16 + 60/16 + 18/16
+      = 80/16 = 5              ✓
+
+  x절편 연장:
+    x절편 x=-1±√6 ≈ -3.449, 1.449
+    t=-3.449 구간은 bezier 분리(de Casteljau) 대신
+    양끝에 짧은 polyline 연장으로 처리.
+  ================================================================
+  -->
+
+  <rect x="-4" y="-1" width="8" height="9" fill="white" />
+
+  <g transform="scale(1,-1) translate(0,-7)">
+    <!-- x축 -->
+    <line x1="-3.8" y1="0" x2="3.65" y2="0" stroke="#333" stroke-width="0.055" />
+    <polygon points="3.8,0 3.6,0.09 3.6,-0.09" fill="#333" />
+
+    <!-- y축 -->
+    <line x1="0" y1="-0.8" x2="0" y2="7.65" stroke="#333" stroke-width="0.055" />
+    <polygon points="0,7.8 -0.09,7.6 0.09,7.6" fill="#333" />
+
+    <!-- 점선: 꼭짓점 → x축 수직  (-1,0)~(-1,6) -->
+    <line x1="-1" y1="0" x2="-1" y2="6" stroke="#aaa" stroke-width="0.038" stroke-dasharray="0.13,0.09" />
+
+    <!-- 점선: 꼭짓점 → y축 수평  (-1,6)~(0,6) -->
+    <line x1="-1" y1="6" x2="0" y2="6" stroke="#aaa" stroke-width="0.038" stroke-dasharray="0.13,0.09" />
+
+    <!-- 축 마커: x=-1 -->
+    <line x1="-1" y1="-0.09" x2="-1" y2="0.09" stroke="#c0392b" stroke-width="0.07" />
+    <!-- 축 마커: y=6 -->
+    <line x1="-0.09" y1="6" x2="0.09" y2="6" stroke="#c0392b" stroke-width="0.07" />
+    <!-- 축 마커: y=5 -->
+    <line x1="-0.09" y1="5" x2="0.09" y2="5" stroke="#2980b9" stroke-width="0.07" />
+
+    <!--
+      이차함수 곡선
+      ① 왼쪽 연장: x∈[-3.449,-3], polyline
+      ② 핵심:      x∈[-3,1],      Q bezier  P0(-3,2) P1(-1,10) P2(1,2)
+      ③ 오른쪽 연장: x∈[1,1.449], polyline
+    -->
+
+    <!-- ① 왼쪽 연장 -->
+    <path
+      d="M -3.449,0
+             L -3.4,0.64
+             L -3.3,1.11
+             L -3.2,1.56
+             L -3.1,1.99
+             L -3.0,2.0"
+      fill="none"
+      stroke="#e74c3c"
+      stroke-width="0.085"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <!-- ② 핵심 quadratic bezier (꼭짓점·y절편 정확 통과) -->
+    <path
+      d="M -3,2 Q -1,10 1,2"
+      fill="none"
+      stroke="#e74c3c"
+      stroke-width="0.085"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <!-- ③ 오른쪽 연장 -->
+    <path
+      d="M 1.0,2.0
+             L 1.1,1.99
+             L 1.2,1.56
+             L 1.3,1.11
+             L 1.4,0.64
+             L 1.449,0"
+      fill="none"
+      stroke="#e74c3c"
+      stroke-width="0.085"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <!-- 꼭짓점 점 (-1, 6) -->
+    <circle cx="-1" cy="6" r="0.12" fill="#c0392b" stroke="white" stroke-width="0.04" />
+
+    <!-- y절편 점 (0, 5) -->
+    <circle cx="0" cy="5" r="0.10" fill="#2980b9" stroke="white" stroke-width="0.035" />
+  </g>
+
+  <!-- 축 레이블 (반전 그룹 밖, svg 좌표 직접 사용) -->
+  <text x="3.6" y="7.42" font-size="0.42" fill="#333" font-style="italic">x</text>
+  <text x="0.14" y="-0.6" font-size="0.42" fill="#333" font-style="italic">y</text>
+
+  <!-- 원점 O  svg(0,7) -->
+  <text x="0.12" y="7.50" font-size="0.38" fill="#555">O</text>
+
+  <!-- x축 위 -1  svg(-1, 7+0.5) -->
+  <text x="-1" y="7.52" font-size="0.40" fill="#c0392b" text-anchor="middle" font-weight="bold">-1</text>
+
+  <!-- y축 위 6  svg_y = 7-6 = 1 -->
+  <text x="-0.16" y="1.14" font-size="0.40" fill="#c0392b" text-anchor="end" font-weight="bold">6</text>
+
+  <!-- y축 위 5  svg_y = 7-5 = 2 -->
+  <text x="-0.16" y="2.14" font-size="0.40" fill="#2980b9" text-anchor="end" font-weight="bold">5</text>
+</svg>

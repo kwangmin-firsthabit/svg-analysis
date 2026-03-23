@@ -1,0 +1,45 @@
+<svg width="200" height="220" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    한국식 세로 나눗셈:
+
+        42 ÷ 5 = 8 ... 2
+
+    형식:
+         42
+       ÷  5
+      ------
+          8
+      ------
+          2
+
+    y 간격 균등: 총 5행
+    상단 여백=20, 행높이=36px
+    행1(피제수): y=20+36=56
+    행2(나누는수): y=56+36=92
+    선1: y=100
+    행3(몫): y=100+36=136
+    선2: y=144
+    행4(나머지): y=144+36=180
+
+    오른쪽 정렬 기준: x=150
+  -->
+
+  <!-- 피제수 42 -->
+  <text x="150" y="56" text-anchor="end" font-size="30" font-family="serif" fill="#333">42</text>
+
+  <!-- ÷ 5 -->
+  <text x="80" y="92" text-anchor="end" font-size="30" font-family="serif" fill="#333">÷</text>
+  <text x="150" y="92" text-anchor="end" font-size="30" font-family="serif" fill="#333">5</text>
+
+  <!-- 가로선 1 -->
+  <line x1="40" y1="104" x2="160" y2="104" stroke="#333" stroke-width="1.8" />
+
+  <!-- 몫 8 -->
+  <text x="150" y="140" text-anchor="end" font-size="30" font-family="serif" fill="#333">8</text>
+
+  <!-- 가로선 2 -->
+  <line x1="40" y1="152" x2="160" y2="152" stroke="#333" stroke-width="1.8" />
+
+  <!-- 나머지 2 -->
+  <text x="150" y="188" text-anchor="end" font-size="30" font-family="serif" fill="#333">2</text>
+</svg>

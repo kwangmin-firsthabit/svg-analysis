@@ -1,0 +1,31 @@
+<svg width="500" height="380" viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg">
+  <!-- 삼각형 세 변 -->
+  <line x1="250" y1="40" x2="70" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+  <line x1="250" y1="40" x2="430" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+  <line x1="70" y1="340" x2="430" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="250" y="22" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">A</text>
+  <text x="46" y="345" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">B</text>
+  <text x="454" y="345" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">C</text>
+
+  <!--
+    AB 중점: (160, 190)
+    AB 방향 단위벡터: (-180,300)/360 = (-0.5, 0.833)
+    법선(왼쪽 바깥): (-0.833, -0.5)
+    숫자 위치: 중점에서 법선 방향으로 16px
+    → (160 + (-0.833)*16, 190 + (-0.5)*16) = (146.7, 182)
+  -->
+  <text x="147" y="182" text-anchor="middle" font-size="14" fill="#111">5</text>
+
+  <!--
+    AC 중점: (340, 190)
+    AC 방향 단위벡터: (180,300)/360 = (0.5, 0.833)
+    법선(오른쪽 바깥): (0.833, -0.5)
+    숫자 위치: (340 + 0.833*16, 190 + (-0.5)*16) = (353.3, 182)
+  -->
+  <text x="353" y="182" text-anchor="middle" font-size="14" fill="#111">5</text>
+
+  <!-- BC 중점 위쪽에 숫자 -->
+  <text x="250" y="328" text-anchor="middle" font-size="14" fill="#111">6</text>
+</svg>

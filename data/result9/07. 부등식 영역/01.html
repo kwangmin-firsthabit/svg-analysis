@@ -1,0 +1,51 @@
+<svg width="420" height="100" viewBox="0 0 420 100" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    수직선 중앙: y=50
+    x=3이 화면 중앙(210)에 오도록
+    1단위 = 40px
+    원점: 210 - 3*40 = 90
+
+    눈금:
+    x=-1: 90-40=50
+    x=0:  90
+    x=1:  130
+    x=2:  170
+    x=3:  210
+    x=4:  250
+    x=5:  290
+    x=6:  330
+    x=7:  370
+  -->
+
+  <!-- 수직선 -->
+  <line x1="30" y1="50" x2="392" y2="50" stroke="#333" stroke-width="1.8" />
+  <!-- 화살표 양쪽 -->
+  <polygon points="392,50 383,45 383,55" fill="#333" />
+  <polygon points="30,50 39,45 39,55" fill="#333" />
+
+  <!-- 눈금 및 레이블 -->
+  <line x1="50" y1="44" x2="50" y2="56" stroke="#333" stroke-width="1.4" />
+  <text x="50" y="72" text-anchor="middle" font-size="13" fill="#333">-1</text>
+  <line x1="90" y1="44" x2="90" y2="56" stroke="#333" stroke-width="1.4" />
+  <text x="90" y="72" text-anchor="middle" font-size="13" fill="#333">0</text>
+  <line x1="130" y1="44" x2="130" y2="56" stroke="#333" stroke-width="1.4" />
+  <text x="130" y="72" text-anchor="middle" font-size="13" fill="#333">1</text>
+  <line x1="170" y1="44" x2="170" y2="56" stroke="#333" stroke-width="1.4" />
+  <text x="170" y="72" text-anchor="middle" font-size="13" fill="#333">2</text>
+  <line x1="210" y1="44" x2="210" y2="56" stroke="#333" stroke-width="1.4" />
+  <text x="210" y="72" text-anchor="middle" font-size="13" fill="#333">3</text>
+  <line x1="250" y1="44" x2="250" y2="56" stroke="#333" stroke-width="1.4" />
+  <text x="250" y="72" text-anchor="middle" font-size="13" fill="#333">4</text>
+  <line x1="290" y1="44" x2="290" y2="56" stroke="#333" stroke-width="1.4" />
+  <text x="290" y="72" text-anchor="middle" font-size="13" fill="#333">5</text>
+  <line x1="330" y1="44" x2="330" y2="56" stroke="#333" stroke-width="1.4" />
+  <text x="330" y="72" text-anchor="middle" font-size="13" fill="#333">6</text>
+  <line x1="370" y1="44" x2="370" y2="56" stroke="#333" stroke-width="1.4" />
+  <text x="370" y="72" text-anchor="middle" font-size="13" fill="#333">7</text>
+
+  <!-- x<3: 왼쪽 방향 굵은 선 (x=3에서 왼쪽 끝까지) -->
+  <line x1="30" y1="50" x2="210" y2="50" stroke="#e05555" stroke-width="3.5" stroke-linecap="round" />
+
+  <!-- x=3: 열린 원 (포함하지 않음) -->
+  <circle cx="210" cy="50" r="6" fill="white" stroke="#e05555" stroke-width="2.2" />
+</svg>

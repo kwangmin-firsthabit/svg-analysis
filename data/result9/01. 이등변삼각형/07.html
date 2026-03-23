@@ -1,0 +1,98 @@
+<svg width="500" height="440" viewBox="0 0 500 440" xmlns="http://www.w3.org/2000/svg">
+  <!-- 삼각형 세 변 -->
+  <line x1="250" y1="40" x2="70" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+  <line x1="250" y1="40" x2="430" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+  <line x1="70" y1="340" x2="430" y2="340" stroke="#333" stroke-width="2" stroke-linecap="round" />
+
+  <!-- 꼭짓점 레이블 -->
+  <text x="250" y="22" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">A</text>
+  <text x="46" y="345" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">B</text>
+  <text x="454" y="345" text-anchor="middle" font-size="16" font-weight="bold" fill="#111">C</text>
+
+  <!--
+    AB: A(250,40) ~ B(70,340)
+    방향벡터: (-180, 300), 길이=360
+    단위벡터: (-0.5, 0.833)
+    법선(바깥 왼쪽): (-0.833, -0.5)
+    변에서 28px 바깥으로 평행 이동한 두 점:
+      A': (250 + (-0.833)*28, 40 + (-0.5)*28) = (226.7, 26)
+      B': (70  + (-0.833)*28, 340 + (-0.5)*28) = (46.7, 326)
+    끝점에서 5px 안쪽(여백):
+      A'': A' + 단위벡터*10 = (226.7+(-0.5)*10, 26+(0.833)*10) = (221.7, 34.3)
+      B'': B' + 단위벡터*(-10) = (46.7+(-0.5)*(-10), 326+(0.833)*(-10)) = (51.7, 317.7)
+    호: 두 점을 잇는 완만한 곡선, 살짝 바깥으로 볼록
+    r=400 (크게 잡아 거의 직선에 가까운 완만한 호)
+    sweep=0
+    중앙점 근사: 두 끝점 중간 + 법선 방향 sagitta
+    d=sqrt((221.7-51.7)²+(34.3-317.7)²)=sqrt(170²+283.4²)=sqrt(28900+80315)≈330.3
+    sagitta = r - sqrt(r²-(d/2)²) = 400-sqrt(160000-27225)=400-sqrt(132775)≈400-364.4=35.6 → 너무 큼
+    r=600: sagitta=600-sqrt(360000-27225)=600-sqrt(332775)≈600-576.9=23.1
+    중앙점: 두 끝점 중점 + 법선*23.1
+    midpoint of arc ends: ((221.7+51.7)/2, (34.3+317.7)/2) = (136.7, 176)
+    arc mid: (136.7+(-0.833)*23.1, 176+(-0.5)*23.1) = (117.4, 164.5)
+    숫자: arc mid + 법선*16 = (117.4+(-0.833)*16, 164.5+(-0.5)*16) = (104.1, 156.5)
+  -->
+  <path
+    d="M 221.7,34.3 A 600,600 0 0,0 51.7,317.7"
+    fill="none"
+    stroke="#888"
+    stroke-width="1.2"
+    stroke-dasharray="3 4"
+    stroke-linecap="round"
+  />
+  <!-- 끝 단선 (변에 수직) -->
+  <line x1="215.8" y1="29.8" x2="227.6" y2="38.8" stroke="#888" stroke-width="1.2" stroke-linecap="round" />
+  <line x1="45.8" y1="312.2" x2="57.6" y2="321.2" stroke="#888" stroke-width="1.2" stroke-linecap="round" />
+  <text x="101" y="159" text-anchor="middle" font-size="13" fill="#444">5</text>
+
+  <!--
+    AC: A(250,40) ~ C(430,340)
+    방향벡터: (180,300), 길이=360
+    단위벡터: (0.5, 0.833)
+    법선(바깥 오른쪽): (0.833, -0.5)
+    A': (250+0.833*28, 40+(-0.5)*28) = (273.3, 26)
+    C': (430+0.833*28, 340+(-0.5)*28) = (453.3, 326)
+    A'': (273.3+0.5*10, 26+0.833*10) = (278.3, 34.3)
+    C'': (453.3+0.5*(-10), 326+0.833*(-10)) = (448.3, 317.7)
+    sweep=1
+    arc mid: ((278.3+448.3)/2 + 0.833*23.1, (34.3+317.7)/2 + (-0.5)*23.1)
+           = (363.3+19.2, 176-11.6) = (382.5, 164.4)
+    숫자: (382.5+0.833*16, 164.4+(-0.5)*16) = (395.8, 156.4)
+  -->
+  <path
+    d="M 278.3,34.3 A 600,600 0 0,1 448.3,317.7"
+    fill="none"
+    stroke="#888"
+    stroke-width="1.2"
+    stroke-dasharray="3 4"
+    stroke-linecap="round"
+  />
+  <line x1="272.4" y1="29.8" x2="284.2" y2="38.8" stroke="#888" stroke-width="1.2" stroke-linecap="round" />
+  <line x1="442.4" y1="312.2" x2="454.2" y2="321.2" stroke="#888" stroke-width="1.2" stroke-linecap="round" />
+  <text x="399" y="159" text-anchor="middle" font-size="13" fill="#444">5</text>
+
+  <!--
+    BC: B(70,340) ~ C(430,340)
+    수평선, 법선(아래): (0,1)
+    B': (70, 340+28) = (70, 368)
+    C': (430, 368)
+    B'': (70+10, 368) = (80, 368)
+    C'': (430-10, 368) = (420, 368)
+    호: 아래로 볼록, sweep=1
+    d=340, r=600
+    sagitta=600-sqrt(360000-28900)=600-sqrt(331100)≈600-575.4=24.6
+    arc mid: (250, 368+24.6) = (250, 392.6)
+    숫자: (250, 392.6+16) = (250, 408.6)
+  -->
+  <path
+    d="M 80,368 A 600,600 0 0,1 420,368"
+    fill="none"
+    stroke="#888"
+    stroke-width="1.2"
+    stroke-dasharray="3 4"
+    stroke-linecap="round"
+  />
+  <line x1="80" y1="362" x2="80" y2="374" stroke="#888" stroke-width="1.2" stroke-linecap="round" />
+  <line x1="420" y1="362" x2="420" y2="374" stroke="#888" stroke-width="1.2" stroke-linecap="round" />
+  <text x="250" y="408" text-anchor="middle" font-size="13" fill="#444">6</text>
+</svg>
