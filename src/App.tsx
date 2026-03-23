@@ -250,15 +250,7 @@ export default function App() {
         </main>
       ) : isResult8 ? (
         <main className="w-full pb-6">
-          <div className="sticky top-[61px] z-10 border-b border-slate-300 bg-slate-100">
-            <div className="flex min-w-max gap-2 px-4 py-2">
-              {[1, 2, 3].map(run => (
-                <div key={run} className="w-[560px] shrink-0 rounded-lg bg-slate-800 px-3 py-2 text-center text-sm font-semibold text-white">
-                  Run {run}
-                </div>
-              ))}
-            </div>
-          </div>
+          {/* result8: 모델명은 각 SvgRenderPanel의 variantLabel로 표시 */}
           <div className="overflow-x-auto">
             <div className="min-w-max space-y-3 px-4 py-3">
               {result8Items.map(item => (
@@ -270,7 +262,7 @@ export default function App() {
                         <div key={r.run} className="w-[560px] shrink-0">
                           <SvgRenderPanel
                             fileName={`${item.baseName}_${r.run}.html`}
-                            variantLabel={`Run ${r.run}`}
+                            variantLabel={r.run <= 3 ? `Sonnet 4.6 — Run ${r.run}` : `Gemini 3.1 Flash — Run ${r.run - 3}`}
                             htmlSource={r.html}
                             userPrompt={item.userPrompt}
                             systemPrompt={result8SystemPrompt}

@@ -1,0 +1,165 @@
+<style>
+  #vis {
+    background-color: transparent;
+    user-select: none;
+  }
+</style>
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  (function () {
+    const svg = document.getElementById('vis');
+    const ns = 'http://www.w3.org/2000/svg';
+
+    const colors = {
+      shapeFill: 'rgba(74, 144, 226, 0.1)',
+      shapeStroke: '#4A90E2',
+      auxiliaryLine: '#999999',
+      labelPrimary: '#333333',
+      labelSecondary: '#666666',
+    };
+
+    function el(tag, attrs) {
+      const e = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      return e;
+    }
+
+    function addText(x, y, content, size, weight, color, anchor = 'middle') {
+      const t = el('text', {
+        x,
+        y,
+        'font-size': size,
+        'font-weight': weight,
+        'text-anchor': anchor,
+        'dominant-baseline': 'central',
+        fill: color,
+        'font-family': 'sans-serif',
+      });
+      t.textContent = content;
+      svg.appendChild(t);
+      return t;
+    }
+
+    // 1. 수학적 계산
+    const r = 4; // 밑면 반지름
+    const l = 10; // 모선 길이 (부채꼴 반지름)
+
+    // 부채꼴의 호의 길이 = 밑면의 둘레 = 2 * PI * r
+    // 부채꼴의 중심각 theta = (호의 길이 / 모선 길이) = (2 * PI * r) / l
+    const theta = (2 * Math.PI * r) / l;
+    const thetaDeg = (theta * 180) / Math.PI;
+
+    const scale = 30; // 1단위당 30px
+    const cx = 340; // 부채꼴의 꼭짓점 중심
+    const cy = 60;
+
+    // 2. 부채꼴(옆면) 그리기
+    // 시작각도를 아래쪽을 향하도록 조정 (90도 - theta/2)
+    const startAngle = Math.PI / 2 - theta / 2;
+    const endAngle = Math.PI / 2 + theta / 2;
+
+    const sx = cx + l * scale * Math.cos(startAngle);
+    const sy = cy + l * scale * Math.sin(startAngle);
+    const ex = cx + l * scale * Math.cos(endAngle);
+    const ey = cy + l * scale * Math.sin(endAngle);
+
+    const largeArc = theta > Math.PI ? 1 : 0;
+    const sidePathData = `M ${cx} ${cy} L ${sx} ${sy} A ${l * scale} ${l * scale} 0 ${largeArc} 1 ${ex} ${ey} Z`;
+
+    svg.appendChild(
+      el('path', {
+        d: sidePathData,
+        fill: colors.shapeFill,
+        stroke: colors.shapeStroke,
+        'stroke-width': '1.5',
+        'stroke-linejoin': 'round',
+      })
+    );
+
+    // 3. 밑면(원) 그리기
+    // 부채꼴 호의 중앙 지점에 접하도록 배치
+    const midAngle = Math.PI / 2;
+    const contactX = cx + l * scale * Math.cos(midAngle);
+    const contactY = cy + l * scale * Math.sin(midAngle);
+    const bottomCircleCenterY = contactY + r * scale;
+
+    svg.appendChild(
+      el('circle', {
+        cx: contactX,
+        cy: bottomCircleCenterY,
+        r: r * scale,
+        fill: colors.shapeFill,
+        stroke: colors.shapeStroke,
+        'stroke-width': '1.5',
+      })
+    );
+
+    // 4. 수치 및 라벨 표시
+    // 모선 길이 (옆면 반지름)
+    const labelLAngle = startAngle - 0.2;
+    addText(
+      cx + (l / 2) * scale * Math.cos(labelLAngle) - 20,
+      cy + (l / 2) * scale * Math.sin(labelLAngle),
+      '모선 10',
+      '14',
+      '500',
+      colors.labelPrimary,
+      'end'
+    );
+
+    // 밑면 반지름
+    svg.appendChild(
+      el('line', {
+        x1: contactX,
+        y1: bottomCircleCenterY,
+        x2: contactX + r * scale,
+        y2: bottomCircleCenterY,
+        stroke: colors.auxiliaryLine,
+        'stroke-width': '1',
+        'stroke-dasharray': '4 3',
+      })
+    );
+    addText(contactX + (r / 2) * scale, bottomCircleCenterY - 12, '반지름 4', '12', '400', colors.labelSecondary);
+
+    // 중심각 표시 (선택적)
+    const arcR = 30;
+    const asx = cx + arcR * Math.cos(startAngle);
+    const asy = cy + arcR * Math.sin(startAngle);
+    const aex = cx + arcR * Math.cos(endAngle);
+    const aey = cy + arcR * Math.sin(endAngle);
+    svg.appendChild(
+      el('path', {
+        d: `M ${asx} ${asy} A ${arcR} ${arcR} 0 0 1 ${aex} ${aey}`,
+        fill: 'none',
+        stroke: colors.labelSecondary,
+        'stroke-width': '1',
+      })
+    );
+    addText(cx, cy + arcR + 15, `${Math.round(thetaDeg)}°`, '12', '400', colors.labelSecondary);
+
+    // ViewBox 높이 업데이트
+    const maxY = bottomCircleCenterY + r * scale + 40;
+    svg.setAttribute('viewBox', `0 0 680 ${Math.round(maxY)}`);
+  })();
+</script>

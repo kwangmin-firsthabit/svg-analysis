@@ -1,13 +1,7 @@
 <!doctype html>
 <html>
   <body>
-    <style>
-      #vis {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        user-select: none;
-      }
-    </style>
-    <svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+    <svg id="vis" width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <marker
           id="arrow"
@@ -29,9 +23,19 @@
         </marker>
       </defs>
     </svg>
+
     <script>
       const svg = document.getElementById('vis');
       const ns = 'http://www.w3.org/2000/svg';
+
+      // 색상 팔레트 정의
+      const colors = {
+        shapeFill: 'rgba(25, 118, 210, 0.1)',
+        shapeStroke: '#1976d2',
+        auxiliaryLine: '#757575',
+        labelPrimary: '#212121',
+        labelSecondary: '#616161',
+      };
 
       function el(tag, attrs) {
         const e = document.createElementNS(ns, tag);
@@ -48,115 +52,100 @@
           'text-anchor': anchor,
           'dominant-baseline': 'central',
           fill: color,
+          'font-family': 'sans-serif',
         });
         t.textContent = content;
         svg.appendChild(t);
-        return t;
       }
 
-      // 1. 수학적 좌표 계산 (세 변 6, 8, 10인 직각삼각형)
-      // vertices: B(0,0), C(8,0), A(0,6)
-      const scale = 50;
-      const ox = 180; // 중앙 배치를 위한 오프셋
-      const oy = 400;
+      // 1. 수학적 매개변수 설정
+      const r = 8;
+      const L = 8;
+      // 반지름과 현의 길이가 같으므로 중심각은 60도 (π/3 rad)
+      const theta = Math.PI / 3;
 
-      const P_B = { x: ox, y: oy };
-      const P_C = { x: ox + 8 * scale, y: oy };
-      const P_A = { x: ox, y: oy - 6 * scale };
+      // 2. 시각화 스케일링 및 좌표 계산
+      const scale = 35; // 1단위당 35px
+      const ox = 340;
+      const oy = 60;
 
-      // 내심(Incenter) 계산: 반지름 2이므로 (2, 2)
-      const I = { x: ox + 2 * scale, y: oy - 2 * scale };
-      const r = 2 * scale;
+      const rPx = r * scale;
 
-      // 2. 배경 및 보조 요소 (Z-order 1)
-      // 직각 표시
-      function drawRightAngle(vertex, p1, p2, size) {
-        const d1 = { x: p1.x - vertex.x, y: p1.y - vertex.y };
-        const d2 = { x: p2.x - vertex.x, y: p2.y - vertex.y };
-        const l1 = Math.sqrt(d1.x * d1.x + d1.y * d1.y);
-        const l2 = Math.sqrt(d2.x * d2.x + d2.y * d2.y);
-        const u1 = { x: d1.x / l1, y: d1.y / l1 };
-        const u2 = { x: d2.x / l2, y: d2.y / l2 };
-        const c1 = { x: vertex.x + u1.x * size, y: vertex.y + u1.y * size };
-        const c2 = { x: c1.x + u2.x * size, y: c1.y + u2.y * size };
-        const c3 = { x: vertex.x + u2.x * size, y: vertex.y + u2.y * size };
-        svg.appendChild(
-          el('path', {
-            d: `M${c1.x} ${c1.y} L${c2.x} ${c2.y} L${c3.x} ${c3.y}`,
-            fill: 'none',
-            stroke: '#95a5a6',
-            'stroke-width': '1',
-          })
-        );
-      }
-      drawRightAngle(P_B, P_C, P_A, 15);
+      // 현의 양 끝점 (중심 O 기준 아래쪽으로 벌어지는 형태)
+      // halfAngle = 30도
+      const halfTheta = theta / 2;
+      const angle1 = Math.PI / 2 - halfTheta; // 60도
+      const angle2 = Math.PI / 2 + halfTheta; // 120도
 
-      // 3. 주요 도형 렌더링 (Z-order 2)
-      // 삼각형 채우기 및 외곽선
-      svg.appendChild(
-        el('polygon', {
-          points: `${P_A.x},${P_A.y} ${P_B.x},${P_B.y} ${P_C.x},${P_C.y}`,
-          fill: 'rgba(52, 152, 219, 0.05)',
-          stroke: '#2c3e50',
-          'stroke-width': '1.5',
-          'stroke-linejoin': 'round',
-        })
-      );
+      const p1 = {
+        x: ox + rPx * Math.cos(angle2),
+        y: oy + rPx * Math.sin(angle2),
+      };
+      const p2 = {
+        x: ox + rPx * Math.cos(angle1),
+        y: oy + rPx * Math.sin(angle1),
+      };
 
-      // 내접원
-      svg.appendChild(
-        el('circle', {
-          cx: I.x,
-          cy: I.y,
-          r: r,
-          fill: 'none',
-          stroke: '#e67e22',
-          'stroke-width': '1.5',
-        })
-      );
+      // 3. 활꼴(Circular Segment) 그리기
+      // 호(Arc) 경로 생성
+      const largeArcFlag = 0; // 60도 < 180도
+      const sweepFlag = 1; // 시계 방향
+      const arcPath = `M ${p1.x} ${p1.y} A ${rPx} ${rPx} 0 ${largeArcFlag} ${sweepFlag} ${p2.x} ${p2.y}`;
+      const chordPath = `L ${p1.x} ${p1.y}`;
 
-      // 반지름 표시 보조선 (내심에서 아래쪽 접점까지)
-      svg.appendChild(
-        el('line', {
-          x1: I.x,
-          y1: I.y,
-          x2: I.x,
-          y2: oy,
-          stroke: '#95a5a6',
-          'stroke-width': '0.8',
-          'stroke-dasharray': '4 3',
-        })
-      );
-
-      // 4. 점 표시 (Z-order 3)
-      const points = [
-        { p: P_A, label: 'A' },
-        { p: P_B, label: 'B' },
-        { p: P_C, label: 'C' },
-        { p: I, label: 'O' },
-      ];
-      points.forEach(pt => {
-        svg.appendChild(el('circle', { cx: pt.p.x, cy: pt.p.y, r: 3.5, fill: '#2c3e50' }));
+      const segment = el('path', {
+        d: arcPath + ' ' + chordPath + ' Z',
+        fill: colors.shapeFill,
+        stroke: colors.shapeStroke,
+        'stroke-width': '2',
+        'stroke-linejoin': 'round',
       });
+      svg.appendChild(segment);
 
-      // 5. 라벨 및 수치 (Z-order 4)
-      // 꼭짓점 라벨
-      addText(P_A.x - 12, P_A.y - 12, 'A', 14, 500, '#2c3e50');
-      addText(P_B.x - 12, P_B.y + 12, 'B', 14, 500, '#2c3e50');
-      addText(P_C.x + 12, P_C.y + 12, 'C', 14, 500, '#2c3e50');
-      addText(I.x + 10, I.y - 10, 'O', 14, 500, '#e67e22', 'start');
+      // 4. 반지름 표시 (O에서 P1 연결)
+      const radiusLine = el('line', {
+        x1: ox,
+        y1: oy,
+        x2: p1.x,
+        y2: p1.y,
+        stroke: colors.auxiliaryLine,
+        'stroke-width': '1',
+        'stroke-dasharray': '4 3',
+      });
+      svg.appendChild(radiusLine);
 
-      // 변의 길이 라벨
-      addText(ox - 15, (oy + P_A.y) / 2, '6', 14, 400, '#2c3e50', 'end'); // 높이
-      addText((ox + P_C.x) / 2, oy + 20, '8', 14, 400, '#2c3e50'); // 밑변
-      addText((ox + P_C.x) / 2 + 15, (oy + P_A.y) / 2 - 15, '10', 14, 400, '#2c3e50', 'start'); // 빗변
+      // 5. 점 표시 (중심 O)
+      const centerDot = el('circle', {
+        cx: ox,
+        cy: oy,
+        r: '4',
+        fill: colors.labelPrimary,
+      });
+      svg.appendChild(centerDot);
 
-      // 반지름 라벨
-      addText(I.x + 8, (I.y + oy) / 2, 'r=2', 12, 400, '#e67e22', 'start');
+      // 6. 라벨 및 수치 텍스트 배치
+      // 중심점 O 라벨
+      addText(ox, oy - 15, 'O', 14, 500, colors.labelPrimary);
 
-      // ViewBox 높이 업데이트
-      const maxY = oy + 40;
-      svg.setAttribute('viewBox', `0 0 680 ${maxY}`);
+      // 반지름 수치 '8' (반지름 선의 중간 지점에서 오프셋)
+      const radMidX = (ox + p1.x) / 2;
+      const radMidY = (oy + p1.y) / 2;
+      // 선에 수직인 방향으로 약간 이동 (벡터 회전 활용)
+      const radDx = p1.x - ox;
+      const radDy = p1.y - oy;
+      const radLen = Math.sqrt(radDx * radDx + radDy * radDy);
+      const nx = -radDy / radLen;
+      const ny = radDx / radLen;
+      addText(radMidX + nx * 12, radMidY + ny * 12, '8', 14, 400, colors.labelPrimary);
+
+      // 현의 길이 수치 '8' (현의 중간 지점 아래)
+      const chordMidX = (p1.x + p2.x) / 2;
+      const chordMidY = (p1.y + p2.y) / 2;
+      addText(chordMidX, chordMidY - 15, '8', 14, 400, colors.labelPrimary);
+
+      // 7. ViewBox 높이 조정
+      const maxY = Math.max(p1.y, p2.y, oy + rPx);
+      svg.setAttribute('viewBox', `0 0 680 ${Math.round(maxY + 40)}`);
     </script>
   </body>
 </html>

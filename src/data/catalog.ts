@@ -274,7 +274,7 @@ const RESULT8_FILES = [
   '83.원뿔전개도',
   '84.원뿔대',
 ];
-const RESULT8_RUNS = 3;
+const RESULT8_RUNS = 6;
 
 export interface Result8RunItem {
   run: number;

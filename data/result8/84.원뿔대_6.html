@@ -1,0 +1,198 @@
+<style>
+  #vis {
+    background-color: transparent;
+    user-select: none;
+  }
+</style>
+<svg id="vis" width="100%" viewBox="0 0 680 450" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  (function () {
+    const svg = document.getElementById('vis');
+    const ns = 'http://www.w3.org/2000/svg';
+
+    const colors = {
+      shapeFill: 'rgba(74, 144, 226, 0.1)',
+      shapeStroke: '#4A90E2',
+      auxiliaryLine: '#999999',
+      labelPrimary: '#333333',
+      labelSecondary: '#666666',
+    };
+
+    function el(tag, attrs) {
+      const e = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      return e;
+    }
+
+    function addText(x, y, content, size, weight, color, anchor = 'middle') {
+      const t = el('text', {
+        x,
+        y,
+        'font-size': size,
+        'font-weight': weight,
+        'text-anchor': anchor,
+        'dominant-baseline': 'central',
+        fill: color,
+        'font-family': 'sans-serif',
+      });
+      t.textContent = content;
+      svg.appendChild(t);
+      return t;
+    }
+
+    // 1. 수학적 계산
+    const r_top = 3;
+    const r_bottom = 6;
+    const height = 5;
+    const scale = 45; // 시각화 크기 조정을 위한 스케일
+
+    const ox = 340; // 중심 x
+    const oy_bottom = 320; // 밑면 중심 y
+    const oy_top = oy_bottom - height * scale; // 윗면 중심 y
+
+    // 타원의 장축/단축 비율 (입체감을 위한 투영 비율)
+    const ry_ratio = 0.3;
+
+    // 2. 렌더링 순서 (뒤에서 앞으로)
+
+    // 밑면 타원 뒷부분 (점선)
+    const b_rx = r_bottom * scale;
+    const b_ry = b_rx * ry_ratio;
+    const bottomBackPath = `M ${ox - b_rx} ${oy_bottom} A ${b_rx} ${b_ry} 0 0 1 ${ox + b_rx} ${oy_bottom}`;
+    svg.appendChild(
+      el('path', {
+        d: bottomBackPath,
+        fill: 'none',
+        stroke: colors.auxiliaryLine,
+        'stroke-width': '1',
+        'stroke-dasharray': '4 3',
+      })
+    );
+
+    // 높이 보조선 (중심축)
+    svg.appendChild(
+      el('line', {
+        x1: ox,
+        y1: oy_top,
+        x2: ox,
+        y2: oy_bottom,
+        stroke: colors.auxiliaryLine,
+        'stroke-width': '1',
+        'stroke-dasharray': '4 3',
+      })
+    );
+
+    // 밑면 반지름 보조선
+    svg.appendChild(
+      el('line', {
+        x1: ox,
+        y1: oy_bottom,
+        x2: ox + b_rx,
+        y2: oy_bottom,
+        stroke: colors.auxiliaryLine,
+        'stroke-width': '1',
+        'stroke-dasharray': '4 3',
+      })
+    );
+
+    // 윗면 반지름 보조선
+    const t_rx = r_top * scale;
+    const t_ry = t_rx * ry_ratio;
+    svg.appendChild(
+      el('line', {
+        x1: ox,
+        y1: oy_top,
+        x2: ox + t_rx,
+        y2: oy_top,
+        stroke: colors.auxiliaryLine,
+        'stroke-width': '1',
+        'stroke-dasharray': '4 3',
+      })
+    );
+
+    // 옆면 외곽선 (실선)
+    svg.appendChild(
+      el('line', {
+        x1: ox - b_rx,
+        y1: oy_bottom,
+        x2: ox - t_rx,
+        y2: oy_top,
+        stroke: colors.shapeStroke,
+        'stroke-width': '1.5',
+      })
+    );
+    svg.appendChild(
+      el('line', {
+        x1: ox + b_rx,
+        y1: oy_bottom,
+        x2: ox + t_rx,
+        y2: oy_top,
+        stroke: colors.shapeStroke,
+        'stroke-width': '1.5',
+      })
+    );
+
+    // 밑면 타원 앞부분 (실선)
+    const bottomFrontPath = `M ${ox - b_rx} ${oy_bottom} A ${b_rx} ${b_ry} 0 0 0 ${ox + b_rx} ${oy_bottom}`;
+    svg.appendChild(
+      el('path', {
+        d: bottomFrontPath,
+        fill: 'none',
+        stroke: colors.shapeStroke,
+        'stroke-width': '1.5',
+      })
+    );
+
+    // 윗면 타원 (실선 및 채우기)
+    svg.appendChild(
+      el('ellipse', {
+        cx: ox,
+        cy: oy_top,
+        rx: t_rx,
+        ry: t_ry,
+        fill: colors.shapeFill,
+        stroke: colors.shapeStroke,
+        'stroke-width': '1.5',
+      })
+    );
+
+    // 중심점 표시
+    svg.appendChild(el('circle', { cx: ox, cy: oy_top, r: 2.5, fill: colors.labelPrimary }));
+    svg.appendChild(el('circle', { cx: ox, cy: oy_bottom, r: 2.5, fill: colors.labelPrimary }));
+
+    // 3. 수치 라벨
+    // 높이 5
+    addText(ox - 12, (oy_top + oy_bottom) / 2, '5', '14', '500', colors.labelPrimary, 'end');
+
+    // 윗면 반지름 3
+    addText(ox + t_rx / 2, oy_top - 12, '3', '14', '500', colors.labelPrimary);
+
+    // 밑면 반지름 6
+    addText(ox + b_rx / 2, oy_bottom + 15, '6', '14', '500', colors.labelPrimary);
+
+    // ViewBox 높이 최적화
+    const maxY = oy_bottom + b_ry + 40;
+    svg.setAttribute('viewBox', `0 0 680 ${Math.round(maxY)}`);
+  })();
+</script>

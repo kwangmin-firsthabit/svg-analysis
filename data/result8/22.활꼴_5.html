@@ -1,0 +1,157 @@
+<style>
+  #vis {
+    background-color: transparent;
+    user-select: none;
+  }
+</style>
+<svg id="vis" width="100%" viewBox="0 0 680 380" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color, anchor = 'middle') {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': anchor,
+      'dominant-baseline': 'central',
+      fill: color,
+      'font-family': 'sans-serif',
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 수학적 계산 및 설정
+  // 반지름 8, 현의 길이 8 -> 정삼각형 관계 (중심각 60도)
+  const centerX = 340;
+  const centerY = 80;
+  const radiusVal = 8;
+  const scale = 32; // 가시성을 위해 조정한 스케일
+  const R = radiusVal * scale; // 256px
+
+  // 각도 설정 (호가 아래를 향하도록 배치)
+  const startAngle = (60 * Math.PI) / 180;
+  const endAngle = (120 * Math.PI) / 180;
+
+  // 좌표 계산
+  const p1 = {
+    x: centerX + R * Math.cos(startAngle),
+    y: centerY + R * Math.sin(startAngle),
+  };
+  const p2 = {
+    x: centerX + R * Math.cos(endAngle),
+    y: centerY + R * Math.sin(endAngle),
+  };
+
+  // 색상 정의
+  const colors = {
+    shapeFill: '#e0e7ff',
+    shapeStroke: '#4338ca',
+    auxiliaryLine: '#64748b',
+    labelPrimary: '#1e1b4b',
+    labelSecondary: '#475569',
+  };
+
+  // 2. 렌더링 순서
+
+  // 활꼴 영역 채우기 (호 + 현)
+  const segmentPath = el('path', {
+    d: `M ${p1.x} ${p1.y} A ${R} ${R} 0 0 1 ${p2.x} ${p2.y} Z`,
+    fill: colors.shapeFill,
+    stroke: 'none',
+  });
+  svg.appendChild(segmentPath);
+
+  // 호 렌더링
+  const arc = el('path', {
+    d: `M ${p1.x} ${p1.y} A ${R} ${R} 0 0 1 ${p2.x} ${p2.y}`,
+    fill: 'none',
+    stroke: colors.shapeStroke,
+    'stroke-width': '2',
+    'stroke-linecap': 'round',
+  });
+  svg.appendChild(arc);
+
+  // 현 렌더링
+  const chord = el('line', {
+    x1: p1.x,
+    y1: p1.y,
+    x2: p2.x,
+    y2: p2.y,
+    stroke: colors.shapeStroke,
+    'stroke-width': '2',
+    'stroke-linecap': 'round',
+  });
+  svg.appendChild(chord);
+
+  // 반지름 보조선 (표시 요청 반영)
+  const radiusLine = el('line', {
+    x1: centerX,
+    y1: centerY,
+    x2: p1.x,
+    y2: p1.y,
+    stroke: colors.auxiliaryLine,
+    'stroke-width': '1',
+    'stroke-dasharray': '4 3',
+  });
+  svg.appendChild(radiusLine);
+
+  // 중심점 O
+  const centerPoint = el('circle', {
+    cx: centerX,
+    cy: centerY,
+    r: 3.5,
+    fill: colors.labelPrimary,
+  });
+  svg.appendChild(centerPoint);
+
+  // 3. 라벨 및 수치 표시
+
+  // 중심점 라벨 O
+  addText(centerX, centerY - 15, 'O', 14, 500, colors.labelPrimary);
+
+  // 반지름 수치 8
+  const midRadX = (centerX + p1.x) / 2;
+  const midRadY = (centerY + p1.y) / 2;
+  // 선에서 약간 오프셋
+  addText(midRadX + 12, midRadY - 8, '8', 14, 500, colors.labelPrimary);
+
+  // 현 길이 수치 8
+  const midChordX = (p1.x + p2.x) / 2;
+  const midChordY = (p1.y + p2.y) / 2;
+  addText(midChordX, midChordY - 16, '8', 14, 500, colors.labelPrimary);
+
+  // ViewBox 높이 조정
+  const maxY = Math.max(p1.y, p2.y) + 40;
+  svg.setAttribute('viewBox', `0 0 680 ${Math.round(maxY)}`);
+</script>

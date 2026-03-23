@@ -1,0 +1,146 @@
+<svg id="vis" width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // 색상 팔레트 정의
+  const colors = {
+    shapeFill: 'rgba(25, 118, 210, 0.1)',
+    shapeStroke: '#1976d2',
+    auxiliaryLine: '#757575',
+    labelPrimary: '#212121',
+    labelSecondary: '#616161',
+  };
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color, anchor = 'middle') {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': anchor,
+      'dominant-baseline': 'central',
+      fill: color,
+      'font-family': 'sans-serif',
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 수학적 매개변수 설정
+  const r = 8;
+  const L = 8;
+  // 반지름과 현의 길이가 같으므로 중심각은 60도 (π/3 rad)
+  const theta = Math.PI / 3;
+
+  // 2. 시각화 스케일링 및 좌표 계산
+  const scale = 35; // 1단위당 35px
+  const ox = 340;
+  const oy = 60;
+
+  const rPx = r * scale;
+
+  // 현의 양 끝점 (중심 O 기준 아래쪽으로 벌어지는 형태)
+  // halfAngle = 30도
+  const halfTheta = theta / 2;
+  const angle1 = Math.PI / 2 - halfTheta; // 60도
+  const angle2 = Math.PI / 2 + halfTheta; // 120도
+
+  const p1 = {
+    x: ox + rPx * Math.cos(angle2),
+    y: oy + rPx * Math.sin(angle2),
+  };
+  const p2 = {
+    x: ox + rPx * Math.cos(angle1),
+    y: oy + rPx * Math.sin(angle1),
+  };
+
+  // 3. 활꼴(Circular Segment) 그리기
+  // 호(Arc) 경로 생성
+  const largeArcFlag = 0; // 60도 < 180도
+  const sweepFlag = 1; // 시계 방향
+  const arcPath = `M ${p1.x} ${p1.y} A ${rPx} ${rPx} 0 ${largeArcFlag} ${sweepFlag} ${p2.x} ${p2.y}`;
+  const chordPath = `L ${p1.x} ${p1.y}`;
+
+  const segment = el('path', {
+    d: arcPath + ' ' + chordPath + ' Z',
+    fill: colors.shapeFill,
+    stroke: colors.shapeStroke,
+    'stroke-width': '2',
+    'stroke-linejoin': 'round',
+  });
+  svg.appendChild(segment);
+
+  // 4. 반지름 표시 (O에서 P1 연결)
+  const radiusLine = el('line', {
+    x1: ox,
+    y1: oy,
+    x2: p1.x,
+    y2: p1.y,
+    stroke: colors.auxiliaryLine,
+    'stroke-width': '1',
+    'stroke-dasharray': '4 3',
+  });
+  svg.appendChild(radiusLine);
+
+  // 5. 점 표시 (중심 O)
+  const centerDot = el('circle', {
+    cx: ox,
+    cy: oy,
+    r: '4',
+    fill: colors.labelPrimary,
+  });
+  svg.appendChild(centerDot);
+
+  // 6. 라벨 및 수치 텍스트 배치
+  // 중심점 O 라벨
+  addText(ox, oy - 15, 'O', 14, 500, colors.labelPrimary);
+
+  // 반지름 수치 '8' (반지름 선의 중간 지점에서 오프셋)
+  const radMidX = (ox + p1.x) / 2;
+  const radMidY = (oy + p1.y) / 2;
+  // 선에 수직인 방향으로 약간 이동 (벡터 회전 활용)
+  const radDx = p1.x - ox;
+  const radDy = p1.y - oy;
+  const radLen = Math.sqrt(radDx * radDx + radDy * radDy);
+  const nx = -radDy / radLen;
+  const ny = radDx / radLen;
+  addText(radMidX + nx * 12, radMidY + ny * 12, '8', 14, 400, colors.labelPrimary);
+
+  // 현의 길이 수치 '8' (현의 중간 지점 아래)
+  const chordMidX = (p1.x + p2.x) / 2;
+  const chordMidY = (p1.y + p2.y) / 2;
+  addText(chordMidX, chordMidY - 15, '8', 14, 400, colors.labelPrimary);
+
+  // 7. ViewBox 높이 조정
+  const maxY = Math.max(p1.y, p2.y, oy + rPx);
+  svg.setAttribute('viewBox', `0 0 680 ${Math.round(maxY + 40)}`);
+</script>

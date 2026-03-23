@@ -1,0 +1,178 @@
+<style>
+  #vis-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Pretendard', sans-serif;
+  }
+</style>
+<div id="vis-container">
+  <svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker
+        id="arrow"
+        viewBox="0 0 10 10"
+        refX="8"
+        refY="5"
+        markerWidth="6"
+        markerHeight="6"
+        orient="auto-start-reverse"
+      >
+        <path
+          d="M2 1L8 5L2 9"
+          fill="none"
+          stroke="context-stroke"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </marker>
+    </defs>
+  </svg>
+</div>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color, anchor = 'middle', dominant = 'central') {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': anchor,
+      'dominant-baseline': dominant,
+      fill: color,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 수학적 계산 및 설정
+  const r = 4; // 밑면 반지름
+  const l = 10; // 모선 길이
+  const centralAngle = (360 * r) / l; // 부채꼴 중심각 (144도)
+  const centralAngleRad = (centralAngle * Math.PI) / 180;
+
+  // 스케일 및 배치 설정
+  const scale = 22;
+  const L = l * scale; // 220px
+  const R = r * scale; // 88px
+
+  const apexX = 340; // 부채꼴 꼭짓점
+  const apexY = 60;
+
+  const baseCenterX = apexX; // 밑면 원 중심
+  const baseCenterY = apexY + L + R; // 부채꼴과 원이 접하도록 배치
+
+  // 색상 팔레트
+  const colors = {
+    fill: 'rgba(56, 189, 248, 0.15)',
+    stroke: '#0369a1',
+    label: '#0c4a6e',
+    aux: '#64748b',
+  };
+
+  // 2. 렌더링 순서
+
+  // 옆면 (부채꼴)
+  // 대칭으로 배치하기 위해 시작각과 끝각 계산
+  const startAngleRad = (Math.PI - centralAngleRad) / 2;
+  const endAngleRad = Math.PI - startAngleRad;
+
+  const arcStartX = apexX + L * Math.cos(startAngleRad);
+  const arcStartY = apexY + L * Math.sin(startAngleRad);
+  const arcEndX = apexX + L * Math.cos(endAngleRad);
+  const arcEndY = apexY + L * Math.sin(endAngleRad);
+
+  const largeArcFlag = centralAngle > 180 ? 1 : 0;
+  const sweepFlag = 1; // 시계 방향
+
+  const sectorPath = el('path', {
+    d: `M ${apexX} ${apexY} L ${arcStartX} ${arcStartY} A ${L} ${L} 0 ${largeArcFlag} ${sweepFlag} ${arcEndX} ${arcEndY} Z`,
+    fill: colors.fill,
+    stroke: colors.stroke,
+    'stroke-width': '1.5',
+    'stroke-linejoin': 'round',
+  });
+  svg.appendChild(sectorPath);
+
+  // 밑면 (원)
+  const baseCircle = el('circle', {
+    cx: baseCenterX,
+    cy: baseCenterY,
+    r: R,
+    fill: colors.fill,
+    stroke: colors.stroke,
+    'stroke-width': '1.5',
+  });
+  svg.appendChild(baseCircle);
+
+  // 중심점 및 보조선
+  // 부채꼴 꼭짓점 O
+  svg.appendChild(el('circle', { cx: apexX, cy: apexY, r: 3, fill: colors.label }));
+  addText(apexX, apexY - 15, 'O', 14, 500, colors.label);
+
+  // 밑면 원 중심 O'
+  svg.appendChild(el('circle', { cx: baseCenterX, cy: baseCenterY, r: 3, fill: colors.label }));
+  addText(baseCenterX + 12, baseCenterY + 12, "O'", 12, 500, colors.label, 'start');
+
+  // 모선 길이 보조선 (OA)
+  svg.appendChild(
+    el('line', {
+      x1: apexX,
+      y1: apexY,
+      x2: arcStartX,
+      y2: arcStartY,
+      stroke: colors.aux,
+      'stroke-width': '0.8',
+      'stroke-dasharray': '4 3',
+    })
+  );
+  // 꼭짓점 A
+  svg.appendChild(el('circle', { cx: arcStartX, cy: arcStartY, r: 2.5, fill: colors.label }));
+  addText(arcStartX + 10, arcStartY + 10, 'A', 12, 400, colors.label, 'start', 'hanging');
+
+  // 밑면 반지름 보조선
+  svg.appendChild(
+    el('line', {
+      x1: baseCenterX,
+      y1: baseCenterY,
+      x2: baseCenterX + R,
+      y2: baseCenterY,
+      stroke: colors.aux,
+      'stroke-width': '0.8',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  // 3. 치수 및 정보 라벨
+
+  // 모선 길이 10
+  const midOB = { x: (apexX + arcEndX) / 2, y: (apexY + arcEndY) / 2 };
+  addText(midOB.x - 12, midOB.y + 12, '10', 14, 500, colors.label, 'end');
+
+  // 밑면 반지름 4
+  addText(baseCenterX + R / 2, baseCenterY - 10, '4', 14, 500, colors.label);
+
+  // 정보 텍스트 박스
+  const infoX = 540;
+  const infoY = 80;
+  const lineH = 22;
+
+  addText(infoX, infoY, '원뿔의 전개도:', 13, 600, colors.label, 'start');
+  addText(infoX, infoY + lineH, `• 모선(l) = 10`, 12, 400, colors.aux, 'start');
+  addText(infoX, infoY + lineH * 2, `• 밑면 반지름(r) = 4`, 12, 400, colors.aux, 'start');
+  addText(infoX, infoY + lineH * 3.5, `• 부채꼴 중심각(θ):`, 12, 500, colors.label, 'start');
+  addText(infoX + 15, infoY + lineH * 4.5, `360° × (r / l)`, 12, 400, colors.aux, 'start');
+  addText(infoX + 15, infoY + lineH * 5.5, `= 360° × (4 / 10)`, 12, 400, colors.aux, 'start');
+  addText(infoX + 15, infoY + lineH * 6.5, `= 144°`, 13, 600, colors.stroke, 'start');
+</script>

@@ -1,0 +1,170 @@
+<style>
+  #vis-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Pretendard', sans-serif;
+  }
+</style>
+<div id="vis-container">
+  <svg id="vis" width="100%" viewBox="0 0 680 400" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker
+        id="arrow"
+        viewBox="0 0 10 10"
+        refX="8"
+        refY="5"
+        markerWidth="6"
+        markerHeight="6"
+        orient="auto-start-reverse"
+      >
+        <path
+          d="M2 1L8 5L2 9"
+          fill="none"
+          stroke="context-stroke"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </marker>
+    </defs>
+  </svg>
+</div>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color, anchor = 'middle') {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': anchor,
+      'dominant-baseline': 'central',
+      fill: color,
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 좌표 변환 설정
+  const ox = 340; // 원점 x
+  const oy = 320; // 원점 y
+  const scale = 80; // 스케일
+
+  function toPX(mx, my) {
+    return { x: ox + mx * scale, y: oy - my * scale };
+  }
+
+  // 색상 팔레트
+  const colors = {
+    axis: '#64748b',
+    curve: '#2563eb',
+    rectFill: 'rgba(37, 99, 235, 0.15)',
+    rectStroke: '#1d4ed8',
+    label: '#1e293b',
+    point: '#1d4ed8',
+  };
+
+  // 1. 좌표축 및 격자
+  const axisAttr = { stroke: colors.axis, 'stroke-width': '1.2', 'marker-end': 'url(#arrow)' };
+  svg.appendChild(el('line', { x1: 60, y1: oy, x2: 620, y2: oy, ...axisAttr })); // x축
+  svg.appendChild(el('line', { x1: ox, y1: 380, x2: ox, y2: 40, ...axisAttr })); // y축
+  addText(630, oy, 'x', 14, 500, colors.label, 'start');
+  addText(ox, 30, 'y', 14, 500, colors.label);
+  addText(ox - 12, oy + 12, 'O', 12, 400, colors.label);
+
+  // 눈금 표시
+  for (let i = -3; i <= 3; i++) {
+    if (i === 0) continue;
+    const p = toPX(i, 0);
+    svg.appendChild(
+      el('line', { x1: p.x, y1: oy - 4, x2: p.x, y2: oy + 4, stroke: colors.axis, 'stroke-width': '0.8' })
+    );
+    addText(p.x, oy + 16, i, 12, 400, colors.label);
+  }
+  for (let j = 1; j <= 4; j++) {
+    const p = toPX(0, j);
+    svg.appendChild(
+      el('line', { x1: ox - 4, y1: p.y, x2: ox + 4, y2: p.y, stroke: colors.axis, 'stroke-width': '0.8' })
+    );
+    addText(ox - 16, p.y, j, 12, 400, colors.label);
+  }
+
+  // 2. 이차함수 그래프 y = -x^2 + 4
+  let curvePoints = '';
+  for (let mx = -2.2; mx <= 2.2; mx += 0.05) {
+    const my = -mx * mx + 4;
+    const p = toPX(mx, my);
+    curvePoints += `${p.x},${p.y} `;
+  }
+  svg.appendChild(
+    el('polyline', {
+      points: curvePoints.trim(),
+      fill: 'none',
+      stroke: colors.curve,
+      'stroke-width': '2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+    })
+  );
+  addText(ox + 100, toPX(1.5, -1.5 * 1.5 + 4).y, 'y = -x² + 4', 14, 500, colors.curve, 'start');
+
+  // 3. 최대 넓이의 직사각형 (x = 2/√3 ≈ 1.155)
+  const optX = 2 / Math.sqrt(3);
+  const optY = -optX * optX + 4;
+  const r1 = toPX(-optX, 0);
+  const r2 = toPX(optX, optY);
+
+  const rectW = optX * 2 * scale;
+  const rectH = optY * scale;
+
+  svg.appendChild(
+    el('rect', {
+      x: r1.x,
+      y: r2.y,
+      width: rectW,
+      height: rectH,
+      fill: colors.rectFill,
+      stroke: colors.rectStroke,
+      'stroke-width': '2',
+      'stroke-dasharray': 'none',
+    })
+  );
+
+  // 주요 꼭짓점 표시
+  [
+    [-optX, optY],
+    [optX, optY],
+  ].forEach(coord => {
+    const p = toPX(coord[0], coord[1]);
+    svg.appendChild(el('circle', { cx: p.x, cy: p.y, r: 4, fill: colors.point }));
+  });
+
+  // 라벨 추가
+  addText(
+    toPX(optX, optY).x + 45,
+    toPX(optX, optY).y - 10,
+    `(${optX.toFixed(3)}, ${optY.toFixed(3)})`,
+    12,
+    500,
+    colors.rectStroke
+  );
+
+  // 정보 텍스트 박스
+  const infoY = 80;
+  addText(520, infoY, '최대 넓이일 때:', 13, 500, colors.label, 'start');
+  addText(520, infoY + 20, `x ≈ ${optX.toFixed(3)}`, 12, 400, colors.label, 'start');
+  addText(520, infoY + 40, `가로 ≈ ${(optX * 2).toFixed(3)}`, 12, 400, colors.label, 'start');
+  addText(520, infoY + 60, `세로 ≈ ${optY.toFixed(3)}`, 12, 400, colors.label, 'start');
+  addText(520, infoY + 85, `Max Area ≈ ${(32 / (3 * Math.sqrt(3))).toFixed(3)}`, 13, 600, colors.rectStroke, 'start');
+</script>

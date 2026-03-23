@@ -1,0 +1,172 @@
+<svg id="vis" width="100%" viewBox="0 0 680 480" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<div id="equation-container" style="display: none"></div>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  // 색상 팔레트
+  const colors = {
+    axis: '#333333',
+    grid: '#e0e0e0',
+    curve: '#1976d2',
+    shapeFill: 'rgba(25, 118, 210, 0.15)',
+    shapeStroke: '#1976d2',
+    labelPrimary: '#212121',
+    labelSecondary: '#757575',
+  };
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color, anchor = 'middle') {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': anchor,
+      'dominant-baseline': 'central',
+      fill: color,
+      'font-family': 'sans-serif',
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+    return t;
+  }
+
+  // 1. 좌표계 설정
+  const scale = 100;
+  const ox = 340;
+  const oy = 400; // x축 위치
+
+  // 2. 배경 격자 및 축
+  // x축
+  svg.appendChild(
+    el('line', {
+      x1: 40,
+      y1: oy,
+      x2: 640,
+      y2: oy,
+      stroke: colors.axis,
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  addText(650, oy, 'x', 14, 500, colors.axis, 'start');
+
+  // y축
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: 440,
+      x2: ox,
+      y2: 40,
+      stroke: colors.axis,
+      'stroke-width': '1.2',
+      'marker-end': 'url(#arrow)',
+    })
+  );
+  addText(ox, 25, 'y', 14, 500, colors.axis);
+  addText(ox - 12, oy + 12, 'O', 12, 400, colors.axis);
+
+  // 눈금 및 라벨
+  for (let i = -2; i <= 2; i++) {
+    if (i === 0) continue;
+    const px = ox + i * scale;
+    svg.appendChild(el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: colors.axis, 'stroke-width': '0.8' }));
+    addText(px, oy + 16, i.toString(), 12, 400, colors.labelSecondary);
+  }
+  for (let j = 1; j <= 4; j++) {
+    const py = oy - j * scale;
+    svg.appendChild(el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: colors.axis, 'stroke-width': '0.8' }));
+    addText(ox - 16, py, j.toString(), 12, 400, colors.labelSecondary, 'end');
+  }
+
+  // 3. 이차함수 그래프 y = -x^2 + 4
+  let points = '';
+  for (let px = 60; px <= 620; px++) {
+    const mx = (px - ox) / scale;
+    const my = -mx * mx + 4;
+    const py = oy - my * scale;
+    if (py >= 40 && py <= 460) {
+      points += `${px},${py} `;
+    }
+  }
+  svg.appendChild(
+    el('polyline', {
+      points: points.trim(),
+      fill: 'none',
+      stroke: colors.curve,
+      'stroke-width': '2',
+      'stroke-linecap': 'round',
+      'stroke-linejoin': 'round',
+    })
+  );
+
+  // 4. 최대 넓이의 직사각형 렌더링
+  const xOpt = 2 / Math.sqrt(3);
+  const yOpt = -xOpt * xOpt + 4;
+
+  const rectX1 = ox - xOpt * scale;
+  const rectX2 = ox + xOpt * scale;
+  const rectYTop = oy - yOpt * scale;
+  const rectYBottom = oy;
+
+  const rect = el('rect', {
+    x: rectX1,
+    y: rectYTop,
+    width: xOpt * 2 * scale,
+    height: yOpt * scale,
+    fill: colors.shapeFill,
+    stroke: colors.shapeStroke,
+    'stroke-width': '1.5',
+    'stroke-dasharray': '4 2',
+  });
+  svg.appendChild(rect);
+
+  // 꼭짓점 표시 (내접하는 두 점)
+  const p1 = el('circle', { cx: rectX1, cy: rectYTop, r: 4, fill: colors.shapeStroke });
+  const p2 = el('circle', { cx: rectX2, cy: rectYTop, r: 4, fill: colors.shapeStroke });
+  svg.appendChild(p1);
+  svg.appendChild(p2);
+
+  // 5. 텍스트 라벨 (KaTeX 활용을 위한 외국 객체 사용 대신 SVG 텍스트로 대체 또는 수식 렌더링)
+  // 함수식 라벨
+  const formulaX = ox + 1.2 * scale;
+  const formulaY = oy - 3 * scale;
+  addText(formulaX, formulaY, 'y = -x² + 4', 14, 500, colors.curve, 'start');
+
+  // 최적 해 좌표 표시
+  addText(rectX2, rectYTop - 15, `(${xOpt.toFixed(2)}, ${yOpt.toFixed(2)})`, 12, 400, colors.labelPrimary);
+
+  // 설명 텍스트
+  addText(340, 460, '최대 넓이일 때 x ≈ 1.15, y ≈ 2.67', 13, 500, colors.labelPrimary);
+</script>

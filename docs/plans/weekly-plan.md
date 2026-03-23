@@ -1,0 +1,32 @@
+- [ ] 3-Phase 파이프라인 전환 및 검증
+  - [ ] Phase 1 — 요소 정의 + 모듈 선택
+    - [ ] Phase 1 시스템 프롬프트 작성 (6개 모듈 정의, 포함/배제 판단 기준, JSON 출력 형식)
+    - [ ] Phase 1 테스트: 10개 유저 프롬프트로 renderList 출력 검증
+      - [ ] 불필요한 요소가 포함되지 않는지 확인
+      - [ ] 필수 구성 요소(꼭짓점 라벨, 직각 기호 등)가 누락되지 않는지 확인
+      - [ ] 모듈 선택이 올바른지 확인 (단일 모듈 + 복합 모듈 케이스)
+  - [ ] Phase 2 — 수학적 좌표 계산
+    - [ ] Phase 2 시스템 프롬프트 작성 (공통 규칙 + 모듈별 수학 규칙 분리)
+    - [ ] Phase 2 최소 출력 구조 정의 (points, elements with renderId, boundingBox + 타입별 필수 필드)
+    - [ ] Phase 2 테스트: Phase 1 출력을 입력으로 좌표 계산 검증
+      - [ ] 유저 프롬프트 원본 없이 renderList만으로 정확한 좌표가 계산되는지 확인
+      - [ ] 교차 검증(거리, 내적 등)이 수행되는지 확인
+      - [ ] renderList에 없는 요소가 추가되지 않는지 확인
+  - [ ] 검증 + 변환 레이어
+    - [ ] 공통 검증 함수 구현 (renderId 유효성, points 참조 무결성, boundingBox 유효성)
+    - [ ] 공통 변환 함수 구현 (computeViewport, toSVG, transformAllPoints)
+    - [ ] geometry-2d 변환 함수 구현 (arcToSVGPath, validateSharedEdges)
+    - [ ] functions 변환 함수 구현 (sampleCurve, detectDiscontinuity)
+    - [ ] geometry-3d 변환 함수 구현 (project3D, computeFaceVisibility, classifyEdges)
+    - [ ] 변환 레이어 테스트: Phase 2 JSON 입력 → SVG 좌표 JSON 출력 검증
+  - [ ] Phase 3 — SVG 코드 생성
+    - [ ] Phase 3 시스템 프롬프트 작성 (코드 조립 규칙, 요소별 순차 생성 형식)
+    - [ ] 디자인 가이드 문서 초안 작성 (색상, 선 두께, 폰트 등)
+    - [ ] Phase 3 테스트: SVG 좌표 JSON 입력 → 최종 HTML 코드 검증
+      - [ ] 좌표 계산 없이 숫자 대입만으로 코드가 생성되는지 확인
+      - [ ] 디자인 가이드가 올바르게 적용되는지 확인
+  - [ ] 전체 파이프라인 통합 테스트
+    - [ ] geometry-2d 5개 주제 end-to-end 테스트 (Phase 1 → 2 → 변환 → 3)
+    - [ ] functions 3개 주제 end-to-end 테스트
+    - [ ] geometry-3d 3개 주제 end-to-end 테스트
+    - [ ] 기존 v5 단일 호출 결과물과 비교 평가

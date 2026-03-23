@@ -1,0 +1,190 @@
+<style>
+  #vis {
+    background-color: transparent;
+    user-select: none;
+  }
+</style>
+<svg id="vis" width="100%" viewBox="0 0 680 440" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+<script>
+  (function () {
+    const svg = document.getElementById('vis');
+    const ns = 'http://www.w3.org/2000/svg';
+
+    const colors = {
+      shapeFill: 'rgba(74, 144, 226, 0.15)',
+      shapeStroke: '#4A90E2',
+      axis: '#333333',
+      curve: '#E74C3C',
+      labelPrimary: '#333333',
+      labelSecondary: '#666666',
+    };
+
+    function el(tag, attrs) {
+      const e = document.createElementNS(ns, tag);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      return e;
+    }
+
+    function addText(x, y, content, size, weight, color, anchor = 'middle') {
+      const t = el('text', {
+        x,
+        y,
+        'font-size': size,
+        'font-weight': weight,
+        'text-anchor': anchor,
+        'dominant-baseline': 'central',
+        fill: color,
+        'font-family': 'sans-serif',
+      });
+      t.textContent = content;
+      svg.appendChild(t);
+      return t;
+    }
+
+    // 1. 수학적 계산
+    // f(x) = -x^2 + 4
+    const func = x => -Math.pow(x, 2) + 4;
+
+    // 최대 넓이 직사각형의 x좌표: A(x) = 2x(-x^2 + 4) = -2x^3 + 8x
+    // A'(x) = -6x^2 + 8 = 0 => x = sqrt(4/3) = 2/sqrt(3)
+    const x_opt = 2 / Math.sqrt(3);
+    const y_opt = func(x_opt);
+
+    // 좌표계 설정
+    const ox = 340;
+    const oy = 360;
+    const scale = 80; // 1단위당 80px
+
+    // 2. 좌표축 및 눈금
+    // x축
+    svg.appendChild(
+      el('line', {
+        x1: 40,
+        y1: oy,
+        x2: 640,
+        y2: oy,
+        stroke: colors.axis,
+        'stroke-width': '1.2',
+        'marker-end': 'url(#arrow)',
+      })
+    );
+    addText(650, oy, 'x', '14', '500', colors.axis, 'start');
+
+    // y축
+    svg.appendChild(
+      el('line', {
+        x1: ox,
+        y1: 400,
+        x2: ox,
+        y2: 40,
+        stroke: colors.axis,
+        'stroke-width': '1.2',
+        'marker-end': 'url(#arrow)',
+      })
+    );
+    addText(ox, 25, 'y', '14', '500', colors.axis);
+    addText(ox - 12, oy + 12, 'O', '12', '400', colors.axis);
+
+    // 눈금 표시
+    for (let i = -3; i <= 3; i++) {
+      if (i === 0) continue;
+      const px = ox + i * scale;
+      svg.appendChild(
+        el('line', { x1: px, y1: oy - 4, x2: px, y2: oy + 4, stroke: colors.axis, 'stroke-width': '0.8' })
+      );
+      addText(px, oy + 16, i, '12', '400', colors.labelSecondary);
+    }
+    for (let j = 1; j <= 4; j++) {
+      const py = oy - j * scale;
+      svg.appendChild(
+        el('line', { x1: ox - 4, y1: py, x2: ox + 4, y2: py, stroke: colors.axis, 'stroke-width': '0.8' })
+      );
+      addText(ox - 16, py, j, '12', '400', colors.labelSecondary, 'end');
+    }
+
+    // 3. 이차함수 그래프 렌더링
+    let curvePoints = '';
+    const xMin = -2.2,
+      xMax = 2.2;
+    for (let mx = xMin; mx <= xMax; mx += 0.05) {
+      const my = func(mx);
+      const px = ox + mx * scale;
+      const py = oy - my * scale;
+      if (py >= 40 && py <= 400) {
+        curvePoints += `${px.toFixed(1)},${py.toFixed(1)} `;
+      }
+    }
+    svg.appendChild(
+      el('polyline', {
+        points: curvePoints.trim(),
+        fill: 'none',
+        stroke: colors.curve,
+        'stroke-width': '2',
+        'stroke-linecap': 'round',
+        'stroke-linejoin': 'round',
+      })
+    );
+    addText(ox + 1.8 * scale, oy - func(1.8) * scale - 20, 'y = -x² + 4', '14', '500', colors.curve, 'start');
+
+    // 4. 내접하는 최대 넓이 직사각형
+    const rx1 = ox - x_opt * scale;
+    const rx2 = ox + x_opt * scale;
+    const ry_top = oy - y_opt * scale;
+    const ry_bottom = oy;
+
+    const rectPath = `M ${rx1} ${ry_bottom} L ${rx1} ${ry_top} L ${rx2} ${ry_top} L ${rx2} ${ry_bottom} Z`;
+
+    // 직사각형 면적 채우기
+    svg.appendChild(
+      el('path', {
+        d: rectPath,
+        fill: colors.shapeFill,
+        stroke: 'none',
+      })
+    );
+
+    // 직사각형 외곽선
+    svg.appendChild(
+      el('path', {
+        d: rectPath,
+        fill: 'none',
+        stroke: colors.shapeStroke,
+        'stroke-width': '1.5',
+        'stroke-linejoin': 'round',
+      })
+    );
+
+    // 주요 좌표 라벨 (옵션이지만 정확성을 위해 표시)
+    const labelX = x_opt.toFixed(2);
+    const labelY = y_opt.toFixed(2);
+
+    // 접점 표시
+    svg.appendChild(el('circle', { cx: rx2, cy: ry_top, r: 3.5, fill: colors.shapeStroke }));
+    addText(rx2 + 10, ry_top - 10, `(${labelX}, ${labelY})`, '12', '400', colors.labelSecondary, 'start');
+
+    // ViewBox 높이 조정
+    const maxY = oy + 40;
+    svg.setAttribute('viewBox', `0 0 680 ${Math.round(maxY)}`);
+  })();
+</script>

@@ -1,0 +1,203 @@
+<style>
+  #vis-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: transparent;
+  }
+</style>
+<div id="vis-container">
+  <svg id="vis" width="100%" viewBox="0 0 680 420" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <marker
+        id="arrow"
+        viewBox="0 0 10 10"
+        refX="8"
+        refY="5"
+        markerWidth="6"
+        markerHeight="6"
+        orient="auto-start-reverse"
+      >
+        <path
+          d="M2 1L8 5L2 9"
+          fill="none"
+          stroke="context-stroke"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </marker>
+    </defs>
+  </svg>
+</div>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color, anchor = 'middle') {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': anchor,
+      'dominant-baseline': 'central',
+      fill: color,
+      'font-family': 'sans-serif',
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 수학적 모델링 및 좌표 계산
+  const r_top = 3; // 윗면 반지름
+  const r_bottom = 6; // 아랫면 반지름
+  const h = 5; // 높이
+  const scale = 45; // 시각화 스케일
+
+  // 투영 변환 (3D -> 2D)
+  // 타원의 단축 비율 (시점 각도 반영)
+  const ry_ratio = 0.3;
+
+  const ox = 340; // 중심 x
+  const oy_bottom = 350; // 아랫면 중심 y
+  const oy_top = oy_bottom - h * scale; // 윗면 중심 y
+
+  const R_top = r_top * scale;
+  const R_bottom = r_bottom * scale;
+  const RY_top = R_top * ry_ratio;
+  const RY_bottom = R_bottom * ry_ratio;
+
+  // 색상 설정
+  const colors = {
+    stroke: '#1e293b',
+    fill: 'rgba(148, 163, 184, 0.2)',
+    auxiliary: '#64748b',
+    label: '#1e1b4b',
+  };
+
+  // 2. 렌더링 순서
+
+  // (1) 뒷부분 (점선 처리될 부분)
+  // 아랫면 뒷쪽 호
+  svg.appendChild(
+    el('path', {
+      d: `M ${ox - R_bottom} ${oy_bottom} A ${R_bottom} ${RY_bottom} 0 0 1 ${ox + R_bottom} ${oy_bottom}`,
+      fill: 'none',
+      stroke: colors.stroke,
+      'stroke-width': '1',
+      'stroke-dasharray': '5 4',
+    })
+  );
+
+  // (2) 면 채우기
+  const bodyPath = `M ${ox - R_top} ${oy_top} 
+                    L ${ox - R_bottom} ${oy_bottom} 
+                    A ${R_bottom} ${RY_bottom} 0 0 0 ${ox + R_bottom} ${oy_bottom} 
+                    L ${ox + R_top} ${oy_top} 
+                    A ${R_top} ${RY_top} 0 0 1 ${ox - R_top} ${oy_top} Z`;
+  svg.appendChild(el('path', { d: bodyPath, fill: colors.fill, stroke: 'none' }));
+
+  // (3) 주요 외곽선 (실선)
+  // 윗면 전체 타원
+  svg.appendChild(
+    el('ellipse', {
+      cx: ox,
+      cy: oy_top,
+      rx: R_top,
+      ry: RY_top,
+      fill: 'rgba(255,255,255,0.3)',
+      stroke: colors.stroke,
+      'stroke-width': '1.5',
+    })
+  );
+
+  // 아랫면 앞쪽 호
+  svg.appendChild(
+    el('path', {
+      d: `M ${ox - R_bottom} ${oy_bottom} A ${R_bottom} ${RY_bottom} 0 0 0 ${ox + R_bottom} ${oy_bottom}`,
+      fill: 'none',
+      stroke: colors.stroke,
+      'stroke-width': '1.5',
+    })
+  );
+
+  // 옆면 모서리
+  svg.appendChild(
+    el('line', {
+      x1: ox - R_top,
+      y1: oy_top,
+      x2: ox - R_bottom,
+      y2: oy_bottom,
+      stroke: colors.stroke,
+      'stroke-width': '1.5',
+    })
+  );
+  svg.appendChild(
+    el('line', {
+      x1: ox + R_top,
+      y1: oy_top,
+      x2: ox + R_bottom,
+      y2: oy_bottom,
+      stroke: colors.stroke,
+      'stroke-width': '1.5',
+    })
+  );
+
+  // (4) 보조선 (높이 및 반지름 표시)
+  // 중심축 (높이)
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: oy_top,
+      x2: ox,
+      y2: oy_bottom,
+      stroke: colors.auxiliary,
+      'stroke-width': '1',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  // 윗면 반지름
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: oy_top,
+      x2: ox + R_top,
+      y2: oy_top,
+      stroke: colors.auxiliary,
+      'stroke-width': '1',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  // 아랫면 반지름
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: oy_bottom,
+      x2: ox + R_bottom,
+      y2: oy_bottom,
+      stroke: colors.auxiliary,
+      'stroke-width': '1',
+      'stroke-dasharray': '4 3',
+    })
+  );
+
+  // 3. 라벨 및 수치
+  addText(ox + R_top / 2, oy_top - 12, '3', 14, 500, colors.label); // 윗면 반지름
+  addText(ox + R_bottom / 2, oy_bottom + 20, '6', 14, 500, colors.label); // 아랫면 반지름
+  addText(ox - 15, (oy_top + oy_bottom) / 2, '5', 14, 500, colors.label); // 높이
+
+  // 중심점 표시
+  svg.appendChild(el('circle', { cx: ox, cy: oy_top, r: 3, fill: colors.label }));
+  svg.appendChild(el('circle', { cx: ox, cy: oy_bottom, r: 3, fill: colors.label }));
+</script>

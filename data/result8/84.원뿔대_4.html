@@ -1,0 +1,173 @@
+<svg id="vis" width="100%" viewBox="0 0 680 450" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const colors = {
+    shapeFill: 'rgba(25, 118, 210, 0.05)',
+    shapeStroke: '#1976d2',
+    auxiliaryLine: '#757575',
+    labelPrimary: '#212121',
+    labelSecondary: '#616161',
+  };
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color, anchor = 'middle') {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': anchor,
+      'dominant-baseline': 'central',
+      fill: color,
+      'font-family': 'sans-serif',
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 매개변수 설정
+  const rTop = 3; // 윗면 반지름
+  const rBottom = 6; // 아랫면 반지름
+  const h = 5; // 높이
+  const scale = 40; // 스케일
+  const ox = 340; // 중심 x
+  const oy = 350; // 바닥 중심 y
+
+  // 타원의 찌그러짐 정도 (입체감 표현)
+  const ryRatio = 0.3;
+
+  // 2. 타원 궤적 생성 함수
+  function getEllipsePath(cx, cy, rx, ry, isTopHalf) {
+    // isTopHalf가 true면 뒷부분(점선), false면 앞부분(실선)
+    const sweep = 1;
+    const largeArc = 0;
+    const x1 = cx - rx;
+    const x2 = cx + rx;
+    if (isTopHalf) {
+      return `M ${x1} ${cy} A ${rx} ${ry} 0 ${largeArc} 1 ${x2} ${cy}`;
+    } else {
+      return `M ${x2} ${cy} A ${rx} ${ry} 0 ${largeArc} 1 ${x1} ${cy}`;
+    }
+  }
+
+  const ty = oy - h * scale;
+  const trx = rTop * scale;
+  const try_ = trx * ryRatio;
+  const brx = rBottom * scale;
+  const bry = brx * ryRatio;
+
+  // 3. 렌더링 - 면 채우기
+  const bodyPath = `M ${ox - brx} ${oy} L ${ox - trx} ${ty} A ${trx} ${try_} 0 0 1 ${ox + trx} ${ty} L ${ox + brx} ${oy} A ${brx} ${bry} 0 0 1 ${ox - brx} ${oy}`;
+  svg.appendChild(el('path', { d: bodyPath, fill: colors.shapeFill, stroke: 'none' }));
+
+  // 4. 렌더링 - 선 (뒷부분 점선 처리)
+  // 아랫면 뒷부분 (점선)
+  svg.appendChild(
+    el('path', {
+      d: getEllipsePath(ox, oy, brx, bry, true),
+      fill: 'none',
+      stroke: colors.shapeStroke,
+      'stroke-width': '1',
+      'stroke-dasharray': '5 4',
+      opacity: '0.6',
+    })
+  );
+  // 아랫면 앞부분 (실선)
+  svg.appendChild(
+    el('path', {
+      d: getEllipsePath(ox, oy, brx, bry, false),
+      fill: 'none',
+      stroke: colors.shapeStroke,
+      'stroke-width': '2',
+    })
+  );
+
+  // 윗면 전체 (실선)
+  svg.appendChild(
+    el('ellipse', { cx: ox, cy: ty, rx: trx, ry: try_, fill: 'none', stroke: colors.shapeStroke, 'stroke-width': '2' })
+  );
+
+  // 옆면 경계선
+  svg.appendChild(
+    el('line', { x1: ox - brx, y1: oy, x2: ox - trx, y2: ty, stroke: colors.shapeStroke, 'stroke-width': '2' })
+  );
+  svg.appendChild(
+    el('line', { x1: ox + brx, y1: oy, x2: ox + trx, y2: ty, stroke: colors.shapeStroke, 'stroke-width': '2' })
+  );
+
+  // 5. 보조선 및 치수 표시
+  // 중심축 (높이)
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: oy,
+      x2: ox,
+      y2: ty,
+      stroke: colors.auxiliaryLine,
+      'stroke-width': '1',
+      'stroke-dasharray': '4 3',
+    })
+  );
+  addText(ox + 15, (oy + ty) / 2, '5', 14, 500, colors.labelPrimary, 'start');
+
+  // 윗면 반지름
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: ty,
+      x2: ox + trx,
+      y2: ty,
+      stroke: colors.auxiliaryLine,
+      'stroke-width': '1',
+      'stroke-dasharray': '2 2',
+    })
+  );
+  addText(ox + trx / 2, ty - 12, '3', 14, 500, colors.labelPrimary);
+
+  // 아랫면 반지름
+  svg.appendChild(
+    el('line', {
+      x1: ox,
+      y1: oy,
+      x2: ox + brx,
+      y2: oy,
+      stroke: colors.auxiliaryLine,
+      'stroke-width': '1',
+      'stroke-dasharray': '2 2',
+    })
+  );
+  addText(ox + brx / 2, oy + 18, '6', 14, 500, colors.labelPrimary);
+
+  // 중심점 표시
+  svg.appendChild(el('circle', { cx: ox, cy: ty, r: 3, fill: colors.labelPrimary }));
+  svg.appendChild(el('circle', { cx: ox, cy: oy, r: 3, fill: colors.labelPrimary }));
+</script>

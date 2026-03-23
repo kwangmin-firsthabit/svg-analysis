@@ -1,0 +1,153 @@
+<svg id="vis" width="100%" viewBox="0 0 680 500" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker
+      id="arrow"
+      viewBox="0 0 10 10"
+      refX="8"
+      refY="5"
+      markerWidth="6"
+      markerHeight="6"
+      orient="auto-start-reverse"
+    >
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="context-stroke"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+</svg>
+
+<script>
+  const svg = document.getElementById('vis');
+  const ns = 'http://www.w3.org/2000/svg';
+
+  const colors = {
+    shapeFill: 'rgba(25, 118, 210, 0.05)',
+    shapeStroke: '#1976d2',
+    auxiliaryLine: '#757575',
+    labelPrimary: '#212121',
+    labelSecondary: '#616161',
+  };
+
+  function el(tag, attrs) {
+    const e = document.createElementNS(ns, tag);
+    for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+    return e;
+  }
+
+  function addText(x, y, content, size, weight, color, anchor = 'middle') {
+    const t = el('text', {
+      x,
+      y,
+      'font-size': size,
+      'font-weight': weight,
+      'text-anchor': anchor,
+      'dominant-baseline': 'central',
+      fill: color,
+      'font-family': 'sans-serif',
+    });
+    t.textContent = content;
+    svg.appendChild(t);
+  }
+
+  // 1. 수학적 매개변수
+  const r = 4; // 밑면 반지름
+  const l = 10; // 모선 길이
+  const theta = (r / l) * 2 * Math.PI; // 중심각 (라디안)
+  const scale = 25; // 1단위당 25px
+
+  // 2. 좌표 계산
+  const ox = 340; // 부채꼴의 꼭짓점 위치
+  const oy = 60;
+
+  const lPx = l * scale;
+  const rPx = r * scale;
+
+  // 부채꼴 양 끝점 (중심축 기준으로 대칭 배치)
+  const startAngle = Math.PI / 2 - theta / 2;
+  const endAngle = Math.PI / 2 + theta / 2;
+
+  const p1 = {
+    x: ox + lPx * Math.cos(startAngle),
+    y: oy + lPx * Math.sin(startAngle),
+  };
+  const p2 = {
+    x: ox + lPx * Math.cos(endAngle),
+    y: oy + lPx * Math.sin(endAngle),
+  };
+
+  // 부채꼴 경로
+  const largeArcFlag = theta > Math.PI ? 1 : 0;
+  const sectorPathStr = `M ${ox} ${oy} L ${p1.x} ${p1.y} A ${lPx} ${lPx} 0 ${largeArcFlag} 1 ${p2.x} ${p2.y} Z`;
+
+  const sector = el('path', {
+    d: sectorPathStr,
+    fill: colors.shapeFill,
+    stroke: colors.shapeStroke,
+    'stroke-width': '1.5',
+  });
+  svg.appendChild(sector);
+
+  // 3. 밑면 원 그리기 (부채꼴 호의 중앙에 접하도록 배치)
+  const midAngle = Math.PI / 2;
+  const contactPoint = {
+    x: ox + lPx * Math.cos(midAngle),
+    y: oy + lPx * Math.sin(midAngle),
+  };
+  const circleCenter = {
+    x: contactPoint.x,
+    y: contactPoint.y + rPx,
+  };
+
+  const baseCircle = el('circle', {
+    cx: circleCenter.x,
+    cy: circleCenter.y,
+    r: rPx,
+    fill: colors.shapeFill,
+    stroke: colors.shapeStroke,
+    'stroke-width': '1.5',
+  });
+  svg.appendChild(baseCircle);
+
+  // 4. 수치 및 라벨 표시
+  // 모선 길이 라벨 (옆면 모서리)
+  const midSideX = (ox + p1.x) / 2;
+  const midSideY = (oy + p1.y) / 2;
+  addText(midSideX - 20, midSideY - 10, '10', 14, 500, colors.labelPrimary);
+
+  // 밑면 반지름 표시
+  svg.appendChild(
+    el('line', {
+      x1: circleCenter.x,
+      y1: circleCenter.y,
+      x2: circleCenter.x + rPx,
+      y2: circleCenter.y,
+      stroke: colors.auxiliaryLine,
+      'stroke-width': '1',
+      'stroke-dasharray': '4 3',
+    })
+  );
+  addText(circleCenter.x + rPx / 2, circleCenter.y - 12, '4', 14, 500, colors.labelPrimary);
+
+  // 중심점들 표시
+  svg.appendChild(el('circle', { cx: ox, cy: oy, r: 3, fill: colors.labelPrimary }));
+  svg.appendChild(el('circle', { cx: circleCenter.x, cy: circleCenter.y, r: 3, fill: colors.labelPrimary }));
+
+  // 5. 부가 설명
+  addText(
+    ox,
+    circleCenter.y + rPx + 30,
+    `중심각: ${((theta * 180) / Math.PI).toFixed(1)}°`,
+    12,
+    400,
+    colors.labelSecondary
+  );
+
+  // ViewBox 높이 갱신
+  const maxY = circleCenter.y + rPx + 60;
+  svg.setAttribute('viewBox', `0 0 680 ${Math.round(maxY)}`);
+</script>
