@@ -1,3 +1,4 @@
+import { useLayoutEffect, useRef } from 'react';
 import type { Result9Category } from '../data/catalog';
 
 const targetImageModules = import.meta.glob('../../data/result9/targets/*.png', {
@@ -10,6 +11,16 @@ function getTargetImageUrl(dirName: string): string | undefined {
   const num = dirName.split('.')[0]?.padStart(2, '0') ?? '';
   const key = Object.keys(targetImageModules).find(k => k.includes(`image${num}`));
   return key ? targetImageModules[key] : undefined;
+}
+
+function parseSvgSize(html: string): { width: number; height: number } {
+  const svgTag = html.match(/<svg[^>]*>/)?.[0] ?? '';
+  const w = parseFloat(svgTag.match(/width="(\d+(?:\.\d+)?)"/)?.at(1) ?? '');
+  const h = parseFloat(svgTag.match(/height="(\d+(?:\.\d+)?)"/)?.at(1) ?? '');
+  return {
+    width: isNaN(w) ? 500 : w,
+    height: isNaN(h) ? 420 : h,
+  };
 }
 
 function renderPromptWithDiff(curr: string, prev: string | undefined): React.ReactNode {
@@ -39,27 +50,41 @@ interface Result9ItemCardProps {
 }
 
 function Result9ItemCard({ index, html, userPrompt, prevUserPrompt }: Result9ItemCardProps) {
+  const articleRef = useRef<HTMLElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const { width, height } = parseSvgSize(html);
+
+  useLayoutEffect(() => {
+    if (iframeRef.current) {
+      iframeRef.current.style.width = `${width}px`;
+      iframeRef.current.style.height = `${height}px`;
+    }
+    if (articleRef.current) {
+      articleRef.current.style.width = `${width + 24}px`; // p-3 padding 양쪽 12px
+    }
+  }, [width, height]);
+
   return (
-    <article className="w-[480px] shrink-0 rounded-xl border border-slate-300 bg-white shadow-sm">
+    <article ref={articleRef} className="shrink-0 rounded-xl border border-slate-300 bg-white shadow-sm">
       <header className="border-b border-slate-200 px-4 py-2">
         <p className="text-xs font-semibold text-slate-500">#{index}</p>
       </header>
 
       <div className="border-b border-slate-200 bg-slate-50 p-3">
-        {/* scrolling="no": iframe 내부 스크롤 제거 */}
         <iframe
+          ref={iframeRef}
           title={`result9-item-${index}`}
           srcDoc={html}
           loading="lazy"
           scrolling="no"
-          className="h-[420px] w-full rounded border border-slate-300 bg-white"
+          className="block rounded border border-slate-300 bg-white"
         />
       </div>
 
       <section className="space-y-3 p-4">
         <div>
           <h3 className="mb-1 text-xs font-semibold text-slate-600">유저 프롬프트</h3>
-          <p className="rounded border border-slate-200 bg-slate-50 p-2 text-xs leading-relaxed text-slate-700">
+          <p className="rounded border border-slate-200 bg-slate-50 p-2 text-sm leading-relaxed text-slate-700">
             {renderPromptWithDiff(userPrompt, prevUserPrompt)}
           </p>
         </div>
@@ -87,7 +112,6 @@ function CategoryRow({ category }: CategoryRowProps) {
   return (
     <div>
       <p className="mb-2 text-sm font-semibold text-slate-700">{category.dirName}</p>
-      {/* 가로 스크롤 컨테이너 */}
       <div className="overflow-x-auto">
         <div className="flex min-w-max items-start gap-3">
           {/* 타겟 이미지 — sticky left */}

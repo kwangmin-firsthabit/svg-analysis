@@ -1,0 +1,125 @@
+<svg width="420" height="420" viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    x범위: -2~7 (총 9단위), y범위: -5~2 (총 7단위)
+    화면: 420x420, 여백 40px 사방
+
+    사용가능 영역: 340x340 (x:40~380, y:40~380)
+    x scale = 340/9 ≈ 37.8px → 38px
+    y scale = 340/7 ≈ 48.6px → 48px
+
+    원점 위치:
+    ox = 40 + 2*38 = 40+76 = 116
+    oy = 40 + 2*48 = 40+96 = 136
+    (y=2가 화면 상단, y=-5가 화면 하단)
+
+    screen_x = ox + x*38
+    screen_y = oy - y*48
+
+    확인:
+    x=-2: 116-76=40 ✓
+    x=7:  116+266=382 ✓
+    y=2:  136-96=40 ✓
+    y=-5: 136+240=376 ✓
+
+    눈금 위치:
+    x: -2,-1,0,1,2,3,4,5,6,7
+    screen: 40,78,116,154,192,230,268,306,344,382
+
+    y: -5,-4,-3,-2,-1,0,1,2
+    screen: 376,328,280,232,184,136,88,40
+
+    2의 배수 레이블:
+    x: -2,0,2,4,6
+    y: -4,-2,0,2
+
+    x축 레이블 영역: x=7(382) 우측 → x=6(344) 눈금 생략
+    y축 레이블 영역: y=2(40) 상단 → y=2(40) 눈금 생략
+
+    함수 y=(1/2)x-3:
+    x=-2: y=-4 → screen(40, 136+192)=(40,328)
+    x=7:  y=0.5 → screen(382, 136-24)=(382,112)
+  -->
+
+  <!-- 격자: x 수직선 (1단위) -->
+  <line x1="40" y1="36" x2="40" y2="380" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="78" y1="36" x2="78" y2="380" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="154" y1="36" x2="154" y2="380" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="192" y1="36" x2="192" y2="380" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="230" y1="36" x2="230" y2="380" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="268" y1="36" x2="268" y2="380" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="306" y1="36" x2="306" y2="380" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="344" y1="36" x2="344" y2="380" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="382" y1="36" x2="382" y2="380" stroke="#f0f0f0" stroke-width="0.7" />
+
+  <!-- 격자: y 수평선 (1단위) -->
+  <line x1="36" y1="376" x2="386" y2="376" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="36" y1="328" x2="386" y2="328" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="36" y1="280" x2="386" y2="280" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="36" y1="232" x2="386" y2="232" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="36" y1="184" x2="386" y2="184" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="36" y1="88" x2="386" y2="88" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="36" y1="40" x2="386" y2="40" stroke="#f0f0f0" stroke-width="0.7" />
+
+  <!-- x축 (y=0, screen_y=136) -->
+  <line x1="36" y1="136" x2="388" y2="136" stroke="#333" stroke-width="1.5" />
+  <polygon points="388,136 380,132 380,140" fill="#333" />
+  <!-- x축 레이블: 우측 아랫편 -->
+  <text x="386" y="150" text-anchor="end" font-size="14" fill="#333">x</text>
+
+  <!-- y축 (x=0, screen_x=116) -->
+  <line x1="116" y1="388" x2="116" y2="36" stroke="#333" stroke-width="1.5" />
+  <polygon points="116,36 112,44 120,44" fill="#333" />
+  <!-- y축 레이블: 상단 왼편 -->
+  <text x="102" y="50" text-anchor="end" font-size="14" fill="#333">y</text>
+
+  <!-- x축 눈금 (1단위 작은 눈금, 2의 배수 레이블) -->
+  <!-- x=-2: screen=40 → 레이블 표시 -->
+  <line x1="40" y1="133" x2="40" y2="139" stroke="#444" stroke-width="1.3" />
+  <text x="40" y="152" text-anchor="middle" font-size="13" fill="#444">-2</text>
+  <!-- x=-1: screen=78 -->
+  <line x1="78" y1="134" x2="78" y2="138" stroke="#555" stroke-width="1" />
+  <!-- x=1: screen=154 -->
+  <line x1="154" y1="134" x2="154" y2="138" stroke="#555" stroke-width="1" />
+  <!-- x=2: screen=192 → 레이블 -->
+  <line x1="192" y1="133" x2="192" y2="139" stroke="#444" stroke-width="1.3" />
+  <text x="192" y="152" text-anchor="middle" font-size="13" fill="#444">2</text>
+  <!-- x=3: screen=230 -->
+  <line x1="230" y1="134" x2="230" y2="138" stroke="#555" stroke-width="1" />
+  <!-- x=4: screen=268 → 레이블 -->
+  <line x1="268" y1="133" x2="268" y2="139" stroke="#444" stroke-width="1.3" />
+  <text x="268" y="152" text-anchor="middle" font-size="13" fill="#444">4</text>
+  <!-- x=5: screen=306 -->
+  <line x1="306" y1="134" x2="306" y2="138" stroke="#555" stroke-width="1" />
+  <!-- x=6: screen=344 → 레이블 (x=7 영역 생략) -->
+  <line x1="344" y1="133" x2="344" y2="139" stroke="#444" stroke-width="1.3" />
+  <text x="344" y="152" text-anchor="middle" font-size="13" fill="#444">6</text>
+
+  <!-- y축 눈금 (1단위 작은 눈금, 2의 배수 레이블) -->
+  <!-- y=2: screen=40 → y축 레이블 영역이므로 생략 -->
+  <!-- y=1: screen=88 -->
+  <line x1="114" y1="88" x2="118" y2="88" stroke="#555" stroke-width="1" />
+  <!-- y=-1: screen=184 -->
+  <line x1="114" y1="184" x2="118" y2="184" stroke="#555" stroke-width="1" />
+  <!-- y=-2: screen=232 → 레이블 -->
+  <line x1="113" y1="232" x2="119" y2="232" stroke="#444" stroke-width="1.3" />
+  <text x="104" y="236" text-anchor="end" font-size="13" fill="#444">-2</text>
+  <!-- y=-3: screen=280 -->
+  <line x1="114" y1="280" x2="118" y2="280" stroke="#555" stroke-width="1" />
+  <!-- y=-4: screen=328 → 레이블 -->
+  <line x1="113" y1="328" x2="119" y2="328" stroke="#444" stroke-width="1.3" />
+  <text x="104" y="332" text-anchor="end" font-size="13" fill="#444">-4</text>
+  <!-- y=-5: screen=376 -->
+  <line x1="114" y1="376" x2="118" y2="376" stroke="#555" stroke-width="1" />
+
+  <!-- 원점 O -->
+  <text x="104" y="150" text-anchor="end" font-size="13" fill="#444">O</text>
+
+  <!-- 함수 그래프: x=-2→(40,328), x=7→(382,112) -->
+  <line x1="40" y1="328" x2="382" y2="112" stroke="#e05555" stroke-width="2.2" stroke-linecap="round" />
+
+  <!-- x절편 (6,0) → screen(344,136) -->
+  <circle cx="344" cy="136" r="3.5" fill="#e05555" />
+
+  <!-- y절편 (0,-3) → screen(116,280) -->
+  <circle cx="116" cy="280" r="3.5" fill="#e05555" />
+</svg>
