@@ -1,0 +1,44 @@
+<svg width="480" height="420" viewBox="0 0 480 420" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    1cm=28px, r=7cm=196px, h=9cm=252px
+    타원: rx=196, ry=40
+    중심 O=(240,360)
+    꼭짓점 A=(240,360-252)=(240,108)
+    L=(44,360), R=(436,360)
+
+    앞쪽 반호: L→R, sweep=0 (아래 볼록, 실선)
+    뒤쪽 반호: R→L, sweep=0 (위 볼록, 점선)
+  -->
+
+  <!-- 옆면 채우기 -->
+  <path d="M 240,108 L 44,360 A 196,40 0 0,0 436,360 Z" fill="#c8dff0" stroke="none" />
+
+  <!-- 밑면 채우기 (앞쪽 반타원) -->
+  <path d="M 44,360 A 196,40 0 0,0 436,360 Z" fill="#c8dff0" stroke="none" />
+
+  <!-- 뒤쪽 점선 반호: R→L, sweep=0 -->
+  <path d="M 436,360 A 196,40 0 0,0 44,360" fill="none" stroke="#888" stroke-width="1.3" stroke-dasharray="5 4" />
+
+  <!-- 앞쪽 반타원 실선: L→R, sweep=0 -->
+  <path d="M 44,360 A 196,40 0 0,0 436,360" fill="none" stroke="#444" stroke-width="1.7" />
+
+  <!-- 모선 -->
+  <line x1="240" y1="108" x2="44" y2="360" stroke="#444" stroke-width="1.7" stroke-linecap="round" />
+  <line x1="240" y1="108" x2="436" y2="360" stroke="#444" stroke-width="1.7" stroke-linecap="round" />
+
+  <!-- 높이 보조선 점선 -->
+  <line x1="240" y1="108" x2="240" y2="360" stroke="#999" stroke-width="1.2" stroke-dasharray="5 4" />
+
+  <!-- 반지름 선분 점선 -->
+  <line x1="240" y1="360" x2="436" y2="360" stroke="#999" stroke-width="1.2" stroke-dasharray="5 4" />
+
+  <!-- 직각 표시 -->
+  <polyline points="252,360 252,348 240,348" fill="none" stroke="#666" stroke-width="1.2" />
+
+  <!-- 밑면 중심 점 -->
+  <circle cx="240" cy="360" r="3.5" fill="#333" />
+
+  <!-- 치수 레이블 -->
+  <text x="258" y="238" text-anchor="start" font-size="14" fill="#333">9 cm</text>
+  <text x="342" y="352" text-anchor="middle" font-size="14" fill="#333">7 cm</text>
+</svg>

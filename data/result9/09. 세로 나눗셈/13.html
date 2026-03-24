@@ -1,0 +1,94 @@
+<svg width="200" height="210" viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="210" fill="white" />
+
+  <!--
+    F   = 36        font-size
+    gap = 11        F × 0.3 = 10.8 ≈ 11
+    cap = 26        F × 0.72 (cap-height)
+    cw  = 22        F × 0.6  (글자 폭)
+
+    ── 행 설계 ──
+    bracket_y = 58        가로선 y
+    q_base    = 47        = bracket_y - gap
+    div_base  = 95        = bracket_y + gap + cap = 58+11+26
+    prod_base = 132       = div_base + gap + cap  = 95+11+26
+    line2_y   = 143       = prod_base + gap       = 132+11
+    rem_base  = 180       = line2_y + gap + cap   = 143+11+26
+
+    피제수 행 높이 h = div_base - bracket_y = 95 - 58 = 37
+
+    ── arc 설계 ──
+    rx = F × 0.4 = 14
+    ry = h × 0.5 = 18.5 ≈ 19
+
+    오른쪽으로 볼록한 ) 모양:
+      상단 = 가로선 왼쪽 끝 (x_ls, bracket_y)
+      하단 = arc 끝점 (x_ls - rx*2 + ?, div_base)
+
+    SVG arc A rx ry x-rot large-arc sweep ex ey
+      sweep=1: 시계방향
+      sweep=0: 반시계방향
+
+    ) 모양 = 오른쪽 볼록:
+      시작: (x_ls, bracket_y) = 상단
+      끝:   x_end, div_base   = 하단
+      오른쪽 볼록이 되려면 호가 오른쪽으로 불룩해야 함.
+
+    타원 중심이 시작점 왼쪽에 있어야 오른쪽 볼록:
+      시작 (x_ls, bracket_y), 끝 (x_ls, div_base)
+      → 시작과 끝의 x를 동일하게 하면 완전한 ) 모양
+      중심 x = x_ls - rx
+      중심 y = (bracket_y + div_base) / 2 = (58+95)/2 = 76.5
+
+      ry = (div_base - bracket_y)/2 = 37/2 = 18.5
+      rx = F × 0.4 = 14
+
+      시작: (x_ls, bracket_y) → 끝: (x_ls, div_base)
+      sweep=1 (시계방향) → 오른쪽 볼록 ✓
+
+    x_ls  = 80    가로선 왼쪽 끝 = arc 시작/끝 x
+    x_le  = 128   가로선 오른쪽 끝
+    x_ten = 97    십의 자리 중심  = x_ls + cw/2 + 6
+    x_one = 119   일의 자리 중심  = x_ten + cw
+    x_div = 46    나누는 수 중심
+
+    arc:
+      M x_ls,bracket_y  A rx,ry 0 0 1  x_ls,div_base
+      = M 80,58  A 14,18.5 0 0 1  80,95
+  -->
+
+  <g font-family="monospace" font-size="36" fill="#222">
+    <!-- 몫: 8 -->
+    <text x="119" y="47" text-anchor="middle">8</text>
+
+    <!-- long division bracket:
+         arc: (80,58) → (80,95), rx=14, ry=18.5, sweep=1 (시계, 오른쪽 볼록)
+         가로선: (80,58) → (128,58)
+    -->
+    <path
+      d="M 80,95 A 14,18.5 0 0 0 80,58 L 128,58"
+      fill="none"
+      stroke="#222"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <!-- 나누는 수: 5 -->
+    <text x="46" y="95" text-anchor="middle">5</text>
+
+    <!-- 피제수: 42 -->
+    <text x="97" y="95" text-anchor="middle">4</text>
+    <text x="119" y="95" text-anchor="middle">2</text>
+
+    <!-- 5×8=40 -->
+    <text x="97" y="132" text-anchor="middle">4</text>
+    <text x="119" y="132" text-anchor="middle">0</text>
+
+    <!-- 빼기 선 -->
+    <line x1="80" y1="143" x2="128" y2="143" stroke="#222" stroke-width="1.8" />
+
+    <!-- 나머지: 2 -->
+    <text x="119" y="180" text-anchor="middle">2</text>
+  </g>
+</svg>

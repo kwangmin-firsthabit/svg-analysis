@@ -1,0 +1,91 @@
+<svg width="200" height="210" viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="210" fill="white" />
+
+  <!--
+    font-size = F = 36px
+    글자 높이 ≈ F, 글자 폭(monospace) ≈ F × 0.6 = 21.6 ≈ 22px
+    가로선 ↔ 숫자 간격 = F × 0.3 = 10.8 ≈ 11px
+
+    ── 열 설계 ──
+    숫자 중심 x:
+      x_div = 40          나누는 수 "5"
+      x_brk = 63          ")"
+      x_ten = 90          십의 자리
+      x_one = 112         일의 자리
+
+    가로선 x 범위:
+      x_line_start = 68   ) 상단 끝점 (x_brk + 5)
+      x_line_end   = 123  피제수/결과 끝 (x_one + 11)
+
+    ── 행 설계 (F=36, gap=11) ──
+    bracket 가로선 y = BL
+    모든 y는 BL 기준 상대값.
+
+    몫 baseline      = BL - gap - (F × 0.2)  ← 선 위 gap 확보 후 숫자 baseline
+                     = BL - 11 - 7 = BL - 18
+    → 몫을 선 위 gap=11 띄우려면:
+       숫자 baseline = BL - gap = BL - 11
+       (text baseline은 글자 하단 기준이므로 선 위로 gap만큼)
+
+    bracket 선 y     = BL = 60
+
+    피제수 baseline  = BL + gap + F × 0.75
+                     ≈ 60 + 11 + 27 = 98
+      (선 아래 gap=11, 숫자 cap-height≈F×0.75=27 → baseline=BL+11+27=98 ... 
+       실제로는 선 아래 gap=11이면 숫자 top이 BL+11,
+       baseline = BL + 11 + cap ≈ BL + 11 + F×0.72 ≈ 60+11+26 = 97)
+      → 피제수 baseline = 98
+
+    빼기선 y         = 피제수 baseline + gap + (F × 0.05)
+                     = 98 + 11 + 2 = 111 ... 
+      아래 숫자(40)의 top = 피제수 baseline + gap = 98+11=109
+      40 baseline    = 109 + F×0.72 = 109+26 = 135
+      빼기선 y       = 135 + gap = 135+11 = 146
+
+    나머지 baseline  = 빼기선 y + gap + F×0.72
+                     = 146 + 11 + 26 = 183
+
+    ── 정리 ──
+    F        = 36
+    gap      = 11  (F×0.3 ≈ 10.8)
+    cap      = 26  (F×0.72)
+
+    bracket_y   = 60
+    q_baseline  = bracket_y - gap          = 49
+    div_base    = bracket_y + gap + cap    = 97
+    prod_base   = div_base  + gap + cap    = 134
+    line2_y     = prod_base + gap          = 145
+    rem_base    = line2_y   + gap + cap    = 182
+
+    x_div=40, x_brk=63, x_ten=90, x_one=112
+    x_ls=68, x_le=124
+  -->
+
+  <g font-family="monospace" font-size="36" fill="#222">
+    <!-- 몫: 8 -->
+    <text x="112" y="49" text-anchor="middle">8</text>
+
+    <!-- long division bracket 가로선 -->
+    <line x1="68" y1="60" x2="124" y2="60" stroke="#222" stroke-width="1.8" />
+
+    <!-- 나누는 수: 5 -->
+    <text x="40" y="97" text-anchor="middle">5</text>
+
+    <!-- 괄호: ) — 상단이 가로선 y=60과 이어짐 -->
+    <text x="63" y="97" text-anchor="middle">)</text>
+
+    <!-- 피제수: 42 -->
+    <text x="90" y="97" text-anchor="middle">4</text>
+    <text x="112" y="97" text-anchor="middle">2</text>
+
+    <!-- 5×8=40 -->
+    <text x="90" y="134" text-anchor="middle">4</text>
+    <text x="112" y="134" text-anchor="middle">0</text>
+
+    <!-- 빼기 선 -->
+    <line x1="68" y1="145" x2="124" y2="145" stroke="#222" stroke-width="1.8" />
+
+    <!-- 나머지: 2 -->
+    <text x="112" y="182" text-anchor="middle">2</text>
+  </g>
+</svg>

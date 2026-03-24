@@ -1,0 +1,57 @@
+<svg width="220" height="200" viewBox="0 0 220 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="220" height="200" fill="white" />
+
+  <!--
+    긴 나눗셈: 42 ÷ 5 = 8 나머지 2
+
+    글자 크기: 32px monospace → 글자 폭 ≈ 19px
+
+    열 설계 (문자 중심 x):
+      col1 = 50   나누는 수 "5"
+      col2 = 75   괄호 ")"
+      col3 = 105  십의 자리 "4"
+      col4 = 130  일의 자리 "2" / "0" / "2"(나머지)
+      몫   = 130  일의 자리 위 "8"
+
+    행 설계 (baseline y):
+      row0 =  45  몫 "8"
+      line1=  52  몫 아래 가로선
+      row1 =  80  5 ) 42
+      row2 = 115  40 (뺄 수)
+      line2= 128  빼기 선
+      row3 = 158  나머지 "2"
+
+    가로선 x 범위: col2+10 ~ col4+15 = 85 ~ 145
+  -->
+
+  <g font-family="monospace" font-size="32" fill="#222">
+    <!-- 몫: 8 (일의 자리 위) -->
+    <text x="130" y="45" text-anchor="middle">8</text>
+
+    <!-- 몫 아래 가로선 -->
+    <line x1="85" y1="52" x2="150" y2="52" stroke="#222" stroke-width="1.8" />
+
+    <!-- 나누는 수: 5 -->
+    <text x="50" y="85" text-anchor="middle">5</text>
+
+    <!-- 괄호: ) -->
+    <text x="75" y="85" text-anchor="middle">)</text>
+
+    <!-- 피제수: 42 -->
+    <text x="105" y="85" text-anchor="middle">4</text>
+    <text x="130" y="85" text-anchor="middle">2</text>
+
+    <!-- 빼기 부호 -->
+    <text x="88" y="118" text-anchor="middle" font-size="28">−</text>
+
+    <!-- 5×8=40 -->
+    <text x="105" y="118" text-anchor="middle">4</text>
+    <text x="130" y="118" text-anchor="middle">0</text>
+
+    <!-- 빼기 선 -->
+    <line x1="85" y1="128" x2="150" y2="128" stroke="#222" stroke-width="1.8" />
+
+    <!-- 나머지: 2 -->
+    <text x="130" y="162" text-anchor="middle">2</text>
+  </g>
+</svg>

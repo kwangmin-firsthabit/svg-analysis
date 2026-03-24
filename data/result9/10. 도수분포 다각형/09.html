@@ -1,0 +1,107 @@
+<svg width="420" height="420" viewBox="0 0 420 420" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    x범위: -2~7 (9단위), y범위: -5~2 (7단위)
+    가로:세로 = 1:1 비율 → x scale = y scale
+    
+    화면 사용 영역을 두 범위에 맞게 조정:
+    x 9단위, y 7단위 → 더 큰 쪽(x, 9단위)에 맞춤
+    scale = min(380/9, 380/7) = min(42.2, 54.3) = 42px (1:1 보장)
+
+    scale = 42px/단위
+
+    x 총폭 = 9*42 = 378px → 좌여백=(420-378)/2=21 → 너무 좁
+    y 총높 = 7*42 = 294px → 상하여백=(420-294)/2=63
+
+    좌여백 조정: x여백=21, y여백=63
+    ox = 21 + 2*42 = 21+84 = 105  (x=-2가 x=21에)
+    oy = 63 + 2*42 = 63+84 = 147  (y=2가 y=63에)
+
+    screen_x = 105 + x*42
+    screen_y = 147 - y*42
+
+    확인:
+    x=-2: 105-84=21 ✓
+    x=7:  105+294=399 ✓
+    y=2:  147-84=63 ✓
+    y=-5: 147+210=357 ✓
+
+    함수 끝점:
+    x=-2: y=-4 → (21, 315)
+    x=7:  y=0.5 → (399, 126)
+
+    x절편(6,0): (357, 147)
+    y절편(0,-3): (105, 273)
+
+    2의 배수 눈금:
+    x: -2(21), 0(105), 2(189), 4(273), 6(357)
+    y: 2(63), 0(147), -2(231), -4(315)
+
+    축 레이블 영역:
+    x레이블 우측 아랫 → x=8 이상 생략 (399 이후)
+    y레이블 상단 왼편 → y=2(63) 생략
+
+    1단위 격자: 42px 간격
+    x격자: x=-2,-1,0,1,2,3,4,5,6,7 → screen: 21,63,105,147,189,231,273,315,357,399
+    y격자: y=2,1,0,-1,-2,-3,-4,-5 → screen: 63,105,147,189,231,273,315,357
+  -->
+
+  <!-- 격자: x 수직선 1단위 -->
+  <line x1="21" y1="57" x2="21" y2="363" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="63" y1="57" x2="63" y2="363" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="105" y1="57" x2="105" y2="363" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="147" y1="57" x2="147" y2="363" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="189" y1="57" x2="189" y2="363" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="231" y1="57" x2="231" y2="363" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="273" y1="57" x2="273" y2="363" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="315" y1="57" x2="315" y2="363" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="357" y1="57" x2="357" y2="363" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="399" y1="57" x2="399" y2="363" stroke="#f0f0f0" stroke-width="0.7" />
+
+  <!-- 격자: y 수평선 1단위 -->
+  <line x1="17" y1="63" x2="403" y2="63" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="17" y1="105" x2="403" y2="105" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="17" y1="147" x2="403" y2="147" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="17" y1="189" x2="403" y2="189" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="17" y1="231" x2="403" y2="231" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="17" y1="273" x2="403" y2="273" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="17" y1="315" x2="403" y2="315" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="17" y1="357" x2="403" y2="357" stroke="#f0f0f0" stroke-width="0.7" />
+
+  <!-- x축 (y=0, screen_y=147) -->
+  <line x1="17" y1="147" x2="408" y2="147" stroke="#333" stroke-width="1.5" />
+  <polygon points="408,147 400,143 400,151" fill="#333" />
+
+  <!-- y축 (x=0, screen_x=105) -->
+  <line x1="105" y1="363" x2="105" y2="55" stroke="#333" stroke-width="1.5" />
+  <polygon points="105,55 101,63 109,63" fill="#333" />
+
+  <!-- x축 레이블: 우측 아랫편 -->
+  <text x="406" y="161" text-anchor="end" font-size="15" font-style="italic" font-family="serif" fill="#333">x</text>
+
+  <!-- y축 레이블: 상단 왼편 -->
+  <text x="91" y="66" text-anchor="end" font-size="15" font-style="italic" font-family="serif" fill="#333">y</text>
+
+  <!-- 원점 O -->
+  <text x="91" y="161" text-anchor="end" font-size="13" fill="#444">O</text>
+
+  <!-- x축 눈금 레이블 (눈금선 없이 텍스트만, 2의 배수) -->
+  <!-- x=-2: 21, x레이블 영역(408) 근처 제외 -->
+  <text x="21" y="163" text-anchor="middle" font-size="13" fill="#444">-2</text>
+  <text x="189" y="163" text-anchor="middle" font-size="13" fill="#444">2</text>
+  <text x="273" y="163" text-anchor="middle" font-size="13" fill="#444">4</text>
+  <text x="357" y="163" text-anchor="middle" font-size="13" fill="#444">6</text>
+
+  <!-- y축 눈금 레이블 (눈금선 없이 텍스트만, 2의 배수) -->
+  <!-- y=2(63) 생략: y레이블 영역 -->
+  <text x="91" y="235" text-anchor="end" font-size="13" fill="#444">-2</text>
+  <text x="91" y="319" text-anchor="end" font-size="13" fill="#444">-4</text>
+
+  <!-- 함수 그래프: (21,315)~(399,126) -->
+  <line x1="17" y1="316.5" x2="410" y2="125.5" stroke="#e05555" stroke-width="2.2" stroke-linecap="round" />
+
+  <!-- x절편 (6,0) → (357,147) -->
+  <circle cx="357" cy="147" r="3.5" fill="#e05555" />
+
+  <!-- y절편 (0,-3) → (105,273) -->
+  <circle cx="105" cy="273" r="3.5" fill="#e05555" />
+</svg>

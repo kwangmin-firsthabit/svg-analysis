@@ -1,0 +1,73 @@
+<svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    중심 원점 O = (250, 250)
+    1단위 = 55px
+    a=2, b=2 (구체적 예시)
+
+    점 (a,b) = (2,2) → screen(250+110, 250-110) = (360, 140)
+    x축 대칭 (a,-b) = (2,-2) → (360, 360)
+    y축 대칭 (-a,b) = (-2,2) → (140, 140)
+    원점 대칭 (-a,-b) = (-2,-2) → (140, 360)
+  -->
+
+  <!-- 격자 -->
+  <line x1="30" y1="140" x2="470" y2="140" stroke="#f0f0f0" stroke-width="0.8" />
+  <line x1="30" y1="195" x2="470" y2="195" stroke="#f0f0f0" stroke-width="0.8" />
+  <line x1="30" y1="305" x2="470" y2="305" stroke="#f0f0f0" stroke-width="0.8" />
+  <line x1="30" y1="360" x2="470" y2="360" stroke="#f0f0f0" stroke-width="0.8" />
+  <line x1="140" y1="30" x2="140" y2="470" stroke="#f0f0f0" stroke-width="0.8" />
+  <line x1="195" y1="30" x2="195" y2="470" stroke="#f0f0f0" stroke-width="0.8" />
+  <line x1="305" y1="30" x2="305" y2="470" stroke="#f0f0f0" stroke-width="0.8" />
+  <line x1="360" y1="30" x2="360" y2="470" stroke="#f0f0f0" stroke-width="0.8" />
+
+  <!-- x축 -->
+  <line x1="28" y1="250" x2="474" y2="250" stroke="#333" stroke-width="1.5" />
+  <polygon points="474,250 466,246 466,254" fill="#333" />
+  <text x="472" y="264" text-anchor="end" font-size="14" fill="#333">x</text>
+
+  <!-- y축 -->
+  <line x1="250" y1="474" x2="250" y2="28" stroke="#333" stroke-width="1.5" />
+  <polygon points="250,28 246,36 254,36" fill="#333" />
+  <text x="236" y="42" text-anchor="end" font-size="14" fill="#333">y</text>
+
+  <!-- 원점 -->
+  <text x="236" y="266" text-anchor="end" font-size="13" fill="#555">O</text>
+
+  <!-- 대칭축 보조 점선 -->
+  <!-- 수평 보조선: (a,b)↔(a,-b) -->
+  <line x1="360" y1="140" x2="360" y2="360" stroke="#bbb" stroke-width="1.2" stroke-dasharray="5 4" />
+  <!-- 수직 보조선: (a,b)↔(-a,b) -->
+  <line x1="140" y1="140" x2="360" y2="140" stroke="#bbb" stroke-width="1.2" stroke-dasharray="5 4" />
+  <!-- 수평 보조선: (-a,b)↔(-a,-b) -->
+  <line x1="140" y1="140" x2="140" y2="360" stroke="#bbb" stroke-width="1.2" stroke-dasharray="5 4" />
+  <!-- 수직 보조선: (a,-b)↔(-a,-b) -->
+  <line x1="140" y1="360" x2="360" y2="360" stroke="#bbb" stroke-width="1.2" stroke-dasharray="5 4" />
+  <!-- 대각선: (a,b)↔(-a,-b) -->
+  <line x1="140" y1="360" x2="360" y2="140" stroke="#bbb" stroke-width="1.2" stroke-dasharray="5 4" />
+
+  <!-- 점 (a,b) -->
+  <circle cx="360" cy="140" r="5" fill="#e05555" />
+  <text x="368" y="132" text-anchor="start" font-size="14" fill="#e05555" font-style="italic">(a, b)</text>
+
+  <!-- 점 (a,-b): x축 대칭 -->
+  <circle cx="360" cy="360" r="5" fill="#3a7fd5" />
+  <text x="368" y="368" text-anchor="start" font-size="14" fill="#3a7fd5" font-style="italic">(a, -b)</text>
+
+  <!-- 점 (-a,b): y축 대칭 -->
+  <circle cx="140" cy="140" r="5" fill="#2aa87a" />
+  <text x="132" y="132" text-anchor="end" font-size="14" fill="#2aa87a" font-style="italic">(-a, b)</text>
+
+  <!-- 점 (-a,-b): 원점 대칭 -->
+  <circle cx="140" cy="360" r="5" fill="#d4850a" />
+  <text x="132" y="368" text-anchor="end" font-size="14" fill="#d4850a" font-style="italic">(-a, -b)</text>
+
+  <!-- 범례 -->
+  <circle cx="44" cy="438" r="5" fill="#e05555" />
+  <text x="54" y="443" font-size="12" fill="#555">원래 점 (a, b)</text>
+  <circle cx="44" cy="458" r="5" fill="#3a7fd5" />
+  <text x="54" y="463" font-size="12" fill="#555">x축 대칭 (a, -b)</text>
+  <circle cx="44" cy="478" r="5" fill="#2aa87a" />
+  <text x="54" y="483" font-size="12" fill="#555">y축 대칭 (-a, b)</text>
+  <circle cx="200" cy="438" r="5" fill="#d4850a" />
+  <text x="210" y="443" font-size="12" fill="#555">원점 대칭 (-a, -b)</text>
+</svg>

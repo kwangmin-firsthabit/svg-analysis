@@ -1,0 +1,205 @@
+<svg width="440" height="400" viewBox="0 0 440 400" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    x축: 계급 경계값 4~10 표시, 데이터점은 중간값(4.5,5.5,...) 위치
+    y축: 0~14, 눈금선 1간격, 레이블 2간격
+
+    여백: 좌=65, 우=55, 상=45, 하=55
+    사용영역: x=65~385(320px), y=45~335(290px)
+
+    x: 계급경계 4,5,6,7,8,9,10 표시
+    계급경계 간격 = 320/6 ≈ 53.3px → 53px
+    screen_x(경계) = 65 + (x-4)*53.3
+    x=4: 65
+    x=5: 118.3
+    x=6: 171.6
+    x=7: 224.9 ≈ 225
+    x=8: 278.2 ≈ 278
+    x=9: 331.5 ≈ 332
+    x=10: 384.8 ≈ 385
+
+    중간값 위치 = 경계값 + 26.65px
+    4.5: 91.7 ≈ 92
+    5.5: 145.0 ≈ 145
+    6.5: 198.3 ≈ 198
+    7.5: 251.6 ≈ 252
+    8.5: 304.9 ≈ 305
+    9.5: 358.2 ≈ 358
+
+    닫힘점:
+    (3,0)→ x=3: 65-53.3=11.7≈12 → 너무 왼쪽
+    x축을 3부터 시작하되 3~4구간은 물결로 생략
+    물결 위치: x=12~55 근방
+
+    재설계: 물결 생략 표시를 위해
+    x=4 위치를 화면 왼쪽에서 충분한 여백 확보
+    좌여백=80
+    screen_x(경계) = 80 + (x-4)*53
+    x=4: 80
+    x=5: 133
+    x=6: 186
+    x=7: 239
+    x=8: 292
+    x=9: 345
+    x=10: 398
+
+    중간값:
+    4.5: 106.5≈107
+    5.5: 159.5≈160
+    6.5: 212.5≈213
+    7.5: 265.5≈266
+    8.5: 318.5≈319
+    9.5: 371.5≈372
+
+    닫힘점 (3,0): x=3→80-53=27
+    닫힘점 (10,0): x=10→398
+
+    y: 0~14, 1간격=290/14≈20.7px→21px
+    oy=335
+    screen_y = 335 - y*21
+    y=0:  335
+    y=1:  314
+    y=2:  293
+    y=3:  272
+    y=4:  251
+    y=5:  230
+    y=6:  209
+    y=7:  188
+    y=8:  167
+    y=9:  146
+    y=10: 125
+    y=11: 104
+    y=12: 83
+    y=13: 62
+    y=14: 41 (=335-294)
+
+    데이터점:
+    (3,0):  (27, 335)  닫힘
+    (4,1):  (107, 314)
+    (5,5):  (160, 230)
+    (6,14): (213, 41)
+    (7,8):  (266, 167)
+    (8,2):  (319, 293)
+    (9,1):  (372, 314)
+    (10,0): (398, 335) 닫힘
+
+    물결 표시: x축(y=335)의 x=27 왼쪽에 ~~ 기호
+    y축 위치: x=80 (x=4 경계)
+    물결은 x=27~x=72 사이(닫힘점과 y축 사이)에 표시
+  -->
+
+  <!-- 격자 수직선 (x=4~10 경계) -->
+  <line x1="80" y1="45" x2="80" y2="335" stroke="#ddd" stroke-width="0.8" />
+  <line x1="133" y1="45" x2="133" y2="335" stroke="#ddd" stroke-width="0.8" />
+  <line x1="186" y1="45" x2="186" y2="335" stroke="#ddd" stroke-width="0.8" />
+  <line x1="239" y1="45" x2="239" y2="335" stroke="#ddd" stroke-width="0.8" />
+  <line x1="292" y1="45" x2="292" y2="335" stroke="#ddd" stroke-width="0.8" />
+  <line x1="345" y1="45" x2="345" y2="335" stroke="#ddd" stroke-width="0.8" />
+  <line x1="398" y1="45" x2="398" y2="335" stroke="#ddd" stroke-width="0.8" />
+
+  <!-- 격자 수평선 (y=1~14, 1간격) -->
+  <line x1="80" y1="314" x2="398" y2="314" stroke="#ddd" stroke-width="0.8" />
+  <line x1="80" y1="293" x2="398" y2="293" stroke="#ddd" stroke-width="0.8" />
+  <line x1="80" y1="272" x2="398" y2="272" stroke="#ddd" stroke-width="0.8" />
+  <line x1="80" y1="251" x2="398" y2="251" stroke="#ddd" stroke-width="0.8" />
+  <line x1="80" y1="230" x2="398" y2="230" stroke="#ddd" stroke-width="0.8" />
+  <line x1="80" y1="209" x2="398" y2="209" stroke="#ddd" stroke-width="0.8" />
+  <line x1="80" y1="188" x2="398" y2="188" stroke="#ddd" stroke-width="0.8" />
+  <line x1="80" y1="167" x2="398" y2="167" stroke="#ddd" stroke-width="0.8" />
+  <line x1="80" y1="146" x2="398" y2="146" stroke="#ddd" stroke-width="0.8" />
+  <line x1="80" y1="125" x2="398" y2="125" stroke="#ddd" stroke-width="0.8" />
+  <line x1="80" y1="104" x2="398" y2="104" stroke="#ddd" stroke-width="0.8" />
+  <line x1="80" y1="83" x2="398" y2="83" stroke="#ddd" stroke-width="0.8" />
+  <line x1="80" y1="62" x2="398" y2="62" stroke="#ddd" stroke-width="0.8" />
+  <line x1="80" y1="41" x2="398" y2="41" stroke="#ddd" stroke-width="0.8" />
+
+  <!-- x축 (물결 왼쪽에서 끝까지) -->
+  <!-- 물결 오른쪽 구간: x=75~410 -->
+  <line x1="75" y1="335" x2="412" y2="335" stroke="#333" stroke-width="1.5" />
+  <polygon points="412,335 404,331 404,339" fill="#333" />
+
+  <!-- y축 -->
+  <line x1="80" y1="340" x2="80" y2="32" stroke="#333" stroke-width="1.5" />
+  <polygon points="80,32 76,40 84,40" fill="#333" />
+
+  <!-- 물결 생략 기호: x축 위 왼쪽 (x=27~72 구간) -->
+  <!-- 물결 모양: 사인파 형태의 짧은 path -->
+  <path
+    d="M 27,335 Q 33,328 39,335 Q 45,342 51,335 Q 57,328 63,335 Q 69,342 75,335"
+    fill="none"
+    stroke="#333"
+    stroke-width="1.5"
+  />
+
+  <!-- x축 눈금 (계급 경계값 4~10) -->
+  <line x1="80" y1="332" x2="80" y2="338" stroke="#333" stroke-width="1.2" />
+  <line x1="133" y1="332" x2="133" y2="338" stroke="#333" stroke-width="1.2" />
+  <line x1="186" y1="332" x2="186" y2="338" stroke="#333" stroke-width="1.2" />
+  <line x1="239" y1="332" x2="239" y2="338" stroke="#333" stroke-width="1.2" />
+  <line x1="292" y1="332" x2="292" y2="338" stroke="#333" stroke-width="1.2" />
+  <line x1="345" y1="332" x2="345" y2="338" stroke="#333" stroke-width="1.2" />
+  <line x1="398" y1="332" x2="398" y2="338" stroke="#333" stroke-width="1.2" />
+
+  <!-- y축 눈금 (1간격) -->
+  <line x1="77" y1="335" x2="83" y2="335" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="314" x2="83" y2="314" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="293" x2="83" y2="293" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="272" x2="83" y2="272" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="251" x2="83" y2="251" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="230" x2="83" y2="230" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="209" x2="83" y2="209" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="188" x2="83" y2="188" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="167" x2="83" y2="167" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="146" x2="83" y2="146" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="125" x2="83" y2="125" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="104" x2="83" y2="104" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="83" x2="83" y2="83" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="62" x2="83" y2="62" stroke="#333" stroke-width="1.2" />
+  <line x1="77" y1="41" x2="83" y2="41" stroke="#333" stroke-width="1.2" />
+
+  <!-- 꺾은선 -->
+  <polyline
+    points="27,335 107,314 160,230 213,41 266,167 319,293 372,314 398,335"
+    fill="none"
+    stroke="#3a9fd5"
+    stroke-width="2"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+
+  <!-- 데이터 점 (중간값 위치) -->
+  <circle cx="107" cy="314" r="3.5" fill="#3a9fd5" />
+  <circle cx="160" cy="230" r="3.5" fill="#3a9fd5" />
+  <circle cx="213" cy="41" r="3.5" fill="#3a9fd5" />
+  <circle cx="266" cy="167" r="3.5" fill="#3a9fd5" />
+  <circle cx="319" cy="293" r="3.5" fill="#3a9fd5" />
+  <circle cx="372" cy="314" r="3.5" fill="#3a9fd5" />
+
+  <!-- 닫힘점 -->
+  <circle cx="27" cy="335" r="3.5" fill="white" stroke="#3a9fd5" stroke-width="1.5" />
+  <circle cx="398" cy="335" r="3.5" fill="white" stroke="#3a9fd5" stroke-width="1.5" />
+
+  <!-- ══ 텍스트 ══ -->
+
+  <!-- 축 레이블 -->
+  <text x="414" y="339" text-anchor="start" font-size="13" fill="#333">(시간)</text>
+  <text x="66" y="30" text-anchor="end" font-size="13" fill="#333">(명)</text>
+
+  <!-- x축 눈금 레이블 (계급 경계값) -->
+  <text x="80" y="352" text-anchor="middle" font-size="12" fill="#555">4</text>
+  <text x="133" y="352" text-anchor="middle" font-size="12" fill="#555">5</text>
+  <text x="186" y="352" text-anchor="middle" font-size="12" fill="#555">6</text>
+  <text x="239" y="352" text-anchor="middle" font-size="12" fill="#555">7</text>
+  <text x="292" y="352" text-anchor="middle" font-size="12" fill="#555">8</text>
+  <text x="345" y="352" text-anchor="middle" font-size="12" fill="#555">9</text>
+  <text x="398" y="352" text-anchor="middle" font-size="12" fill="#555">10</text>
+
+  <!-- y축 눈금 레이블 (2간격) -->
+  <text x="68" y="339" text-anchor="end" font-size="12" fill="#555">0</text>
+  <text x="68" y="297" text-anchor="end" font-size="12" fill="#555">2</text>
+  <text x="68" y="255" text-anchor="end" font-size="12" fill="#555">4</text>
+  <text x="68" y="213" text-anchor="end" font-size="12" fill="#555">6</text>
+  <text x="68" y="171" text-anchor="end" font-size="12" fill="#555">8</text>
+  <text x="68" y="129" text-anchor="end" font-size="12" fill="#555">10</text>
+  <text x="68" y="87" text-anchor="end" font-size="12" fill="#555">12</text>
+  <text x="68" y="45" text-anchor="end" font-size="12" fill="#555">14</text>
+</svg>

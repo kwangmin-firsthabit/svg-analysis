@@ -1,0 +1,151 @@
+<svg width="520" height="480" viewBox="0 0 520 480" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    원점 O = (260, 240), scale=52px
+    a=3, b=1.5 (|a|>|b|)
+
+    (a,b)   = (260+156, 240-78) = (416, 162)
+    (a,-b)  = (416, 318)
+    (-a,b)  = (104, 162)
+    (-a,-b) = (104, 318)
+
+    x=a:416, x=-a:104, y=b:162, y=-b:318
+
+    ── 텍스트 위치 사전 계획 (겹침 방지) ──
+    좌표축: x축 y=240, y축 x=260
+
+    [축 레이블]
+    x: (490, 258) → x축 끝 아래
+    y: (244, 36)  → y축 끝 왼쪽
+    O: (246, 258) → 원점 왼쪽 아래
+
+    [축 눈금 레이블]
+    a:  (416, 258) → x축 아래, 점(416,162)와 y거리=96 OK
+    -a: (104, 258) → x축 아래
+    b:  (246, 158) → y축 왼쪽, text-anchor=end
+    -b: (246, 324) → y축 왼쪽
+
+    [점 좌표 레이블]
+    (a,b):   (424,152) → 오른쪽 위, y축 대칭 레이블과 x거리 충분
+    (a,-b):  (424,334) → 오른쪽 아래
+    (-a,b):  (96,152)  → 왼쪽 위, text-anchor=end
+    (-a,-b): (96,334)  → 왼쪽 아래
+
+    [화살표 레이블]
+    x축 대칭 (수직 우측): x=430, y=240
+      → (a,-b)레이블(424,334), (a,b)레이블(424,152)와 겹치지 않음 OK
+    y축 대칭 (수평 위): x=260, y=148
+      → (a,b)레이블(424,152)와 y근접: 레이블을 y=144로
+    원점 대칭 (대각선 오른쪽):
+      중점(260,240), 법선오른쪽(0.4472,0.8944)으로 22px
+      (260+9.8, 240+19.7)=(269.8,259.7)
+      → x축(y=240)에서 아래로 19.7px: 축 레이블과 겹치지 않음
+      → (272, 262)
+
+    모든 텍스트 위치 확정:
+    x축 대칭 레이블: (430, 237) → x축(y=240) 위, 점선(x=416)과 x거리=14 OK
+    y축 대칭 레이블: (260, 144) → 점(416,162)레이블(y=152)과 y거리=8 → (260,140)
+    원점 대칭 레이블: (272, 262) → x축 아래
+  -->
+
+  <defs>
+    <marker id="ax" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="#e05555"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+    <marker id="ay" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="#3a7fd5"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+    <marker id="ao" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path
+        d="M2 1L8 5L2 9"
+        fill="none"
+        stroke="#d4850a"
+        stroke-width="1.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </marker>
+  </defs>
+
+  <!-- 점선 보조선 -->
+  <line x1="416" y1="162" x2="416" y2="240" stroke="#ccc" stroke-width="1" stroke-dasharray="4 3" />
+  <line x1="416" y1="162" x2="260" y2="162" stroke="#ccc" stroke-width="1" stroke-dasharray="4 3" />
+  <line x1="416" y1="318" x2="416" y2="240" stroke="#ccc" stroke-width="1" stroke-dasharray="4 3" />
+  <line x1="416" y1="318" x2="260" y2="318" stroke="#ccc" stroke-width="1" stroke-dasharray="4 3" />
+  <line x1="104" y1="162" x2="104" y2="240" stroke="#ccc" stroke-width="1" stroke-dasharray="4 3" />
+  <line x1="104" y1="162" x2="260" y2="162" stroke="#ccc" stroke-width="1" stroke-dasharray="4 3" />
+  <line x1="104" y1="318" x2="104" y2="240" stroke="#ccc" stroke-width="1" stroke-dasharray="4 3" />
+  <line x1="104" y1="318" x2="260" y2="318" stroke="#ccc" stroke-width="1" stroke-dasharray="4 3" />
+
+  <!-- 좌표축 -->
+  <line x1="24" y1="240" x2="492" y2="240" stroke="#333" stroke-width="1.5" />
+  <polygon points="492,240 484,236 484,244" fill="#333" />
+  <line x1="260" y1="462" x2="260" y2="24" stroke="#333" stroke-width="1.5" />
+  <polygon points="260,24 256,32 264,32" fill="#333" />
+
+  <!-- 축 눈금 -->
+  <line x1="416" y1="236" x2="416" y2="244" stroke="#333" stroke-width="1.3" />
+  <line x1="104" y1="236" x2="104" y2="244" stroke="#333" stroke-width="1.3" />
+  <line x1="256" y1="162" x2="264" y2="162" stroke="#333" stroke-width="1.3" />
+  <line x1="256" y1="318" x2="264" y2="318" stroke="#333" stroke-width="1.3" />
+
+  <!-- 화살표 (a,b)→(a,-b): x축 대칭 -->
+  <line x1="416" y1="171" x2="416" y2="309" stroke="#e05555" stroke-width="1.8" marker-end="url(#ax)" />
+
+  <!-- 화살표 (a,b)→(-a,b): y축 대칭 -->
+  <line x1="407" y1="162" x2="113" y2="162" stroke="#3a7fd5" stroke-width="1.8" marker-end="url(#ay)" />
+
+  <!-- 화살표 (a,b)→(-a,-b): 원점 대칭
+       벡터(-312,156), len=348.8
+       단위(-0.8944,0.4472)
+       start:(408,166), end:(112,314) -->
+  <line x1="408" y1="166" x2="112" y2="314" stroke="#d4850a" stroke-width="1.8" marker-end="url(#ao)" />
+
+  <!-- 네 점 -->
+  <circle cx="416" cy="162" r="5" fill="#444" />
+  <circle cx="416" cy="318" r="5" fill="#444" />
+  <circle cx="104" cy="162" r="5" fill="#444" />
+  <circle cx="104" cy="318" r="5" fill="#444" />
+
+  <!-- ══ 텍스트 요소 (마지막에 배치) ══ -->
+
+  <!-- 축 레이블 -->
+  <text x="490" y="258" text-anchor="middle" font-size="14" fill="#333">x</text>
+  <text x="244" y="36" text-anchor="end" font-size="14" fill="#333">y</text>
+
+  <!-- 원점 -->
+  <text x="246" y="258" text-anchor="end" font-size="14" fill="#555">O</text>
+
+  <!-- 축 눈금 레이블 -->
+  <text x="416" y="258" text-anchor="middle" font-size="13" fill="#555" font-style="italic">a</text>
+  <text x="104" y="258" text-anchor="middle" font-size="13" fill="#555" font-style="italic">-a</text>
+  <text x="246" y="158" text-anchor="end" font-size="13" fill="#555" font-style="italic">b</text>
+  <text x="246" y="324" text-anchor="end" font-size="13" fill="#555" font-style="italic">-b</text>
+
+  <!-- 화살표 레이블 -->
+  <!-- x축 대칭: 화살표(x=416) 오른쪽, x축(y=240) 위 -->
+  <text x="428" y="236" text-anchor="start" font-size="12" fill="#e05555">x축 대칭</text>
+  <!-- y축 대칭: 화살표(y=162) 위쪽, 점 레이블보다 위 -->
+  <text x="260" y="140" text-anchor="middle" font-size="12" fill="#3a7fd5">y축 대칭</text>
+  <!-- 원점 대칭: 대각선 중점 오른쪽 아래 -->
+  <text x="272" y="264" text-anchor="start" font-size="12" fill="#d4850a">원점 대칭</text>
+
+  <!-- 점 좌표 레이블 -->
+  <text x="424" y="154" text-anchor="start" font-size="14" fill="#444" font-style="italic">(a, b)</text>
+  <text x="424" y="334" text-anchor="start" font-size="14" fill="#444" font-style="italic">(a, -b)</text>
+  <text x="96" y="154" text-anchor="end" font-size="14" fill="#444" font-style="italic">(-a, b)</text>
+  <text x="96" y="334" text-anchor="end" font-size="14" fill="#444" font-style="italic">(-a, -b)</text>
+</svg>

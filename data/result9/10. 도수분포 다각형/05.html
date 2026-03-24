@@ -1,0 +1,165 @@
+<svg width="440" height="400" viewBox="0 0 440 400" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    여백: 좌=70, 우=45, 상=45, 하=55
+    y축: x=70
+    x=0 레이블: x=70 (y축 위치)
+    x=4~9: x=120~370, 간격=(370-120)/5=50px
+    x=4: 120, x=5: 170, x=6: 220, x=7: 270, x=8: 320, x=9: 370
+
+    중간값(+25px):
+    4.5: 145
+    5.5: 195
+    6.5: 245
+    7.5: 295
+    8.5: 345
+    9.5: 395
+
+    닫힘점:
+    (3,0): 145-50=95 (4.5에서 한 간격 왼쪽)
+    → 실제: 중간값 3.5=145-50=95
+    (10,0): 395 (9.5위치)
+
+    y: oy=335, 0~14, 1간격=290/14≈20.7px
+    screen_y = 335 - y*20.7
+
+    y=0:  335
+    y=1:  314
+    y=2:  294
+    y=4:  252
+    y=5:  232
+    y=6:  211
+    y=7:  190
+    y=8:  169
+    y=10: 128
+    y=12: 87
+    y=14: 46
+
+    데이터점:
+    (3,0):  (95,  335) 닫힘
+    (4,1):  (145, 314)
+    (5,5):  (195, 232)
+    (6,14): (245, 46)
+    (7,8):  (295, 169)
+    (8,2):  (345, 294)
+    (9,1):  (395, 314)
+    (10,0): 중간값 10.5→너무 오른쪽
+    → (10,0) 닫힘점: x=9+50=420 → viewBox=440이므로 420 사용
+
+    물결 구간: x=70~115 (0과 4 사이), y=335
+    흰배경 rect: x=72, y=328, w=42, h=14
+    물결 path: x=74~114
+  -->
+
+  <!-- 격자 수직선 (x=4~9) -->
+  <line x1="120" y1="45" x2="120" y2="335" stroke="#ddd" stroke-width="0.8" />
+  <line x1="170" y1="45" x2="170" y2="335" stroke="#ddd" stroke-width="0.8" />
+  <line x1="220" y1="45" x2="220" y2="335" stroke="#ddd" stroke-width="0.8" />
+  <line x1="270" y1="45" x2="270" y2="335" stroke="#ddd" stroke-width="0.8" />
+  <line x1="320" y1="45" x2="320" y2="335" stroke="#ddd" stroke-width="0.8" />
+  <line x1="370" y1="45" x2="370" y2="335" stroke="#ddd" stroke-width="0.8" />
+
+  <!-- 격자 수평선 (y=1~14, 1간격) -->
+  <line x1="70" y1="314" x2="420" y2="314" stroke="#ddd" stroke-width="0.8" />
+  <line x1="70" y1="294" x2="420" y2="294" stroke="#ddd" stroke-width="0.8" />
+  <line x1="70" y1="273" x2="420" y2="273" stroke="#ddd" stroke-width="0.8" />
+  <line x1="70" y1="252" x2="420" y2="252" stroke="#ddd" stroke-width="0.8" />
+  <line x1="70" y1="232" x2="420" y2="232" stroke="#ddd" stroke-width="0.8" />
+  <line x1="70" y1="211" x2="420" y2="211" stroke="#ddd" stroke-width="0.8" />
+  <line x1="70" y1="190" x2="420" y2="190" stroke="#ddd" stroke-width="0.8" />
+  <line x1="70" y1="169" x2="420" y2="169" stroke="#ddd" stroke-width="0.8" />
+  <line x1="70" y1="149" x2="420" y2="149" stroke="#ddd" stroke-width="0.8" />
+  <line x1="70" y1="128" x2="420" y2="128" stroke="#ddd" stroke-width="0.8" />
+  <line x1="70" y1="107" x2="420" y2="107" stroke="#ddd" stroke-width="0.8" />
+  <line x1="70" y1="87" x2="420" y2="87" stroke="#ddd" stroke-width="0.8" />
+  <line x1="70" y1="66" x2="420" y2="66" stroke="#ddd" stroke-width="0.8" />
+  <line x1="70" y1="46" x2="420" y2="46" stroke="#ddd" stroke-width="0.8" />
+
+  <!-- x축 -->
+  <line x1="65" y1="335" x2="428" y2="335" stroke="#333" stroke-width="1.5" />
+  <polygon points="428,335 420,331 420,339" fill="#333" />
+
+  <!-- y축 -->
+  <line x1="70" y1="340" x2="70" y2="32" stroke="#333" stroke-width="1.5" />
+  <polygon points="70,32 66,40 74,40" fill="#333" />
+
+  <!-- 물결 생략: 흰 배경으로 x축 가리고 물결 표시 -->
+  <rect x="73" y="328" width="44" height="14" fill="white" />
+  <path
+    d="M 74,335 Q 80,329 86,335 Q 92,341 98,335 Q 104,329 110,335 Q 116,341 116,335"
+    fill="none"
+    stroke="#333"
+    stroke-width="1.5"
+  />
+
+  <!-- x축 눈금 -->
+  <line x1="70" y1="332" x2="70" y2="338" stroke="#333" stroke-width="1.2" />
+  <line x1="120" y1="332" x2="120" y2="338" stroke="#333" stroke-width="1.2" />
+  <line x1="170" y1="332" x2="170" y2="338" stroke="#333" stroke-width="1.2" />
+  <line x1="220" y1="332" x2="220" y2="338" stroke="#333" stroke-width="1.2" />
+  <line x1="270" y1="332" x2="270" y2="338" stroke="#333" stroke-width="1.2" />
+  <line x1="320" y1="332" x2="320" y2="338" stroke="#333" stroke-width="1.2" />
+  <line x1="370" y1="332" x2="370" y2="338" stroke="#333" stroke-width="1.2" />
+
+  <!-- y축 눈금 (1간격) -->
+  <line x1="67" y1="335" x2="73" y2="335" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="314" x2="73" y2="314" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="294" x2="73" y2="294" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="273" x2="73" y2="273" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="252" x2="73" y2="252" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="232" x2="73" y2="232" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="211" x2="73" y2="211" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="190" x2="73" y2="190" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="169" x2="73" y2="169" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="149" x2="73" y2="149" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="128" x2="73" y2="128" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="107" x2="73" y2="107" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="87" x2="73" y2="87" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="66" x2="73" y2="66" stroke="#333" stroke-width="1.2" />
+  <line x1="67" y1="46" x2="73" y2="46" stroke="#333" stroke-width="1.2" />
+
+  <!-- 꺾은선 -->
+  <polyline
+    points="95,335 145,314 195,232 245,46 295,169 345,294 395,314 420,335"
+    fill="none"
+    stroke="#3a9fd5"
+    stroke-width="2"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+
+  <!-- 데이터 점 (중간값) -->
+  <circle cx="145" cy="314" r="3.5" fill="#3a9fd5" />
+  <circle cx="195" cy="232" r="3.5" fill="#3a9fd5" />
+  <circle cx="245" cy="46" r="3.5" fill="#3a9fd5" />
+  <circle cx="295" cy="169" r="3.5" fill="#3a9fd5" />
+  <circle cx="345" cy="294" r="3.5" fill="#3a9fd5" />
+  <circle cx="395" cy="314" r="3.5" fill="#3a9fd5" />
+
+  <!-- 닫힘점 -->
+  <circle cx="95" cy="335" r="3.5" fill="white" stroke="#3a9fd5" stroke-width="1.5" />
+  <circle cx="420" cy="335" r="3.5" fill="white" stroke="#3a9fd5" stroke-width="1.5" />
+
+  <!-- ══ 텍스트 ══ -->
+
+  <text x="430" y="339" text-anchor="start" font-size="13" fill="#333">(시간)</text>
+  <text x="56" y="30" text-anchor="end" font-size="13" fill="#333">(명)</text>
+
+  <!-- x축 눈금 레이블 -->
+  <text x="70" y="352" text-anchor="middle" font-size="12" fill="#555">0</text>
+  <text x="120" y="352" text-anchor="middle" font-size="12" fill="#555">4</text>
+  <text x="170" y="352" text-anchor="middle" font-size="12" fill="#555">5</text>
+  <text x="220" y="352" text-anchor="middle" font-size="12" fill="#555">6</text>
+  <text x="270" y="352" text-anchor="middle" font-size="12" fill="#555">7</text>
+  <text x="320" y="352" text-anchor="middle" font-size="12" fill="#555">8</text>
+  <text x="370" y="352" text-anchor="middle" font-size="12" fill="#555">9</text>
+
+  <!-- y축 눈금 레이블 (2간격) -->
+  <text x="58" y="339" text-anchor="end" font-size="12" fill="#555">0</text>
+  <text x="58" y="298" text-anchor="end" font-size="12" fill="#555">2</text>
+  <text x="58" y="256" text-anchor="end" font-size="12" fill="#555">4</text>
+  <text x="58" y="215" text-anchor="end" font-size="12" fill="#555">6</text>
+  <text x="58" y="173" text-anchor="end" font-size="12" fill="#555">8</text>
+  <text x="58" y="132" text-anchor="end" font-size="12" fill="#555">10</text>
+  <text x="58" y="91" text-anchor="end" font-size="12" fill="#555">12</text>
+  <text x="58" y="50" text-anchor="end" font-size="12" fill="#555">14</text>
+</svg>

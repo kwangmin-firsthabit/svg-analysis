@@ -1,0 +1,118 @@
+<svg width="420" height="430" viewBox="0 0 420 430" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    ═══ 1단계: 좌표평면 설계 ═══
+
+    x범위: -2~7 (9단위), y범위: -5~2 (7단위)
+    1:1 비율 → scale 통일
+
+    가용 x폭: 420px, 좌여백=40, 우여백=30 → 사용=350px
+    scale = 350/9 ≈ 38.9 → 39px/단위 (정수)
+
+    가용 y높: 7*39=273px
+    상여백=55, 하여백=55 → viewBox높이=273+55+55=383 → 430으로 여유
+
+    원점:
+    ox = 40 + 2*39 = 40+78 = 118
+    oy = 55 + 2*39 = 55+78 = 133   (y=2가 y=55에)
+
+    screen_x(x) = 118 + x*39
+    screen_y(y) = 133 - y*39
+
+    주요 좌표:
+    x=-2: screen_x=40,   x=7: screen_x=391
+    y= 2: screen_y=55,   y=-5: screen_y=328
+
+    x축: screen_y=133 (y=0)
+    y축: screen_x=118 (x=0)
+
+    격자 x좌표 (1단위):
+    x=-2: 40,  x=-1: 79,  x=0: 118, x=1: 157
+    x=2:  196, x=3:  235, x=4: 274, x=5: 313
+    x=6:  352, x=7:  391
+
+    격자 y좌표 (1단위):
+    y=2:  55,  y=1:  94,  y=0: 133, y=-1: 172
+    y=-2: 211, y=-3: 250, y=-4: 289, y=-5: 328
+
+    2의 배수 눈금 레이블:
+    x: -2(40), 2(196), 4(274), 6(352)
+      x=0 → O로 대체
+      x축 라벨 영역(우측) → x=8 이상 없으므로 x=6(352)까지 OK
+    y: -2(211), -4(289)
+      y=2(55) → y라벨 영역 생략
+      y=0 → O로 대체
+
+    ═══ 2단계: 함수 좌표 계산 ═══
+
+    y = (1/2)x - 3
+
+    화면 끝점:
+    screen_x=0: x=(0-118)/39=-3.026, y=0.5*(-3.026)-3=-4.513
+      screen_y=133-(-4.513)*39=133+176=309 → (0,309)
+    screen_x=420: x=(420-118)/39=7.744, y=0.5*7.744-3=0.872
+      screen_y=133-0.872*39=133-34=99 → (420,99)
+
+    x절편(6,0):  screen(352, 133)
+    y절편(0,-3): screen(118, 250)
+  -->
+
+  <!-- ─── 좌표평면: 격자 수직선 ─── -->
+  <line x1="40" y1="49" x2="40" y2="334" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="79" y1="49" x2="79" y2="334" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="118" y1="49" x2="118" y2="334" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="157" y1="49" x2="157" y2="334" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="196" y1="49" x2="196" y2="334" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="235" y1="49" x2="235" y2="334" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="274" y1="49" x2="274" y2="334" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="313" y1="49" x2="313" y2="334" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="352" y1="49" x2="352" y2="334" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="391" y1="49" x2="391" y2="334" stroke="#f0f0f0" stroke-width="0.7" />
+
+  <!-- ─── 좌표평면: 격자 수평선 ─── -->
+  <line x1="34" y1="55" x2="395" y2="55" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="34" y1="94" x2="395" y2="94" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="34" y1="133" x2="395" y2="133" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="34" y1="172" x2="395" y2="172" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="34" y1="211" x2="395" y2="211" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="34" y1="250" x2="395" y2="250" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="34" y1="289" x2="395" y2="289" stroke="#f0f0f0" stroke-width="0.7" />
+  <line x1="34" y1="328" x2="395" y2="328" stroke="#f0f0f0" stroke-width="0.7" />
+
+  <!-- ─── 좌표평면: x축 (screen_y=133) ─── -->
+  <line x1="32" y1="133" x2="402" y2="133" stroke="#333" stroke-width="1.5" />
+  <polygon points="402,133 394,129 394,137" fill="#333" />
+
+  <!-- ─── 좌표평면: y축 (screen_x=118) ─── -->
+  <line x1="118" y1="336" x2="118" y2="46" stroke="#333" stroke-width="1.5" />
+  <polygon points="118,46 114,54 122,54" fill="#333" />
+
+  <!-- ─── 좌표평면: 축 라벨 ─── -->
+  <text x="400" y="147" text-anchor="end" font-size="15" font-style="italic" font-family="serif" fill="#333">x</text>
+  <text x="104" y="58" text-anchor="end" font-size="15" font-style="italic" font-family="serif" fill="#333">y</text>
+
+  <!-- ─── 좌표평면: 원점 O ─── -->
+  <text x="104" y="147" text-anchor="end" font-size="13" fill="#444">O</text>
+
+  <!-- ─── 좌표평면: x축 눈금 레이블 (눈금선 없이, 2의 배수) ─── -->
+  <text x="40" y="149" text-anchor="middle" font-size="13" fill="#444">-2</text>
+  <text x="196" y="149" text-anchor="middle" font-size="13" fill="#444">2</text>
+  <text x="274" y="149" text-anchor="middle" font-size="13" fill="#444">4</text>
+  <text x="352" y="149" text-anchor="middle" font-size="13" fill="#444">6</text>
+
+  <!-- ─── 좌표평면: y축 눈금 레이블 (눈금선 없이, 2의 배수) ─── -->
+  <!-- y=2(55): y라벨 영역 → 생략 -->
+  <text x="104" y="215" text-anchor="end" font-size="13" fill="#444">-2</text>
+  <text x="104" y="293" text-anchor="end" font-size="13" fill="#444">-4</text>
+
+  <!-- ═══ 함수 그래프 ═══ -->
+  <!-- 좌표평면 참조:
+       ox=118, oy=133, scale=39
+       끝점: (0,309)~(420,99) -->
+  <line x1="0" y1="309" x2="420" y2="99" stroke="#e05555" stroke-width="2.2" stroke-linecap="round" />
+
+  <!-- x절편 (6,0) → screen(352, 133) -->
+  <circle cx="352" cy="133" r="3.5" fill="#e05555" />
+
+  <!-- y절편 (0,-3) → screen(118, 250) -->
+  <circle cx="118" cy="250" r="3.5" fill="#e05555" />
+</svg>

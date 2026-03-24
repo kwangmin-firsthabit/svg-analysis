@@ -1,0 +1,143 @@
+<svg width="440" height="380" viewBox="0 0 440 380" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    x범위: 3~10 (7단위), y범위: 0~14 (14단위)
+    여백: 좌=60, 우=60, 상=40, 하=50
+    사용영역: x=60~380(320px), y=40~330(290px)
+
+    x scale = 320/7 ≈ 45.7px → 46px
+    y scale = 290/14 ≈ 20.7px → 21px
+
+    원점(3,0) screen:
+    ox = 60 (x=3 위치)
+    oy = 330 (y=0 위치)
+
+    screen_x = 60 + (x-3)*46
+    screen_y = 330 - y*21
+
+    x좌표:
+    x=3:  60
+    x=4:  106
+    x=5:  152
+    x=6:  198
+    x=7:  244
+    x=8:  290
+    x=9:  336
+    x=10: 382
+
+    y좌표:
+    y=0:  330
+    y=2:  288
+    y=4:  246
+    y=6:  204
+    y=8:  162
+    y=10: 120
+    y=12: 78
+    y=14: 36
+
+    데이터 점:
+    (3,0):  (60,  330) 닫힘
+    (4,1):  (106, 309)
+    (5,5):  (152, 225)
+    (6,14): (198, 36)
+    (7,8):  (244, 162)
+    (8,2):  (290, 288)
+    (9,1):  (336, 309)
+    (10,0): (382, 330) 닫힘
+  -->
+
+  <!-- 격자 수직선 (x=3~10) -->
+  <line x1="60" y1="40" x2="60" y2="330" stroke="#ddd" stroke-width="0.8" />
+  <line x1="106" y1="40" x2="106" y2="330" stroke="#ddd" stroke-width="0.8" />
+  <line x1="152" y1="40" x2="152" y2="330" stroke="#ddd" stroke-width="0.8" />
+  <line x1="198" y1="40" x2="198" y2="330" stroke="#ddd" stroke-width="0.8" />
+  <line x1="244" y1="40" x2="244" y2="330" stroke="#ddd" stroke-width="0.8" />
+  <line x1="290" y1="40" x2="290" y2="330" stroke="#ddd" stroke-width="0.8" />
+  <line x1="336" y1="40" x2="336" y2="330" stroke="#ddd" stroke-width="0.8" />
+  <line x1="382" y1="40" x2="382" y2="330" stroke="#ddd" stroke-width="0.8" />
+
+  <!-- 격자 수평선 (y=0~14, 2간격) -->
+  <line x1="60" y1="330" x2="382" y2="330" stroke="#ddd" stroke-width="0.8" />
+  <line x1="60" y1="288" x2="382" y2="288" stroke="#ddd" stroke-width="0.8" />
+  <line x1="60" y1="246" x2="382" y2="246" stroke="#ddd" stroke-width="0.8" />
+  <line x1="60" y1="204" x2="382" y2="204" stroke="#ddd" stroke-width="0.8" />
+  <line x1="60" y1="162" x2="382" y2="162" stroke="#ddd" stroke-width="0.8" />
+  <line x1="60" y1="120" x2="382" y2="120" stroke="#ddd" stroke-width="0.8" />
+  <line x1="60" y1="78" x2="382" y2="78" stroke="#ddd" stroke-width="0.8" />
+  <line x1="60" y1="36" x2="382" y2="36" stroke="#ddd" stroke-width="0.8" />
+
+  <!-- x축 -->
+  <line x1="55" y1="330" x2="400" y2="330" stroke="#333" stroke-width="1.5" />
+
+  <!-- y축 -->
+  <line x1="60" y1="335" x2="60" y2="28" stroke="#333" stroke-width="1.5" />
+
+  <!-- x축 눈금 -->
+  <line x1="60" y1="327" x2="60" y2="333" stroke="#333" stroke-width="1.2" />
+  <line x1="106" y1="327" x2="106" y2="333" stroke="#333" stroke-width="1.2" />
+  <line x1="152" y1="327" x2="152" y2="333" stroke="#333" stroke-width="1.2" />
+  <line x1="198" y1="327" x2="198" y2="333" stroke="#333" stroke-width="1.2" />
+  <line x1="244" y1="327" x2="244" y2="333" stroke="#333" stroke-width="1.2" />
+  <line x1="290" y1="327" x2="290" y2="333" stroke="#333" stroke-width="1.2" />
+  <line x1="336" y1="327" x2="336" y2="333" stroke="#333" stroke-width="1.2" />
+  <line x1="382" y1="327" x2="382" y2="333" stroke="#333" stroke-width="1.2" />
+
+  <!-- y축 눈금 -->
+  <line x1="57" y1="330" x2="63" y2="330" stroke="#333" stroke-width="1.2" />
+  <line x1="57" y1="288" x2="63" y2="288" stroke="#333" stroke-width="1.2" />
+  <line x1="57" y1="246" x2="63" y2="246" stroke="#333" stroke-width="1.2" />
+  <line x1="57" y1="204" x2="63" y2="204" stroke="#333" stroke-width="1.2" />
+  <line x1="57" y1="162" x2="63" y2="162" stroke="#333" stroke-width="1.2" />
+  <line x1="57" y1="120" x2="63" y2="120" stroke="#333" stroke-width="1.2" />
+  <line x1="57" y1="78" x2="63" y2="78" stroke="#333" stroke-width="1.2" />
+  <line x1="57" y1="36" x2="63" y2="36" stroke="#333" stroke-width="1.2" />
+
+  <!-- 꺾은선 (채우기 없음) -->
+  <polyline
+    points="60,330 106,309 152,225 198,36 244,162 290,288 336,309 382,330"
+    fill="none"
+    stroke="#3a9fd5"
+    stroke-width="2"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+
+  <!-- 데이터 점 (닫힘점 제외) -->
+  <circle cx="106" cy="309" r="3.5" fill="#3a9fd5" />
+  <circle cx="152" cy="225" r="3.5" fill="#3a9fd5" />
+  <circle cx="198" cy="36" r="3.5" fill="#3a9fd5" />
+  <circle cx="244" cy="162" r="3.5" fill="#3a9fd5" />
+  <circle cx="290" cy="288" r="3.5" fill="#3a9fd5" />
+  <circle cx="336" cy="309" r="3.5" fill="#3a9fd5" />
+
+  <!-- 닫힘점 (빈 원) -->
+  <circle cx="60" cy="330" r="3.5" fill="white" stroke="#3a9fd5" stroke-width="1.5" />
+  <circle cx="382" cy="330" r="3.5" fill="white" stroke="#3a9fd5" stroke-width="1.5" />
+
+  <!-- ══ 텍스트 ══ -->
+
+  <!-- y축 레이블 "(명)" : y축 상단 -->
+  <text x="46" y="26" text-anchor="end" font-size="13" fill="#333">(명)</text>
+
+  <!-- x축 레이블 "(시간)" : x축 끝 오른쪽 -->
+  <text x="404" y="334" text-anchor="start" font-size="13" fill="#333">(시간)</text>
+
+  <!-- x축 눈금 레이블 -->
+  <text x="60" y="348" text-anchor="middle" font-size="12" fill="#555">3</text>
+  <text x="106" y="348" text-anchor="middle" font-size="12" fill="#555">4</text>
+  <text x="152" y="348" text-anchor="middle" font-size="12" fill="#555">5</text>
+  <text x="198" y="348" text-anchor="middle" font-size="12" fill="#555">6</text>
+  <text x="244" y="348" text-anchor="middle" font-size="12" fill="#555">7</text>
+  <text x="290" y="348" text-anchor="middle" font-size="12" fill="#555">8</text>
+  <text x="336" y="348" text-anchor="middle" font-size="12" fill="#555">9</text>
+  <text x="382" y="348" text-anchor="middle" font-size="12" fill="#555">10</text>
+
+  <!-- y축 눈금 레이블 -->
+  <text x="50" y="334" text-anchor="end" font-size="12" fill="#555">0</text>
+  <text x="50" y="292" text-anchor="end" font-size="12" fill="#555">2</text>
+  <text x="50" y="250" text-anchor="end" font-size="12" fill="#555">4</text>
+  <text x="50" y="208" text-anchor="end" font-size="12" fill="#555">6</text>
+  <text x="50" y="166" text-anchor="end" font-size="12" fill="#555">8</text>
+  <text x="50" y="124" text-anchor="end" font-size="12" fill="#555">10</text>
+  <text x="50" y="82" text-anchor="end" font-size="12" fill="#555">12</text>
+  <text x="50" y="40" text-anchor="end" font-size="12" fill="#555">14</text>
+</svg>

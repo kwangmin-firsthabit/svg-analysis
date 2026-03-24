@@ -1,0 +1,64 @@
+<svg width="200" height="210" viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="210" fill="white" />
+
+  <!--
+    F  = 36        font-size
+    gap = 11       F × 0.3 = 10.8 ≈ 11  (가로선 ↔ 숫자 간격)
+    cap = 26       F × 0.72 (cap-height, 숫자 실제 높이)
+    cw  = 22       F × 0.6  (monospace 글자 폭)
+
+    ── 열 설계 ──
+    x_div  = 38          나누는 수 "5" 중심
+    x_brk  = 68          bracket 수직선 x (가로선 왼쪽 끝)
+    x_ten  = 93          십의 자리 중심  (x_brk + cw/2 + gap/2 = 68+11+14)
+    x_one  = 115         일의 자리 중심  (x_ten + cw = 93+22)
+
+    가로선 x:
+      x_ls = 68          bracket 수직선과 동일 (끊김 없이 연결)
+      x_le = 126         x_one + cw/2 = 115+11
+
+    ── 행 설계 ──
+    bracket_y  = 58      가로선 y
+    q_base     = 47      몫 baseline = bracket_y - gap = 58-11
+    div_base   = 95      피제수 baseline = bracket_y + gap + cap = 58+11+26
+    prod_base  = 132     곱 baseline = div_base + gap + cap = 95+11+26
+    line2_y    = 143     빼기선 y = prod_base + gap = 132+11
+    rem_base   = 180     나머지 baseline = line2_y + gap + cap = 143+11+26
+
+    bracket 수직선:
+      x = x_brk = 68
+      y_top = bracket_y = 58   (가로선과 동일 y → 꺾이는 지점)
+      y_bot = div_base = 95    (피제수 baseline, 숫자 아래까지)
+
+    bracket path:
+      가로선 좌측 끝(68, 58)에서 수직으로 내려와
+      피제수 행 아래(68, 95)까지
+      → M 68,58 L 68,95
+  -->
+
+  <g font-family="monospace" font-size="36" fill="#222">
+    <!-- 몫: 8 -->
+    <text x="115" y="47" text-anchor="middle">8</text>
+
+    <!-- long division bracket:
+         가로선 + 수직선을 하나의 path로 연결 -->
+    <path d="M 68,58 L 126,58 M 68,58 L 68,95" fill="none" stroke="#222" stroke-width="1.8" stroke-linecap="square" />
+
+    <!-- 나누는 수: 5 -->
+    <text x="38" y="95" text-anchor="middle">5</text>
+
+    <!-- 피제수: 42 -->
+    <text x="93" y="95" text-anchor="middle">4</text>
+    <text x="115" y="95" text-anchor="middle">2</text>
+
+    <!-- 5×8=40 -->
+    <text x="93" y="132" text-anchor="middle">4</text>
+    <text x="115" y="132" text-anchor="middle">0</text>
+
+    <!-- 빼기 선 -->
+    <line x1="68" y1="143" x2="126" y2="143" stroke="#222" stroke-width="1.8" />
+
+    <!-- 나머지: 2 -->
+    <text x="115" y="180" text-anchor="middle">2</text>
+  </g>
+</svg>

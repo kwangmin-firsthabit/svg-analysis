@@ -1,0 +1,73 @@
+<svg width="200" height="210" viewBox="0 0 200 210" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="210" fill="white" />
+
+  <!--
+    F   = 36       font-size
+    gap = 11       F × 0.3 (가로선 ↔ 숫자 간격)
+    cap = 26       F × 0.72 (숫자 cap-height)
+    cw  = 22       F × 0.6  (monospace 글자 폭)
+
+    ── 열 설계 ──
+    x_ls  = 72          가로선 왼쪽 끝 = 호 상단 끝점 x
+    x_le  = 128         가로선 오른쪽 끝 = x_one + cw/2
+    x_ten = 95          십의 자리 중심
+    x_one = 117         일의 자리 중심
+    x_div = 40          나누는 수 중심
+
+    ── 행 설계 ──
+    bracket_y = 58      가로선 y = 호 상단 끝점 y
+    q_base    = 47      몫 baseline    = bracket_y - gap
+    div_base  = 95      피제수 baseline = bracket_y + gap + cap
+    prod_base = 132     곱 baseline    = div_base + gap + cap
+    line2_y   = 143     빼기선 y       = prod_base + gap
+    rem_base  = 180     나머지 baseline = line2_y + gap + cap
+
+    ── bracket 호 설계 ──
+    호 상단: (x_ls, bracket_y) = (72, 58)
+    호 하단: 피제수 행 아래 끝  = (72 - arc_w, div_base) 
+      → 오른쪽으로 볼록 = 호가 왼쪽으로 열리는 ) 모양
+      상단(72, 58) → 하단(52, 95) 로 cubic bezier
+      제어점: 오른쪽으로 볼록하게
+        CP1 = (72, 58 + (95-58)×0.4) = (72, 73)
+        CP2 = (52, 58 + (95-58)×0.6) = (52, 80)
+      → M 72,58 C 78,70 60,82 52,95
+        (오른쪽으로 볼록: CP1을 오른쪽으로, CP2를 왼쪽으로)
+        CP1 = (80, 68)  CP2 = (55, 85)
+  -->
+
+  <g font-family="monospace" font-size="36" fill="#222">
+    <!-- 몫: 8 -->
+    <text x="117" y="47" text-anchor="middle">8</text>
+
+    <!-- long division bracket:
+         가로선 + 오른쪽 볼록 호(괄호)
+         가로선: (72,58) → (128,58)
+         호: 상단(72,58) → 하단(52,95), 오른쪽 볼록 cubic bezier
+    -->
+    <path
+      d="M 52,95 C 55,85 80,68 72,58 L 128,58"
+      fill="none"
+      stroke="#222"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <!-- 나누는 수: 5 -->
+    <text x="40" y="95" text-anchor="middle">5</text>
+
+    <!-- 피제수: 42 -->
+    <text x="95" y="95" text-anchor="middle">4</text>
+    <text x="117" y="95" text-anchor="middle">2</text>
+
+    <!-- 5×8=40 -->
+    <text x="95" y="132" text-anchor="middle">4</text>
+    <text x="117" y="132" text-anchor="middle">0</text>
+
+    <!-- 빼기 선 -->
+    <line x1="72" y1="143" x2="128" y2="143" stroke="#222" stroke-width="1.8" />
+
+    <!-- 나머지: 2 -->
+    <text x="117" y="180" text-anchor="middle">2</text>
+  </g>
+</svg>

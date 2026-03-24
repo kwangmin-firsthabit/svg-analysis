@@ -1,0 +1,76 @@
+<svg width="185" height="210" viewBox="0 0 185 210" xmlns="http://www.w3.org/2000/svg">
+  <rect width="185" height="210" fill="white" />
+
+  <!--
+    F   = 36
+    gap = F × 0.3 = 10.8 ≈ 11
+    cap = F × 0.72 = 25.9 ≈ 26
+    cw  = F × 0.6  = 21.6 ≈ 22
+
+    ── arc 치수 ──
+    rx = F × 0.2 = 7.2 ≈ 7
+
+    ── 나누는 수 → arc 위치 ──
+    x_div = 36                       나누는 수 중심
+    div_right = x_div + cw/2 = 47    나누는 수 오른쪽 끝
+    arc_left  = div_right + F×0.2    호 왼쪽 끝 = 47 + 7 = 54
+    x_arc     = arc_left + rx = 54 + 7 = 61   호 시작/끝 x = 가로선 왼쪽 끝
+
+    ── 열 ──
+    x_ls  = 61     가로선 왼쪽 끝
+    x_le  = 121    가로선 오른쪽 끝 = x_one + cw/2
+    x_ten = 83     십의 자리 중심
+    x_one = 105    일의 자리 중심
+
+    ── 행 ──
+    bracket_y = 56
+    q_base    = 45    = bracket_y - gap
+    div_base  = 93    = bracket_y + gap + cap
+
+    수직길이  = 93 - 56 = 37
+    ry        = 37 × 0.5 = 18.5
+
+    prod_base = 130   = div_base + gap + cap
+    line2_y   = 141   = prod_base + gap
+    rem_base  = 178   = line2_y + gap + cap
+
+    ── arc path ──
+    시작: (x_arc, div_base) = (61, 93)  ← 하단
+    끝:   (x_arc, bracket_y) = (61, 56) ← 상단
+    sweep=0 (반시계) → 오른쪽 볼록 ✓
+
+    M 61,93  A 7,18.5 0 0 0  61,56  L 121,56
+  -->
+
+  <g font-family="monospace" font-size="36" fill="#222">
+    <!-- 몫 -->
+    <text x="105" y="45" text-anchor="middle">8</text>
+
+    <!-- long division bracket -->
+    <path
+      d="M 61,93 A 7,18.5 0 0 0 61,56 L 121,56"
+      fill="none"
+      stroke="#222"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    />
+
+    <!-- 나누는 수 -->
+    <text x="36" y="93" text-anchor="middle">5</text>
+
+    <!-- 피제수 42 -->
+    <text x="83" y="93" text-anchor="middle">4</text>
+    <text x="105" y="93" text-anchor="middle">2</text>
+
+    <!-- 40 -->
+    <text x="83" y="130" text-anchor="middle">4</text>
+    <text x="105" y="130" text-anchor="middle">0</text>
+
+    <!-- 빼기 선 -->
+    <line x1="61" y1="141" x2="121" y2="141" stroke="#222" stroke-width="1.8" />
+
+    <!-- 나머지 2 -->
+    <text x="105" y="178" text-anchor="middle">2</text>
+  </g>
+</svg>

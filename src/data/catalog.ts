@@ -12,11 +12,17 @@ export type Variant = 'static' | 'dynamic' | 'original' | 'modified' | 'v1' | 'v
 export type ResultTab = 'result1' | 'result2' | 'result3' | 'result4' | 'result5' | 'result6' | 'result7' | 'result8' | 'result9';
 export type RenderableResultTab = 'result1' | 'result2' | 'result3' | 'result4' | 'result5' | 'result6';
 
+export interface AnalysisEntry {
+  goal: string;
+  actual: string;
+}
+
 export interface Result9CategoryItem {
   index: number;
   html: string;
   userPrompt: string;
   prevUserPrompt: string | undefined;
+  analysis: AnalysisEntry | undefined;
 }
 
 export interface Result9Category {
@@ -331,6 +337,38 @@ export const resultPairsByTab: Record<RenderableResultTab, PairItem[]> = {
 
 // ─── result9 ────────────────────────────────────────────────────────────────
 
+const result9AnalysisModules = import.meta.glob('../../data/result9/*/analysis.md', {
+  eager: true,
+  import: 'default',
+  query: '?raw',
+}) as Record<string, string>;
+
+function parseAnalysis(raw: string): Record<number, AnalysisEntry> {
+  const result: Record<number, AnalysisEntry> = {};
+  const blocks = raw.split(/^### /m).filter(Boolean);
+  for (const block of blocks) {
+    const lines = block.trim().split('\n');
+    const index = parseInt(lines[0] ?? '', 10);
+    if (isNaN(index)) continue;
+    const goal = lines.find(l => l.startsWith('목표한 바:'))?.replace('목표한 바:', '').trim() ?? '';
+    const actual = lines.find(l => l.startsWith('실제 동작:'))?.replace('실제 동작:', '').trim() ?? '';
+    if (goal || actual) result[index] = { goal, actual };
+  }
+  return result;
+}
+
+function buildAnalysisMap(): Record<string, Record<number, AnalysisEntry>> {
+  const map: Record<string, Record<number, AnalysisEntry>> = {};
+  for (const [path, raw] of Object.entries(result9AnalysisModules)) {
+    const segments = path.split('/');
+    const dirName = segments[segments.length - 2] ?? '';
+    map[dirName] = parseAnalysis(raw);
+  }
+  return map;
+}
+
+const result9AnalysisMap = buildAnalysisMap();
+
 const result9Modules = import.meta.glob('../../data/result9/*/*.html', {
   eager: true,
   import: 'default',
@@ -381,11 +419,13 @@ function buildResult9Categories(): Result9Category[] {
       if (html.trim().length === 0) continue;
 
       const fileIndex = parseInt(fileName.replace('.html', ''), 10);
+      const analysisEntry = result9AnalysisMap[dirName]?.[fileIndex];
       items.push({
         index: fileIndex,
         html,
         userPrompt: categoryPrompts[fileIndex - 1] ?? '',
         prevUserPrompt: fileIndex >= 2 ? (categoryPrompts[fileIndex - 2] ?? undefined) : undefined,
+        analysis: analysisEntry,
       });
     }
 

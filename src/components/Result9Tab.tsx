@@ -1,5 +1,5 @@
 import { useLayoutEffect, useRef } from 'react';
-import type { Result9Category } from '../data/catalog';
+import type { AnalysisEntry, Result9Category } from '../data/catalog';
 
 const targetImageModules = import.meta.glob('../../data/result9/targets/*.png', {
   eager: true,
@@ -23,21 +23,64 @@ function parseSvgSize(html: string): { width: number; height: number } {
   };
 }
 
+type DiffSegment = { text: string; changed: boolean };
+
+function computeSentenceDiff(prev: string, curr: string): DiffSegment[] {
+  const endsWithPeriod = curr.trimEnd().endsWith('.');
+  const prevSentences = prev.replace(/\.\s*$/, '').split('. ');
+  const currSentences = curr.replace(/\.\s*$/, '').split('. ');
+  const m = prevSentences.length;
+  const n = currSentences.length;
+
+  const dp: number[][] = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = 1; i <= m; i++)
+    for (let j = 1; j <= n; j++)
+      dp[i][j] = prevSentences[i - 1] === currSentences[j - 1]
+        ? dp[i - 1][j - 1] + 1
+        : Math.max(dp[i - 1][j], dp[i][j - 1]);
+
+  const tokens: Array<{ sentence: string; changed: boolean }> = [];
+  let i = m, j = n;
+  while (i > 0 || j > 0) {
+    if (i > 0 && j > 0 && prevSentences[i - 1] === currSentences[j - 1]) {
+      tokens.unshift({ sentence: currSentences[j - 1]!, changed: false });
+      i--; j--;
+    } else if (j > 0 && (i === 0 || dp[i][j - 1] >= dp[i - 1][j])) {
+      tokens.unshift({ sentence: currSentences[j - 1]!, changed: true });
+      j--;
+    } else {
+      i--;
+    }
+  }
+
+  const segments: DiffSegment[] = [];
+  tokens.forEach(({ sentence, changed }, k) => {
+    const isLast = k === tokens.length - 1;
+    const text = (k > 0 ? '. ' : '') + sentence + (isLast && endsWithPeriod ? '.' : '');
+    const last = segments[segments.length - 1];
+    if (last && last.changed === changed) {
+      last.text += text;
+    } else {
+      segments.push({ text, changed });
+    }
+  });
+
+  return segments;
+}
+
 function renderPromptWithDiff(curr: string, prev: string | undefined): React.ReactNode {
   if (!prev) return curr;
 
-  let prefixLen = 0;
-  const minLen = Math.min(prev.length, curr.length);
-  while (prefixLen < minLen && prev[prefixLen] === curr[prefixLen]) {
-    prefixLen++;
-  }
-
-  if (prefixLen === curr.length && curr.length === prev.length) return curr;
+  const segments = computeSentenceDiff(prev, curr);
+  if (segments.every(s => !s.changed)) return curr;
 
   return (
     <>
-      {curr.slice(0, prefixLen)}
-      <span className="text-blue-600">{curr.slice(prefixLen)}</span>
+      {segments.map((seg, idx) =>
+        seg.changed
+          ? <span key={idx} className="text-blue-600">{seg.text}</span>
+          : seg.text
+      )}
     </>
   );
 }
@@ -47,9 +90,10 @@ interface Result9ItemCardProps {
   html: string;
   userPrompt: string;
   prevUserPrompt: string | undefined;
+  analysis: AnalysisEntry | undefined;
 }
 
-function Result9ItemCard({ index, html, userPrompt, prevUserPrompt }: Result9ItemCardProps) {
+function Result9ItemCard({ index, html, userPrompt, prevUserPrompt, analysis }: Result9ItemCardProps) {
   const articleRef = useRef<HTMLElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const { width, height } = parseSvgSize(html);
@@ -64,6 +108,15 @@ function Result9ItemCard({ index, html, userPrompt, prevUserPrompt }: Result9Ite
     }
   }, [width, height]);
 
+  const handleLoad = () => {
+    const iframe = iframeRef.current;
+    if (!iframe?.contentDocument) return;
+    const scrollHeight = iframe.contentDocument.documentElement.scrollHeight;
+    if (scrollHeight > 0) {
+      iframe.style.height = `${scrollHeight}px`;
+    }
+  };
+
   return (
     <article ref={articleRef} className="shrink-0 rounded-xl border border-slate-300 bg-white shadow-sm">
       <header className="border-b border-slate-200 px-4 py-2">
@@ -77,6 +130,7 @@ function Result9ItemCard({ index, html, userPrompt, prevUserPrompt }: Result9Ite
           srcDoc={html}
           loading="lazy"
           scrolling="no"
+          onLoad={handleLoad}
           className="block rounded border border-slate-300 bg-white"
         />
       </div>
@@ -93,10 +147,23 @@ function Result9ItemCard({ index, html, userPrompt, prevUserPrompt }: Result9Ite
           <summary className="cursor-pointer px-3 py-2 text-xs font-semibold text-slate-600">
             코드
           </summary>
-          <pre className="max-h-60 overflow-auto border-t border-slate-200 px-3 py-2 text-xs leading-relaxed text-slate-700 whitespace-pre-wrap">
+          <pre className="max-h-[600px] overflow-auto border-t border-slate-200 px-3 py-2 text-xs leading-relaxed text-slate-700 whitespace-pre-wrap">
             {html}
           </pre>
         </details>
+
+        {analysis && (
+          <div className="rounded border border-indigo-200 bg-indigo-50 p-3 space-y-2">
+            <div>
+              <h3 className="mb-0.5 text-xs font-semibold text-indigo-700">목표한 바</h3>
+              <p className="text-xs leading-relaxed text-indigo-900">{analysis.goal}</p>
+            </div>
+            <div>
+              <h3 className="mb-0.5 text-xs font-semibold text-indigo-700">실제 동작</h3>
+              <p className="text-xs leading-relaxed text-indigo-900">{analysis.actual}</p>
+            </div>
+          </div>
+        )}
       </section>
     </article>
   );
@@ -144,6 +211,7 @@ function CategoryRow({ category }: CategoryRowProps) {
               html={item.html}
               userPrompt={item.userPrompt}
               prevUserPrompt={item.prevUserPrompt}
+              analysis={item.analysis}
             />
           ))}
         </div>

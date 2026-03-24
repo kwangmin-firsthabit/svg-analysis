@@ -1,0 +1,56 @@
+<svg width="200" height="190" viewBox="0 0 200 190" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="190" fill="white" />
+
+  <!--
+    긴 나눗셈: 42 ÷ 5 = 8 나머지 2
+
+    글자 크기: 36px monospace → 글자 폭 ≈ 22px
+
+    열 설계 (문자 중심 x):
+      col_divisor = 40    나누는 수 "5"
+      col_bracket = 62    ")"
+      col_tens    = 92    십의 자리 "4"
+      col_ones    = 118   일의 자리 "2","0","2"
+      col_quotient= 118   몫 "8" (일의 자리 위)
+
+    행 설계 (baseline y):
+      row_quotient =  42   몫 "8"
+      bracket_line =  52   피제수 위 가로선 (long division bracket 수평부)
+      row_dividend =  82   5 ) 42
+      row_product  = 118   40
+      line_sub     = 132   빼기 선
+      row_remainder= 162   나머지 "2"
+
+    long division bracket:
+      수평선: x= 70 ~ 132, y= 52  (괄호 오른쪽 끝 ~ 피제수 끝)
+      ")" : x=62, y=82 에 위치, 수평선과 시각적으로 연결
+  -->
+
+  <g font-family="monospace" font-size="36" fill="#222">
+    <!-- 몫: 8 -->
+    <text x="118" y="42" text-anchor="middle">8</text>
+
+    <!-- long division bracket 수평선 (피제수 위) -->
+    <line x1="68" y1="52" x2="132" y2="52" stroke="#222" stroke-width="1.8" />
+
+    <!-- 나누는 수: 5 -->
+    <text x="40" y="88" text-anchor="middle">5</text>
+
+    <!-- 괄호: ) — 수평선 왼쪽 끝과 이어지도록 배치 -->
+    <text x="64" y="88" text-anchor="middle">)</text>
+
+    <!-- 피제수: 42 -->
+    <text x="92" y="88" text-anchor="middle">4</text>
+    <text x="118" y="88" text-anchor="middle">2</text>
+
+    <!-- 5×8=40 -->
+    <text x="92" y="124" text-anchor="middle">4</text>
+    <text x="118" y="124" text-anchor="middle">0</text>
+
+    <!-- 빼기 선 -->
+    <line x1="68" y1="135" x2="132" y2="135" stroke="#222" stroke-width="1.8" />
+
+    <!-- 나머지: 2 -->
+    <text x="118" y="165" text-anchor="middle">2</text>
+  </g>
+</svg>
